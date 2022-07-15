@@ -15,6 +15,9 @@ interface Filesystem
 
     public function file(string $path): File;
 
+    /**
+     * @return Directory<Node>
+     */
     public function directory(string $path = ''): Directory;
 
     public function exists(string $path = ''): bool;
@@ -28,7 +31,7 @@ interface Filesystem
     public function mkdir(string $path = ''): void;
 
     /**
-     * @param resource|string|\SplFileInfo|Directory|File $value
+     * @param resource|string|\SplFileInfo|Directory<Node>|File $value
      */
     public function write(string $path, mixed $value): void;
 }

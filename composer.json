@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "php": ">=8.0"
+        "php": ">=8.0",
+        "league/flysystem": "^3.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.4",
