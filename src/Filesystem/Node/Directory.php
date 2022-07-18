@@ -6,6 +6,8 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
+use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -20,6 +22,18 @@ final class Directory extends Node implements \IteratorAggregate
 
     /** @var array<callable(Node):bool> */
     private array $filters = [];
+
+    /** @var string[] */
+    private array $names = [];
+
+    /** @var string[] */
+    private array $notNames = [];
+
+    /** @var string[] */
+    private array $paths = [];
+
+    /** @var string[] */
+    private array $notPaths = [];
 
     public function __construct(DirectoryAttributes $attributes, FilesystemOperator $flysystem)
     {
@@ -53,7 +67,7 @@ final class Directory extends Node implements \IteratorAggregate
     }
 
     /**
-     * Include only files larger than (or equal to) $size.
+     * Include only files larger than $size.
      *
      * @param string|int $size Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      *
@@ -64,11 +78,11 @@ final class Directory extends Node implements \IteratorAggregate
         $size = FileSize::from($size)->bytes();
 
         // @phpstan-ignore-next-line
-        return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isLargerThanOrEqualTo($size));
+        return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isLargerThan($size));
     }
 
     /**
-     * Include only files smaller than (or equal to) $size.
+     * Include only files smaller than $size.
      *
      * @param string|int $size Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      *
@@ -79,7 +93,7 @@ final class Directory extends Node implements \IteratorAggregate
         $size = FileSize::from($size)->bytes();
 
         // @phpstan-ignore-next-line
-        return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isSmallerThanOrEqualTo($size));
+        return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isSmallerThan($size));
     }
 
     /**
@@ -97,6 +111,136 @@ final class Directory extends Node implements \IteratorAggregate
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isWithin($min, $max));
+    }
+
+    /**
+     * Include only files last modified before $date.
+     *
+     * @param string             $date Valid {@see strtotime} textual datetime description (ie "yesterday")
+     * @param int                $date Specific timestamp
+     * @param \DateTimeInterface $date Specific DateTime
+     *
+     * @return self<Node>
+     */
+    public function olderThan(\DateTimeInterface|int|string $date): self
+    {
+        $date = self::parseDateTime($date);
+
+        return $this->filter(static fn(Node $node) => $node->lastModified() < $date);
+    }
+
+    /**
+     * Include only files last modified after $date.
+     *
+     * @param string             $date Valid {@see strtotime} textual datetime description (ie "yesterday")
+     * @param int                $date Specific timestamp
+     * @param \DateTimeInterface $date Specific DateTime
+     *
+     * @return self<Node>
+     */
+    public function newerThan(\DateTimeInterface|int|string $date): self
+    {
+        $date = self::parseDateTime($date);
+
+        return $this->filter(static fn(Node $node) => $node->lastModified() > $date);
+    }
+
+    /**
+     * Include only files modified after (or on) $min and before (or on) $max.
+     *
+     * @param string             $min Valid {@see strtotime} textual datetime description (ie "yesterday")
+     * @param int                $min Specific timestamp
+     * @param \DateTimeInterface $min Specific DateTime
+     * @param string             $max Valid {@see strtotime} textual datetime description (ie "yesterday")
+     * @param int                $max Specific timestamp
+     * @param \DateTimeInterface $max Specific DateTime
+     *
+     * @return self<Node>
+     */
+    public function modifiedBetween(\DateTimeInterface|int|string $min, \DateTimeInterface|int|string $max): self
+    {
+        $min = self::parseDateTime($min);
+        $max = self::parseDateTime($max);
+
+        return $this->filter(static function(Node $node) use ($min, $max): bool {
+            return $node->lastModified() >= $min && $node->lastModified() <= $max;
+        });
+    }
+
+    /**
+     * Adds rules that file/directory names must match.
+     *
+     * @example "*.jpg"
+     * @example "'/\.jpg/" (same as above)
+     * @example "foo.jpg"
+     * @example ["*.jpg", "*.png"]
+     *
+     * @param string|string[] $pattern A pattern (a regexp, a glob, or a string) or an array of patterns
+     *
+     * @return self<Node>
+     */
+    public function matchingName(string|array $pattern): self
+    {
+        $clone = clone $this;
+        $clone->names = \array_merge($this->names, (array) $pattern);
+
+        return $clone;
+    }
+
+    /**
+     * Adds rules that file/directory names must not match.
+     *
+     * @example "*.jpg"
+     * @example "'/\.jpg/" (same as above)
+     * @example "foo.jpg"
+     * @example ["*.jpg", "*.png"]
+     *
+     * @param string|string[] $pattern A pattern (a regexp, a glob, or a string) or an array of patterns
+     *
+     * @return self<Node>
+     */
+    public function notMatchingName(string|array $pattern): self
+    {
+        $clone = clone $this;
+        $clone->notNames = \array_merge($this->notNames, (array) $pattern);
+
+        return $clone;
+    }
+
+    /**
+     * Adds rules that path's must match.
+     *
+     * @example "some/dir"
+     * @example ["some/dir", "another/dir"]
+     *
+     * @param string|string[] $pattern A pattern (a regexp or a string) or an array of patterns
+     *
+     * @return self<Node>
+     */
+    public function matchingPath(string|array $pattern): self
+    {
+        $clone = clone $this;
+        $clone->paths = \array_merge($this->paths, (array) $pattern);
+
+        return $clone;
+    }
+
+    /**
+     * Adds rules that path's must not match.
+     *
+     * @example "some/dir"
+     * @example ["some/dir", "another/dir"]
+     *
+     * @param string|string[] $pattern A pattern (a regexp or a string) or an array of patterns
+     *
+     * @return self<Node>
+     */
+    public function notMatchingPath(string|array $pattern): self
+    {
+        $clone = clone $this;
+        $clone->notPaths = \array_merge($this->notPaths, (array) $pattern);
+
+        return $clone;
     }
 
     /**
@@ -126,23 +270,32 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function getIterator(): \Traversable
     {
-        $listing = $this->flysystem->listContents($this->path(), $this->recursive);
+        /** @var \Iterator<int,T> $iterator */
+        $iterator = function(): \Iterator {
+            $listing = $this->flysystem->listContents($this->path(), $this->recursive);
 
-        foreach ($listing as $attributes) {
-            /** @var T $node */
-            $node = match (true) {
-                $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
-                $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
-                default => throw new \LogicException('Unexpected StorageAttributes object.'),
-            };
-
-            foreach ($this->filters as $filter) {
-                if (!$filter($node)) {
-                    continue 2;
-                }
+            foreach ($listing as $attributes) {
+                yield match (true) {
+                    $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
+                    $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
+                    default => throw new \LogicException('Unexpected StorageAttributes object.'),
+                };
             }
+        };
 
-            yield $node;
+        foreach ($this->filters as $filter) {
+            $iterator = new \CallbackFilterIterator($iterator, $filter);
         }
+
+        if ($this->names || $this->notNames) {
+            $iterator = new MatchingNameFilter($iterator, $this->names, $this->notNames);
+        }
+
+        if ($this->paths || $this->notPaths) {
+            $iterator = new MatchingPathFilter($iterator, $this->paths, $this->notPaths);
+        }
+
+        /** @var \Traversable<T> $iterator */
+        yield from $iterator;
     }
 }

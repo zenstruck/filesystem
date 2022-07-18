@@ -7,6 +7,8 @@ use League\Flysystem\StorageAttributes;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 abstract class Node
 {
@@ -19,7 +21,7 @@ abstract class Node
         $this->path = $attributes->path();
 
         if ($lastModified = $attributes->lastModified()) {
-            $this->lastModified = self::dateTimeFrom((string) $lastModified);
+            $this->lastModified = self::parseDateTime($lastModified);
         }
 
         if ($visibility = $attributes->visibility()) {
@@ -58,9 +60,12 @@ abstract class Node
         return \pathinfo($this->path(), \PATHINFO_DIRNAME);
     }
 
+    /**
+     * @return \DateTimeImmutable In the PHP default timezone
+     */
     final public function lastModified(): \DateTimeImmutable
     {
-        return $this->lastModified ??= self::dateTimeFrom((string) $this->flysystem->lastModified($this->path()));
+        return $this->lastModified ??= self::parseDateTime($this->flysystem->lastModified($this->path()));
     }
 
     public function visibility(): string
@@ -68,11 +73,25 @@ abstract class Node
         return $this->visibility ??= $this->flysystem->visibility($this->path());
     }
 
-    private static function dateTimeFrom(string $timestamp): \DateTimeImmutable
+    final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U', $timestamp) // @phpstan-ignore-line
-            // timestamp is always in UTC so convert to current system timezone
-            ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
-        ;
+        if (\is_numeric($timestamp)) {
+            $timestamp = \DateTimeImmutable::createFromFormat('U', (string) $timestamp);
+        }
+
+        if (\is_string($timestamp)) {
+            $timestamp = new \DateTimeImmutable($timestamp);
+        }
+
+        if ($timestamp instanceof \DateTime) {
+            $timestamp = \DateTimeImmutable::createFromMutable($timestamp);
+        }
+
+        if (!$timestamp instanceof \DateTimeImmutable) {
+            throw new \RuntimeException('Unable to parse datetime.');
+        }
+
+        // ensure in the PHP default timezone
+        return $timestamp->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
     }
 }

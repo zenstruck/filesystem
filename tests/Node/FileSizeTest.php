@@ -79,6 +79,7 @@ final class FileSizeTest extends TestCase
         yield ['4.2 MiB', 4404019, '4.2 MiB'];
         yield ['4.2 mib', 4404019, '4.2 MiB'];
         yield ['521565415613.5468 kib', 534082985588271, '485.75 TiB'];
+        yield ['400K', 400000, '400 kB'];
     }
 
     /**

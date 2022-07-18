@@ -182,6 +182,10 @@ final class FileSize
             return new self((int) $quantity);
         }
 
+        if ('k' === $lower) {
+            $lower = 'kb';
+        }
+
         $factor = match (true) {
             \array_key_exists($lower, self::DECIMAL_UNITS) => self::DECIMAL,
             \array_key_exists($lower, self::BINARY_UNITS) => self::BINARY,
