@@ -2,6 +2,9 @@
 
 namespace Zenstruck\Filesystem\Node;
 
+use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Node;
 
 /**
@@ -11,6 +14,19 @@ final class File extends Node
 {
     private int $size;
     private string $mimeType;
+
+    public function __construct(FileAttributes $attributes, FilesystemOperator $flysystem)
+    {
+        parent::__construct($attributes, $flysystem);
+
+        if ($size = $attributes->fileSize()) {
+            $this->size = $size;
+        }
+
+        if ($mimeType = $attributes->mimeType()) {
+            $this->mimeType = $mimeType;
+        }
+    }
 
     public function size(): int
     {
@@ -40,7 +56,7 @@ final class File extends Node
      */
     public function directory(): Directory
     {
-        return self::createDirectory($this->dirname(), $this->flysystem);
+        return new Directory(new DirectoryAttributes($this->path()), $this->flysystem);
     }
 
     public function extension(): ?string

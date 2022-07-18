@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Filesystem;
 
+use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\Directory;
@@ -19,11 +21,11 @@ final class FlysystemFilesystem implements Filesystem
     public function node(string $path = ''): Node
     {
         if ($this->flysystem->fileExists($path)) {
-            return Node::createFile($path, $this->flysystem);
+            return new File(new FileAttributes($path), $this->flysystem);
         }
 
         if ($this->flysystem->directoryExists($path)) {
-            return Node::createDirectory($path, $this->flysystem);
+            return new Directory(new DirectoryAttributes($path), $this->flysystem);
         }
 
         throw new \RuntimeException('not found'); // todo
@@ -31,12 +33,16 @@ final class FlysystemFilesystem implements Filesystem
 
     public function file(string $path): File
     {
-        return $this->node($path)->ensureFile();
+        $node = $this->node($path);
+
+        return $node instanceof File ? $node : throw new \RuntimeException('node type mismatch'); // todo
     }
 
     public function directory(string $path = ''): Directory
     {
-        return $this->node($path)->ensureDirectory();
+        $node = $this->node($path);
+
+        return $node instanceof Directory ? $node : throw new \RuntimeException('node type mismatch'); // todo
     }
 
     public function exists(string $path = ''): bool

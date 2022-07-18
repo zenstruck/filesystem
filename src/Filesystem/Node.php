@@ -2,45 +2,34 @@
 
 namespace Zenstruck\Filesystem;
 
-use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
-use Zenstruck\Filesystem\Node\Directory;
-use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class Node
 {
+    private string $path;
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
-    private function __construct(private string $path, protected FilesystemOperator $flysystem)
+    public function __construct(StorageAttributes $attributes, protected FilesystemOperator $flysystem)
     {
+        $this->path = $attributes->path();
+
+        if ($lastModified = $attributes->lastModified()) {
+            $this->lastModified = self::dateTimeFrom((string) $lastModified);
+        }
+
+        if ($visibility = $attributes->visibility()) {
+            $this->visibility = $visibility;
+        }
     }
 
     public function __toString(): string
     {
         return $this->path;
-    }
-
-    /**
-     * @internal
-     */
-    public static function createFile(string $path, FilesystemOperator $flysystem): File
-    {
-        return new File($path, $flysystem);
-    }
-
-    /**
-     * @internal
-     *
-     * @return Directory<Node>
-     */
-    public static function createDirectory(string $path, FilesystemOperator $flysystem): Directory
-    {
-        return new Directory($path, $flysystem);
     }
 
     final public function path(): string
@@ -50,11 +39,7 @@ abstract class Node
 
     final public function lastModified(): \DateTimeImmutable
     {
-        // @phpstan-ignore-next-line
-        return $this->lastModified ??= \DateTimeImmutable::createFromFormat('U', (string) $this->flysystem->lastModified($this->path()))
-            // timestamp is always in UTC so convert to current system timezone
-            ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
-        ;
+        return $this->lastModified ??= self::dateTimeFrom((string) $this->flysystem->lastModified($this->path()));
     }
 
     public function visibility(): string
@@ -62,31 +47,11 @@ abstract class Node
         return $this->visibility ??= $this->flysystem->visibility($this->path());
     }
 
-    final public function isDirectory(): bool
+    private static function dateTimeFrom(string $timestamp): \DateTimeImmutable
     {
-        return $this instanceof Directory;
-    }
-
-    final public function isFile(): bool
-    {
-        return $this instanceof File;
-    }
-
-    /**
-     * @return Directory<Node>
-     */
-    final public function ensureDirectory(): Directory
-    {
-        return $this instanceof Directory ? $this : throw new \RuntimeException('Not a directory.'); // TODO add path
-    }
-
-    final public function ensureFile(): File
-    {
-        return $this instanceof File ? $this : throw new \RuntimeException('Not a file.'); // TODO add path
-    }
-
-    protected static function fromAttributes(StorageAttributes $attributes): self
-    {
-
+        return \DateTimeImmutable::createFromFormat('U', $timestamp) // @phpstan-ignore-line
+            // timestamp is always in UTC so convert to current system timezone
+            ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
+        ;
     }
 }

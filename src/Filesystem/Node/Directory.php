@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
 use Zenstruck\Filesystem\Node;
 
@@ -20,6 +21,11 @@ final class Directory extends Node implements \IteratorAggregate
 
     /** @var array<callable(StorageAttributes):bool> */
     private array $filters = [];
+
+    public function __construct(DirectoryAttributes $attributes, FilesystemOperator $flysystem)
+    {
+        parent::__construct($attributes, $flysystem);
+    }
 
     /**
      * @return self<Node>
@@ -65,11 +71,10 @@ final class Directory extends Node implements \IteratorAggregate
             $listing = $listing->filter($filter);
         }
 
-        foreach ($listing as $attr) {
-            // TODO use StorageAttributes to "pre-cache" metadata
+        foreach ($listing as $attributes) {
             yield match (true) { // @phpstan-ignore-line
-                $attr instanceof FileAttributes => self::createFile($attr->path(), $this->flysystem),
-                $attr instanceof DirectoryAttributes => self::createDirectory($attr->path(), $this->flysystem),
+                $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
+                $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
                 default => throw new \LogicException('Unexpected StorageAttributes object.'),
             };
         }
