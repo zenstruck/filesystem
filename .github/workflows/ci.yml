@@ -6,6 +6,9 @@ on:
   schedule:
     - cron: '0 0 1,16 * *'
 
+env:
+  LANG: en_US.UTF-8 # (for FileSize)
+
 jobs:
   tests:
     name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
@@ -30,9 +33,12 @@ jobs:
           symfony: ${{ matrix.symfony }}
 
   code-coverage:
-    uses: zenstruck/.github/.github/workflows/php-coverage-codecov.yml@main
-    with:
-      php: 8.1
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zenstruck/.github@php-coverage-codecov
+        with:
+          php: 8.1
 
   composer-validate:
     uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main

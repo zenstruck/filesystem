@@ -12,7 +12,7 @@ use Zenstruck\Filesystem\Node;
  */
 final class File extends Node
 {
-    private int $size;
+    private FileSize $size;
     private string $mimeType;
 
     public function __construct(FileAttributes $attributes, FilesystemOperator $flysystem)
@@ -20,7 +20,7 @@ final class File extends Node
         parent::__construct($attributes, $flysystem);
 
         if ($size = $attributes->fileSize()) {
-            $this->size = $size;
+            $this->size = FileSize::binary($size);
         }
 
         if ($mimeType = $attributes->mimeType()) {
@@ -28,9 +28,9 @@ final class File extends Node
         }
     }
 
-    public function size(): int
+    public function size(): FileSize
     {
-        return $this->size ??= $this->flysystem->fileSize($this->path());
+        return $this->size ??= FileSize::binary($this->flysystem->fileSize($this->path()));
     }
 
     public function mimeType(): string
