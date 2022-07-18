@@ -37,6 +37,27 @@ abstract class Node
         return $this->path;
     }
 
+    /**
+     * Returns the file or directory name (with extension if applicable).
+     *
+     * @example If $path is "foo/bar/baz.txt", returns "baz.txt"
+     * @example If $path is "foo/bar/baz", returns "baz"
+     */
+    final public function name(): string
+    {
+        return \pathinfo($this->path(), \PATHINFO_BASENAME);
+    }
+
+    /**
+     * Returns the "parent" directory path.
+     *
+     * @example If $path is "foo/bar/baz", returns "foo/bar"
+     */
+    final public function dirname(): string
+    {
+        return \pathinfo($this->path(), \PATHINFO_DIRNAME);
+    }
+
     final public function lastModified(): \DateTimeImmutable
     {
         return $this->lastModified ??= self::dateTimeFrom((string) $this->flysystem->lastModified($this->path()));

@@ -56,26 +56,11 @@ final class File extends Node
      */
     public function directory(): Directory
     {
-        return new Directory(new DirectoryAttributes($this->path()), $this->flysystem);
+        return new Directory(new DirectoryAttributes($this->dirname()), $this->flysystem);
     }
 
     public function extension(): ?string
     {
         return \pathinfo($this->path(), \PATHINFO_EXTENSION) ?: null;
-    }
-
-    public function dirname(): string
-    {
-        return \pathinfo($this->path(), \PATHINFO_DIRNAME);
-    }
-
-    public function filename(): ?string
-    {
-        return \pathinfo($this->path(), \PATHINFO_FILENAME) ?: null;
-    }
-
-    public function basename(): ?string
-    {
-        return \pathinfo($this->path(), \PATHINFO_BASENAME) ?: null;
     }
 }
