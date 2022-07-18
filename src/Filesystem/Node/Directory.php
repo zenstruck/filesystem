@@ -55,7 +55,7 @@ final class Directory extends Node implements \IteratorAggregate
     }
 
     /**
-     * @return \Traversable<T>
+     * @return \Traversable<T>|T[]
      */
     public function getIterator(): \Traversable
     {
@@ -70,7 +70,7 @@ final class Directory extends Node implements \IteratorAggregate
             yield match (true) { // @phpstan-ignore-line
                 $attr instanceof FileAttributes => self::createFile($attr->path(), $this->flysystem),
                 $attr instanceof DirectoryAttributes => self::createDirectory($attr->path(), $this->flysystem),
-                default => throw new \LogicException('Unexpected storage attributes.'),
+                default => throw new \LogicException('Unexpected StorageAttributes object.'),
             };
         }
     }

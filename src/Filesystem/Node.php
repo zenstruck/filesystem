@@ -2,7 +2,9 @@
 
 namespace Zenstruck\Filesystem;
 
+use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 
@@ -81,5 +83,10 @@ abstract class Node
     final public function ensureFile(): File
     {
         return $this instanceof File ? $this : throw new \RuntimeException('Not a file.'); // TODO add path
+    }
+
+    protected static function fromAttributes(StorageAttributes $attributes): self
+    {
+
     }
 }

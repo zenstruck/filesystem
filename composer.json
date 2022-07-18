@@ -1,10 +1,10 @@
 {
     "name": "zenstruck/filesystem",
-    "description": "Wrapper for league/flysystem with added functionality.",
+    "description": "Wrapper for league/flysystem with alternate API and added functionality.",
     "homepage": "https://github.com/zenstruck/filesystem",
     "type": "library",
     "license": "MIT",
-    "keywords": ["filesystem"],
+    "keywords": ["filesystem", "flysystem"],
     "authors": [
         {
             "name": "Kevin Bond",
