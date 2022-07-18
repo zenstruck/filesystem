@@ -64,12 +64,19 @@ interface Filesystem
     public function move(string $source, string $destination, array $config = []): void;
 
     /**
+     * Delete a file or directory.
+     *
      * @see FilesystemWriter::delete()
      * @see FilesystemWriter::deleteDirectory()
      *
+     * @param string|Directory<Node>   $path     If {@see Directory}, deletes filtered nodes
+     * @param null|callable(Node):void $progress If passed, called before each node is deleted
+     *
+     * @return int The number of nodes deleted
+     *
      * @throws FilesystemException
      */
-    public function delete(string $path = ''): void;
+    public function delete(string|Directory $path = '', ?callable $progress = null): int;
 
     /**
      * @see FilesystemWriter::createDirectory()
