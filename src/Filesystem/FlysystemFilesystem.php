@@ -105,6 +105,20 @@ final class FlysystemFilesystem implements Filesystem
 
     public function write(string $path, mixed $value, array $config = []): void
     {
+        if (\is_callable($value)) {
+            $file = $this->file($path);
+
+            $tempFile = $value(TempFile::with($file->read()));
+
+            if (!$tempFile instanceof \SplFileInfo || !$tempFile->isReadable() || $tempFile->isDir()) {
+                throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
+            }
+
+            $this->write($path, $tempFile, $config);
+
+            return;
+        }
+
         if (\is_string($value)) { // check if local filename
             try {
                 if ((new SymfonyFilesystem())->exists($value)) {

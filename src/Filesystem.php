@@ -95,12 +95,19 @@ interface Filesystem
     public function chmod(string $path, string $visibility): void;
 
     /**
+     * Write $value to the filesystem.
+     *
+     * A callback provided for $values allows for "manipulating" an "existing"
+     * file in place. A "real" {@see \SplFileInfo} is passed and must be returned.
+     *
      * @see FilesystemWriter::write()
      * @see FilesystemWriter::writeStream()
      *
-     * @param resource|string|\SplFileInfo|Directory<Node>|File $value
-     * @param array<string,mixed>                               $config
+     * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
+     * @param array<string,mixed>                                                                   $config
      *
+     * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
+     * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
      * @throws FilesystemException
      */
     public function write(string $path, mixed $value, array $config = []): void;
