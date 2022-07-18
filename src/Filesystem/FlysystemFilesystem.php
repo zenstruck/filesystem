@@ -6,6 +6,8 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Flysystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Flysystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 
@@ -28,21 +30,21 @@ final class FlysystemFilesystem implements Filesystem
             return new Directory(new DirectoryAttributes($path), $this->flysystem);
         }
 
-        throw new \RuntimeException('not found'); // todo
+        throw NodeNotFound::for($path);
     }
 
     public function file(string $path): File
     {
         $node = $this->node($path);
 
-        return $node instanceof File ? $node : throw new \RuntimeException('node type mismatch'); // todo
+        return $node instanceof File ? $node : throw NodeTypeMismatch::expectedFileAt($path);
     }
 
     public function directory(string $path = ''): Directory
     {
         $node = $this->node($path);
 
-        return $node instanceof Directory ? $node : throw new \RuntimeException('node type mismatch'); // todo
+        return $node instanceof Directory ? $node : throw NodeTypeMismatch::expectedDirectoryAt($path);
     }
 
     public function exists(string $path = ''): bool
@@ -50,12 +52,12 @@ final class FlysystemFilesystem implements Filesystem
         return $this->flysystem->has($path);
     }
 
-    public function copy(string $source, string $destination): void
+    public function copy(string $source, string $destination, array $config = []): void
     {
         $this->flysystem->move($source, $destination);
     }
 
-    public function move(string $source, string $destination): void
+    public function move(string $source, string $destination, array $config = []): void
     {
         $this->flysystem->move($source, $destination);
     }
@@ -69,12 +71,17 @@ final class FlysystemFilesystem implements Filesystem
         $this->flysystem->delete($path);
     }
 
-    public function mkdir(string $path = ''): void
+    public function mkdir(string $path = '', array $config = []): void
     {
         $this->flysystem->createDirectory($path);
     }
 
-    public function write(string $path, mixed $value): void
+    public function chmod(string $path, string $visibility): void
+    {
+        $this->flysystem->setVisibility($path, $visibility);
+    }
+
+    public function write(string $path, mixed $value, array $config = []): void
     {
         // TODO: Implement write() method.
     }
