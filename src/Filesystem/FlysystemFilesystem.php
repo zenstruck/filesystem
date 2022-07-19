@@ -4,9 +4,8 @@ namespace Zenstruck\Filesystem;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\Filesystem as LeagueFilesystem;
-use League\Flysystem\FilesystemOperator;
-use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\PathNormalizer;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -16,6 +15,8 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Uri\Path;
@@ -25,25 +26,28 @@ use Zenstruck\Uri\Path;
  */
 final class FlysystemFilesystem implements Filesystem
 {
-    private FilesystemOperator $flysystem;
+    private Operator $operator;
 
-    public function __construct(FilesystemOperator|string $flysystem)
+    /**
+     * @param array<string,mixed> $config
+     */
+    public function __construct(FilesystemAdapter|string $adapter, array $config = [], ?PathNormalizer $pathNormalizer = null)
     {
-        if (\is_string($flysystem)) {
-            $flysystem = new LeagueFilesystem(new LocalFilesystemAdapter($flysystem));
+        if (\is_string($adapter)) {
+            $adapter = new LocalAdapter($adapter);
         }
 
-        $this->flysystem = $flysystem;
+        $this->operator = new Operator($adapter, $config, $pathNormalizer);
     }
 
     public function node(string $path = ''): File|Directory
     {
-        if ($this->flysystem->fileExists($path)) {
-            return new File(new FileAttributes($path), $this->flysystem);
+        if ($this->operator->fileExists($path)) {
+            return new File(new FileAttributes($path), $this->operator);
         }
 
-        if ($this->flysystem->directoryExists($path)) {
-            return new Directory(new DirectoryAttributes($path), $this->flysystem);
+        if ($this->operator->directoryExists($path)) {
+            return new Directory(new DirectoryAttributes($path), $this->operator);
         }
 
         throw NodeNotFound::for($path);
@@ -65,7 +69,7 @@ final class FlysystemFilesystem implements Filesystem
 
     public function exists(string $path = ''): bool
     {
-        return $this->flysystem->has($path);
+        return $this->operator->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): void
@@ -75,7 +79,7 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         try {
-            $this->flysystem->copy($source, $destination, $config);
+            $this->operator->copy($source, $destination, $config);
         } catch (UnableToCopyFile $e) {
             if (!$this->exists($source)) {
                 throw NodeNotFound::for($source);
@@ -92,7 +96,7 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         try {
-            $this->flysystem->move($source, $destination, $config);
+            $this->operator->move($source, $destination, $config);
         } catch (UnableToMoveFile $e) {
             if (!$this->exists($source)) {
                 throw NodeNotFound::for($source);
@@ -124,19 +128,19 @@ final class FlysystemFilesystem implements Filesystem
 
         $config['progress']($node);
 
-        $node instanceof File ? $this->flysystem->delete($path) : $this->flysystem->deleteDirectory($path);
+        $node instanceof File ? $this->operator->delete($path) : $this->operator->deleteDirectory($path);
 
         return 1;
     }
 
     public function mkdir(string $path = '', array $config = []): void
     {
-        $this->flysystem->createDirectory($path, $config);
+        $this->operator->createDirectory($path, $config);
     }
 
     public function chmod(string $path, string $visibility): void
     {
-        $this->flysystem->setVisibility($path, $visibility);
+        $this->operator->setVisibility($path, $visibility);
     }
 
     public function write(string $path, mixed $value, array $config = []): File|Directory
@@ -174,7 +178,7 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append($file->getRelativePathname()), $file, $config);
             }
 
-            return new Directory(new DirectoryAttributes($path), $this->flysystem);
+            return new Directory(new DirectoryAttributes($path), $this->operator);
         }
 
         if ($value instanceof Directory) { // check if Directory node
@@ -185,7 +189,7 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file, $config);
             }
 
-            return new Directory(new DirectoryAttributes($path), $this->flysystem);
+            return new Directory(new DirectoryAttributes($path), $this->operator);
         }
 
         if ($value instanceof File) { // check if File node
@@ -197,9 +201,9 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         match (true) {
-            \is_string($value) => $this->flysystem->write($path, $value, $config),
-            \is_resource($value) => $this->flysystem->writeStream($path, $value, $config),
-            $value instanceof ResourceWrapper => $this->flysystem->writeStream($path, $value->get(), $config),
+            \is_string($value) => $this->operator->write($path, $value, $config),
+            \is_resource($value) => $this->operator->writeStream($path, $value, $config),
+            $value instanceof ResourceWrapper => $this->operator->writeStream($path, $value->get(), $config),
             default => throw new \InvalidArgumentException(\sprintf('Invalid $value type: "%s".', \get_debug_type($value))),
         };
 
@@ -207,7 +211,7 @@ final class FlysystemFilesystem implements Filesystem
             $value->close();
         }
 
-        $file = new File(new FileAttributes($path), $this->flysystem);
+        $file = new File(new FileAttributes($path), $this->operator);
 
         $config['progress']($file);
 

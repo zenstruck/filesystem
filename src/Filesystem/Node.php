@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem;
 
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
+use Zenstruck\Filesystem\Flysystem\Operator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -16,7 +17,7 @@ abstract class Node
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
-    public function __construct(StorageAttributes $attributes, protected FilesystemOperator $flysystem)
+    public function __construct(StorageAttributes $attributes, protected Operator $operator)
     {
         $this->path = $attributes->path();
 
@@ -65,7 +66,7 @@ abstract class Node
      */
     final public function lastModified(): \DateTimeImmutable
     {
-        return $this->lastModified ??= self::parseDateTime($this->flysystem->lastModified($this->path()));
+        return $this->lastModified ??= self::parseDateTime($this->operator->lastModified($this->path()));
     }
 
     /**
@@ -73,7 +74,7 @@ abstract class Node
      */
     final public function visibility(): string
     {
-        return $this->visibility ??= $this->flysystem->visibility($this->path());
+        return $this->visibility ??= $this->operator->visibility($this->path());
     }
 
     /**
@@ -81,7 +82,7 @@ abstract class Node
      */
     final public function exists(): bool
     {
-        return $this->flysystem->has($this->path());
+        return $this->operator->has($this->path());
     }
 
     /**

@@ -4,8 +4,8 @@ namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Finder\Iterator\LazyIterator;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
@@ -37,9 +37,9 @@ final class Directory extends Node implements \IteratorAggregate
     /** @var string[] */
     private array $notPaths = [];
 
-    public function __construct(DirectoryAttributes $attributes, FilesystemOperator $flysystem)
+    public function __construct(DirectoryAttributes $attributes, Operator $operator)
     {
-        parent::__construct($attributes, $flysystem);
+        parent::__construct($attributes, $operator);
     }
 
     /**
@@ -274,12 +274,12 @@ final class Directory extends Node implements \IteratorAggregate
     {
         $iterator = new \IteratorIterator(
             new LazyIterator(function(): \Iterator {
-                $listing = $this->flysystem->listContents($this->path(), $this->recursive);
+                $listing = $this->operator->listContents($this->path(), $this->recursive);
 
                 foreach ($listing as $attributes) {
                     yield match (true) {
-                        $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
-                        $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
+                        $attributes instanceof FileAttributes => new File($attributes, $this->operator),
+                        $attributes instanceof DirectoryAttributes => new self($attributes, $this->operator),
                         default => throw new \LogicException('Unexpected StorageAttributes object.'),
                     };
                 }

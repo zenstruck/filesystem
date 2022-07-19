@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Filesystem\Node\File;
 
+use Zenstruck\Filesystem\Feature\FileChecksum;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -26,7 +28,7 @@ final class Checksum
     /**
      * @internal
      */
-    public function __construct(private File $file)
+    public function __construct(private File $file, private Operator $operator)
     {
     }
 
@@ -53,6 +55,14 @@ final class Checksum
     {
         if (isset($this->checksum)) {
             return $this->checksum;
+        }
+
+        if (!$this->metadata && $this->operator->supports(FileChecksum::class)) {
+            return $this->checksum = match ($this->mode) {
+                self::MD5 => $this->operator->md5Checksum($this->file->path()),
+                self::SHA1 => $this->operator->sha1Checksum($this->file->path()),
+                default => throw new \LogicException('Invalid mode.'),
+            };
         }
 
         $contents = $this->metadata ? $this->metadataString() : $this->file->contents();

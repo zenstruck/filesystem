@@ -4,7 +4,7 @@ namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\FilesystemOperator;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Filesystem\Node\File\Size;
@@ -18,9 +18,9 @@ final class File extends Node
     private string $mimeType;
     private Checksum $checksum;
 
-    public function __construct(FileAttributes $attributes, FilesystemOperator $flysystem)
+    public function __construct(FileAttributes $attributes, Operator $operator)
     {
-        parent::__construct($attributes, $flysystem);
+        parent::__construct($attributes, $operator);
 
         if ($size = $attributes->fileSize()) {
             $this->size = Size::binary($size);
@@ -33,17 +33,17 @@ final class File extends Node
 
     public function size(): Size
     {
-        return $this->size ??= Size::binary($this->flysystem->fileSize($this->path()));
+        return $this->size ??= Size::binary($this->operator->fileSize($this->path()));
     }
 
     public function mimeType(): string
     {
-        return $this->mimeType ??= $this->flysystem->mimeType($this->path());
+        return $this->mimeType ??= $this->operator->mimeType($this->path());
     }
 
     public function contents(): string
     {
-        return $this->flysystem->read($this->path());
+        return $this->operator->read($this->path());
     }
 
     /**
@@ -51,7 +51,7 @@ final class File extends Node
      */
     public function read()
     {
-        return $this->flysystem->readStream($this->path());
+        return $this->operator->readStream($this->path());
     }
 
     /**
@@ -64,7 +64,7 @@ final class File extends Node
      */
     public function checksum(): Checksum
     {
-        return $this->checksum ??= new Checksum($this);
+        return $this->checksum ??= new Checksum($this, $this->operator);
     }
 
     /**
@@ -88,7 +88,7 @@ final class File extends Node
      */
     public function directory(): Directory
     {
-        return new Directory(new DirectoryAttributes($this->dirname()), $this->flysystem);
+        return new Directory(new DirectoryAttributes($this->dirname()), $this->operator);
     }
 
     public function extension(): ?string
