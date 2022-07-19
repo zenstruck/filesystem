@@ -5,6 +5,8 @@ namespace Zenstruck\Filesystem;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToMoveFile;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
@@ -63,7 +65,15 @@ final class FlysystemFilesystem implements Filesystem
             throw NodeExists::forCopy($source, $this->node($destination));
         }
 
-        $this->flysystem->move($source, $destination, $config);
+        try {
+            $this->flysystem->copy($source, $destination, $config);
+        } catch (UnableToCopyFile $e) {
+            if (!$this->exists($source)) {
+                throw NodeNotFound::for($source);
+            }
+
+            throw $e;
+        }
     }
 
     public function move(string $source, string $destination, array $config = []): void
@@ -72,7 +82,15 @@ final class FlysystemFilesystem implements Filesystem
             throw NodeExists::forMove($source, $this->node($destination));
         }
 
-        $this->flysystem->move($source, $destination, $config);
+        try {
+            $this->flysystem->move($source, $destination, $config);
+        } catch (UnableToMoveFile $e) {
+            if (!$this->exists($source)) {
+                throw NodeNotFound::for($source);
+            }
+
+            throw $e;
+        }
     }
 
     public function delete(string|Directory $path = '', array $config = []): int

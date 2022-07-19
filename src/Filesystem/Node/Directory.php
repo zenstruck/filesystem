@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Node;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
+use Symfony\Component\Finder\Iterator\LazyIterator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
@@ -271,18 +272,19 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function getIterator(): \Traversable
     {
-        /** @var \Iterator<int,T> $iterator */
-        $iterator = function(): \Iterator {
-            $listing = $this->flysystem->listContents($this->path(), $this->recursive);
+        $iterator = new \IteratorIterator(
+            new LazyIterator(function(): \Iterator {
+                $listing = $this->flysystem->listContents($this->path(), $this->recursive);
 
-            foreach ($listing as $attributes) {
-                yield match (true) {
-                    $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
-                    $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
-                    default => throw new \LogicException('Unexpected StorageAttributes object.'),
-                };
-            }
-        };
+                foreach ($listing as $attributes) {
+                    yield match (true) {
+                        $attributes instanceof FileAttributes => new File($attributes, $this->flysystem),
+                        $attributes instanceof DirectoryAttributes => new self($attributes, $this->flysystem),
+                        default => throw new \LogicException('Unexpected StorageAttributes object.'),
+                    };
+                }
+            })
+        );
 
         foreach ($this->filters as $filter) {
             $iterator = new \CallbackFilterIterator($iterator, $filter);
