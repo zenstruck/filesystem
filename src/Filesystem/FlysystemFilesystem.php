@@ -24,7 +24,7 @@ final class FlysystemFilesystem implements Filesystem
     {
     }
 
-    public function node(string $path = ''): Node
+    public function node(string $path = ''): File|Directory
     {
         if ($this->flysystem->fileExists($path)) {
             return new File(new FileAttributes($path), $this->flysystem);
@@ -66,15 +66,15 @@ final class FlysystemFilesystem implements Filesystem
         $this->flysystem->move($source, $destination);
     }
 
-    public function delete(string|Directory $path = '', ?callable $progress = null): int
+    public function delete(string|Directory $path = '', array $config = []): int
     {
-        $progress ??= static function(Node $node) {};
+        $config['progress'] ??= static function(Node $node) {};
 
         if ($path instanceof Directory) {
             $count = 0;
 
             foreach ($path as $node) {
-                $count += $this->delete($node->path(), $progress);
+                $count += $this->delete($node->path(), $config);
             }
 
             return $count;
@@ -86,7 +86,7 @@ final class FlysystemFilesystem implements Filesystem
             return 0;
         }
 
-        $progress($node);
+        $config['progress']($node);
 
         $node instanceof File ? $this->flysystem->delete($path) : $this->flysystem->deleteDirectory($path);
 
@@ -103,8 +103,10 @@ final class FlysystemFilesystem implements Filesystem
         $this->flysystem->setVisibility($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): void
+    public function write(string $path, mixed $value, array $config = []): File|Directory
     {
+        $config['progress'] ??= static function(File $file) {};
+
         if (\is_callable($value)) {
             $file = $this->file($path);
 
@@ -114,9 +116,7 @@ final class FlysystemFilesystem implements Filesystem
                 throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
             }
 
-            $this->write($path, $tempFile, $config);
-
-            return;
+            return $this->write($path, $tempFile, $config);
         }
 
         if (\is_string($value)) { // check if local filename
@@ -133,10 +133,10 @@ final class FlysystemFilesystem implements Filesystem
             $relative = new Path($path);
 
             foreach (Finder::create()->in((string) $value)->files() as $file) {
-                $this->write($relative->append($file->getRelativePathname()), $file);
+                $this->write($relative->append($file->getRelativePathname()), $file, $config);
             }
 
-            return;
+            return new Directory(new DirectoryAttributes($path), $this->flysystem);
         }
 
         if ($value instanceof Directory) { // check if Directory node
@@ -144,10 +144,10 @@ final class FlysystemFilesystem implements Filesystem
             $prefixLength = \mb_strlen($value->path());
 
             foreach ($value->recursive()->files() as $file) {
-                $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file);
+                $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file, $config);
             }
 
-            return;
+            return new Directory(new DirectoryAttributes($path), $this->flysystem);
         }
 
         if ($value instanceof File) { // check if File node
@@ -168,5 +168,11 @@ final class FlysystemFilesystem implements Filesystem
         if ($value instanceof ResourceWrapper) { // if we opened a resource, close
             $value->close();
         }
+
+        $file = new File(new FileAttributes($path), $this->flysystem);
+
+        $config['progress']($file);
+
+        return $file;
     }
 }

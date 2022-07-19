@@ -19,8 +19,10 @@ interface Filesystem
     /**
      * @throws NodeNotFound        If node at path is not found
      * @throws FilesystemException {@see FilesystemReader::has()}
+     *
+     * @return File|Directory<Node>
      */
-    public function node(string $path = ''): Node;
+    public function node(string $path = ''): File|Directory;
 
     /**
      * @throws NodeNotFound        If node at path is not found
@@ -66,17 +68,29 @@ interface Filesystem
     /**
      * Delete a file or directory.
      *
+     * You can pass a "progress" callback to $config that is called before each
+     * node is deleted with said node as the argument (useful when deleting a
+     * filtered {@see Directory}).
+     *
+     * EXAMPLE:
+     *
+     * ```php
+     * $filesystem->delete($directory, [
+     *      'progress' => fn(Node $node) => ...do something with $node
+     * ]);
+     * ```
+     *
      * @see FilesystemWriter::delete()
      * @see FilesystemWriter::deleteDirectory()
      *
-     * @param string|Directory<Node>   $path     If {@see Directory}, deletes filtered nodes
-     * @param null|callable(Node):void $progress If passed, called before each node is deleted
+     * @param string|Directory<Node> $path   If {@see Directory}, deletes filtered nodes
+     * @param array<string,mixed>    $config If passed, called before each node is deleted
      *
      * @return int The number of nodes deleted
      *
      * @throws FilesystemException
      */
-    public function delete(string|Directory $path = '', ?callable $progress = null): int;
+    public function delete(string|Directory $path = '', array $config = []): int;
 
     /**
      * @see FilesystemWriter::createDirectory()
@@ -100,15 +114,45 @@ interface Filesystem
      * A callback provided for $values allows for "manipulating" an "existing"
      * file in place. A "real" {@see \SplFileInfo} is passed and must be returned.
      *
+     * EXAMPLE - Manipulate an image:
+     *
+     * ```php
+     * $filesystem->write('path/to/image.jpg', function(\SplFileInfo $file) {
+     *      $this->imageManipulator()->load($file)->sharpen();
+     *
+     *      return $file;
+     * });
+     * ```
+     *
+     * You can pass a "progress" callback to $config that is called before each
+     * file is written with said file as an argument (useful when writing
+     * {@see Directory} or local {@see \SplFileInfo} directories).
+     *
+     * EXAMPLE - Track files written:
+     *
+     * ```php
+     * $filesWritten = [];
+     *
+     * $filesystem->write('some/path', $directory, [
+     *      'progress' => function(File $file) use (&$filesWritten) {
+     *          $filesWritten[] = $file;
+     *      }
+     * ]);
+     *
+     * \count($filesWritten);
+     * ```
+     *
      * @see FilesystemWriter::write()
      * @see FilesystemWriter::writeStream()
      *
      * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
      * @param array<string,mixed>                                                                   $config
      *
+     * @return File|Directory<Node>
+     *
      * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
      * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
      * @throws FilesystemException
      */
-    public function write(string $path, mixed $value, array $config = []): void;
+    public function write(string $path, mixed $value, array $config = []): File|Directory;
 }
