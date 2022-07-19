@@ -59,8 +59,8 @@ final class Checksum
 
         if (!$this->metadata && $this->operator->supports(FileChecksum::class)) {
             return $this->checksum = match ($this->mode) {
-                self::MD5 => $this->operator->md5Checksum($this->file->path()),
-                self::SHA1 => $this->operator->sha1Checksum($this->file->path()),
+                self::MD5 => $this->operator->md5Checksum($this->file),
+                self::SHA1 => $this->operator->sha1Checksum($this->file),
                 default => throw new \LogicException('Invalid mode.'),
             };
         }

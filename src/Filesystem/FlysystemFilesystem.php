@@ -152,13 +152,7 @@ final class FlysystemFilesystem implements Filesystem
         $config['progress'] ??= static function(File $file) {};
 
         if (\is_callable($value)) {
-            $tempFile = $value(TempFile::with($this->file($path)->read()));
-
-            if (!$tempFile instanceof \SplFileInfo || !$tempFile->isReadable() || $tempFile->isDir()) {
-                throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
-            }
-
-            return $this->write($path, $tempFile, $config);
+            return $this->write($path, $this->operator->modifyFile($this->file($path), $value), $config);
         }
 
         if (\is_string($value)) { // check if local filename

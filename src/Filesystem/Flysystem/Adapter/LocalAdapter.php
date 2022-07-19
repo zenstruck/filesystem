@@ -8,11 +8,18 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnixVisibility\VisibilityConverter;
 use League\MimeTypeDetection\MimeTypeDetector;
 use Zenstruck\Filesystem\Feature\FileChecksum;
+use Zenstruck\Filesystem\Feature\ModifyFile;
+use Zenstruck\Filesystem\Node\File;
 
 /**
+ * Similar to Flysystem's {@see LocalFilesystemAdapter} but with extra features.
+ *
+ * - Efficient checksum calculation using {@see md5_file()}/{@see sha1_file()}
+ * - Can modify files "in place" instead of writing to a temporary file
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LocalAdapter extends LocalFilesystemAdapter implements FileChecksum
+final class LocalAdapter extends LocalFilesystemAdapter implements FileChecksum, ModifyFile
 {
     private PathPrefixer $prefixer;
 
@@ -27,14 +34,25 @@ final class LocalAdapter extends LocalFilesystemAdapter implements FileChecksum
         parent::__construct($location, $visibility, $writeFlags, $linkHandling, $mimeTypeDetector, $lazyRootCreation);
     }
 
-    public function md5Checksum(string $path): string
+    public function md5Checksum(File $file): string
     {
-        return \md5_file($this->prefixer()->prefixPath($path)) ?: throw UnableToRetrieveMetadata::create($path, 'md5_checksum');
+        return \md5_file($this->prefixer()->prefixPath($file)) ?: throw UnableToRetrieveMetadata::create($file, 'md5_checksum');
     }
 
-    public function sha1Checksum(string $path): string
+    public function sha1Checksum(File $file): string
     {
-        return \sha1_file($this->prefixer()->prefixPath($path)) ?: throw UnableToRetrieveMetadata::create($path, 'sha1_checksum');
+        return \sha1_file($this->prefixer()->prefixPath($file)) ?: throw UnableToRetrieveMetadata::create($file, 'sha1_checksum');
+    }
+
+    public function modifyFile(File $file, callable $callback): \SplFileInfo
+    {
+        $file = $callback(new \SplFileInfo($this->prefixer()->prefixPath($file)));
+
+        if (!$file instanceof \SplFileInfo || !$file->isReadable() || $file->isDir()) {
+            throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
+        }
+
+        return $file;
     }
 
     private function prefixer(): PathPrefixer

@@ -8,6 +8,8 @@ use League\Flysystem\FilesystemAdapter;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\All;
 use Zenstruck\Filesystem\Feature\FileChecksum;
+use Zenstruck\Filesystem\Feature\ModifyFile;
+use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,14 +20,19 @@ final class WrappedAdapter implements FilesystemAdapter, All
     {
     }
 
-    public function md5Checksum(string $path): string
+    public function md5Checksum(File $file): string
     {
-        return $this->ensureSupports(FileChecksum::class)->md5Checksum($path); // @phpstan-ignore-line
+        return $this->ensureSupports(FileChecksum::class)->md5Checksum($file); // @phpstan-ignore-line
     }
 
-    public function sha1Checksum(string $path): string
+    public function sha1Checksum(File $file): string
     {
-        return $this->ensureSupports(FileChecksum::class)->sha1Checksum($path); // @phpstan-ignore-line
+        return $this->ensureSupports(FileChecksum::class)->sha1Checksum($file); // @phpstan-ignore-line
+    }
+
+    public function modifyFile(File $file, callable $callback): \SplFileInfo
+    {
+        return $this->ensureSupports(ModifyFile::class)->modifyFile($file, $callback); // @phpstan-ignore-line
     }
 
     public function fileExists(string $path): bool
