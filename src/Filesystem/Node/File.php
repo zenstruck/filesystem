@@ -6,6 +6,7 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Filesystem\Node\File\Size;
 
 /**
@@ -15,6 +16,7 @@ final class File extends Node
 {
     private Size $size;
     private string $mimeType;
+    private Checksum $checksum;
 
     public function __construct(FileAttributes $attributes, FilesystemOperator $flysystem)
     {
@@ -53,6 +55,19 @@ final class File extends Node
     }
 
     /**
+     * Calculate the checksum for the file. Defaults to md5.
+     *
+     * @example $file->checksum()->toString() (md5 hash of contents)
+     * @example $file->checksum()->sha1()->toString() (sha1 hash of contents)
+     * @example $file->checksum()->metadata()->toString() (md5 hash of file size + last modified timestamp)
+     * @example $file->checksum()->metadata()->sha1()->toString() (sha1 hash of file size + last modified timestamp)
+     */
+    public function checksum(): Checksum
+    {
+        return $this->checksum ??= new Checksum($this);
+    }
+
+    /**
      * @return Directory<Node>
      */
     public function directory(): Directory
@@ -67,7 +82,7 @@ final class File extends Node
 
     public function refresh(): Node
     {
-        unset($this->size, $this->mimeType);
+        unset($this->size, $this->mimeType, $this->checksum);
 
         return parent::refresh();
     }

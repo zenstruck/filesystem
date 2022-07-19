@@ -121,9 +121,7 @@ final class FlysystemFilesystem implements Filesystem
         $config['progress'] ??= static function(File $file) {};
 
         if (\is_callable($value)) {
-            $file = $this->file($path);
-
-            $tempFile = $value(TempFile::with($file->read()));
+            $tempFile = $value(TempFile::with($this->file($path)->read()));
 
             if (!$tempFile instanceof \SplFileInfo || !$tempFile->isReadable() || $tempFile->isDir()) {
                 throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
