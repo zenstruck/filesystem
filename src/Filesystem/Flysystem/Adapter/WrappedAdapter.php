@@ -16,8 +16,10 @@ use Zenstruck\Uri;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class WrappedAdapter implements FilesystemAdapter, All
+class WrappedAdapter implements FilesystemAdapter, All
 {
+    protected const FEATURES_ADDED = [];
+
     public function __construct(private FilesystemAdapter $next)
     {
     }
@@ -127,8 +129,12 @@ final class WrappedAdapter implements FilesystemAdapter, All
         $this->next->copy($source, $destination, $config);
     }
 
-    public function supports(string $feature): bool
+    final public function supports(string $feature): bool
     {
+        if (\in_array($feature, static::FEATURES_ADDED, true)) {
+            return true;
+        }
+
         return $this->next instanceof self ? $this->next->supports($feature) : $this->next instanceof $feature;
     }
 

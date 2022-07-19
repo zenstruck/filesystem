@@ -88,7 +88,7 @@ abstract class Node
     /**
      * Clear any cached metadata.
      */
-    public function refresh(): self
+    public function refresh(): static
     {
         unset($this->visibility, $this->lastModified);
 

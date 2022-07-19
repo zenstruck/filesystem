@@ -1,14 +1,15 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests;
+namespace Zenstruck\Filesystem\Tests\Flysystem\Adapter;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LocalFilesystemTest extends FilesystemTestCase
+final class LocalAdapterTest extends FilesystemTestCase
 {
     protected function createFilesystem(): Filesystem
     {

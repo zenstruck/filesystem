@@ -11,6 +11,7 @@ use League\Flysystem\WhitespacePathNormalizer;
 use Zenstruck\Filesystem\Feature\All;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
+use Zenstruck\Filesystem\Flysystem\Adapter\UrlPrefixAdapter;
 use Zenstruck\Filesystem\Flysystem\Adapter\WrappedAdapter;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\TempFile;
@@ -35,6 +36,10 @@ final class Operator extends Filesystem implements All
             $adapter = new WrappedAdapter($adapter);
         }
 
+        if ($prefixes = $config['url_prefix'] ?? $config['url_prefixes'] ?? null) {
+            $adapter = new UrlPrefixAdapter($adapter, $prefixes);
+        }
+
         parent::__construct($this->adapter = $adapter, $config, $this->normalizer = $pathNormalizer ?: new WhitespacePathNormalizer());
     }
 
@@ -46,11 +51,6 @@ final class Operator extends Filesystem implements All
     public function directoryAttributesFor(string $path): DirectoryAttributes
     {
         return new DirectoryAttributes($this->normalizer->normalizePath($path));
-    }
-
-    public function supports(string $feature): bool
-    {
-        return $this->adapter->supports($feature);
     }
 
     public function md5ChecksumFor(File $file): string

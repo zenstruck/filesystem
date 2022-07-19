@@ -106,7 +106,7 @@ final class File extends Node
         return $this->operator->urlFor($this);
     }
 
-    public function refresh(): Node
+    public function refresh(): static
     {
         unset($this->size, $this->mimeType, $this->checksum);
 

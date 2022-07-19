@@ -76,8 +76,6 @@ abstract class FilesystemTestCase extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('subdir/file.txt', 'contents');
 
-        (new SymfonyFilesystem())->touch(self::TEMP_DIR.'/subdir/file.txt', 1658247870);
-
         $file = $filesystem->file('/subdir/file.txt');
         $checksum = $file->checksum();
 
@@ -90,7 +88,6 @@ abstract class FilesystemTestCase extends TestCase
         $this->assertSame('98bf7d8c15784f0a3d63204441e1e2aa', $checksum->toString());
         $this->assertSame('98bf7d8c15784f0a3d63204441e1e2aa', $checksum->useMd5()->toString());
         $this->assertSame('4a756ca07e9487f482465a99e8286abc86ba4dc7', $checksum->useSha1()->toString());
-        $this->assertSame('022ebb4539cd52e8465e78d681ce253f', (string) $checksum->forMetadata());
         $this->assertSame('contents', $file->contents());
         $this->assertSame('contents', \stream_get_contents($file->read()));
         // stream is reset on each call to read
