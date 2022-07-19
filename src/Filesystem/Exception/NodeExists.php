@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Filesystem\Flysystem\Exception;
+namespace Zenstruck\Filesystem\Exception;
 
 use League\Flysystem\FilesystemException;
 use Zenstruck\Filesystem\Node;
