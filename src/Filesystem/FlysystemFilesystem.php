@@ -9,6 +9,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Flysystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Flysystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Flysystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
@@ -58,12 +59,20 @@ final class FlysystemFilesystem implements Filesystem
 
     public function copy(string $source, string $destination, array $config = []): void
     {
-        $this->flysystem->move($source, $destination);
+        if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
+            throw NodeExists::forCopy($source, $this->node($destination));
+        }
+
+        $this->flysystem->move($source, $destination, $config);
     }
 
     public function move(string $source, string $destination, array $config = []): void
     {
-        $this->flysystem->move($source, $destination);
+        if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
+            throw NodeExists::forMove($source, $this->node($destination));
+        }
+
+        $this->flysystem->move($source, $destination, $config);
     }
 
     public function delete(string|Directory $path = '', array $config = []): int
@@ -95,7 +104,7 @@ final class FlysystemFilesystem implements Filesystem
 
     public function mkdir(string $path = '', array $config = []): void
     {
-        $this->flysystem->createDirectory($path);
+        $this->flysystem->createDirectory($path, $config);
     }
 
     public function chmod(string $path, string $visibility): void
@@ -105,6 +114,10 @@ final class FlysystemFilesystem implements Filesystem
 
     public function write(string $path, mixed $value, array $config = []): File|Directory
     {
+        if (($config['fail_if_exists'] ?? false) && $this->exists($path)) {
+            throw NodeExists::forWrite($this->node($path));
+        }
+
         $config['progress'] ??= static function(File $file) {};
 
         if (\is_callable($value)) {

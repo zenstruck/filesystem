@@ -5,6 +5,7 @@ namespace Zenstruck;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
+use Zenstruck\Filesystem\Flysystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Flysystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Flysystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node;
@@ -48,19 +49,31 @@ interface Filesystem
     public function exists(string $path = ''): bool;
 
     /**
+     * Copy a file.
+     *
+     * Overrides $destination if exists, pass $config "fail_if_exists" => true to instead
+     * throw a {@see NodeExists} exception.
+     *
      * @see FilesystemWriter::copy()
      *
-     * @param array<string,mixed> $config
+     * @param array<string,mixed>|array{'fail_if_exists':bool} $config
      *
+     * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
     public function copy(string $source, string $destination, array $config = []): void;
 
     /**
+     * Move a file.
+     *
+     * Overrides $destination if exists, pass $config "fail_if_exists" => true to instead
+     * throw a {@see NodeExists} exception.
+     *
      * @see FilesystemWriter::move()
      *
-     * @param array<string,mixed> $config
+     * @param array<string,mixed>|array{'fail_if_exists':bool} $config
      *
+     * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
     public function move(string $source, string $destination, array $config = []): void;
@@ -83,8 +96,8 @@ interface Filesystem
      * @see FilesystemWriter::delete()
      * @see FilesystemWriter::deleteDirectory()
      *
-     * @param string|Directory<Node> $path   If {@see Directory}, deletes filtered nodes
-     * @param array<string,mixed>    $config If passed, called before each node is deleted
+     * @param string|Directory<Node>                                    $path   If {@see Directory}, deletes filtered nodes
+     * @param array<string,mixed>|array{'progress':callable(Node):void} $config If passed, called before each node is deleted
      *
      * @return int The number of nodes deleted
      *
@@ -110,6 +123,9 @@ interface Filesystem
 
     /**
      * Write $value to the filesystem.
+     *
+     * Overrides $path if exists, pass $config "fail_if_exists" => true to instead
+     * throw a {@see NodeExists} exception.
      *
      * A callback provided for $values allows for "manipulating" an "existing"
      * file in place. A "real" {@see \SplFileInfo} is passed and must be returned.
@@ -146,12 +162,13 @@ interface Filesystem
      * @see FilesystemWriter::writeStream()
      *
      * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
-     * @param array<string,mixed>                                                                   $config
+     * @param array<string,mixed>|array{'progress':callable(File):void,'fail_if_exists':bool}       $config
      *
      * @return File|Directory<Node>
      *
      * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
      * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
+     * @throws NodeExists          If the $path exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
     public function write(string $path, mixed $value, array $config = []): File|Directory;
