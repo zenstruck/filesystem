@@ -2,9 +2,12 @@
 
 namespace Zenstruck\Filesystem\Flysystem;
 
+use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
+use League\Flysystem\WhitespacePathNormalizer;
 use Zenstruck\Filesystem\Feature\All;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
@@ -20,6 +23,7 @@ use Zenstruck\Filesystem\TempFile;
 final class Operator extends Filesystem implements All
 {
     private WrappedAdapter $adapter;
+    private PathNormalizer $normalizer;
 
     /**
      * @param array<string,mixed> $config
@@ -30,7 +34,17 @@ final class Operator extends Filesystem implements All
             $adapter = new WrappedAdapter($adapter);
         }
 
-        parent::__construct($this->adapter = $adapter, $config, $pathNormalizer);
+        parent::__construct($this->adapter = $adapter, $config, $this->normalizer = $pathNormalizer ?: new WhitespacePathNormalizer());
+    }
+
+    public function fileAttributesFor(string $path): FileAttributes
+    {
+        return new FileAttributes($this->normalizer->normalizePath($path));
+    }
+
+    public function directoryAttributesFor(string $path): DirectoryAttributes
+    {
+        return new DirectoryAttributes($this->normalizer->normalizePath($path));
     }
 
     public function supports(string $feature): bool

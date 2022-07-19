@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Filesystem\Node;
 
-use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
@@ -88,7 +87,7 @@ final class File extends Node
      */
     public function directory(): Directory
     {
-        return new Directory(new DirectoryAttributes($this->dirname()), $this->operator);
+        return new Directory($this->operator->directoryAttributesFor($this->dirname()), $this->operator);
     }
 
     public function extension(): ?string

@@ -2,8 +2,6 @@
 
 namespace Zenstruck\Filesystem;
 
-use League\Flysystem\DirectoryAttributes;
-use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
 use League\Flysystem\UnableToCopyFile;
@@ -43,11 +41,11 @@ final class FlysystemFilesystem implements Filesystem
     public function node(string $path = ''): File|Directory
     {
         if ($this->operator->fileExists($path)) {
-            return new File(new FileAttributes($path), $this->operator);
+            return new File($this->operator->fileAttributesFor($path), $this->operator);
         }
 
         if ($this->operator->directoryExists($path)) {
-            return new Directory(new DirectoryAttributes($path), $this->operator);
+            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
         throw NodeNotFound::for($path);
@@ -172,7 +170,7 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append($file->getRelativePathname()), $file, $config);
             }
 
-            return new Directory(new DirectoryAttributes($path), $this->operator);
+            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
         if ($value instanceof Directory) { // check if Directory node
@@ -183,7 +181,7 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file, $config);
             }
 
-            return new Directory(new DirectoryAttributes($path), $this->operator);
+            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
         if ($value instanceof File) { // check if File node
@@ -205,7 +203,7 @@ final class FlysystemFilesystem implements Filesystem
             $value->close();
         }
 
-        $file = new File(new FileAttributes($path), $this->operator);
+        $file = new File($this->operator->fileAttributesFor($path), $this->operator);
 
         $config['progress']($file);
 
