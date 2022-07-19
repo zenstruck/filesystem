@@ -59,12 +59,28 @@ final class File extends Node
      *
      * @example $file->checksum()->toString() (md5 hash of contents)
      * @example $file->checksum()->sha1()->toString() (sha1 hash of contents)
-     * @example $file->checksum()->metadata()->toString() (md5 hash of file size + last modified timestamp)
-     * @example $file->checksum()->metadata()->sha1()->toString() (sha1 hash of file size + last modified timestamp)
+     * @example $file->checksum()->metadata()->toString() (md5 hash of file size + last modified timestamp + mime-type)
+     * @example $file->checksum()->metadata()->sha1()->toString() (sha1 hash of file size + last modified timestamp + mime-type)
      */
     public function checksum(): Checksum
     {
         return $this->checksum ??= new Checksum($this);
+    }
+
+    /**
+     * Whether the contents of this file and another match (content checksum is used).
+     */
+    public function contentsEquals(self $other): bool
+    {
+        return $this->checksum->equals($other->checksum());
+    }
+
+    /**
+     * Whether the metadata of this file and another match (metadata checksum is used).
+     */
+    public function metadataEquals(self $other): bool
+    {
+        return $this->checksum->forMetadata()->equals($other->checksum());
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Tests;
 
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToMoveFile;
@@ -32,6 +33,202 @@ final class FlysystemFilesystemTest extends TestCase
     public static function cleanup(): void
     {
         (new SymfonyFilesystem())->remove(self::ROOT);
+    }
+
+    /**
+     * @test
+     */
+    public function can_check_if_file_exists(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'file1');
+
+        $this->assertTrue($filesystem->exists('file.txt'));
+        $this->assertFalse($filesystem->exists('non-existent'));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_non_existent_key(): void
+    {
+        $this->expectException(NodeNotFound::class);
+
+        $this->createFilesystem()->node('non-existent');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_nodes(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir/file1.txt', 'file1');
+        $filesystem->write('subdir/file2.txt', 'file2');
+        $filesystem->write('subdir/nested/file3.txt', 'file3');
+
+        $this->assertInstanceOf(File::class, $filesystem->node('/subdir/file1.txt'));
+        $this->assertInstanceOf(Directory::class, $filesystem->node('/subdir'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_file(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir/file.txt', 'contents');
+
+        (new SymfonyFilesystem())->touch(self::ROOT.'/subdir/file.txt', 1658247870);
+
+        $file = $filesystem->file('/subdir/file.txt');
+        $checksum = $file->checksum();
+
+        $this->assertSame('file.txt', $file->name());
+        $this->assertSame('txt', $file->extension());
+        $this->assertSame('text/plain', $file->mimeType());
+        $this->assertSame(8, $file->size()->bytes());
+        $this->assertSame((new \DateTime())->format('Y-m-d O'), $file->lastModified()->format('Y-m-d O'));
+        $this->assertSame('98bf7d8c15784f0a3d63204441e1e2aa', $checksum->toString());
+        $this->assertSame('98bf7d8c15784f0a3d63204441e1e2aa', $checksum->toString());
+        $this->assertSame('98bf7d8c15784f0a3d63204441e1e2aa', $checksum->useMd5()->toString());
+        $this->assertSame('4a756ca07e9487f482465a99e8286abc86ba4dc7', $checksum->useSha1()->toString());
+        $this->assertSame('022ebb4539cd52e8465e78d681ce253f', (string) $checksum->forMetadata());
+        $this->assertSame('contents', $file->contents());
+        $this->assertSame('contents', \stream_get_contents($file->read()));
+        // stream is reset on each call to read
+        $this->assertSame('contents', \stream_get_contents($file->read()));
+    }
+
+    /**
+     * @test
+     */
+    public function removing_non_existent_key_does_nothing(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'contents');
+
+        $filesystem->delete('non-existent');
+
+        $this->assertTrue($filesystem->exists('file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_move_non_existent_source_key(): void
+    {
+        $this->expectException(NodeNotFound::class);
+
+        $this->createFilesystem()->move('non-existent', 'file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function can_read_file_as_resource(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'contents');
+
+        $this->assertIsResource($resource = $filesystem->file('file.txt')->read());
+        $this->assertSame('contents', \stream_get_contents($resource));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->node('../../../some-file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_copy_from_source_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->copy('../../../some-file.txt', 'new-file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_copy_to_destination_outside_of_root(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'content');
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystem->copy('file.txt', '../../../some-file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_make_directory_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->mkdir('../../../some-dir');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_check_existance_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->exists('../../../some-dir');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_remove_file_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->delete('../../../some-dir');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_write_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->write('../../../some-file.txt', 'contents');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_move_source_outside_of_root(): void
+    {
+        $this->expectException(PathTraversalDetected::class);
+
+        $this->createFilesystem()->move('../../../some-file.txt', 'new-file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_move_destination_outside_of_root(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'content');
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystem->move('file.txt', '../../../some-file.txt');
     }
 
     /**
@@ -285,16 +482,6 @@ final class FlysystemFilesystemTest extends TestCase
         }
 
         $this->fail('Exception not thrown.');
-    }
-
-    /**
-     * @test
-     */
-    public function cannot_move_non_existent_source_key(): void
-    {
-        $this->expectException(NodeNotFound::class);
-
-        $this->createFilesystem()->move('non-existent', 'file.txt');
     }
 
     /**
