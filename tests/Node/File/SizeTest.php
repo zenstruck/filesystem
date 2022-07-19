@@ -1,14 +1,14 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Node;
+namespace Zenstruck\Filesystem\Tests\Node\File;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Filesystem\Node\FileSize;
+use Zenstruck\Filesystem\Node\File\Size;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FileSizeTest extends TestCase
+final class SizeTest extends TestCase
 {
     /**
      * @test
@@ -16,7 +16,7 @@ final class FileSizeTest extends TestCase
      */
     public function can_create_from_binary(int $bytes, string $humanized): void
     {
-        $size = FileSize::binary($bytes);
+        $size = Size::binary($bytes);
 
         $this->assertSame($bytes, $size->bytes());
         $this->assertSame($humanized, (string) $size);
@@ -37,7 +37,7 @@ final class FileSizeTest extends TestCase
      */
     public function can_create_from_decimal(int $bytes, string $humanized): void
     {
-        $size = FileSize::decimal($bytes);
+        $size = Size::decimal($bytes);
 
         $this->assertSame($bytes, $size->bytes());
         $this->assertSame($humanized, (string) $size);
@@ -58,7 +58,7 @@ final class FileSizeTest extends TestCase
      */
     public function can_create_from_value(string|int $value, $bytes, string $humanized): void
     {
-        $size = FileSize::from($value);
+        $size = Size::from($value);
 
         $this->assertSame((int) $bytes, $size->bytes());
         $this->assertSame($humanized, (string) $size);
@@ -87,7 +87,7 @@ final class FileSizeTest extends TestCase
      */
     public function can_convert_between_formats(): void
     {
-        $size = FileSize::decimal(1024);
+        $size = Size::decimal(1024);
 
         $this->assertSame('1.02 kB', (string) $size);
 
@@ -107,7 +107,7 @@ final class FileSizeTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        FileSize::from('foobar');
+        Size::from('foobar');
     }
 
     /**
@@ -117,7 +117,7 @@ final class FileSizeTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        FileSize::from('6.6 foo');
+        Size::from('6.6 foo');
     }
 
     /**
@@ -126,7 +126,7 @@ final class FileSizeTest extends TestCase
      */
     public function comparison_test(string|int $first, string $method, string|int $second, bool $expected): void
     {
-        $this->assertSame($expected, FileSize::from($first)->{$method}($second));
+        $this->assertSame($expected, Size::from($first)->{$method}($second));
     }
 
     public static function comparisonProvider(): iterable
@@ -169,7 +169,7 @@ final class FileSizeTest extends TestCase
      */
     public function within_range(string|int $value, string|int $min, string|int $max, bool $expected): void
     {
-        $this->assertSame($expected, FileSize::from($value)->isWithin($min, $max));
+        $this->assertSame($expected, Size::from($value)->isWithin($min, $max));
     }
 
     public static function withinRangeProvider(): iterable

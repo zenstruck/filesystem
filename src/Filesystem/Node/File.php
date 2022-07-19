@@ -6,13 +6,14 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\Size;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class File extends Node
 {
-    private FileSize $size;
+    private Size $size;
     private string $mimeType;
 
     public function __construct(FileAttributes $attributes, FilesystemOperator $flysystem)
@@ -20,7 +21,7 @@ final class File extends Node
         parent::__construct($attributes, $flysystem);
 
         if ($size = $attributes->fileSize()) {
-            $this->size = FileSize::binary($size);
+            $this->size = Size::binary($size);
         }
 
         if ($mimeType = $attributes->mimeType()) {
@@ -28,9 +29,9 @@ final class File extends Node
         }
     }
 
-    public function size(): FileSize
+    public function size(): Size
     {
-        return $this->size ??= FileSize::binary($this->flysystem->fileSize($this->path()));
+        return $this->size ??= Size::binary($this->flysystem->fileSize($this->path()));
     }
 
     public function mimeType(): string

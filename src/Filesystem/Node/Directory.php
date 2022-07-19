@@ -8,6 +8,7 @@ use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
+use Zenstruck\Filesystem\Node\File\Size;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -75,7 +76,7 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function largerThan(string|int $size): self
     {
-        $size = FileSize::from($size)->bytes();
+        $size = Size::from($size)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isLargerThan($size));
@@ -90,7 +91,7 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function smallerThan(string|int $size): self
     {
-        $size = FileSize::from($size)->bytes();
+        $size = Size::from($size)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isSmallerThan($size));
@@ -106,8 +107,8 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function sizeWithin(string|int $min, string|int $max): self
     {
-        $min = FileSize::from($min)->bytes();
-        $max = FileSize::from($max)->bytes();
+        $min = Size::from($min)->bytes();
+        $max = Size::from($max)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isWithin($min, $max));

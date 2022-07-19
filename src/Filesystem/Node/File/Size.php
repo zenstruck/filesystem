@@ -1,13 +1,13 @@
 <?php
 
-namespace Zenstruck\Filesystem\Node;
+namespace Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @immutable
  */
-final class FileSize
+final class Size
 {
     private const DECIMAL = 1000;
     private const BINARY = 1024;
