@@ -64,4 +64,11 @@ final class File extends Node
     {
         return \pathinfo($this->path(), \PATHINFO_EXTENSION) ?: null;
     }
+
+    public function refresh(): Node
+    {
+        unset($this->size, $this->mimeType);
+
+        return parent::refresh();
+    }
 }

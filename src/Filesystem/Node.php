@@ -68,9 +68,30 @@ abstract class Node
         return $this->lastModified ??= self::parseDateTime($this->flysystem->lastModified($this->path()));
     }
 
-    public function visibility(): string
+    /**
+     * @see FilesystemOperator::visibility()
+     */
+    final public function visibility(): string
     {
         return $this->visibility ??= $this->flysystem->visibility($this->path());
+    }
+
+    /**
+     * Check if the node still exists.
+     */
+    final public function exists(): bool
+    {
+        return $this->flysystem->has($this->path());
+    }
+
+    /**
+     * Clear any cached metadata.
+     */
+    public function refresh(): self
+    {
+        unset($this->visibility, $this->lastModified);
+
+        return $this;
     }
 
     final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
