@@ -6,6 +6,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
 use Zenstruck\Filesystem\Feature\All;
+use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
 use Zenstruck\Filesystem\Flysystem\Adapter\WrappedAdapter;
 use Zenstruck\Filesystem\Node\File;
@@ -39,12 +40,20 @@ final class Operator extends Filesystem implements All
 
     public function md5Checksum(File $file): string
     {
-        return $this->adapter->md5Checksum($file);
+        if ($this->adapter->supports(FileChecksum::class)) {
+            return $this->adapter->md5Checksum($file);
+        }
+
+        return \md5($file->contents());
     }
 
     public function sha1Checksum(File $file): string
     {
-        return $this->adapter->sha1Checksum($file);
+        if ($this->adapter->supports(FileChecksum::class)) {
+            return $this->adapter->sha1Checksum($file);
+        }
+
+        return \sha1($file->contents());
     }
 
     public function modifyFile(File $file, callable $callback): \SplFileInfo
