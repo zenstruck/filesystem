@@ -4,7 +4,9 @@ namespace Zenstruck\Filesystem;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\Filesystem as LeagueFilesystem;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -23,8 +25,15 @@ use Zenstruck\Uri\Path;
  */
 final class FlysystemFilesystem implements Filesystem
 {
-    public function __construct(private FilesystemOperator $flysystem)
+    private FilesystemOperator $flysystem;
+
+    public function __construct(FilesystemOperator|string $flysystem)
     {
+        if (\is_string($flysystem)) {
+            $flysystem = new LeagueFilesystem(new LocalFilesystemAdapter($flysystem));
+        }
+
+        $this->flysystem = $flysystem;
     }
 
     public function node(string $path = ''): File|Directory
