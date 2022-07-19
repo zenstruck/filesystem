@@ -3,10 +3,13 @@
 namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\FileAttributes;
+use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Filesystem\Node\File\Size;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -93,6 +96,14 @@ final class File extends Node
     public function extension(): ?string
     {
         return \pathinfo($this->path(), \PATHINFO_EXTENSION) ?: null;
+    }
+
+    /**
+     * @throws UnsupportedFeature If your adapter does not support {@see FileUrl}
+     */
+    public function url(): Uri
+    {
+        return $this->operator->urlFor($this);
     }
 
     public function refresh(): Node

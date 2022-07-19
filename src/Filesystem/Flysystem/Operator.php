@@ -14,6 +14,7 @@ use Zenstruck\Filesystem\Feature\ModifyFile;
 use Zenstruck\Filesystem\Flysystem\Adapter\WrappedAdapter;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -52,22 +53,27 @@ final class Operator extends Filesystem implements All
         return $this->adapter->supports($feature);
     }
 
-    public function md5Checksum(File $file): string
+    public function md5ChecksumFor(File $file): string
     {
         if ($this->adapter->supports(FileChecksum::class)) {
-            return $this->adapter->md5Checksum($file);
+            return $this->adapter->md5ChecksumFor($file);
         }
 
         return \md5($file->contents());
     }
 
-    public function sha1Checksum(File $file): string
+    public function sha1ChecksumFor(File $file): string
     {
         if ($this->adapter->supports(FileChecksum::class)) {
-            return $this->adapter->sha1Checksum($file);
+            return $this->adapter->sha1ChecksumFor($file);
         }
 
         return \sha1($file->contents());
+    }
+
+    public function urlFor(File $file): Uri
+    {
+        return $this->adapter->urlFor($file);
     }
 
     public function modifyFile(File $file, callable $callback): \SplFileInfo

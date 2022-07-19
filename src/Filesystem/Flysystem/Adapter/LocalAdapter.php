@@ -34,12 +34,12 @@ final class LocalAdapter extends LocalFilesystemAdapter implements FileChecksum,
         parent::__construct($location, $visibility, $writeFlags, $linkHandling, $mimeTypeDetector, $lazyRootCreation);
     }
 
-    public function md5Checksum(File $file): string
+    public function md5ChecksumFor(File $file): string
     {
         return \md5_file($this->prefixer()->prefixPath($file)) ?: throw UnableToRetrieveMetadata::create($file, 'md5_checksum');
     }
 
-    public function sha1Checksum(File $file): string
+    public function sha1ChecksumFor(File $file): string
     {
         return \sha1_file($this->prefixer()->prefixPath($file)) ?: throw UnableToRetrieveMetadata::create($file, 'sha1_checksum');
     }

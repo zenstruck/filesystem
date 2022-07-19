@@ -3,13 +3,12 @@
 namespace Zenstruck\Filesystem\Feature;
 
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-interface FileChecksum
+interface FileUrl
 {
-    public function md5ChecksumFor(File $file): string;
-
-    public function sha1ChecksumFor(File $file): string;
+    public function urlFor(File $file): Uri;
 }
