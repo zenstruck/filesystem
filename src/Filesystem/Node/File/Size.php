@@ -80,7 +80,7 @@ final class Size
     }
 
     /**
-     * Convert to binary system (ie MiB -> MB).
+     * Convert to decimal system (ie MiB -> MB).
      */
     public function asDecimal(): self
     {
@@ -92,6 +92,7 @@ final class Size
 
     /**
      * Converts bytes to a human-readable format (ie "1.1 MB", "3.3 KiB").
+     * The unit suffix depends on the detected system.
      */
     public function humanize(string $format = '%s %s'): string
     {
