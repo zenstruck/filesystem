@@ -111,6 +111,16 @@ abstract class Node
         return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
     }
 
+    final public function isFile(): bool
+    {
+        return $this instanceof File;
+    }
+
+    final public function isDirectory(): bool
+    {
+        return $this instanceof Directory;
+    }
+
     final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
     {
         if (\is_numeric($timestamp)) {

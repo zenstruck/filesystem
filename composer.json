@@ -19,6 +19,7 @@
         "zenstruck/uri": "^1.0"
     },
     "require-dev": {
+        "league/flysystem-memory": "^3.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
         "symfony/phpunit-bridge": "^6.0",
@@ -33,5 +34,8 @@
     },
     "autoload-dev": {
         "psr-4": { "Zenstruck\\Filesystem\\Tests\\": ["tests/"] }
+    },
+    "suggest": {
+        "league/flysystem-memory": "To use the in-memory adapters"
     }
 }

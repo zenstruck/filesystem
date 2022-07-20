@@ -5,7 +5,9 @@ namespace Zenstruck\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
 use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToMoveFile;
+use League\Flysystem\UnableToWriteFile;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
@@ -183,6 +185,13 @@ final class FlysystemFilesystem implements Filesystem
 
     public function mkdir(string $path = '', array $config = []): static
     {
+        try {
+            if ($this->node($path)->isFile()) {
+                throw UnableToCreateDirectory::atLocation($path, 'Location is a file.');
+            }
+        } catch (NodeNotFound) {
+        }
+
         $this->operator->createDirectory($path, $config);
         $this->last = $path;
 
@@ -199,8 +208,18 @@ final class FlysystemFilesystem implements Filesystem
 
     public function write(string $path, mixed $value, array $config = []): static
     {
-        if (($config['fail_if_exists'] ?? false) && $this->exists($path)) {
-            throw NodeExists::forWrite($this->node($path));
+        try {
+            $node = $this->node($path);
+        } catch (NodeNotFound) {
+            $node = null;
+        }
+
+        if ($node && ($config['fail_if_exists'] ?? false)) {
+            throw NodeExists::forWrite($node);
+        }
+
+        if ($node instanceof Directory) {
+            throw UnableToWriteFile::atLocation($path, 'Location is a directory.');
         }
 
         if (\is_callable($value)) {
