@@ -26,6 +26,7 @@ use Zenstruck\Uri\Path;
 final class FlysystemFilesystem implements Filesystem
 {
     private Operator $operator;
+    private string|\LogicException $last;
 
     /**
      * @param array<string,mixed> $config
@@ -37,6 +38,7 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         $this->operator = new Operator($adapter, $config, $pathNormalizer);
+        $this->last = new \LogicException('No operations have been performed.');
     }
 
     public function node(string $path = ''): File|Directory
@@ -62,12 +64,17 @@ final class FlysystemFilesystem implements Filesystem
         return $this->node($path)->ensureDirectory();
     }
 
+    public function last(): File|Directory
+    {
+        return \is_string($this->last) ? $this->node($this->last) : throw $this->last;
+    }
+
     public function exists(string $path = ''): bool
     {
         return $this->operator->has($path);
     }
 
-    public function copy(string $source, string $destination, array $config = []): void
+    public function copy(string $source, string $destination, array $config = []): static
     {
         if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
             throw NodeExists::forCopy($source, $this->node($destination));
@@ -96,13 +103,16 @@ final class FlysystemFilesystem implements Filesystem
         if ($sourceNode instanceof Directory) {
             $this->write($destination, $sourceNode, $config);
 
-            return;
+            return $this;
         }
 
         $this->operator->copy($source, $destination, $config);
+        $this->last = $destination;
+
+        return $this;
     }
 
-    public function move(string $source, string $destination, array $config = []): void
+    public function move(string $source, string $destination, array $config = []): static
     {
         if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
             throw NodeExists::forMove($source, $this->node($destination));
@@ -131,43 +141,53 @@ final class FlysystemFilesystem implements Filesystem
         if ($sourceNode instanceof Directory) {
             $this->write($destination, $sourceNode, $config);
             $this->delete($source);
+            $this->last = $destination; // because delete() disables last
 
-            return;
+            return $this;
         }
 
-        try {
-            $this->operator->move($source, $destination, $config);
-        } catch (UnableToMoveFile $e) {
-            if (!$this->exists($source)) {
-                throw NodeNotFound::for($source);
-            }
+        $this->operator->move($source, $destination, $config);
+        $this->last = $destination;
 
-            throw $e;
-        }
+        return $this;
     }
 
-    public function delete(string $path = '', array $config = []): void
+    public function delete(string $path = '', array $config = []): static
     {
         try {
             $node = $this->node($path);
         } catch (NodeNotFound) {
-            return;
+            $node = null;
         }
 
-        $node instanceof File ? $this->operator->delete($path) : $this->operator->deleteDirectory($path);
+        match (true) {
+            $node instanceof File => $this->operator->delete($path),
+            $node instanceof Directory => $this->operator->deleteDirectory($path),
+            default => null,
+        };
+
+        $this->last = new \LogicException('Last node not available as the last operation deleted it.');
+
+        return $this;
     }
 
-    public function mkdir(string $path = '', array $config = []): void
+    public function mkdir(string $path = '', array $config = []): static
     {
         $this->operator->createDirectory($path, $config);
+        $this->last = $path;
+
+        return $this;
     }
 
-    public function chmod(string $path, string $visibility): void
+    public function chmod(string $path, string $visibility): static
     {
         $this->operator->setVisibility($path, $visibility);
+        $this->last = $path;
+
+        return $this;
     }
 
-    public function write(string $path, mixed $value, array $config = []): File|Directory
+    public function write(string $path, mixed $value, array $config = []): static
     {
         if (($config['fail_if_exists'] ?? false) && $this->exists($path)) {
             throw NodeExists::forWrite($this->node($path));
@@ -196,7 +216,9 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append($file->getRelativePathname()), $file, $config);
             }
 
-            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+            $this->last = $path;
+
+            return $this;
         }
 
         if ($value instanceof Directory) { // check if Directory node
@@ -207,7 +229,9 @@ final class FlysystemFilesystem implements Filesystem
                 $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file, $config);
             }
 
-            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+            $this->last = $path;
+
+            return $this;
         }
 
         if ($value instanceof File) { // check if File node
@@ -233,6 +257,8 @@ final class FlysystemFilesystem implements Filesystem
 
         $config['progress']($file);
 
-        return $file;
+        $this->last = $path;
+
+        return $this;
     }
 }

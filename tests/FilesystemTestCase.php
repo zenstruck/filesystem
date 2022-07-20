@@ -916,5 +916,64 @@ abstract class FilesystemTestCase extends TestCase
         $this->assertFalse($filesystem->exists('subdir2/file3.txt'));
     }
 
+    /**
+     * @test
+     */
+    public function is_fluent(): void
+    {
+        $filesystem = $this->createFilesystem();
+
+        $this->assertSame($filesystem, $filesystem->delete('foo'));
+        $this->assertSame($filesystem, $filesystem->mkdir('foo'));
+        $this->assertSame($filesystem, $filesystem->write('foo/bar.txt', 'content'));
+        $this->assertSame($filesystem, $filesystem->copy('foo/bar.txt', 'foo/baz.txt'));
+        $this->assertSame($filesystem, $filesystem->copy('foo', 'bar'));
+        $this->assertSame($filesystem, $filesystem->move('foo/bar.txt', 'baz/baz.txt'));
+        $this->assertSame($filesystem, $filesystem->move('foo', 'baz'));
+        $this->assertSame($filesystem, $filesystem->chmod('baz/baz.txt', 'public'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_last_modified_node(): void
+    {
+        $filesystem = $this->createFilesystem();
+
+        $this->assertSame('foo', $filesystem->mkdir('foo')->last()->path());
+        $this->assertSame('foo/bar.txt', $filesystem->write('foo/bar.txt', 'content')->last()->path());
+        $this->assertSame('foo/baz.txt', $filesystem->copy('foo/bar.txt', 'foo/baz.txt')->last()->path());
+        $this->assertSame('bar', $filesystem->copy('foo', 'bar')->last()->path());
+        $this->assertSame('baz/baz.txt', $filesystem->move('foo/bar.txt', 'baz/baz.txt')->last()->path());
+        $this->assertSame('baz', $filesystem->move('foo', 'baz')->last()->path());
+        $this->assertSame('baz/baz.txt', $filesystem->chmod('baz/baz.txt', 'public')->last()->path());
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_last_modified_node_if_no_operations_performed(): void
+    {
+        $filesystem = $this->createFilesystem();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('No operations have been performed.');
+
+        $filesystem->last();
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_last_modified_node_after_delete(): void
+    {
+        $filesystem = $this->createFilesystem()->write('foo.txt', 'bar')->delete('foo.txt');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Last node not available as the last operation deleted it.');
+
+        $filesystem->last();
+    }
+
     abstract protected function createFilesystem(): Filesystem;
 }

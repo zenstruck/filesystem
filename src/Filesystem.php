@@ -77,7 +77,7 @@ interface Filesystem
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
-    public function copy(string $source, string $destination, array $config = []): void;
+    public function copy(string $source, string $destination, array $config = []): static;
 
     /**
      * Move a file or directory.
@@ -108,7 +108,7 @@ interface Filesystem
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
-    public function move(string $source, string $destination, array $config = []): void;
+    public function move(string $source, string $destination, array $config = []): static;
 
     /**
      * Delete a file or directory.
@@ -120,7 +120,7 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function delete(string $path = '', array $config = []): void;
+    public function delete(string $path = '', array $config = []): static;
 
     /**
      * @see FilesystemWriter::createDirectory()
@@ -129,14 +129,14 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function mkdir(string $path = '', array $config = []): void;
+    public function mkdir(string $path = '', array $config = []): static;
 
     /**
      * @see FilesystemWriter::setVisibility()
      *
      * @throws FilesystemException
      */
-    public function chmod(string $path, string $visibility): void;
+    public function chmod(string $path, string $visibility): static;
 
     /**
      * Write $value to the filesystem.
@@ -181,12 +181,25 @@ interface Filesystem
      * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
      * @param array<string,mixed>|array{'progress':callable(File):void,'fail_if_exists':bool}       $config
      *
-     * @return File|Directory<Node>
-     *
      * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
      * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
      * @throws NodeExists          If the $path exists and "fail_if_exists" => true
      * @throws FilesystemException
      */
-    public function write(string $path, mixed $value, array $config = []): File|Directory;
+    public function write(string $path, mixed $value, array $config = []): static;
+
+    /**
+     * Fetch the last modified node.
+     *
+     * @example $filesystem->write(...)->last()
+     * @example $filesystem->chmod(...)->last()
+     * @example $filesystem->copy(...)->last()
+     * @example $filesystem->move(...)->last()
+     * @example $filesystem->mkdir(...)->last()
+     *
+     * @return File|Directory<Node>
+     *
+     * @throws \LogicException If the last operation didn't modify a file
+     */
+    public function last(): File|Directory;
 }
