@@ -49,14 +49,30 @@ interface Filesystem
     public function exists(string $path = ''): bool;
 
     /**
-     * Copy a file.
+     * Copy a file or directory.
      *
      * Overrides $destination if exists, pass $config "fail_if_exists" => true to instead
      * throw a {@see NodeExists} exception.
      *
+     * If copying a directory, you can pass a "progress" callback to $config
+     * that is called before each file is copied with said file as an argument.
+     *
+     * EXAMPLE - Track files copied:
+     *
+     * ```php
+     * $filesCopied = [];
+     *
+     * $filesystem->copy('source/dir', 'dest/dir', [
+     *      'progress' => function(File $file) use (&$filesCopied) {
+     *          $filesCopied[] = $file;
+     *      }
+     * ]);
+     *
+     * \count($filesCopied);
+     *
      * @see FilesystemWriter::copy()
      *
-     * @param array<string,mixed>|array{'fail_if_exists':bool} $config
+     * @param array<string,mixed>|array{'fail_if_exists':bool,'progress':callable(File):void} $config
      *
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
@@ -64,14 +80,30 @@ interface Filesystem
     public function copy(string $source, string $destination, array $config = []): void;
 
     /**
-     * Move a file.
+     * Move a file or directory.
      *
      * Overrides $destination if exists, pass $config "fail_if_exists" => true to instead
      * throw a {@see NodeExists} exception.
      *
+     * If moving a directory, you can pass a "progress" callback to $config
+     * that is called before each file is moved with said file as an argument.
+     *
+     * EXAMPLE - Track files moved:
+     *
+     * ```php
+     * $filesMoved = [];
+     *
+     * $filesystem->move('source/dir', 'dest/dir', [
+     *      'progress' => function(File $file) use (&$filesMoved) {
+     *          $filesMoved[] = $file;
+     *      }
+     * ]);
+     *
+     * \count($filesMoved);
+     *
      * @see FilesystemWriter::move()
      *
-     * @param array<string,mixed>|array{'fail_if_exists':bool} $config
+     * @param array<string,mixed>|array{'fail_if_exists':bool,'progress':callable(File):void} $config
      *
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException

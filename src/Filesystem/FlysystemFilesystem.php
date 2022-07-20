@@ -78,6 +78,8 @@ final class FlysystemFilesystem implements Filesystem
             throw NodeExists::forCopy($source, $this->node($destination));
         }
 
+        unset($config['fail_if_exists']);
+
         $sourceNode = $this->node($source);
 
         try {
@@ -97,7 +99,7 @@ final class FlysystemFilesystem implements Filesystem
         $this->delete($destination);
 
         if ($sourceNode instanceof Directory) {
-            $this->write($destination, $sourceNode);
+            $this->write($destination, $sourceNode, $config);
 
             return;
         }
@@ -110,6 +112,8 @@ final class FlysystemFilesystem implements Filesystem
         if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
             throw NodeExists::forMove($source, $this->node($destination));
         }
+
+        unset($config['fail_if_exists']);
 
         $sourceNode = $this->node($source);
 
@@ -130,7 +134,7 @@ final class FlysystemFilesystem implements Filesystem
         $this->delete($destination);
 
         if ($sourceNode instanceof Directory) {
-            $this->write($destination, $sourceNode);
+            $this->write($destination, $sourceNode, $config);
             $this->delete($source);
 
             return;
