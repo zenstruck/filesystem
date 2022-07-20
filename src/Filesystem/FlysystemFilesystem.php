@@ -193,8 +193,6 @@ final class FlysystemFilesystem implements Filesystem
             throw NodeExists::forWrite($this->node($path));
         }
 
-        $config['progress'] ??= static function(File $file) {};
-
         if (\is_callable($value)) {
             return $this->write($path, $this->operator->modifyFile($this->file($path), $value), $config);
         }
@@ -213,7 +211,11 @@ final class FlysystemFilesystem implements Filesystem
             $relative = new Path($path);
 
             foreach (Finder::create()->in((string) $value)->files() as $file) {
-                $this->write($relative->append($file->getRelativePathname()), $file, $config);
+                $this->write(
+                    $relative->append($file->getRelativePathname()),
+                    $file,
+                    \array_merge($config, ['set_last_path' => false])
+                );
             }
 
             $this->last = $path;
@@ -226,7 +228,11 @@ final class FlysystemFilesystem implements Filesystem
             $prefixLength = \mb_strlen($value->path());
 
             foreach ($value->recursive()->files() as $file) {
-                $this->write($relative->append(\mb_substr($file->path(), $prefixLength)), $file, $config);
+                $this->write(
+                    $relative->append(\mb_substr($file->path(), $prefixLength)),
+                    $file,
+                    \array_merge($config, ['set_last_path' => false])
+                );
             }
 
             $this->last = $path;
@@ -253,11 +259,13 @@ final class FlysystemFilesystem implements Filesystem
             $value->close();
         }
 
-        $file = new File($this->operator->fileAttributesFor($path), $this->operator);
+        if (isset($config['progress'])) {
+            $config['progress'](new File($this->operator->fileAttributesFor($path), $this->operator));
+        }
 
-        $config['progress']($file);
-
-        $this->last = $path;
+        if ($config['set_last_path'] ?? true) {
+            $this->last = $path;
+        }
 
         return $this;
     }
