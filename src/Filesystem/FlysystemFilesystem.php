@@ -152,8 +152,14 @@ final class FlysystemFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(string $path = '', array $config = []): static
+    public function delete(string|Directory $path = '', array $config = []): static
     {
+        if ($path instanceof Directory) {
+            foreach ($path as $node) {
+                $this->delete($node->path(), $config);
+            }
+        }
+
         try {
             $node = $this->node($path);
         } catch (NodeNotFound) {
@@ -165,6 +171,10 @@ final class FlysystemFilesystem implements Filesystem
             $node instanceof Directory => $this->operator->deleteDirectory($path),
             default => null,
         };
+
+        if ($node && isset($config['progress'])) {
+            $config['progress']($node);
+        }
 
         $this->last = new \LogicException('Last node not available as the last operation deleted it.');
 
