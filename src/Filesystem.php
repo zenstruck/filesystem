@@ -81,29 +81,14 @@ interface Filesystem
     /**
      * Delete a file or directory.
      *
-     * You can pass a "progress" callback to $config that is called before each
-     * node is deleted with said node as the argument (useful when deleting a
-     * filtered {@see Directory}).
-     *
-     * EXAMPLE:
-     *
-     * ```php
-     * $filesystem->delete($directory, [
-     *      'progress' => fn(Node $node) => ...do something with $node
-     * ]);
-     * ```
-     *
      * @see FilesystemWriter::delete()
      * @see FilesystemWriter::deleteDirectory()
      *
-     * @param string|Directory<Node>                                    $path   If {@see Directory}, deletes filtered nodes
-     * @param array<string,mixed>|array{'progress':callable(Node):void} $config If passed, called before each node is deleted
-     *
-     * @return int The number of nodes deleted
+     * @param array<string,mixed> $config
      *
      * @throws FilesystemException
      */
-    public function delete(string|Directory $path = '', array $config = []): int;
+    public function delete(string $path = '', array $config = []): void;
 
     /**
      * @see FilesystemWriter::createDirectory()

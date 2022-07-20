@@ -147,31 +147,15 @@ final class FlysystemFilesystem implements Filesystem
         }
     }
 
-    public function delete(string|Directory $path = '', array $config = []): int
+    public function delete(string $path = '', array $config = []): void
     {
-        $config['progress'] ??= static function(Node $node) {};
-
-        if ($path instanceof Directory) {
-            $count = 0;
-
-            foreach ($path as $node) {
-                $count += $this->delete($node->path(), $config);
-            }
-
-            return $count;
-        }
-
         try {
             $node = $this->node($path);
         } catch (NodeNotFound) {
-            return 0;
+            return;
         }
 
-        $config['progress']($node);
-
         $node instanceof File ? $this->operator->delete($path) : $this->operator->deleteDirectory($path);
-
-        return 1;
     }
 
     public function mkdir(string $path = '', array $config = []): void
