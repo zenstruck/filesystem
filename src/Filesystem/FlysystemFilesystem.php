@@ -13,6 +13,8 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
+use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
@@ -76,21 +78,62 @@ final class FlysystemFilesystem implements Filesystem
             throw NodeExists::forCopy($source, $this->node($destination));
         }
 
-        try {
-            $this->operator->copy($source, $destination, $config);
-        } catch (UnableToCopyFile $e) {
-            if (!$this->exists($source)) {
-                throw NodeNotFound::for($source);
-            }
+        $sourceNode = $this->node($source);
 
-            throw $e;
+        try {
+            $destinationNode = $this->node($destination);
+        } catch (NodeNotFound) {
+            $destinationNode = null;
         }
+
+        if ($sourceNode instanceof File && $destinationNode instanceof Directory) {
+            throw UnableToCopyFile::fromLocationTo($source, $destination);
+        }
+
+        if ($sourceNode instanceof Directory && $destinationNode instanceof File) {
+            throw UnableToCopyDirectory::fromLocationTo($source, $destination, 'Source is a directory but destination is a file.');
+        }
+
+        $this->delete($destination);
+
+        if ($sourceNode instanceof Directory) {
+            $this->write($destination, $sourceNode);
+
+            return;
+        }
+
+        $this->operator->copy($source, $destination, $config);
     }
 
     public function move(string $source, string $destination, array $config = []): void
     {
         if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
             throw NodeExists::forMove($source, $this->node($destination));
+        }
+
+        $sourceNode = $this->node($source);
+
+        try {
+            $destinationNode = $this->node($destination);
+        } catch (NodeNotFound) {
+            $destinationNode = null;
+        }
+
+        if ($sourceNode instanceof File && $destinationNode instanceof Directory) {
+            throw UnableToMoveFile::fromLocationTo($source, $destination);
+        }
+
+        if ($sourceNode instanceof Directory && $destinationNode instanceof File) {
+            throw UnableToMoveDirectory::fromLocationTo($source, $destination, 'Source is a directory but destination is a file.');
+        }
+
+        $this->delete($destination);
+
+        if ($sourceNode instanceof Directory) {
+            $this->write($destination, $sourceNode);
+            $this->delete($source);
+
+            return;
         }
 
         try {

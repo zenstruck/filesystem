@@ -12,6 +12,8 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
+use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
@@ -784,6 +786,134 @@ abstract class FilesystemTestCase extends TestCase
         }
 
         $this->fail('Exception not thrown.');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_copy_dir_to_existing_file(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'file1');
+        $filesystem->mkdir('dir');
+
+        $this->expectException(UnableToCopyDirectory::class);
+
+        $filesystem->copy('dir', 'file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function can_copy_directory(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir1/file1.txt', 'file1');
+        $filesystem->write('subdir1/nested/file2.txt', 'file2');
+
+        $this->assertTrue($filesystem->exists('subdir1'));
+        $this->assertFalse($filesystem->exists('subdir2'));
+        $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir1/nested/file2.txt')->contents());
+
+        $filesystem->copy('subdir1', 'subdir2');
+
+        $this->assertTrue($filesystem->exists('subdir1'));
+        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir1/nested/file2.txt')->contents());
+        $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir2/nested/file2.txt')->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function can_copy_directory_over_existing_directory(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir1/file1.txt', 'file1');
+        $filesystem->write('subdir1/file2.txt', 'file2');
+        $filesystem->write('subdir2/file3.txt', 'file3');
+
+        $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
+        $this->assertTrue($filesystem->exists('subdir2/file3.txt'));
+
+        $filesystem->copy('subdir1', 'subdir2');
+
+        $this->assertTrue($filesystem->exists('subdir1'));
+        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
+        $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir2/file2.txt')->contents());
+        $this->assertFalse($filesystem->exists('subdir2/file3.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_move_dir_to_existing_file(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('file.txt', 'file1');
+        $filesystem->mkdir('dir');
+
+        try {
+            $filesystem->move('dir', 'file.txt');
+        } catch (UnableToMoveDirectory) {
+            $this->assertTrue($filesystem->exists('dir'));
+            $this->assertTrue($filesystem->exists('file.txt'));
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_move_directory(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir/file1.txt', 'file1');
+        $filesystem->write('subdir/file2.txt', 'file2');
+
+        $this->assertTrue($filesystem->exists('subdir'));
+        $this->assertSame('file1', $filesystem->file('subdir/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir/file2.txt')->contents());
+
+        $filesystem->move('subdir', 'new-subdir');
+
+        $this->assertFalse($filesystem->exists('subdir'));
+        $this->assertTrue($filesystem->exists('new-subdir'));
+        $this->assertSame('file1', $filesystem->file('new-subdir/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('new-subdir/file2.txt')->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function can_move_directory_over_existing_directory(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('subdir1/file1.txt', 'file1');
+        $filesystem->write('subdir1/file2.txt', 'file2');
+        $filesystem->write('subdir2/file3.txt', 'file3');
+
+        $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
+        $this->assertTrue($filesystem->exists('subdir2/file3.txt'));
+
+        $filesystem->move('subdir1', 'subdir2');
+
+        $this->assertFalse($filesystem->exists('subdir1'));
+        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
+        $this->assertSame('file2', $filesystem->file('subdir2/file2.txt')->contents());
+        $this->assertFalse($filesystem->exists('subdir2/file3.txt'));
     }
 
     abstract protected function createFilesystem(): Filesystem;
