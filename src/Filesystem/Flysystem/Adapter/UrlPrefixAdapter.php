@@ -10,7 +10,7 @@ use Zenstruck\Uri;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class UrlPrefixAdapter extends WrappedAdapter
+final class UrlPrefixAdapter extends FeatureAwareAdapter
 {
     protected const FEATURES_ADDED = [FileUrl::class];
 

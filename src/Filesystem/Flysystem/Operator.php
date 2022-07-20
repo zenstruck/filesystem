@@ -11,8 +11,8 @@ use League\Flysystem\WhitespacePathNormalizer;
 use Zenstruck\Filesystem\Feature\All;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
+use Zenstruck\Filesystem\Flysystem\Adapter\FeatureAwareAdapter;
 use Zenstruck\Filesystem\Flysystem\Adapter\UrlPrefixAdapter;
-use Zenstruck\Filesystem\Flysystem\Adapter\WrappedAdapter;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Uri;
@@ -24,7 +24,7 @@ use Zenstruck\Uri;
  */
 final class Operator extends Filesystem implements All
 {
-    private WrappedAdapter $adapter;
+    private FeatureAwareAdapter $adapter;
     private PathNormalizer $normalizer;
 
     /**
@@ -32,8 +32,8 @@ final class Operator extends Filesystem implements All
      */
     public function __construct(FilesystemAdapter $adapter, array $config = [], ?PathNormalizer $pathNormalizer = null)
     {
-        if (!$adapter instanceof WrappedAdapter) {
-            $adapter = new WrappedAdapter($adapter);
+        if (!$adapter instanceof FeatureAwareAdapter) {
+            $adapter = new FeatureAwareAdapter($adapter);
         }
 
         if ($prefixes = $config['url_prefix'] ?? $config['url_prefixes'] ?? null) {
