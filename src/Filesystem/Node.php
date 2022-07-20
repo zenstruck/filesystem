@@ -4,7 +4,10 @@ namespace Zenstruck\Filesystem;
 
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
+use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Flysystem\Operator;
+use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -93,6 +96,19 @@ abstract class Node
         unset($this->visibility, $this->lastModified);
 
         return $this;
+    }
+
+    final public function ensureFile(): File
+    {
+        return $this instanceof File ? $this : throw NodeTypeMismatch::expectedFileAt($this->path());
+    }
+
+    /**
+     * @return Directory<Node>
+     */
+    final public function ensureDirectory(): Directory
+    {
+        return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
     }
 
     final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable

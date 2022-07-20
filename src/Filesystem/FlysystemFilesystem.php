@@ -12,7 +12,6 @@ use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
-use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
 use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
@@ -55,16 +54,12 @@ final class FlysystemFilesystem implements Filesystem
 
     public function file(string $path): File
     {
-        $node = $this->node($path);
-
-        return $node instanceof File ? $node : throw NodeTypeMismatch::expectedFileAt($path);
+        return $this->node($path)->ensureFile();
     }
 
     public function directory(string $path = ''): Directory
     {
-        $node = $this->node($path);
-
-        return $node instanceof Directory ? $node : throw NodeTypeMismatch::expectedDirectoryAt($path);
+        return $this->node($path)->ensureDirectory();
     }
 
     public function exists(string $path = ''): bool
