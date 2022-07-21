@@ -9,8 +9,5 @@ use Zenstruck\Filesystem\Node\File;
  */
 interface ModifyFile
 {
-    /**
-     * @param callable(\SplFileInfo):\SplFileInfo $callback
-     */
-    public function modifyFile(File $file, callable $callback): \SplFileInfo;
+    public function realFile(File $file): \SplFileInfo;
 }

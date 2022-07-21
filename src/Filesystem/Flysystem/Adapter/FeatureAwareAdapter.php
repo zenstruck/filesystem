@@ -32,9 +32,9 @@ class FeatureAwareAdapter extends WrappedAdapter implements All
         return $this->ensureSupports(FileChecksum::class)->sha1ChecksumFor($file); // @phpstan-ignore-line
     }
 
-    public function modifyFile(File $file, callable $callback): \SplFileInfo
+    public function realFile(File $file): \SplFileInfo
     {
-        return $this->ensureSupports(ModifyFile::class)->modifyFile($file, $callback); // @phpstan-ignore-line
+        return $this->ensureSupports(ModifyFile::class)->realFile($file); // @phpstan-ignore-line
     }
 
     public function urlFor(File $file): Uri

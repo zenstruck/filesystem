@@ -76,18 +76,12 @@ final class Operator extends Filesystem implements All
         return $this->adapter->urlFor($file);
     }
 
-    public function modifyFile(File $file, callable $callback): \SplFileInfo
+    public function realFile(File $file): \SplFileInfo
     {
         if ($this->adapter->supports(ModifyFile::class)) {
-            return $this->adapter->modifyFile($file, $callback);
+            return $this->adapter->realFile($file);
         }
 
-        $tempFile = $callback(TempFile::with($file->read()));
-
-        if (!$tempFile instanceof \SplFileInfo || !$tempFile->isReadable() || $tempFile->isDir()) {
-            throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
-        }
-
-        return $tempFile;
+        return TempFile::with($file->read());
     }
 }

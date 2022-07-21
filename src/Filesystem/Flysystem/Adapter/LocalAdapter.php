@@ -44,15 +44,9 @@ final class LocalAdapter extends LocalFilesystemAdapter implements FileChecksum,
         return \sha1_file($this->prefixer()->prefixPath($file)) ?: throw UnableToRetrieveMetadata::create($file, 'sha1_checksum');
     }
 
-    public function modifyFile(File $file, callable $callback): \SplFileInfo
+    public function realFile(File $file): \SplFileInfo
     {
-        $file = $callback(new \SplFileInfo($this->prefixer()->prefixPath($file)));
-
-        if (!$file instanceof \SplFileInfo || !$file->isReadable() || $file->isDir()) {
-            throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
-        }
-
-        return $file;
+        return new \SplFileInfo($this->prefixer()->prefixPath($file));
     }
 
     private function prefixer(): PathPrefixer

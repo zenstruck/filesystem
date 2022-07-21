@@ -223,7 +223,19 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         if (\is_callable($value)) {
-            return $this->write($path, $this->operator->modifyFile($this->file($path), $value), $config);
+            $file = $this->operator->realFile($this->file($path));
+
+            if (!$file->isReadable() || $file->isDir()) {
+                throw new \LogicException(\sprintf('File "%s" is not a readable file.', $file));
+            }
+
+            $file = $value($file);
+
+            if (!$file instanceof \SplFileInfo || !$file->isReadable() || $file->isDir()) {
+                throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
+            }
+
+            return $this->write($path, $file, $config);
         }
 
         if (\is_string($value)) { // check if local filename
