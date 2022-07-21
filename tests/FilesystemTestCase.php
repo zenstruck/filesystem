@@ -99,6 +99,14 @@ abstract class FilesystemTestCase extends TestCase
     /**
      * @test
      */
+    public function can_get_image(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
     public function removing_non_existent_key_does_nothing(): void
     {
         $filesystem = $this->createFilesystem();
