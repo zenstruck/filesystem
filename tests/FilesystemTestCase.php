@@ -25,6 +25,7 @@ use Zenstruck\Filesystem\ResourceWrapper;
 abstract class FilesystemTestCase extends TestCase
 {
     protected const TEMP_DIR = __DIR__.'/../var/filesystem';
+    protected const FIXTURE_DIR = __DIR__.'/Fixture/files';
 
     /**
      * @before
