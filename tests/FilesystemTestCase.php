@@ -102,6 +102,37 @@ abstract class FilesystemTestCase extends TestCase
      */
     public function can_get_image(): void
     {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('images', self::FIXTURE_DIR);
+
+        foreach (['jpg', 'gif', 'png'] as $ext) {
+            $image = $filesystem->node('images/symfony.'.$ext)->ensureImage();
+
+            $this->assertSame(563, $image->width());
+            $this->assertSame(678, $image->height());
+            $this->assertSame(0.83, \round($image->aspectRatio(), 2));
+        }
+
+        $image = $filesystem->node('images/symfony.svg')->ensureImage();
+
+        $this->assertSame(202, $image->width());
+        $this->assertSame(224, $image->height());
+        $this->assertSame(0.90, \round($image->aspectRatio(), 2));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_image_for_directory(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_get_image_for_non_image_file_type(): void
+    {
         $this->markTestIncomplete();
     }
 

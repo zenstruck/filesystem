@@ -14,12 +14,15 @@ use Zenstruck\Uri;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class File extends Node
+class File extends Node
 {
     private Information $size;
     private string $mimeType;
     private Checksum $checksum;
 
+    /**
+     * @internal
+     */
     public function __construct(FileAttributes $attributes, Operator $operator)
     {
         parent::__construct($attributes, $operator);
@@ -33,17 +36,17 @@ final class File extends Node
         }
     }
 
-    public function size(): Information
+    final public function size(): Information
     {
         return $this->size ??= Information::binary($this->operator->fileSize($this->path()));
     }
 
-    public function mimeType(): string
+    final public function mimeType(): string
     {
         return $this->mimeType ??= $this->operator->mimeType($this->path());
     }
 
-    public function contents(): string
+    final public function contents(): string
     {
         return $this->operator->read($this->path());
     }
@@ -51,7 +54,7 @@ final class File extends Node
     /**
      * @return resource
      */
-    public function read()
+    final public function read()
     {
         return $this->operator->readStream($this->path());
     }
@@ -64,7 +67,7 @@ final class File extends Node
      * @example $file->checksum()->metadata()->toString() (md5 hash of file size + last modified timestamp + mime-type)
      * @example $file->checksum()->metadata()->sha1()->toString() (sha1 hash of file size + last modified timestamp + mime-type)
      */
-    public function checksum(): Checksum
+    final public function checksum(): Checksum
     {
         return $this->checksum ??= new Checksum($this, $this->operator);
     }
@@ -72,7 +75,7 @@ final class File extends Node
     /**
      * Whether the contents of this file and another match (content checksum is used).
      */
-    public function contentsEquals(self $other): bool
+    final public function contentsEquals(self $other): bool
     {
         return $this->checksum->equals($other->checksum());
     }
@@ -80,7 +83,7 @@ final class File extends Node
     /**
      * Whether the metadata of this file and another match (metadata checksum is used).
      */
-    public function metadataEquals(self $other): bool
+    final public function metadataEquals(self $other): bool
     {
         return $this->checksum->forMetadata()->equals($other->checksum());
     }
@@ -88,12 +91,12 @@ final class File extends Node
     /**
      * @return Directory<Node>
      */
-    public function directory(): Directory
+    final public function directory(): Directory
     {
         return new Directory($this->operator->directoryAttributesFor($this->dirname()), $this->operator);
     }
 
-    public function extension(): ?string
+    final public function extension(): ?string
     {
         return \pathinfo($this->path(), \PATHINFO_EXTENSION) ?: null;
     }
@@ -101,7 +104,7 @@ final class File extends Node
     /**
      * @throws UnsupportedFeature If your adapter does not support {@see FileUrl}
      */
-    public function url(): Uri
+    final public function url(): Uri
     {
         return $this->operator->urlFor($this);
     }
@@ -111,5 +114,26 @@ final class File extends Node
         unset($this->size, $this->mimeType, $this->checksum);
 
         return parent::refresh();
+    }
+
+    protected function castTo(Node $to): self
+    {
+        $to = parent::castTo($to);
+
+        \assert($to instanceof self);
+
+        if (isset($to->size)) {
+            $to->size = $this->size;
+        }
+
+        if (isset($to->mimeType)) {
+            $to->mimeType = $this->mimeType;
+        }
+
+        if (isset($to->checksum)) {
+            $to->checksum = $this->checksum;
+        }
+
+        return $to;
     }
 }

@@ -29,7 +29,7 @@ trait InteractsWithFilesystem
         unset($this->_testFilesystem);
     }
 
-    public function filesystem(): TestFilesystem
+    protected function filesystem(): TestFilesystem
     {
         if (isset($this->_testFilesystem)) {
             return $this->_testFilesystem;

@@ -8,6 +8,7 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -20,6 +21,9 @@ abstract class Node
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
+    /**
+     * @internal
+     */
     public function __construct(StorageAttributes $attributes, protected Operator $operator)
     {
         $this->path = $attributes->path();
@@ -33,7 +37,7 @@ abstract class Node
         }
     }
 
-    public function __toString(): string
+    final public function __toString(): string
     {
         return $this->path;
     }
@@ -88,6 +92,8 @@ abstract class Node
         return $this->operator->has($this->path());
     }
 
+    abstract public function mimeType(): string;
+
     /**
      * Clear any cached metadata.
      */
@@ -98,6 +104,9 @@ abstract class Node
         return $this;
     }
 
+    /**
+     * @throws NodeTypeMismatch If not a file
+     */
     final public function ensureFile(): File
     {
         return $this instanceof File ? $this : throw NodeTypeMismatch::expectedFileAt($this->path());
@@ -105,10 +114,28 @@ abstract class Node
 
     /**
      * @return Directory<Node>
+     *
+     * @throws NodeTypeMismatch If not a directory
      */
     final public function ensureDirectory(): Directory
     {
         return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
+    }
+
+    /**
+     * @throws NodeTypeMismatch If not an image file
+     */
+    final public function ensureImage(): Image
+    {
+        if ($this instanceof Image) {
+            return $this;
+        }
+
+        if (!$this->isImage()) {
+            throw NodeTypeMismatch::expectedImageAt($this->path(), $this->mimeType());
+        }
+
+        return $this->castTo(new Image());
     }
 
     final public function isFile(): bool
@@ -119,6 +146,11 @@ abstract class Node
     final public function isDirectory(): bool
     {
         return $this instanceof Directory;
+    }
+
+    final public function isImage(): bool
+    {
+        return $this instanceof Image || ($this instanceof File && \str_contains($this->mimeType(), 'image/'));
     }
 
     final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
@@ -141,5 +173,28 @@ abstract class Node
 
         // ensure in the PHP default timezone
         return $timestamp->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
+    }
+
+    /**
+     * @template T of Node
+     *
+     * @param T $to
+     *
+     * @return T
+     */
+    protected function castTo(self $to): self
+    {
+        $to->operator = $this->operator;
+        $to->path = $this->path;
+
+        if (isset($to->visibility)) {
+            $to->visibility = $this->visibility;
+        }
+
+        if (isset($to->lastModified)) {
+            $to->lastModified = $this->lastModified;
+        }
+
+        return $to;
     }
 }

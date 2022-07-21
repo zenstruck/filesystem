@@ -37,9 +37,17 @@ final class Directory extends Node implements \IteratorAggregate
     /** @var string[] */
     private array $notPaths = [];
 
+    /**
+     * @internal
+     */
     public function __construct(DirectoryAttributes $attributes, Operator $operator)
     {
         parent::__construct($attributes, $operator);
+    }
+
+    public function mimeType(): string
+    {
+        return '(directory)';
     }
 
     /**

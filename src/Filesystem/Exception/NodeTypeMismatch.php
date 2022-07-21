@@ -23,4 +23,9 @@ final class NodeTypeMismatch extends \RuntimeException implements FilesystemExce
     {
         return new self(\sprintf('Expected node at path "%s" to be a file but is a directory.', $path));
     }
+
+    public static function expectedImageAt(string $path, string $type): self
+    {
+        return new self(\sprintf('Expected node at path "%s" to be an image but is type "%s".', $path, $type));
+    }
 }
