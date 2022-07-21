@@ -3,12 +3,12 @@
 namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\FileAttributes;
+use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
-use Zenstruck\Filesystem\Node\File\Size;
 use Zenstruck\Uri;
 
 /**
@@ -16,7 +16,7 @@ use Zenstruck\Uri;
  */
 final class File extends Node
 {
-    private Size $size;
+    private Information $size;
     private string $mimeType;
     private Checksum $checksum;
 
@@ -25,7 +25,7 @@ final class File extends Node
         parent::__construct($attributes, $operator);
 
         if ($size = $attributes->fileSize()) {
-            $this->size = Size::binary($size);
+            $this->size = Information::binary($size);
         }
 
         if ($mimeType = $attributes->mimeType()) {
@@ -33,9 +33,9 @@ final class File extends Node
         }
     }
 
-    public function size(): Size
+    public function size(): Information
     {
-        return $this->size ??= Size::binary($this->operator->fileSize($this->path()));
+        return $this->size ??= Information::binary($this->operator->fileSize($this->path()));
     }
 
     public function mimeType(): string

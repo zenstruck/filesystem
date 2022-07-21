@@ -5,11 +5,11 @@ namespace Zenstruck\Filesystem\Node;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use Symfony\Component\Finder\Iterator\LazyIterator;
+use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
-use Zenstruck\Filesystem\Node\File\Size;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -77,7 +77,7 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function largerThan(string|int $size): self
     {
-        $size = Size::from($size)->bytes();
+        $size = Information::from($size)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isLargerThan($size));
@@ -92,7 +92,7 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function smallerThan(string|int $size): self
     {
-        $size = Size::from($size)->bytes();
+        $size = Information::from($size)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isSmallerThan($size));
@@ -108,8 +108,8 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function sizeWithin(string|int $min, string|int $max): self
     {
-        $min = Size::from($min)->bytes();
-        $max = Size::from($max)->bytes();
+        $min = Information::from($min)->bytes();
+        $max = Information::from($max)->bytes();
 
         // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isWithin($min, $max));
