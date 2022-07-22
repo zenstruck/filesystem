@@ -9,30 +9,10 @@ use Zenstruck\Filesystem\Node\File;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ReadonlyFilesystem implements Filesystem
+final class ReadonlyFilesystem extends WrappedFilesystem
 {
     public function __construct(private Filesystem $inner)
     {
-    }
-
-    public function node(string $path = ''): File|Directory
-    {
-        return $this->inner->node($path);
-    }
-
-    public function file(string $path): File
-    {
-        return $this->inner->file($path);
-    }
-
-    public function directory(string $path = ''): Directory
-    {
-        return $this->inner->directory($path);
-    }
-
-    public function exists(string $path = ''): bool
-    {
-        return $this->inner->exists($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
@@ -68,6 +48,11 @@ final class ReadonlyFilesystem implements Filesystem
     public function last(): File|Directory
     {
         self::throw();
+    }
+
+    protected function inner(): Filesystem
+    {
+        return $this->inner;
     }
 
     /**
