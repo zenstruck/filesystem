@@ -7,7 +7,7 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class MultiFilesystemTestCase extends FilesystemTestCase
+abstract class MultiFilesystemTest extends FilesystemTest
 {
     /**
      * @test

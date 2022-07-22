@@ -5,12 +5,12 @@ namespace Zenstruck\Filesystem\Tests\Flysystem\Adapter;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\FlysystemFilesystem;
-use Zenstruck\Filesystem\Tests\FilesystemTestCase;
+use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class UrlPrefixAdapterTest extends FilesystemTestCase
+final class UrlPrefixAdapterTest extends FilesystemTest
 {
     /**
      * @test

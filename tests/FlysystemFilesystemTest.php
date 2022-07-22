@@ -9,7 +9,7 @@ use Zenstruck\Filesystem\FlysystemFilesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FlysystemFilesystemTest extends FilesystemTestCase
+final class FlysystemFilesystemTest extends FilesystemTest
 {
     protected function createFilesystem(): Filesystem
     {

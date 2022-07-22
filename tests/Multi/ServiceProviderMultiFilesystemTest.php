@@ -2,11 +2,11 @@
 
 namespace Zenstruck\Filesystem\Tests\Multi;
 
-use Zenstruck\Filesystem\Tests\MultiFilesystemTestCase;
+use Zenstruck\Filesystem\Tests\MultiFilesystemTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ServiceProviderMultiFilesystemTest extends MultiFilesystemTestCase
+final class ServiceProviderMultiFilesystemTest extends MultiFilesystemTest
 {
 }
