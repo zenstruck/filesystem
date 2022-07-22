@@ -8,7 +8,7 @@ use Zenstruck\Filesystem\Node\File;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Image extends File
+class Image extends File
 {
     /** @var array{0:int,1:int} */
     private array $imageSize;
