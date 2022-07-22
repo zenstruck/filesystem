@@ -102,6 +102,15 @@ class File extends Node
     }
 
     /**
+     * @example If $path is "foo/bar/baz.txt", returns "baz"
+     * @example If $path is "foo/bar/baz", returns "baz"
+     */
+    final public function nameWithoutExtension(): string
+    {
+        return \pathinfo($this->path(), \PATHINFO_FILENAME);
+    }
+
+    /**
      * @throws UnsupportedFeature If your adapter does not support {@see FileUrl}
      */
     final public function url(): Uri

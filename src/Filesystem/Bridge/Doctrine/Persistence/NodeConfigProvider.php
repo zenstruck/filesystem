@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\ImageType;
  *      filesystem: string,
  *      property: string,
  *      delete_on_remove?: bool,
+ *      namer?: string,
+ *      expression?: string,
  * }>
  */
 interface NodeConfigProvider

@@ -10,4 +10,12 @@ namespace Zenstruck\Filesystem\Node;
 interface PendingNode
 {
     public function localFile(): \SplFileInfo;
+
+    public function originalName(): string;
+
+    public function originalNameWithoutExtension(): string;
+
+    public function originalExtension(): ?string;
+
+    public function originalExtensionWithDot(): ?string;
 }
