@@ -10,14 +10,13 @@ use Zenstruck\Filesystem\Node\File\LazyImage;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @internal
+ *
  * @method FileCollection<Image>|null convertToPHPValue(mixed $value, AbstractPlatform $platform)
  */
 final class ImageCollectionType extends FileCollectionType
 {
-    public function getName(): string
-    {
-        return 'image_collection';
-    }
+    public const NAME = 'image_collection';
 
     protected static function createFileFor(string $path): Image
     {

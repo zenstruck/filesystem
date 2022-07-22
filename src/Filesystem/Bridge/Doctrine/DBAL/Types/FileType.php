@@ -9,9 +9,13 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class FileType extends StringType
 {
+    public const NAME = 'file';
+
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         return $value instanceof File ? $value->path() : null;
@@ -24,7 +28,7 @@ final class FileType extends StringType
 
     public function getName(): string
     {
-        return 'file';
+        return self::NAME;
     }
 
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool

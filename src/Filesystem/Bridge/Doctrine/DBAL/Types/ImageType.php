@@ -9,9 +9,13 @@ use Zenstruck\Filesystem\Node\File\LazyImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class ImageType extends StringType
 {
+    public const NAME = 'image';
+
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         return $value instanceof Image ? $value->path() : null;
@@ -24,7 +28,7 @@ final class ImageType extends StringType
 
     public function getName(): string
     {
-        return 'image';
+        return self::NAME;
     }
 
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool

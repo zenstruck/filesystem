@@ -11,9 +11,13 @@ use Zenstruck\Filesystem\Node\File\LazyFileCollection;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class FileCollectionType extends JsonType
 {
+    public const NAME = 'file_collection';
+
     final public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof FileCollection) {
@@ -40,9 +44,9 @@ class FileCollectionType extends JsonType
         ));
     }
 
-    public function getName(): string
+    final public function getName(): string
     {
-        return 'file_collection';
+        return static::NAME;
     }
 
     protected static function createFileFor(string $path): File
