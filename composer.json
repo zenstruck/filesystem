@@ -20,6 +20,7 @@
         "zenstruck/uri": "^1.0"
     },
     "require-dev": {
+        "doctrine/orm": "^2.12",
         "league/flysystem-memory": "^3.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
@@ -38,6 +39,7 @@
         "psr-4": { "Zenstruck\\Filesystem\\Tests\\": ["tests/"] }
     },
     "suggest": {
-        "league/flysystem-memory": "To use the in-memory adapters"
+        "league/flysystem-memory": "To use the in-memory adapters",
+        "doctrine/dbal": "To use the File/Image/FileCollection types"
     }
 }
