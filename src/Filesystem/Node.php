@@ -17,6 +17,9 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 abstract class Node
 {
+    /** @var array<string,Operator> */
+    protected static array $localOperators = [];
+
     protected string $path;
     private \DateTimeImmutable $lastModified;
     private string $visibility;
