@@ -48,7 +48,7 @@ final class Image extends File
             return $this->imageSize;
         }
 
-        $file = $this->operator->realFile($this);
+        $file = $this->operator()->realFile($this);
 
         if ('image/svg+xml' === $this->mimeType()) {
             return $this->imageSize = self::parseSvg($file) ?? throw UnableToRetrieveMetadata::create($this->path(), 'image_metadata', 'Unable to load svg.');

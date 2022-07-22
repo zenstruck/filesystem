@@ -17,14 +17,14 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 abstract class Node
 {
-    private string $path;
+    protected string $path;
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
     /**
      * @internal
      */
-    public function __construct(StorageAttributes $attributes, protected Operator $operator)
+    public function __construct(StorageAttributes $attributes, private Operator $operator)
     {
         $this->path = $attributes->path();
 
@@ -73,7 +73,7 @@ abstract class Node
      */
     final public function lastModified(): \DateTimeImmutable
     {
-        return $this->lastModified ??= self::parseDateTime($this->operator->lastModified($this->path()));
+        return $this->lastModified ??= self::parseDateTime($this->operator()->lastModified($this->path()));
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class Node
      */
     final public function visibility(): string
     {
-        return $this->visibility ??= $this->operator->visibility($this->path());
+        return $this->visibility ??= $this->operator()->visibility($this->path());
     }
 
     /**
@@ -89,7 +89,7 @@ abstract class Node
      */
     final public function exists(): bool
     {
-        return $this->operator->has($this->path());
+        return $this->operator()->has($this->path());
     }
 
     abstract public function mimeType(): string;
@@ -175,6 +175,11 @@ abstract class Node
         return $timestamp->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
     }
 
+    protected function operator(): Operator
+    {
+        return $this->operator;
+    }
+
     /**
      * @template T of Node
      *
@@ -184,8 +189,11 @@ abstract class Node
      */
     protected function castTo(self $to): self
     {
-        $to->operator = $this->operator;
         $to->path = $this->path;
+
+        if (isset($this->operator)) {
+            $to->operator = $this->operator;
+        }
 
         if (isset($to->visibility)) {
             $to->visibility = $this->visibility;

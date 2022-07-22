@@ -282,12 +282,12 @@ final class Directory extends Node implements \IteratorAggregate
     {
         $iterator = new \IteratorIterator(
             new LazyIterator(function(): \Iterator {
-                $listing = $this->operator->listContents($this->path(), $this->recursive);
+                $listing = $this->operator()->listContents($this->path(), $this->recursive);
 
                 foreach ($listing as $attributes) {
                     yield match (true) {
-                        $attributes instanceof FileAttributes => new File($attributes, $this->operator),
-                        $attributes instanceof DirectoryAttributes => new self($attributes, $this->operator),
+                        $attributes instanceof FileAttributes => new File($attributes, $this->operator()),
+                        $attributes instanceof DirectoryAttributes => new self($attributes, $this->operator()),
                         default => throw new \LogicException('Unexpected StorageAttributes object.'),
                     };
                 }

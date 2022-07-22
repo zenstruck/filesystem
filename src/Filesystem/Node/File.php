@@ -38,17 +38,17 @@ class File extends Node
 
     final public function size(): Information
     {
-        return $this->size ??= Information::binary($this->operator->fileSize($this->path()));
+        return $this->size ??= Information::binary($this->operator()->fileSize($this->path()));
     }
 
     final public function mimeType(): string
     {
-        return $this->mimeType ??= $this->operator->mimeType($this->path());
+        return $this->mimeType ??= $this->operator()->mimeType($this->path());
     }
 
     final public function contents(): string
     {
-        return $this->operator->read($this->path());
+        return $this->operator()->read($this->path());
     }
 
     /**
@@ -56,7 +56,7 @@ class File extends Node
      */
     final public function read()
     {
-        return $this->operator->readStream($this->path());
+        return $this->operator()->readStream($this->path());
     }
 
     /**
@@ -69,7 +69,7 @@ class File extends Node
      */
     final public function checksum(): Checksum
     {
-        return $this->checksum ??= new Checksum($this, $this->operator);
+        return $this->checksum ??= new Checksum($this, $this->operator());
     }
 
     /**
@@ -93,7 +93,7 @@ class File extends Node
      */
     final public function directory(): Directory
     {
-        return new Directory($this->operator->directoryAttributesFor($this->dirname()), $this->operator);
+        return new Directory($this->operator()->directoryAttributesFor($this->dirname()), $this->operator());
     }
 
     final public function extension(): ?string
@@ -106,7 +106,7 @@ class File extends Node
      */
     final public function url(): Uri
     {
-        return $this->operator->urlFor($this);
+        return $this->operator()->urlFor($this);
     }
 
     public function refresh(): static
