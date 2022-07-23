@@ -72,7 +72,7 @@ interface Filesystem
      *
      * @see FilesystemWriter::copy()
      *
-     * @param array<string,mixed>|array{'fail_if_exists':bool,'progress':callable(File):void} $config
+     * @param array<string,mixed>|array{fail_if_exists:bool,progress:callable(File):void} $config
      *
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
@@ -103,7 +103,7 @@ interface Filesystem
      *
      * @see FilesystemWriter::move()
      *
-     * @param array<string,mixed>|array{'fail_if_exists':bool,'progress':callable(File):void} $config
+     * @param array<string,mixed>|array{fail_if_exists:bool,progress:callable(File):void} $config
      *
      * @throws NodeExists          If the $destination exists and "fail_if_exists" => true
      * @throws FilesystemException
@@ -128,8 +128,8 @@ interface Filesystem
      * @see FilesystemWriter::delete()
      * @see FilesystemWriter::deleteDirectory()
      *
-     * @param string|Directory<Node>                                    $path   If {@see Directory}, deletes filtered nodes
-     * @param array<string,mixed>|array{'progress':callable(Node):void} $config
+     * @param string|Directory<Node>                                  $path   If {@see Directory}, deletes filtered nodes
+     * @param array<string,mixed>|array{progress:callable(Node):void} $config
      *
      * @throws FilesystemException
      */
@@ -192,7 +192,7 @@ interface Filesystem
      * @see FilesystemWriter::writeStream()
      *
      * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
-     * @param array<string,mixed>|array{'progress':callable(File):void,'fail_if_exists':bool}       $config
+     * @param array<string,mixed>|array{progress:callable(File):void,fail_if_exists:bool}           $config
      *
      * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
      * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
