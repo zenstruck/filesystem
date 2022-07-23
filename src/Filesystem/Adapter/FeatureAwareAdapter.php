@@ -37,9 +37,9 @@ class FeatureAwareAdapter extends WrappedAdapter implements All
         return $this->ensureSupports(ModifyFile::class)->realFile($file); // @phpstan-ignore-line
     }
 
-    public function urlFor(File $file): Uri
+    public function urlFor(File $file, array $options = []): Uri
     {
-        return $this->ensureSupports(FileUrl::class)->urlFor($file); // @phpstan-ignore-line
+        return $this->ensureSupports(FileUrl::class)->urlFor($file, $options); // @phpstan-ignore-line
     }
 
     final public function supports(string $feature): bool

@@ -119,11 +119,13 @@ class File implements Node
     }
 
     /**
+     * @param array<string,mixed> $options
+     *
      * @throws UnsupportedFeature If your adapter does not support {@see FileUrl}
      */
-    final public function url(): Uri
+    final public function url(array $options = []): Uri
     {
-        return $this->operator()->urlFor($this);
+        return $this->operator()->urlFor($this, $options);
     }
 
     public function refresh(): static

@@ -72,9 +72,9 @@ final class Operator extends Filesystem implements All
         return \sha1($file->contents());
     }
 
-    public function urlFor(File $file): Uri
+    public function urlFor(File $file, array $options = []): Uri
     {
-        return $this->adapter->urlFor($file);
+        return $this->adapter->urlFor($file, $options);
     }
 
     public function realFile(File $file): \SplFileInfo

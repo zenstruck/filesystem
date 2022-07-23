@@ -27,7 +27,7 @@ final class UrlPrefixAdapter extends FeatureAwareAdapter
         $this->prefixes = \array_values(!\is_array($prefix) ? [$prefix] : $prefix);
     }
 
-    public function urlFor(File $file): Uri
+    public function urlFor(File $file, array $options = []): Uri
     {
         $path = $file->path();
 
