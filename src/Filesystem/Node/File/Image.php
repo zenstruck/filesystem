@@ -13,8 +13,9 @@ class Image extends File
     /** @var array{0:int,1:int} */
     private array $imageSize;
 
-    protected function __construct()
+    protected function __construct(string $path)
     {
+        $this->path = $path;
     }
 
     public function height(): int

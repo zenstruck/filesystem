@@ -5,7 +5,6 @@ namespace Zenstruck\Filesystem\Node\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\FlysystemFilesystem;
-use Zenstruck\Filesystem\Node;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -47,7 +46,8 @@ trait IsPendingFile
 
     protected function operator(): Operator
     {
-        return Node::$localOperators[$dir = \dirname($this->file)] ??= (new FlysystemFilesystem($dir))
+        // todo, does this cache image/file separate?
+        return self::$localOperators[$dir = \dirname($this->file)] ??= (new FlysystemFilesystem($dir))
             ->file($this->file->getFilename())
             ->operator()
         ;

@@ -15,7 +15,7 @@ use Zenstruck\Filesystem\Node\LazyNode;
  *
  * @internal
  */
-final class LazyFileCollection extends FileCollection implements LazyNode
+final class LazyFileCollection extends FileCollection
 {
     private bool $initialized = false;
     private Filesystem $filesystem;

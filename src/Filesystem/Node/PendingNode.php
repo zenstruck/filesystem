@@ -2,12 +2,14 @@
 
 namespace Zenstruck\Filesystem\Node;
 
+use Zenstruck\Filesystem\Node;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-interface PendingNode
+interface PendingNode extends Node
 {
     public function localFile(): \SplFileInfo;
 

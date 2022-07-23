@@ -28,7 +28,7 @@ final class ORMNodeConfigProvider implements NodeConfigProvider
 
             $config[] = [
                 'filesystem' => $mapping['options']['filesystem'] ?? throw new \LogicException(\sprintf('Column definition for %s::$%s is missing the required "filesystem" option.', $class, $mapping['fieldName'])),
-                'property' => $mapping['options']['fieldName'],
+                'property' => $mapping['fieldName'],
             ];
         }
 

@@ -18,8 +18,12 @@ use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
  * @template T of Node
  * @implements \IteratorAggregate<int,T>
  */
-final class Directory extends Node implements \IteratorAggregate
+final class Directory implements Node, \IteratorAggregate
 {
+    use IsNode {
+        __construct as traitConstruct;
+    }
+
     private bool $recursive = false;
 
     /** @var array<callable(Node):bool> */
@@ -42,7 +46,7 @@ final class Directory extends Node implements \IteratorAggregate
      */
     public function __construct(DirectoryAttributes $attributes, Operator $operator)
     {
-        parent::__construct($attributes, $operator);
+        $this->traitConstruct($attributes, $operator);
     }
 
     public function mimeType(): string

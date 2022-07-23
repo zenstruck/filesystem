@@ -37,6 +37,8 @@ final class NodeLifecycleSubscriber
      */
     public function postRemove(LifecycleEventArgs $event): void
     {
+        // todo collections
+
         if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
             return;
         }
@@ -72,6 +74,8 @@ final class NodeLifecycleSubscriber
      */
     public function postPersist(LifecycleEventArgs $event): void
     {
+        // todo collections
+
         if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
             return;
         }
@@ -94,8 +98,6 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            \assert($node instanceof Node);
-
             $node = $this->filesystem->get($config['filesystem'])->write(
                 $this->namer($config['namer'] ?? null)->generateName($node, $object, $config),
                 $node->localFile()
@@ -110,6 +112,7 @@ final class NodeLifecycleSubscriber
      */
     public function preUpdate(PreUpdateEventArgs|ORMPreUpdateEventArgs $event): void
     {
+        // todo collections
         // TODO save pending updates and execute in postUpdate/postFlush?
 
         if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {

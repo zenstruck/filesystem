@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Bridge\Doctrine;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
+use Zenstruck\Filesystem\Node\File\LazyFileCollection;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
@@ -48,7 +49,7 @@ final class ObjectNodeLoader
 
             $node = $refProp->getValue($object);
 
-            if (!$node instanceof LazyNode) {
+            if (!$node instanceof LazyNode && !$node instanceof LazyFileCollection) {
                 continue;
             }
 

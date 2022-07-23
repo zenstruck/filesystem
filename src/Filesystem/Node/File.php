@@ -14,8 +14,13 @@ use Zenstruck\Uri;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class File extends Node
+class File implements Node
 {
+    use IsNode {
+        __construct as traitConstruct;
+        refresh as traitRefresh;
+    }
+
     private Information $size;
     private string $mimeType;
     private Checksum $checksum;
@@ -25,7 +30,7 @@ class File extends Node
      */
     public function __construct(FileAttributes $attributes, Operator $operator)
     {
-        parent::__construct($attributes, $operator);
+        $this->traitConstruct($attributes, $operator);
 
         if ($size = $attributes->fileSize()) {
             $this->size = Information::binary($size);
@@ -122,27 +127,6 @@ class File extends Node
     {
         unset($this->size, $this->mimeType, $this->checksum);
 
-        return parent::refresh();
-    }
-
-    protected function castTo(Node $to): self
-    {
-        $to = parent::castTo($to);
-
-        \assert($to instanceof self);
-
-        if (isset($to->size)) {
-            $to->size = $this->size;
-        }
-
-        if (isset($to->mimeType)) {
-            $to->mimeType = $this->mimeType;
-        }
-
-        if (isset($to->checksum)) {
-            $to->checksum = $this->checksum;
-        }
-
-        return $to;
+        return $this->traitRefresh();
     }
 }

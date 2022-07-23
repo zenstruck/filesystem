@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 use Zenstruck\Filesystem\Node;
@@ -15,6 +16,9 @@ abstract class BaseNamer implements Namer
 {
     public function __construct(protected ?SluggerInterface $slugger = null)
     {
+        if (!$this->slugger && \class_exists(AsciiSlugger::class)) {
+            $this->slugger = new AsciiSlugger();
+        }
     }
 
     final protected static function extensionWithDot(Node $node): string
