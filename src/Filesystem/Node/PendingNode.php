@@ -18,6 +18,4 @@ interface PendingNode extends Node
     public function originalNameWithoutExtension(): string;
 
     public function originalExtension(): ?string;
-
-    public function originalExtensionWithDot(): ?string;
 }

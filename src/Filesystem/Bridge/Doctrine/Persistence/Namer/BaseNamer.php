@@ -26,10 +26,10 @@ abstract class BaseNamer implements Namer
     final protected static function extensionWithDot(Node $node): string
     {
         if ($node instanceof PendingNode) {
-            return '.'.\mb_strtolower((string) $node->originalExtensionWithDot());
+            return '.'.\mb_strtolower((string) $node->originalExtension());
         }
 
-        return $node instanceof File ? \mb_strtolower((string) $node->extension()) : '';
+        return $node instanceof File ? '.'.\mb_strtolower((string) $node->extension()) : '';
     }
 
     final protected static function nameWithoutExtension(Node $node): string

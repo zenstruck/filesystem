@@ -35,15 +35,6 @@ trait IsPendingFile
         return $this->file instanceof UploadedFile ? $this->file->getClientOriginalExtension() : $this->extension();
     }
 
-    public function originalExtensionWithDot(): ?string
-    {
-        if (!$ext = $this->originalExtension()) {
-            return null;
-        }
-
-        return '.'.$ext;
-    }
-
     protected function operator(): Operator
     {
         return $this->operator ??= self::$localOperators[$dir = \dirname($this->file)] ??= (new AdapterFilesystem($dir))
