@@ -110,7 +110,7 @@ final class NodeLifecycleSubscriber
      */
     public function preUpdate(PreUpdateEventArgs|ORMPreUpdateEventArgs $event): void
     {
-        // TODO save pending updates and execute in postUpdate?
+        // TODO save pending updates and execute in postUpdate/postFlush?
 
         if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
             return;
@@ -135,7 +135,15 @@ final class NodeLifecycleSubscriber
             $old = $event->getOldValue($config['property']);
             $new = $event->getNewValue($config['property']);
 
+            if (!$new instanceof Node && $old instanceof Node) {
+                // user removed node, delete file
+                $this->filesystem->get($config['filesystem'])->delete($old);
+
+                continue;
+            }
+
             if ($new instanceof PendingNode && $new instanceof Node) {
+                // user is adding a new file
                 $new = $this->filesystem->get($config['filesystem'])->write(
                     $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),
                     $new->localFile()
