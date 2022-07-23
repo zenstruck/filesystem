@@ -1,10 +1,10 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Flysystem\Adapter;
+namespace Zenstruck\Filesystem\Tests\Adapter;
 
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
@@ -14,6 +14,6 @@ final class InMemoryAdapterTest extends FilesystemTest
 {
     protected function createFilesystem(): Filesystem
     {
-        return new FlysystemFilesystem(new InMemoryFilesystemAdapter());
+        return new AdapterFilesystem(new InMemoryFilesystemAdapter());
     }
 }

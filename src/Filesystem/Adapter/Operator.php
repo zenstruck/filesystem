@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Filesystem\Flysystem;
+namespace Zenstruck\Filesystem\Adapter;
 
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
@@ -8,12 +8,10 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\PathNormalizer;
 use League\Flysystem\WhitespacePathNormalizer;
+use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Feature\All;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
-use Zenstruck\Filesystem\Flysystem\Adapter\FeatureAwareAdapter;
-use Zenstruck\Filesystem\Flysystem\Adapter\UrlPrefixAdapter;
-use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Uri;
@@ -23,7 +21,7 @@ use Zenstruck\Uri;
  *
  * @internal
  *
- * @phpstan-import-type GlobalOptions from FlysystemFilesystem
+ * @phpstan-import-type GlobalOptions from AdapterFilesystem
  */
 final class Operator extends Filesystem implements All
 {

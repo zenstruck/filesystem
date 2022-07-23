@@ -1,10 +1,10 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Flysystem\Adapter;
+namespace Zenstruck\Filesystem\Tests\Adapter;
 
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
-use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\Adapter\LocalAdapter;
+use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
@@ -30,7 +30,7 @@ final class UrlPrefixAdapterTest extends FilesystemTest
      */
     public function can_use_multiple_prefixes_to_provide_a_deterministic_distribution_strategy(): void
     {
-        $filesystem = new FlysystemFilesystem(new LocalAdapter(self::TEMP_DIR), [
+        $filesystem = new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
             'url_prefixes' => ['https://sub1.example.com', 'https://sub2.example.com'],
         ]);
         $filesystem->write('some-file.txt', 'contents');
@@ -42,7 +42,7 @@ final class UrlPrefixAdapterTest extends FilesystemTest
 
     protected function createFilesystem(): Filesystem
     {
-        return new FlysystemFilesystem(new LocalAdapter(self::TEMP_DIR), [
+        return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
             'url_prefix' => 'https://example.com/sub/',
         ]);
     }

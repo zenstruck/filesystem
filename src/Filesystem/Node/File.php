@@ -4,9 +4,9 @@ namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\FileAttributes;
 use Zenstruck\Dimension\Information;
+use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
-use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Uri;

@@ -3,8 +3,8 @@
 namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\StorageAttributes;
+use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
-use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyImage;

@@ -12,12 +12,12 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Adapter\LocalAdapter;
+use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
 use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
-use Zenstruck\Filesystem\Flysystem\Adapter\LocalAdapter;
-use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Uri\Path;
@@ -31,7 +31,7 @@ use Zenstruck\Uri\Path;
  *     path_normalizer?: PathNormalizer
  * }
  */
-final class FlysystemFilesystem implements Filesystem
+final class AdapterFilesystem implements Filesystem
 {
     private Operator $operator;
     private string|\LogicException $last;

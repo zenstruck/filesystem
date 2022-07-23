@@ -6,7 +6,7 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use Symfony\Component\Finder\Iterator\LazyIterator;
 use Zenstruck\Dimension\Information;
-use Zenstruck\Filesystem\Flysystem\Operator;
+use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;

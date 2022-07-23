@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Filesystem\Flysystem\Adapter;
+namespace Zenstruck\Filesystem\Adapter;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PathPrefixer;

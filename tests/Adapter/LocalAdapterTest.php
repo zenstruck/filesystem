@@ -1,9 +1,9 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Flysystem\Adapter;
+namespace Zenstruck\Filesystem\Tests\Adapter;
 
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
@@ -13,6 +13,6 @@ final class LocalAdapterTest extends FilesystemTest
 {
     protected function createFilesystem(): Filesystem
     {
-        return new FlysystemFilesystem(self::TEMP_DIR);
+        return new AdapterFilesystem(self::TEMP_DIR);
     }
 }

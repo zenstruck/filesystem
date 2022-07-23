@@ -5,8 +5,8 @@ namespace Zenstruck\Filesystem\Test;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Flysystem\Adapter\StaticInMemoryAdapter;
-use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
+use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
 
@@ -42,12 +42,12 @@ trait InteractsWithFilesystem
                 throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
             }
         } else {
-            $filesystem = new FlysystemFilesystem(new StaticInMemoryAdapter());
+            $filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
         }
 
         if ($this instanceof FixtureFilesystemProvider) {
             $fixtures = $this->fixtureFilesystem();
-            $fixtures = new ReadonlyFilesystem(\is_string($fixtures) ? new FlysystemFilesystem($fixtures) : $fixtures);
+            $fixtures = new ReadonlyFilesystem(\is_string($fixtures) ? new AdapterFilesystem($fixtures) : $fixtures);
 
             $filesystem = new MultiFilesystem(['_default_' => $filesystem, 'fixture' => $fixtures], '_default_');
         }

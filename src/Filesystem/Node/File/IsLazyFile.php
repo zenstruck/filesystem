@@ -3,7 +3,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Flysystem\Operator;
+use Zenstruck\Filesystem\Adapter\Operator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

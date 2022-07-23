@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Filesystem\Node\File;
 
-use Zenstruck\Filesystem\Flysystem\Operator;
+use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Node\File;
 
 /**
