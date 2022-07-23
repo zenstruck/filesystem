@@ -21,6 +21,9 @@ class File implements Node
         refresh as traitRefresh;
     }
 
+    /** @var array<string,Operator> */
+    protected static array $localOperators = [];
+
     private Information $size;
     private string $mimeType;
     private Checksum $checksum;

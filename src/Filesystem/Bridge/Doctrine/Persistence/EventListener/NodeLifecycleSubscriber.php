@@ -145,7 +145,7 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            if ($new instanceof PendingNode && $new instanceof Node) {
+            if ($new instanceof PendingNode) {
                 // user is adding a new file
                 $new = $this->filesystem->get($config['filesystem'])->write(
                     $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),

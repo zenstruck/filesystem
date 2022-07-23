@@ -46,8 +46,7 @@ trait IsPendingFile
 
     protected function operator(): Operator
     {
-        // todo, does this cache image/file separate?
-        return self::$localOperators[$dir = \dirname($this->file)] ??= (new FlysystemFilesystem($dir))
+        return $this->operator ??= self::$localOperators[$dir = \dirname($this->file)] ??= (new FlysystemFilesystem($dir))
             ->file($this->file->getFilename())
             ->operator()
         ;

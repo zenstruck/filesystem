@@ -14,10 +14,12 @@ use Zenstruck\Filesystem\Node\PendingNode;
  */
 abstract class BaseNamer implements Namer
 {
+    private static AsciiSlugger $asciiSlugger;
+
     public function __construct(protected ?SluggerInterface $slugger = null)
     {
         if (!$this->slugger && \class_exists(AsciiSlugger::class)) {
-            $this->slugger = new AsciiSlugger();
+            $this->slugger = self::$asciiSlugger ??= new AsciiSlugger();
         }
     }
 

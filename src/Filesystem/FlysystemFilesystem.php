@@ -24,6 +24,12 @@ use Zenstruck\Uri\Path;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-type GlobalOptions = array{
+ *     url_prefix?: string,
+ *     url_prefixes?: array,
+ *     path_normalizer?: PathNormalizer
+ * }
  */
 final class FlysystemFilesystem implements Filesystem
 {
@@ -31,15 +37,15 @@ final class FlysystemFilesystem implements Filesystem
     private string|\LogicException $last;
 
     /**
-     * @param array<string,mixed> $config
+     * @param GlobalOptions|array<string,mixed> $config
      */
-    public function __construct(FilesystemAdapter|string $adapter, array $config = [], ?PathNormalizer $pathNormalizer = null)
+    public function __construct(FilesystemAdapter|string $adapter, array $config = [])
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
         }
 
-        $this->operator = new Operator($adapter, $config, $pathNormalizer);
+        $this->operator = new Operator($adapter, $config);
         $this->last = new \LogicException('No operations have been performed.');
     }
 

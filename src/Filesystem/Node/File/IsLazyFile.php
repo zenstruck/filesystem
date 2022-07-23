@@ -13,7 +13,6 @@ use Zenstruck\Filesystem\Flysystem\Operator;
 trait IsLazyFile
 {
     private Filesystem $filesystem;
-    private Operator $operator;
 
     public function __construct(string $path)
     {

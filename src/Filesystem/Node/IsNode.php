@@ -11,14 +11,11 @@ use Zenstruck\Filesystem\Node\File\LazyImage;
 
 trait IsNode
 {
-    /** @var array<string,Operator> */
-    protected static array $localOperators = [];
-
     protected string $path;
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
-    public function __construct(StorageAttributes $attributes, private Operator $operator)
+    public function __construct(StorageAttributes $attributes, protected Operator $operator)
     {
         $this->path = $attributes->path();
 

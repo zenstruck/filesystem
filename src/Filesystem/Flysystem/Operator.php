@@ -13,6 +13,7 @@ use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\ModifyFile;
 use Zenstruck\Filesystem\Flysystem\Adapter\FeatureAwareAdapter;
 use Zenstruck\Filesystem\Flysystem\Adapter\UrlPrefixAdapter;
+use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Uri;
@@ -21,6 +22,8 @@ use Zenstruck\Uri;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ *
+ * @phpstan-import-type GlobalOptions from FlysystemFilesystem
  */
 final class Operator extends Filesystem implements All
 {
@@ -28,9 +31,9 @@ final class Operator extends Filesystem implements All
     private PathNormalizer $normalizer;
 
     /**
-     * @param array<string,mixed> $config
+     * @param GlobalOptions|array<string,mixed> $config
      */
-    public function __construct(FilesystemAdapter $adapter, array $config = [], ?PathNormalizer $pathNormalizer = null)
+    public function __construct(FilesystemAdapter $adapter, array $config = [])
     {
         if (!$adapter instanceof FeatureAwareAdapter) {
             $adapter = new FeatureAwareAdapter($adapter);
@@ -40,7 +43,7 @@ final class Operator extends Filesystem implements All
             $adapter = new UrlPrefixAdapter($adapter, $prefixes);
         }
 
-        parent::__construct($this->adapter = $adapter, $config, $this->normalizer = $pathNormalizer ?: new WhitespacePathNormalizer());
+        parent::__construct($this->adapter = $adapter, $config, $this->normalizer = $config['path_normalizer'] ?? new WhitespacePathNormalizer());
     }
 
     public function fileAttributesFor(string $path): FileAttributes
