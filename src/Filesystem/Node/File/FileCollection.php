@@ -13,7 +13,7 @@ use Zenstruck\Filesystem\Node\File;
 class FileCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<int,T> $files
+     * @param list<T> $files
      *
      * @internal
      */

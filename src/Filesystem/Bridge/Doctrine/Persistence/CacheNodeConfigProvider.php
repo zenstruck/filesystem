@@ -13,7 +13,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 final class CacheNodeConfigProvider implements NodeConfigProvider
 {
-    /** @var array<class-string,ConfigMapping> */
+    /** @var array<class-string,list<ConfigMapping>> */
     private array $localCache;
 
     public function __construct(private NodeConfigProvider $inner, private CacheInterface $cache)

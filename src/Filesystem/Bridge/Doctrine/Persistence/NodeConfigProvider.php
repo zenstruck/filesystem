@@ -12,13 +12,13 @@ use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\ImageType;
  *
  * @internal
  *
- * @phpstan-type ConfigMapping = array<int,array{
+ * @phpstan-type ConfigMapping = array{
  *      filesystem: string,
  *      property: string,
  *      delete_on_remove?: bool,
  *      namer?: string,
  *      expression?: string,
- * }>
+ * }
  */
 interface NodeConfigProvider
 {
@@ -27,7 +27,7 @@ interface NodeConfigProvider
     /**
      * @param class-string $class
      *
-     * @return ConfigMapping
+     * @return list<ConfigMapping>
      */
     public function configFor(string $class): array;
 
