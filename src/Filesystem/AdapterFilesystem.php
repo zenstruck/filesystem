@@ -39,7 +39,7 @@ final class AdapterFilesystem implements Filesystem
     /**
      * @param GlobalOptions|array<string,mixed> $config
      */
-    public function __construct(FilesystemAdapter|string $adapter, array $config = [])
+    public function __construct(FilesystemAdapter|string $adapter, array $config = [], private string $name = 'default')
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
@@ -47,6 +47,11 @@ final class AdapterFilesystem implements Filesystem
 
         $this->operator = new Operator($adapter, $config);
         $this->last = new \LogicException('No operations have been performed.');
+    }
+
+    public function name(): string
+    {
+        return $this->name;
     }
 
     public function node(string $path = ''): File|Directory

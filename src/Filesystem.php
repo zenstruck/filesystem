@@ -215,4 +215,9 @@ interface Filesystem
      * @throws \LogicException If the last operation didn't modify a file
      */
     public function last(): File|Directory;
+
+    /**
+     * The name of this filesystem.
+     */
+    public function name(): string;
 }

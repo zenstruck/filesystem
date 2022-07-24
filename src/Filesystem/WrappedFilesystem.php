@@ -11,6 +11,11 @@ use Zenstruck\Filesystem\Node\File;
  */
 abstract class WrappedFilesystem implements Filesystem
 {
+    public function name(): string
+    {
+        return $this->inner()->name();
+    }
+
     public function node(string $path = ''): File|Directory
     {
         return $this->inner()->node($path);

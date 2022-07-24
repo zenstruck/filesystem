@@ -52,6 +52,11 @@ final class MultiFilesystem implements Filesystem
         throw new \InvalidArgumentException(\sprintf('Filesystem "%s" not found.', $name), previous: $e ?? null);
     }
 
+    public function name(?string $name = null): string
+    {
+        return $this->get($name)->name();
+    }
+
     public function node(string $path = ''): File|Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
