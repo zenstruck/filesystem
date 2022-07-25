@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,6 +25,11 @@ abstract class WrappedFilesystem implements Filesystem
     public function file(string $path): File
     {
         return $this->inner()->file($path);
+    }
+
+    public function image(string $path, array $config = []): Image
+    {
+        return $this->inner()->image($path, $config);
     }
 
     public function directory(string $path = ''): Directory

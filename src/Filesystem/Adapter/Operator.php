@@ -21,7 +21,7 @@ use Zenstruck\Uri;
  *
  * @internal
  *
- * @phpstan-import-type GlobalOptions from AdapterFilesystem
+ * @phpstan-import-type GlobalConfig from AdapterFilesystem
  */
 final class Operator extends Filesystem implements All
 {
@@ -29,7 +29,7 @@ final class Operator extends Filesystem implements All
     private PathNormalizer $normalizer;
 
     /**
-     * @param GlobalOptions|array<string,mixed> $config
+     * @param GlobalConfig|array<string,mixed> $config
      */
     public function __construct(FilesystemAdapter $adapter, array $config = [])
     {

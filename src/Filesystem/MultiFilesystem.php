@@ -8,6 +8,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -69,6 +70,13 @@ final class MultiFilesystem implements Filesystem
         [$filesystem, $path] = $this->parsePath($path);
 
         return $filesystem->file($path);
+    }
+
+    public function image(string $path, array $config = []): Image
+    {
+        [$filesystem, $path] = $this->parsePath($path);
+
+        return $filesystem->image($path, $config);
     }
 
     public function directory(string $path = ''): Directory

@@ -10,6 +10,8 @@ use Zenstruck\Filesystem\Node\File;
  */
 class Image extends File
 {
+    protected const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
+
     /** @var array{0:int,1:int} */
     private array $imageSize;
 

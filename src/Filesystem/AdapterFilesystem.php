@@ -20,15 +20,17 @@ use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
 use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Uri\Path;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @phpstan-type GlobalOptions = array{
+ * @phpstan-type GlobalConfig = array{
  *     url_prefix?: string,
  *     url_prefixes?: array,
- *     path_normalizer?: PathNormalizer
+ *     path_normalizer?: PathNormalizer,
+ *     image_check_mime?: bool,
  * }
  */
 final class AdapterFilesystem implements Filesystem
@@ -37,9 +39,9 @@ final class AdapterFilesystem implements Filesystem
     private string|\LogicException $last;
 
     /**
-     * @param GlobalOptions|array<string,mixed> $config
+     * @param GlobalConfig|array<string,mixed> $config
      */
-    public function __construct(FilesystemAdapter|string $adapter, array $config = [], private string $name = 'default')
+    public function __construct(FilesystemAdapter|string $adapter, private array $config = [], private string $name = 'default')
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
@@ -70,6 +72,15 @@ final class AdapterFilesystem implements Filesystem
     public function file(string $path): File
     {
         return $this->node($path)->ensureFile();
+    }
+
+    public function image(string $path, array $config = []): Image
+    {
+        if (isset($this->config['image_check_mime'])) {
+            $config = \array_merge(['check_mime' => $this->config['image_check_mime']], $config);
+        }
+
+        return $this->node($path)->ensureImage($config);
     }
 
     public function directory(string $path = ''): Directory

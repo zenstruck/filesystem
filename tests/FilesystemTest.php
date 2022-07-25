@@ -106,14 +106,14 @@ abstract class FilesystemTest extends TestCase
         $filesystem->write('images', self::FIXTURE_DIR);
 
         foreach (['jpg', 'gif', 'png'] as $ext) {
-            $image = $filesystem->node('images/symfony.'.$ext)->ensureImage();
+            $image = $filesystem->image('images/symfony.'.$ext);
 
             $this->assertSame(563, $image->width());
             $this->assertSame(678, $image->height());
             $this->assertSame(0.83, \round($image->aspectRatio(), 2));
         }
 
-        $image = $filesystem->node('images/symfony.svg')->ensureImage();
+        $image = $filesystem->image('images/symfony.svg');
 
         $this->assertSame(202, $image->width());
         $this->assertSame(224, $image->height());

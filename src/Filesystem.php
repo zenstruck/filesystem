@@ -11,6 +11,7 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -29,6 +30,9 @@ use Zenstruck\Filesystem\Node\File;
  * @phpstan-type WriteConfig = array{
  *     progress: callable(File):void,
  *     fail_if_exists: bool,
+ * }
+ * @phpstan-type ImageConfig = array{
+ *     check_mime?:bool,
  * }
  */
 interface Filesystem
@@ -56,6 +60,19 @@ interface Filesystem
      * @throws FilesystemException {@see FilesystemReader::has()}
      */
     public function directory(string $path = ''): Directory;
+
+    /**
+     * Returns an image file type. By default, only ensures a file's
+     * extension is a valid image extension. If you'd like to check
+     * the file's mime-type, pass the $config "check_mime" => true.
+     *
+     * @param ImageConfig $config
+     *
+     * @throws NodeNotFound        If node at path is not found
+     * @throws NodeTypeMismatch    If the node at path is not an image file
+     * @throws FilesystemException {@see FilesystemReader::has()}
+     */
+    public function image(string $path, array $config = []): Image;
 
     /**
      * @see FilesystemReader::has()

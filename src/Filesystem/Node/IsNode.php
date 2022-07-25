@@ -5,10 +5,12 @@ namespace Zenstruck\Filesystem\Node;
 use League\Flysystem\StorageAttributes;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyImage;
 
+/**
+ * @author Kevin Bond <kevinbond@gmail.com>
+ */
 trait IsNode
 {
     protected string $path;
@@ -38,30 +40,16 @@ trait IsNode
         return $this->path;
     }
 
-    /**
-     * Returns the file or directory name (with extension if applicable).
-     *
-     * @example If $path is "foo/bar/baz.txt", returns "baz.txt"
-     * @example If $path is "foo/bar/baz", returns "baz"
-     */
     final public function name(): string
     {
         return \pathinfo($this->path(), \PATHINFO_BASENAME);
     }
 
-    /**
-     * Returns the "parent" directory path.
-     *
-     * @example If $path is "foo/bar/baz", returns "foo/bar"
-     */
     final public function dirname(): string
     {
         return \pathinfo($this->path(), \PATHINFO_DIRNAME);
     }
 
-    /**
-     * @return \DateTimeImmutable In the PHP default timezone
-     */
     final public function lastModified(): \DateTimeImmutable
     {
         return $this->lastModified ??= self::parseDateTime($this->operator()->lastModified($this->path()));
@@ -75,9 +63,6 @@ trait IsNode
         return $this->visibility ??= $this->operator()->visibility($this->path());
     }
 
-    /**
-     * Check if the node still exists.
-     */
     final public function exists(): bool
     {
         return $this->operator()->has($this->path());
@@ -85,9 +70,6 @@ trait IsNode
 
     abstract public function mimeType(): string;
 
-    /**
-     * Clear any cached metadata.
-     */
     public function refresh(): static
     {
         unset($this->visibility, $this->lastModified);
@@ -95,34 +77,23 @@ trait IsNode
         return $this;
     }
 
-    /**
-     * @throws NodeTypeMismatch If not a file
-     */
     final public function ensureFile(): File
     {
         return $this instanceof File ? $this : throw NodeTypeMismatch::expectedFileAt($this->path());
     }
 
-    /**
-     * @return Directory<Node>
-     *
-     * @throws NodeTypeMismatch If not a directory
-     */
     final public function ensureDirectory(): Directory
     {
         return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
     }
 
-    /**
-     * @throws NodeTypeMismatch If not an image file
-     */
-    final public function ensureImage(): Image
+    final public function ensureImage(array $config = []): Image
     {
         if ($this instanceof Image) {
             return $this;
         }
 
-        if (!$this->isImage()) {
+        if (!$this->isImage($config)) {
             throw NodeTypeMismatch::expectedImageAt($this->path(), $this->mimeType());
         }
 
@@ -165,9 +136,21 @@ trait IsNode
         return $this instanceof Directory;
     }
 
-    final public function isImage(): bool
+    final public function isImage(array $config = []): bool
     {
-        return $this instanceof Image || ($this instanceof File && \str_contains($this->mimeType(), 'image/'));
+        if ($this instanceof Image) {
+            return true;
+        }
+
+        if (!$this instanceof File) {
+            return false;
+        }
+
+        if (($config['check_mime'] ?? false) || !($ext = $this->extension())) {
+            return \str_contains($this->mimeType(), 'image/');
+        }
+
+        return \in_array(\mb_strtolower($ext), Image::IMAGE_EXTENSIONS, true); // @phpstan-ignore-line
     }
 
     final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable

@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem;
 
 use League\Flysystem\FilesystemOperator;
+use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
@@ -10,6 +11,8 @@ use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type ImageConfig from Filesystem
  */
 interface Node extends \Stringable
 {
@@ -65,13 +68,18 @@ interface Node extends \Stringable
     public function ensureDirectory(): Directory;
 
     /**
+     * @param ImageConfig $config
+     *
      * @throws NodeTypeMismatch If not an image file
      */
-    public function ensureImage(): Image;
+    public function ensureImage(array $config = []): Image;
 
     public function isFile(): bool;
 
     public function isDirectory(): bool;
 
-    public function isImage(): bool;
+    /**
+     * @param ImageConfig $config
+     */
+    public function isImage(array $config = []): bool;
 }
