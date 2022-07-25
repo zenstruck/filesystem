@@ -11,8 +11,12 @@ use Zenstruck\Filesystem\AdapterFilesystem;
  */
 trait IsPendingFile
 {
-    public function __construct(private \SplFileInfo $file)
+    private \SplFileInfo $file;
+
+    public function __construct(\SplFileInfo|string $file)
     {
+        $this->file = \is_string($file) ? new \SplFileInfo($file) : $file;
+        $this->path = (string) $file;
     }
 
     public function localFile(): \SplFileInfo
