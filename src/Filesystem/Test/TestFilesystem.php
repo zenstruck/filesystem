@@ -8,8 +8,10 @@ use Zenstruck\Filesystem\WrappedFilesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TestFilesystem extends WrappedFilesystem
+final class TestFilesystem implements Filesystem
 {
+    use WrappedFilesystem;
+
     public function __construct(private Filesystem $inner)
     {
     }

@@ -7,8 +7,10 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LazyFilesystem extends WrappedFilesystem
+final class LazyFilesystem implements Filesystem
 {
+    use WrappedFilesystem;
+
     /** @var Filesystem|callable():Filesystem */
     private $inner;
 

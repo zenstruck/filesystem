@@ -10,7 +10,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class WrappedFilesystem implements Filesystem
+trait WrappedFilesystem
 {
     public function name(): string
     {

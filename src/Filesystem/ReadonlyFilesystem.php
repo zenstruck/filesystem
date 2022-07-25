@@ -9,8 +9,10 @@ use Zenstruck\Filesystem\Node\File;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ReadonlyFilesystem extends WrappedFilesystem
+final class ReadonlyFilesystem implements Filesystem
 {
+    use WrappedFilesystem;
+
     public function __construct(private Filesystem $inner)
     {
     }
