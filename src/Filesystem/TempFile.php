@@ -31,6 +31,11 @@ final class TempFile extends \SplFileInfo
         self::$created[] = $filename;
     }
 
+    public static function new(?string $filename = null): self
+    {
+        return new self($filename);
+    }
+
     /**
      * @param string|resource|ResourceWrapper $contents
      */
@@ -54,11 +59,13 @@ final class TempFile extends \SplFileInfo
         }
     }
 
-    public function delete(): void
+    public function delete(): self
     {
         if (\file_exists($this)) {
             \unlink($this);
         }
+
+        return $this;
     }
 
     public function getSize(): int

@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Tests;
 
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;
+use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\ArchiveFile;
@@ -183,6 +184,63 @@ final class ArchiveFileTest extends FilesystemTest
 
         $this->assertSame('contents 1', $archive->file('file1.txt')->contents());
         $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_directory(): void
+    {
+        $dir = $this->filesystem()
+            ->write('sub/file1.txt', 'contents 1')
+            ->write('sub/nested/file2.txt', 'contents 2')
+            ->directory('sub')
+        ;
+
+        $archive = ArchiveFile::tar($dir, self::TEMP_DIR.'/archive1.tar');
+
+        $this->assertFileExists($archive);
+        $this->assertSame('application/x-tar', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_file(): void
+    {
+        $file = $this->filesystem()->write('nested/file.txt', 'contents')->last();
+
+        $archive = ArchiveFile::tar($file, self::TEMP_DIR.'/archive2.tar');
+
+        $this->assertFileExists($archive);
+        $this->assertSame('application/x-tar', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_spl_file(): void
+    {
+        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+
+        $archive = ArchiveFile::tar($file, self::TEMP_DIR.'/archive3.tar');
+
+        $this->assertFileExists($archive);
+        $this->assertSame('application/x-tar', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_spl_directory(): void
+    {
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+
+        $archive = ArchiveFile::tar(self::TEMP_DIR, self::TEMP_DIR.'/archive4.tar');
+
+        $this->assertFileExists($archive);
+        $this->assertSame('application/x-tar', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
     }
 
     protected function createFilesystem(): Filesystem
