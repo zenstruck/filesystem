@@ -9,10 +9,10 @@ use Zenstruck\Filesystem\Adapter\ZipArchive\TransactionalZipArchiveProvider;
 
 /**
  * Similar to Flysystem's {@see \League\Flysystem\ZipArchive\ZipArchiveAdapter}
- * but with some normalization.
+ * but with some customizations.
  *
- * - fix to delete root level directories (https://github.com/thephpleague/flysystem/pull/1525)
- * - normalize checking existence of root
+ * - when deleting root, delete the file
+ * - when checking existence of root, check if file exists
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -51,10 +51,6 @@ final class ZipArchiveAdapter extends WrappedAdapter
         }
 
         parent::deleteDirectory($path);
-
-        $archive = $this->provider->createZipArchive();
-        $archive->deleteName('/'.$path.'/');
-        $archive->close();
     }
 
     protected function inner(): FilesystemAdapter
