@@ -84,6 +84,23 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         return $filesystem;
     }
 
+    public function directory(string $path = Filesystem::ROOT): Directory
+    {
+        return $this->inner()->directory($path);
+    }
+
+    public function exists(string $path = Filesystem::ROOT): bool
+    {
+        return $this->inner()->exists($path);
+    }
+
+    public function delete(Directory|string $path = Filesystem::ROOT, array $config = []): static
+    {
+        $this->inner()->delete($path, $config);
+
+        return $this;
+    }
+
     /**
      * Subsequent write operations will be "queued".
      */
