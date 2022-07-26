@@ -128,7 +128,11 @@ abstract class FilesystemTest extends TestCase
      */
     public function cannot_get_image_for_directory(): void
     {
-        $this->markTestIncomplete();
+        $filesystem = $this->createFilesystem()->mkdir('foo');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $filesystem->image('foo');
     }
 
     /**
@@ -136,7 +140,21 @@ abstract class FilesystemTest extends TestCase
      */
     public function cannot_get_image_for_non_image_file_type(): void
     {
-        $this->markTestIncomplete();
+        $filesystem = $this->createFilesystem()->write('foo.txt', 'bar');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $filesystem->image('foo.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_image_for_image_file_without_extension(): void
+    {
+        $filesystem = $this->createFilesystem()->write('foo', self::FIXTURE_DIR.'/symfony.png');
+
+        $this->assertSame('image/png', $filesystem->image('foo')->mimeType());
     }
 
     /**
