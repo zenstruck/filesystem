@@ -85,7 +85,11 @@ final class AdapterFilesystem implements Filesystem
 
     public function directory(string $path = ''): Directory
     {
-        return $this->node($path)->ensureDirectory();
+        if ($this->operator->directoryExists($path)) {
+            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+        }
+
+        throw NodeNotFound::for($path);
     }
 
     public function last(): File|Directory
