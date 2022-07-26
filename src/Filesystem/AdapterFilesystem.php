@@ -16,6 +16,7 @@ use Zenstruck\Filesystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\NodeExists;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
 use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node\Directory;
@@ -71,7 +72,15 @@ final class AdapterFilesystem implements Filesystem
 
     public function file(string $path): File
     {
-        return $this->node($path)->ensureFile();
+        if ($this->operator->fileExists($path)) {
+            return new File($this->operator->fileAttributesFor($path), $this->operator);
+        }
+
+        if ($this->exists($path)) {
+            throw NodeTypeMismatch::expectedFileAt($path);
+        }
+
+        throw NodeNotFound::for($path);
     }
 
     public function image(string $path, array $config = []): Image
@@ -80,13 +89,17 @@ final class AdapterFilesystem implements Filesystem
             $config = \array_merge(['check_mime' => $this->config['image_check_mime']], $config);
         }
 
-        return $this->node($path)->ensureImage($config);
+        return $this->file($path)->ensureImage($config);
     }
 
     public function directory(string $path = ''): Directory
     {
         if ($this->operator->directoryExists($path)) {
             return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+        }
+
+        if ($this->exists($path)) {
+            throw NodeTypeMismatch::expectedDirectoryAt($path);
         }
 
         throw NodeNotFound::for($path);
