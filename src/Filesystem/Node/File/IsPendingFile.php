@@ -31,12 +31,16 @@ trait IsPendingFile
 
     public function originalNameWithoutExtension(): string
     {
-        return \pathinfo($this->originalName(), \PATHINFO_FILENAME);
+        return self::parseNameParts($this->originalName())[0];
     }
 
     public function originalExtension(): ?string
     {
-        return $this->file instanceof UploadedFile ? $this->file->getClientOriginalExtension() : $this->extension();
+        if ($this->file instanceof UploadedFile) {
+            return self::parseNameParts($this->file->getClientOriginalName())[1];
+        }
+
+        return $this->extension();
     }
 
     protected function operator(): Operator

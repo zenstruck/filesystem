@@ -21,12 +21,17 @@ class File implements Node
         refresh as traitRefresh;
     }
 
+    protected const MULTI_EXTENSIONS = ['gz' => 'tar.gz', 'bz2' => 'tar.bz2'];
+
     /** @var array<string,Operator> */
     protected static array $localOperators = [];
 
     private Information $size;
     private string $mimeType;
     private Checksum $checksum;
+
+    /** @var array{0:string,1:string|null} */
+    private array $nameParts;
 
     /**
      * @internal
@@ -106,7 +111,7 @@ class File implements Node
 
     final public function extension(): ?string
     {
-        return \pathinfo($this->path(), \PATHINFO_EXTENSION) ?: null;
+        return $this->nameParts($this->name())[1];
     }
 
     /**
@@ -115,7 +120,7 @@ class File implements Node
      */
     final public function nameWithoutExtension(): string
     {
-        return \pathinfo($this->path(), \PATHINFO_FILENAME);
+        return $this->nameParts($this->name())[0];
     }
 
     /**
@@ -133,5 +138,29 @@ class File implements Node
         unset($this->size, $this->mimeType, $this->checksum);
 
         return $this->traitRefresh();
+    }
+
+    /**
+     * @return array{0:string,1:string|null}
+     */
+    protected static function parseNameParts(string $filename): array
+    {
+        if (!$ext = \mb_strtolower(\pathinfo($filename, \PATHINFO_EXTENSION)) ?: null) {
+            return [$filename, null];
+        }
+
+        if (isset(self::MULTI_EXTENSIONS[$ext]) && \str_ends_with($filename, self::MULTI_EXTENSIONS[$ext])) {
+            $ext = self::MULTI_EXTENSIONS[$ext];
+        }
+
+        return [\mb_substr($filename, 0, -(\mb_strlen($ext) + 1)), $ext];
+    }
+
+    /**
+     * @return array{0:string,1:string|null}
+     */
+    private function nameParts(string $filename): array
+    {
+        return $this->nameParts ??= self::parseNameParts($filename);
     }
 }
