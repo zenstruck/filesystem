@@ -8,7 +8,6 @@ use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToWriteFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
@@ -19,6 +18,7 @@ use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Util;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -35,7 +35,7 @@ abstract class FilesystemTest extends TestCase
      */
     public static function cleanup(): void
     {
-        (new SymfonyFilesystem())->remove(self::TEMP_DIR);
+        Util::fs()->remove(self::TEMP_DIR);
     }
 
     /**

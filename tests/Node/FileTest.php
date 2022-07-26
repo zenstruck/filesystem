@@ -3,11 +3,11 @@
 namespace Zenstruck\Filesystem\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
+use Zenstruck\Filesystem\Util;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -27,7 +27,7 @@ final class FileTest extends TestCase
         $this->assertSame($extension, $file->extension());
         $this->assertSame($nameWithoutExtension, $file->nameWithoutExtension());
 
-        (new SymfonyFilesystem())->dumpFile($file = FilesystemTest::TEMP_DIR.'/'.$filename, 'content');
+        Util::fs()->dumpFile($file = FilesystemTest::TEMP_DIR.'/'.$filename, 'content');
 
         $pending = new PendingFile($file);
 
@@ -46,14 +46,14 @@ final class FileTest extends TestCase
 
     public static function extensionProvider(): iterable
     {
-//        yield ['foo', null, 'foo'];
-//        yield ['nested/foo', null, 'foo'];
+        yield ['foo', null, 'foo'];
+        yield ['nested/foo', null, 'foo'];
         yield ['foo.txt', 'txt', 'foo'];
-//        yield ['nested/foo.txt', 'txt', 'foo'];
-//        yield ['foo.tar', 'tar', 'foo'];
-//        yield ['foo.tar.gz', 'tar.gz', 'foo'];
-//        yield ['foo.tar.bz2', 'tar.bz2', 'foo'];
-//        yield ['foo.gz', 'gz', 'foo'];
-//        yield ['foo.bz2', 'bz2', 'foo'];
+        yield ['nested/foo.txt', 'txt', 'foo'];
+        yield ['foo.tar', 'tar', 'foo'];
+        yield ['foo.tar.gz', 'tar.gz', 'foo'];
+        yield ['foo.tar.bz2', 'tar.bz2', 'foo'];
+        yield ['foo.gz', 'gz', 'foo'];
+        yield ['foo.bz2', 'bz2', 'foo'];
     }
 }

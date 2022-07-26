@@ -4,9 +4,9 @@ namespace Zenstruck\Filesystem\Tests;
 
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\ArchiveFile;
+use Zenstruck\Filesystem\Util;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -15,19 +15,12 @@ final class ArchiveFileTest extends FilesystemTest
 {
     private const FILE = self::TEMP_DIR.'/archive.zip';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        (new SymfonyFilesystem())->remove(self::FILE);
-    }
-
     /**
      * @test
      */
     public function can_create_archive_file_in_non_existent_directory(): void
     {
-        (new SymfonyFilesystem())->remove(\dirname(self::FILE));
+        Util::fs()->remove(\dirname(self::FILE));
 
         $filesystem = new ArchiveFile(self::FILE);
         $filesystem->write('foo.txt', 'contents');
@@ -69,7 +62,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function cannot_open_invalid_zip(): void
     {
-        (new SymfonyFilesystem())->dumpFile(self::FILE, 'not-a-zip');
+        Util::fs()->dumpFile(self::FILE, 'not-a-zip');
 
         $filesystem = new ArchiveFile(self::FILE);
 
@@ -162,7 +155,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_zip_spl_file(): void
     {
-        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+        Util::fs()->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
 
         $archive = ArchiveFile::zip($file);
 
@@ -176,8 +169,8 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_zip_spl_directory(): void
     {
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
 
         $archive = ArchiveFile::zip(self::TEMP_DIR);
 
@@ -223,7 +216,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_spl_file(): void
     {
-        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+        Util::fs()->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
 
         $archive = ArchiveFile::tar($file, self::TEMP_DIR.'/archive3.tar');
 
@@ -236,8 +229,8 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_spl_directory(): void
     {
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
 
         $archive = ArchiveFile::tar(self::TEMP_DIR, self::TEMP_DIR.'/archive4.tar');
 
@@ -283,7 +276,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_gz_spl_file(): void
     {
-        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+        Util::fs()->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
 
         $archive = ArchiveFile::tarGz($file, self::TEMP_DIR.'/archive7.tar.gz');
 
@@ -297,8 +290,8 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_gz_spl_directory(): void
     {
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
 
         $archive = ArchiveFile::tarGz(self::TEMP_DIR, self::TEMP_DIR.'/archive8.tar.gz');
 
@@ -345,7 +338,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_bz2_spl_file(): void
     {
-        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+        Util::fs()->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
 
         $archive = ArchiveFile::tarBz2($file, self::TEMP_DIR.'/archive11.tar.bz2');
 
@@ -359,8 +352,8 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_tar_bz2_spl_directory(): void
     {
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
-        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        Util::fs()->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
 
         $archive = ArchiveFile::tarBz2(self::TEMP_DIR, self::TEMP_DIR.'/archive12.tar.bz2');
 

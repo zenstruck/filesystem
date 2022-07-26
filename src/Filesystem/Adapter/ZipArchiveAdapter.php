@@ -4,8 +4,8 @@ namespace Zenstruck\Filesystem\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as FlysystemAdapter;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Zenstruck\Filesystem\Adapter\ZipArchive\TransactionalZipArchiveProvider;
+use Zenstruck\Filesystem\Util;
 
 /**
  * Similar to Flysystem's {@see \League\Flysystem\ZipArchive\ZipArchiveAdapter}
@@ -45,7 +45,7 @@ final class ZipArchiveAdapter extends WrappedAdapter
     public function deleteDirectory(string $path): void
     {
         if ('' === $path) {
-            (new SymfonyFilesystem())->remove($this->filename);
+            Util::fs()->remove($this->filename);
 
             return;
         }

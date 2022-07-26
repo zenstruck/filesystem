@@ -3,7 +3,6 @@
 namespace Zenstruck\Filesystem;
 
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as FlysystemAdapter;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\ZipArchiveAdapter;
@@ -103,7 +102,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         $tar = self::createTar($what, $tarFile = \mb_substr($filename, 0, -3));
         $tar->compress(\Phar::GZ);
 
-        (new SymfonyFilesystem())->remove($tarFile);
+        Util::fs()->remove($tarFile);
 
         return new \SplFileInfo($filename);
     }
@@ -119,7 +118,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         $tar = self::createTar($what, $tarFile = \mb_substr($filename, 0, -4));
         $tar->compress(\Phar::BZ2);
 
-        (new SymfonyFilesystem())->remove($tarFile);
+        Util::fs()->remove($tarFile);
 
         return new \SplFileInfo($filename);
     }
@@ -176,7 +175,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         }
 
         if (!\is_dir(\dirname($filename))) {
-            (new SymfonyFilesystem())->mkdir(\dirname($filename));
+            Util::fs()->mkdir(\dirname($filename));
         }
 
         if (\file_exists($filename)) {
