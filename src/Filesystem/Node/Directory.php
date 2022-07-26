@@ -7,7 +7,6 @@ use League\Flysystem\FileAttributes;
 use Symfony\Component\Finder\Iterator\LazyIterator;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
-use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\ArchiveFile;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
@@ -20,7 +19,6 @@ use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
  * @template T of Node
  * @implements \IteratorAggregate<int,T>
  *
- * @phpstan-import-type GlobalConfig from AdapterFilesystem
  * @phpstan-import-type ZipConfig from ArchiveFile
  */
 final class Directory implements Node, \IteratorAggregate
@@ -322,7 +320,7 @@ final class Directory implements Node, \IteratorAggregate
     /**
      * @see ArchiveFile::zip()
      *
-     * @param GlobalConfig|ZipConfig|array<string,mixed> $config
+     * @param ZipConfig|array<string,mixed> $config
      */
     public function zip(?string $filename = null, array $config = []): ArchiveFile
     {
