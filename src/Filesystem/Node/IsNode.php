@@ -10,6 +10,8 @@ use Zenstruck\Filesystem\Node\File\LazyImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 trait IsNode
 {

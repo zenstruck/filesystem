@@ -8,6 +8,8 @@ use Zenstruck\Filesystem\AdapterFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 trait IsPendingFile
 {

@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
  *
  * @phpstan-import-type ZipConfig from ArchiveFile
  */
-final class Directory implements Node, \IteratorAggregate
+class Directory implements Node, \IteratorAggregate
 {
     use IsNode {
         __construct as traitConstruct;
@@ -52,15 +52,15 @@ final class Directory implements Node, \IteratorAggregate
         $this->traitConstruct($attributes, $operator);
     }
 
-    public function mimeType(): string
+    final public function mimeType(): string
     {
         return '(directory)';
     }
 
     /**
-     * @return self<Node>
+     * @return $this
      */
-    public function recursive(): self
+    final public function recursive(): self
     {
         $clone = clone $this;
         $clone->recursive = true;
@@ -73,9 +73,9 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param callable(Node):bool $predicate
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function filter(callable $predicate): self
+    final public function filter(callable $predicate): self
     {
         $clone = clone $this;
         $clone->filters[] = $predicate;
@@ -88,13 +88,12 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|int $size Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      *
-     * @return self<File>
+     * @return $this
      */
-    public function largerThan(string|int $size): self
+    final public function largerThan(string|int $size): self
     {
         $size = Information::from($size)->bytes();
 
-        // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isLargerThan($size));
     }
 
@@ -103,13 +102,12 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|int $size Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      *
-     * @return self<File>
+     * @return $this
      */
-    public function smallerThan(string|int $size): self
+    final public function smallerThan(string|int $size): self
     {
         $size = Information::from($size)->bytes();
 
-        // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isSmallerThan($size));
     }
 
@@ -119,14 +117,13 @@ final class Directory implements Node, \IteratorAggregate
      * @param string|int $min Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      * @param string|int $max Bytes (ie 546548) or a human-readable format (ie "1.1kB", "3.42 MiB").
      *
-     * @return self<File>
+     * @return $this
      */
-    public function sizeWithin(string|int $min, string|int $max): self
+    final public function sizeWithin(string|int $min, string|int $max): self
     {
         $min = Information::from($min)->bytes();
         $max = Information::from($max)->bytes();
 
-        // @phpstan-ignore-next-line
         return $this->filter(static fn(Node $node) => $node instanceof File && $node->size()->isWithin($min, $max));
     }
 
@@ -137,9 +134,9 @@ final class Directory implements Node, \IteratorAggregate
      * @param int                $date Specific timestamp
      * @param \DateTimeInterface $date Specific DateTime
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function olderThan(\DateTimeInterface|int|string $date): self
+    final public function olderThan(\DateTimeInterface|int|string $date): self
     {
         $date = self::parseDateTime($date);
 
@@ -153,9 +150,9 @@ final class Directory implements Node, \IteratorAggregate
      * @param int                $date Specific timestamp
      * @param \DateTimeInterface $date Specific DateTime
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function newerThan(\DateTimeInterface|int|string $date): self
+    final public function newerThan(\DateTimeInterface|int|string $date): self
     {
         $date = self::parseDateTime($date);
 
@@ -172,9 +169,9 @@ final class Directory implements Node, \IteratorAggregate
      * @param int                $max Specific timestamp
      * @param \DateTimeInterface $max Specific DateTime
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function modifiedBetween(\DateTimeInterface|int|string $min, \DateTimeInterface|int|string $max): self
+    final public function modifiedBetween(\DateTimeInterface|int|string $min, \DateTimeInterface|int|string $max): self
     {
         $min = self::parseDateTime($min);
         $max = self::parseDateTime($max);
@@ -194,9 +191,9 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|string[] $pattern A pattern (a regexp, a glob, or a string) or an array of patterns
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function matchingName(string|array $pattern): self
+    final public function matchingName(string|array $pattern): self
     {
         $clone = clone $this;
         $clone->names = \array_merge($this->names, (array) $pattern);
@@ -214,9 +211,9 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|string[] $pattern A pattern (a regexp, a glob, or a string) or an array of patterns
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function notMatchingName(string|array $pattern): self
+    final public function notMatchingName(string|array $pattern): self
     {
         $clone = clone $this;
         $clone->notNames = \array_merge($this->notNames, (array) $pattern);
@@ -232,9 +229,9 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|string[] $pattern A pattern (a regexp or a string) or an array of patterns
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function matchingPath(string|array $pattern): self
+    final public function matchingPath(string|array $pattern): self
     {
         $clone = clone $this;
         $clone->paths = \array_merge($this->paths, (array) $pattern);
@@ -250,9 +247,9 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param string|string[] $pattern A pattern (a regexp or a string) or an array of patterns
      *
-     * @return self<Node>
+     * @return $this
      */
-    public function notMatchingPath(string|array $pattern): self
+    final public function notMatchingPath(string|array $pattern): self
     {
         $clone = clone $this;
         $clone->notPaths = \array_merge($this->notPaths, (array) $pattern);
@@ -261,9 +258,9 @@ final class Directory implements Node, \IteratorAggregate
     }
 
     /**
-     * @return self<File>
+     * @return self<File>|$this
      */
-    public function files(): self
+    final public function files(): self
     {
         $clone = clone $this;
         $clone->filters[] = static fn(Node $node) => $node instanceof File;
@@ -272,9 +269,9 @@ final class Directory implements Node, \IteratorAggregate
     }
 
     /**
-     * @return self<Directory<Node>>
+     * @return self<Directory<Node>>|$this
      */
-    public function directories(): self
+    final public function directories(): self
     {
         $clone = clone $this;
         $clone->filters[] = static fn(Node $node) => $node instanceof self;
@@ -285,7 +282,7 @@ final class Directory implements Node, \IteratorAggregate
     /**
      * @return \Traversable<T>|T[]
      */
-    public function getIterator(): \Traversable
+    final public function getIterator(): \Traversable
     {
         $iterator = new \IteratorIterator(
             new LazyIterator(function(): \Iterator {
@@ -322,7 +319,7 @@ final class Directory implements Node, \IteratorAggregate
      *
      * @param ZipConfig|array<string,mixed> $config
      */
-    public function zip(?string $filename = null, array $config = []): ArchiveFile
+    final public function zip(?string $filename = null, array $config = []): ArchiveFile
     {
         return ArchiveFile::zip($this, $filename, $config);
     }

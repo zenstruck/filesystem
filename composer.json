@@ -29,7 +29,8 @@
         "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
         "symfony/phpunit-bridge": "^6.0",
-        "symfony/var-dumper": "^5.4|^6.0"
+        "symfony/var-dumper": "^5.4|^6.0",
+        "zenstruck/assert": "^1.2"
     },
     "config": {
         "preferred-install": "dist",
@@ -44,6 +45,7 @@
     "suggest": {
         "league/flysystem-memory": "To use the in-memory adapters",
         "league/flysystem-ziparchive": "To use ArchiveFile as a filesystem",
-        "doctrine/dbal": "To use the File/Image/FileCollection types"
+        "doctrine/dbal": "To use the File/Image/FileCollection types",
+        "zenstruck/assert": "To use the TestFilesystem assertions"
     }
 }
