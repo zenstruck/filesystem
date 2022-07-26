@@ -243,6 +243,128 @@ final class ArchiveFileTest extends FilesystemTest
         $this->assertSame('application/x-tar', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
     }
 
+    /**
+     * @test
+     */
+    public function can_tar_gz_directory(): void
+    {
+        $dir = $this->filesystem()
+            ->write('sub/file1.txt', 'contents 1')
+            ->write('sub/nested/file2.txt', 'contents 2')
+            ->directory('sub')
+        ;
+
+        $archive = ArchiveFile::tarGz($dir, self::TEMP_DIR.'/archive5.tar.gz');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive5.tar');
+        $this->assertSame('application/gzip', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_gz_file(): void
+    {
+        $file = $this->filesystem()->write('nested/file.txt', 'contents')->last();
+
+        $archive = ArchiveFile::tarGz($file, self::TEMP_DIR.'/archive6.tar.gz');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive6.tar');
+        $this->assertSame('application/gzip', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_gz_spl_file(): void
+    {
+        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+
+        $archive = ArchiveFile::tarGz($file, self::TEMP_DIR.'/archive7.tar.gz');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive7.tar');
+        $this->assertSame('application/gzip', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_gz_spl_directory(): void
+    {
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+
+        $archive = ArchiveFile::tarGz(self::TEMP_DIR, self::TEMP_DIR.'/archive8.tar.gz');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive8.tar');
+        $this->assertSame('application/gzip', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_bz2_directory(): void
+    {
+        $dir = $this->filesystem()
+            ->write('sub/file1.txt', 'contents 1')
+            ->write('sub/nested/file2.txt', 'contents 2')
+            ->directory('sub')
+        ;
+
+        $archive = ArchiveFile::tarBz2($dir, self::TEMP_DIR.'/archive9.tar.bz2');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive9.tar');
+        $this->assertSame('application/x-bzip2', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_bz2_file(): void
+    {
+        $file = $this->filesystem()->write('nested/file.txt', 'contents')->last();
+
+        $archive = ArchiveFile::tarBz2($file, self::TEMP_DIR.'/archive10.tar.bz2');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive10.tar');
+        $this->assertSame('application/x-bzip2', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_bz2_spl_file(): void
+    {
+        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+
+        $archive = ArchiveFile::tarBz2($file, self::TEMP_DIR.'/archive11.tar.bz2');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive11.tar');
+        $this->assertSame('application/x-bzip2', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
+    /**
+     * @test
+     */
+    public function can_tar_bz2_spl_directory(): void
+    {
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+
+        $archive = ArchiveFile::tarBz2(self::TEMP_DIR, self::TEMP_DIR.'/archive12.tar.bz2');
+
+        $this->assertFileExists($archive);
+        $this->assertFileDoesNotExist(self::TEMP_DIR.'/archive12.tar');
+        $this->assertSame('application/x-bzip2', (new FinfoMimeTypeDetector())->detectMimeTypeFromFile($archive));
+    }
+
     protected function createFilesystem(): Filesystem
     {
         return new ArchiveFile();

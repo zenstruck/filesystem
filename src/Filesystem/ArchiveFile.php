@@ -86,53 +86,40 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
     public static function tar(Node|\SplFileInfo|string $what, ?string $filename = null): \SplFileInfo
     {
         $filename = $filename ?? TempFile::new()->delete().'.tar';
-        $what = \is_string($what) ? new \SplFileInfo($what) : $what;
 
-        if (!\str_ends_with($filename, '.tar')) {
-            throw new \LogicException(\sprintf('Filename (%s) must end with ".tar".', $filename));
+        self::createTar($what, $filename);
+
+        return new \SplFileInfo($filename);
+    }
+
+    public static function tarGz(Node|\SplFileInfo|string $what, ?string $filename = null): \SplFileInfo
+    {
+        $filename = $filename ?? TempFile::new()->delete().'.tar.gz';
+
+        if (!\str_ends_with($filename, '.tar.gz')) {
+            throw new \LogicException(\sprintf('Filename (%s) must end with ".tar.gz".', $filename));
         }
 
-        if (!\is_dir(\dirname($filename))) {
-            (new SymfonyFilesystem())->mkdir(\dirname($filename));
+        $tar = self::createTar($what, $tarFile = \mb_substr($filename, 0, -3));
+        $tar->compress(\Phar::GZ);
+
+        (new SymfonyFilesystem())->remove($tarFile);
+
+        return new \SplFileInfo($filename);
+    }
+
+    public static function tarBz2(Node|\SplFileInfo|string $what, ?string $filename = null): \SplFileInfo
+    {
+        $filename = $filename ?? TempFile::new()->delete().'.tar.bz2';
+
+        if (!\str_ends_with($filename, '.tar.bz2')) {
+            throw new \LogicException(\sprintf('Filename (%s) must end with ".tar.bz2".', $filename));
         }
 
-        if (\file_exists($filename)) {
-            throw new \RuntimeException(\sprintf('Unable to tar %s, destination filename (%s) already exists.', $what, $filename));
-        }
+        $tar = self::createTar($what, $tarFile = \mb_substr($filename, 0, -4));
+        $tar->compress(\Phar::BZ2);
 
-        if ($what instanceof \SplFileInfo && !\file_exists($what)) {
-            throw new \RuntimeException(\sprintf('Unable to tar %s, this file does not exist.', $what));
-        }
-
-        $tar = new \PharData($filename);
-
-        if ($what instanceof Directory) {
-            $prefixLength = \mb_strlen($what->path());
-
-            foreach ($what->recursive()->files() as $file) {
-                $tar->addFromString(\mb_substr($file->path(), $prefixLength), $file->contents());
-            }
-
-            return new \SplFileInfo($filename);
-        }
-
-        if ($what instanceof File) {
-            $tar->addFromString($what->name(), $what->contents());
-
-            return new \SplFileInfo($filename);
-        }
-
-        \assert($what instanceof \SplFileInfo);
-
-        if (!$what->isDir()) {
-            $tar->addFile($what, $what->getFilename());
-
-            return new \SplFileInfo($filename);
-        }
-
-        foreach (Finder::create()->in((string) $what)->files() as $file) {
-            $tar->addFile($file, $file->getRelativePathname());
-        }
+        (new SymfonyFilesystem())->remove($tarFile);
 
         return new \SplFileInfo($filename);
     }
@@ -178,5 +165,58 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
     protected function inner(): Filesystem
     {
         return $this->inner;
+    }
+
+    private static function createTar(Node|\SplFileInfo|string $what, string $filename): \PharData
+    {
+        $what = \is_string($what) ? new \SplFileInfo($what) : $what;
+
+        if (!\str_ends_with($filename, '.tar')) {
+            throw new \LogicException(\sprintf('Filename (%s) must end with ".tar".', $filename));
+        }
+
+        if (!\is_dir(\dirname($filename))) {
+            (new SymfonyFilesystem())->mkdir(\dirname($filename));
+        }
+
+        if (\file_exists($filename)) {
+            throw new \RuntimeException(\sprintf('Unable to tar %s, destination filename (%s) already exists.', $what, $filename));
+        }
+
+        if ($what instanceof \SplFileInfo && !\file_exists($what)) {
+            throw new \RuntimeException(\sprintf('Unable to tar %s, this file does not exist.', $what));
+        }
+
+        $tar = new \PharData($filename);
+
+        if ($what instanceof Directory) {
+            $prefixLength = \mb_strlen($what->path());
+
+            foreach ($what->recursive()->files() as $file) {
+                $tar->addFromString(\mb_substr($file->path(), $prefixLength), $file->contents());
+            }
+
+            return $tar;
+        }
+
+        if ($what instanceof File) {
+            $tar->addFromString($what->name(), $what->contents());
+
+            return $tar;
+        }
+
+        \assert($what instanceof \SplFileInfo);
+
+        if (!$what->isDir()) {
+            $tar->addFile($what, $what->getFilename());
+
+            return $tar;
+        }
+
+        foreach (Finder::create()->in((string) $what)->files() as $file) {
+            $tar->addFile($file, $file->getRelativePathname());
+        }
+
+        return $tar;
     }
 }
