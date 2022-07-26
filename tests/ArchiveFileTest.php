@@ -125,33 +125,64 @@ final class ArchiveFileTest extends FilesystemTest
     /**
      * @test
      */
-    public function can_compress_directory(): void
+    public function can_zip_directory(): void
     {
-        $this->markTestIncomplete();
+        $dir = $this->filesystem()
+            ->write('sub/file1.txt', 'contents 1')
+            ->write('sub/nested/file2.txt', 'contents 2')
+            ->directory('sub')
+        ;
+
+        $archive = ArchiveFile::zip($dir);
+
+        $this->assertFileExists($archive);
+
+        $this->assertSame('contents 1', $archive->file('file1.txt')->contents());
+        $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
     }
 
     /**
      * @test
      */
-    public function can_compress_file(): void
+    public function can_zip_file(): void
     {
-        $this->markTestIncomplete();
+        $file = $this->filesystem()->write('nested/file.txt', 'contents')->last();
+
+        $archive = ArchiveFile::zip($file);
+
+        $this->assertFileExists($archive);
+
+        $this->assertSame('contents', $archive->file('file.txt')->contents());
     }
 
     /**
      * @test
      */
-    public function can_compress_spl_file(): void
+    public function can_zip_spl_file(): void
     {
-        $this->markTestIncomplete();
+        (new SymfonyFilesystem())->dumpFile($file = self::TEMP_DIR.'/file.txt', 'contents');
+
+        $archive = ArchiveFile::zip($file);
+
+        $this->assertFileExists($archive);
+
+        $this->assertSame('contents', $archive->file('file.txt')->contents());
     }
 
     /**
      * @test
      */
-    public function can_compress_spl_directory(): void
+    public function can_zip_spl_directory(): void
     {
-        $this->markTestIncomplete();
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/file1.txt', 'contents 1');
+        (new SymfonyFilesystem())->dumpFile(self::TEMP_DIR.'/nested/file2.txt', 'contents 2');
+
+        $archive = ArchiveFile::zip(self::TEMP_DIR);
+
+        $this->assertFileExists($archive);
+
+        $this->assertSame('contents 1', $archive->file('file1.txt')->contents());
+        $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
     }
 
     protected function createFilesystem(): Filesystem

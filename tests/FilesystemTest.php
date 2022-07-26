@@ -18,12 +18,15 @@ use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\ResourceWrapper;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class FilesystemTest extends TestCase
 {
+    use InteractsWithFilesystem;
+
     public const TEMP_DIR = __DIR__.'/../var/filesystem';
     public const FIXTURE_DIR = __DIR__.'/Fixture/files';
 
