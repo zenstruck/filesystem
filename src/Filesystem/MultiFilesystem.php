@@ -105,7 +105,13 @@ final class MultiFilesystem implements Filesystem
             return $this;
         }
 
-        $destFilesystem->write($destPath, $sourceFilesystem->node($sourcePath), $config);
+        $sourceNode = $sourceFilesystem->node($sourcePath);
+
+        if ($sourceNode instanceof Directory) {
+            $sourceNode = $sourceNode->recursive();
+        }
+
+        $destFilesystem->write($destPath, $sourceNode, $config);
 
         return $this;
     }
@@ -122,7 +128,13 @@ final class MultiFilesystem implements Filesystem
             return $this;
         }
 
-        $destFilesystem->write($destPath, $sourceFilesystem->node($sourcePath), $config);
+        $sourceNode = $sourceFilesystem->node($sourcePath);
+
+        if ($sourceNode instanceof Directory) {
+            $sourceNode = $sourceNode->recursive();
+        }
+
+        $destFilesystem->write($destPath, $sourceNode, $config);
         $sourceFilesystem->delete($sourcePath);
 
         return $this;
@@ -180,8 +192,14 @@ final class MultiFilesystem implements Filesystem
         foreach ($names as $name) {
             $nested = $this->get($name);
 
-            if ($nested instanceof self) {
-                return $this->get($key);
+            if (!$nested instanceof self) {
+                continue;
+            }
+
+            try {
+                return $nested->get($key);
+            } catch (\InvalidArgumentException) {
+                continue;
             }
         }
 
