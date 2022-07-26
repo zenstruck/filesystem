@@ -132,6 +132,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->write('sub/file1.txt', 'contents 1')
             ->write('sub/nested/file2.txt', 'contents 2')
             ->directory('sub')
+            ->recursive()
         ;
 
         $archive = ArchiveFile::zip($dir);
@@ -195,6 +196,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->write('sub/file1.txt', 'contents 1')
             ->write('sub/nested/file2.txt', 'contents 2')
             ->directory('sub')
+            ->recursive()
         ;
 
         $archive = ArchiveFile::tar($dir, self::TEMP_DIR.'/archive1.tar');
@@ -252,6 +254,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->write('sub/file1.txt', 'contents 1')
             ->write('sub/nested/file2.txt', 'contents 2')
             ->directory('sub')
+            ->recursive()
         ;
 
         $archive = ArchiveFile::tarGz($dir, self::TEMP_DIR.'/archive5.tar.gz');
@@ -313,6 +316,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->write('sub/file1.txt', 'contents 1')
             ->write('sub/nested/file2.txt', 'contents 2')
             ->directory('sub')
+            ->recursive()
         ;
 
         $archive = ArchiveFile::tarBz2($dir, self::TEMP_DIR.'/archive9.tar.bz2');

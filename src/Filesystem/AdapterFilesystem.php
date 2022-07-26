@@ -142,7 +142,7 @@ final class AdapterFilesystem implements Filesystem
         $this->delete($destination);
 
         if ($sourceNode instanceof Directory) {
-            $this->write($destination, $sourceNode, $config);
+            $this->write($destination, $sourceNode->recursive(), $config);
 
             return $this;
         }
@@ -307,7 +307,7 @@ final class AdapterFilesystem implements Filesystem
             $relative = new Path($path);
             $prefixLength = \mb_strlen($value->path());
 
-            foreach ($value->recursive()->files() as $file) {
+            foreach ($value->files() as $file) {
                 $this->write(
                     $relative->append(\mb_substr($file->path(), $prefixLength)),
                     $file,

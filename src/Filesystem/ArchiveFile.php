@@ -192,7 +192,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         if ($what instanceof Directory) {
             $prefixLength = \mb_strlen($what->path());
 
-            foreach ($what->recursive()->files() as $file) {
+            foreach ($what->files() as $file) {
                 $tar->addFromString(\mb_substr($file->path(), $prefixLength), $file->contents());
             }
 
