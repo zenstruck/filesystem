@@ -85,4 +85,9 @@ final class Operator extends Filesystem implements All
 
         return TempFile::with($file->read());
     }
+
+    public function swap(FilesystemAdapter $adapter): void
+    {
+        $this->adapter->swap($adapter);
+    }
 }

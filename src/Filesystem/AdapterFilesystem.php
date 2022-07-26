@@ -348,4 +348,12 @@ final class AdapterFilesystem implements Filesystem
 
         return $this;
     }
+
+    /**
+     * @internal
+     */
+    public function swap(FilesystemAdapter $adapter): void
+    {
+        $this->operator->swap($adapter);
+    }
 }

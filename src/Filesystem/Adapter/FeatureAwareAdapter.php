@@ -51,6 +51,20 @@ class FeatureAwareAdapter extends WrappedAdapter implements All
         return $this->next instanceof self ? $this->next->supports($feature) : $this->next instanceof $feature;
     }
 
+    /**
+     * @internal
+     */
+    final public function swap(FilesystemAdapter $adapter): void
+    {
+        if ($this->next instanceof self) {
+            $this->next->swap($adapter);
+
+            return;
+        }
+
+        $this->next = $adapter;
+    }
+
     protected function inner(): FilesystemAdapter
     {
         return $this->next;
