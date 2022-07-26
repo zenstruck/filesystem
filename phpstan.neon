@@ -2,4 +2,7 @@ parameters:
     level: 8
     paths:
         - src
+    excludePaths:
+        - src/Filesystem/Bridge/Symfony/DependencyInjection/*
     treatPhpDocTypesAsCertain: false
+

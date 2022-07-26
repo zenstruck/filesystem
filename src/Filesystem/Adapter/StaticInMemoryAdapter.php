@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Adapter;
 
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 
 /**
@@ -14,8 +15,13 @@ final class StaticInMemoryAdapter extends WrappedAdapter
 
     public function __construct(private string $name = 'default')
     {
+        self::ensureSupported();
+    }
+
+    public static function ensureSupported(): void
+    {
         if (!\class_exists(InMemoryFilesystemAdapter::class)) {
-            throw new \LogicException(\sprintf('league/flysystem-memory is required to use %s. Install with "composer install (--dev) league/flysystem-memory".', self::class));
+            throw new \LogicException(\sprintf('league/flysystem-memory is required to use %s. Install with "composer require (--dev) league/flysystem-memory".', self::class));
         }
     }
 
@@ -24,7 +30,7 @@ final class StaticInMemoryAdapter extends WrappedAdapter
         self::$adapters = [];
     }
 
-    protected function inner(): InMemoryFilesystemAdapter
+    protected function inner(): FilesystemAdapter
     {
         return self::$adapters[$this->name] ??= new InMemoryFilesystemAdapter();
     }

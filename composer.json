@@ -46,6 +46,7 @@
         "league/flysystem-memory": "To use the in-memory adapters",
         "league/flysystem-ziparchive": "To use ArchiveFile as a filesystem",
         "doctrine/dbal": "To use the File/Image/FileCollection types",
-        "zenstruck/assert": "To use the TestFilesystem assertions"
+        "zenstruck/assert": "To use the TestFilesystem assertions",
+        "symfony/framework-bundle": "To use the provided Symfony bundle"
     }
 }
