@@ -17,7 +17,7 @@ trait WrappedFilesystem
         return $this->inner()->name();
     }
 
-    public function node(string $path = ''): File|Directory
+    public function node(string $path): File|Directory
     {
         return $this->inner()->node($path);
     }
@@ -32,12 +32,12 @@ trait WrappedFilesystem
         return $this->inner()->image($path, $config);
     }
 
-    public function directory(string $path = ''): Directory
+    public function directory(string $path): Directory
     {
         return $this->inner()->directory($path);
     }
 
-    public function exists(string $path = ''): bool
+    public function exists(string $path): bool
     {
         return $this->inner()->exists($path);
     }
@@ -56,14 +56,14 @@ trait WrappedFilesystem
         return $this;
     }
 
-    public function delete(Directory|string $path = '', array $config = []): static
+    public function delete(Directory|string $path, array $config = []): static
     {
         $this->inner()->delete($path, $config);
 
         return $this;
     }
 
-    public function mkdir(string $path = '', array $config = []): static
+    public function mkdir(string $path, array $config = []): static
     {
         $this->inner()->mkdir($path, $config);
 

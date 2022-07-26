@@ -441,13 +441,13 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('file.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists());
+        $this->assertTrue($filesystem->exists(Filesystem::ROOT));
         $this->assertTrue($filesystem->exists('file.txt'));
 
-        $filesystem->delete(); // delete root
+        $filesystem->delete(Filesystem::ROOT); // delete root
 
         $this->assertFalse($filesystem->exists('file.txt'));
-        $this->assertFalse($filesystem->exists());
+        $this->assertFalse($filesystem->exists(Filesystem::ROOT));
     }
 
     /**
@@ -631,7 +631,7 @@ abstract class FilesystemTest extends TestCase
         $filesystem->write('subdir/file2.txt', 'file2');
         $filesystem->write('subdir/nested/file3.txt', 'file3');
 
-        $root = $filesystem->directory();
+        $root = $filesystem->directory(Filesystem::ROOT);
 
         $this->assertCount(1, $root);
     }
@@ -644,7 +644,7 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('subdir/file1.txt', 'file1');
 
-        $this->assertTrue($filesystem->exists());
+        $this->assertTrue($filesystem->exists(Filesystem::ROOT));
     }
 
     /**

@@ -58,7 +58,7 @@ final class MultiFilesystem implements Filesystem
         return $this->get($name)->name();
     }
 
-    public function node(string $path = ''): File|Directory
+    public function node(string $path): File|Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 
@@ -79,14 +79,14 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->image($path, $config);
     }
 
-    public function directory(string $path = ''): Directory
+    public function directory(string $path): Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 
         return $filesystem->directory($path);
     }
 
-    public function exists(string $path = ''): bool
+    public function exists(string $path): bool
     {
         [$filesystem, $path] = $this->parsePath($path);
 
@@ -128,7 +128,7 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path = '', array $config = []): static
+    public function delete(Directory|string $path, array $config = []): static
     {
         [$filesystem, $path] = $this->parsePath($path);
 
@@ -137,7 +137,7 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path = '', array $config = []): static
+    public function mkdir(string $path, array $config = []): static
     {
         [$filesystem, $path] = $this->parsePath($path);
 

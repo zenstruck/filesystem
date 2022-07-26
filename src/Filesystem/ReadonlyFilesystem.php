@@ -27,12 +27,12 @@ final class ReadonlyFilesystem implements Filesystem
         self::throw();
     }
 
-    public function delete(Directory|string $path = '', array $config = []): static
+    public function delete(Directory|string $path, array $config = []): static
     {
         self::throw();
     }
 
-    public function mkdir(string $path = '', array $config = []): static
+    public function mkdir(string $path, array $config = []): static
     {
         self::throw();
     }

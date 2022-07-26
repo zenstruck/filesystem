@@ -57,7 +57,7 @@ final class AdapterFilesystem implements Filesystem
         return $this->name;
     }
 
-    public function node(string $path = ''): File|Directory
+    public function node(string $path): File|Directory
     {
         if ($this->operator->fileExists($path)) {
             return new File($this->operator->fileAttributesFor($path), $this->operator);
@@ -92,7 +92,7 @@ final class AdapterFilesystem implements Filesystem
         return $this->file($path)->ensureImage($config);
     }
 
-    public function directory(string $path = ''): Directory
+    public function directory(string $path): Directory
     {
         if ($this->operator->directoryExists($path)) {
             return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
@@ -110,7 +110,7 @@ final class AdapterFilesystem implements Filesystem
         return \is_string($this->last) ? $this->node($this->last) : throw $this->last;
     }
 
-    public function exists(string $path = ''): bool
+    public function exists(string $path): bool
     {
         return $this->operator->has($path);
     }
@@ -193,7 +193,7 @@ final class AdapterFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(string|Directory $path = '', array $config = []): static
+    public function delete(string|Directory $path, array $config = []): static
     {
         if ($path instanceof Directory) {
             foreach ($path as $node) {
@@ -222,7 +222,7 @@ final class AdapterFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path = '', array $config = []): static
+    public function mkdir(string $path, array $config = []): static
     {
         try {
             if ($this->node($path)->isFile()) {

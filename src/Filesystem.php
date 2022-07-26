@@ -37,13 +37,15 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 interface Filesystem
 {
+    public const ROOT = '';
+
     /**
      * @throws NodeNotFound        If node at path is not found
      * @throws FilesystemException {@see FilesystemReader::has()}
      *
      * @return File|Directory<Node>
      */
-    public function node(string $path = ''): File|Directory;
+    public function node(string $path): File|Directory;
 
     /**
      * @throws NodeNotFound        If node at path is not found
@@ -59,7 +61,7 @@ interface Filesystem
      * @throws NodeTypeMismatch    If the node at path is a file
      * @throws FilesystemException {@see FilesystemReader::has()}
      */
-    public function directory(string $path = ''): Directory;
+    public function directory(string $path): Directory;
 
     /**
      * Returns an image file type. By default, only ensures a file's
@@ -79,7 +81,7 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function exists(string $path = ''): bool;
+    public function exists(string $path): bool;
 
     /**
      * Copy a file or directory.
@@ -166,7 +168,7 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function delete(string|Directory $path = '', array $config = []): static;
+    public function delete(string|Directory $path, array $config = []): static;
 
     /**
      * @see FilesystemWriter::createDirectory()
@@ -175,7 +177,7 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function mkdir(string $path = '', array $config = []): static;
+    public function mkdir(string $path, array $config = []): static;
 
     /**
      * @see FilesystemWriter::setVisibility()
