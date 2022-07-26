@@ -51,5 +51,7 @@ final class TransactionalZipArchiveProvider extends FilesystemZipArchiveProvider
         if (false === $this->archive->commit($callback)) {
             throw new \RuntimeException('Unable to commit archive.');
         }
+
+        unset($this->archive);
     }
 }
