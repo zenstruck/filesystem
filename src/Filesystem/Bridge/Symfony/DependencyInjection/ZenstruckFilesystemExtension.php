@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
 
@@ -52,22 +53,23 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
     private function addFilesystem(string $name, array $config, ContainerBuilder $container): void
     {
-        $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.adapter_'.$name, AdapterFilesystem::class)
+        $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.filesystem_'.$name, AdapterFilesystem::class)
             ->setArguments([$config['dsn'], $config['config'], $name])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
 
         if ($config['readonly']) {
-            $container->register('zenstruck_filesystem.readonly_'.$name, ReadonlyFilesystem::class)
+            $container->register('zenstruck_filesystem.filesystem.readonly_'.$name, ReadonlyFilesystem::class)
                 ->setDecoratedService($filesystem)
                 ->setArguments([new Reference('.inner')])
             ;
         }
 
         if ($config['test']) {
+            // todo allow dsn here and default to static/filesystem
             StaticInMemoryAdapter::ensureSupported();
 
-            $container->register($testName = 'zenstruck_filesystem.test_'.$name, StaticInMemoryAdapter::class)
+            $container->register($testName = 'zenstruck_filesystem.filesystem.test_'.$name, StaticInMemoryAdapter::class)
                 ->setArguments([$name])
             ;
 
@@ -75,12 +77,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         if ($config['log']) {
-            // todo
+            $container->register('zenstruck_filesystem.filesystem.log_'.$name, LoggableFilesystem::class)
+                ->setDecoratedService($filesystem)
+                ->setArguments([new Reference('.inner'), new Reference('logger')])
+                ->addTag('monolog.logger', ['channel' => 'filesystem'])
+            ;
         }
 
-        if ($config['trace']) {
-            // todo
-        }
+        // todo traceable filesystem if debug
 
         $container->registerAliasForArgument($filesystem, Filesystem::class, $name);
     }
