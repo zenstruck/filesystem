@@ -18,9 +18,14 @@ final class StaticInMemoryAdapter extends WrappedAdapter
         self::ensureSupported();
     }
 
+    public static function isSupported(): bool
+    {
+        return \class_exists(InMemoryFilesystemAdapter::class);
+    }
+
     public static function ensureSupported(): void
     {
-        if (!\class_exists(InMemoryFilesystemAdapter::class)) {
+        if (!self::isSupported()) {
             throw new \LogicException('league/flysystem-memory is required to use the in-memory adapters. Install with "composer require --dev league/flysystem-memory".');
         }
     }
