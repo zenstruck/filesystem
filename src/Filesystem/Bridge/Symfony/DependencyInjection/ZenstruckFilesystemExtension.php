@@ -12,12 +12,16 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
+use Zenstruck\Filesystem\TraceableFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
@@ -33,6 +37,15 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         $container->register('.zenstruck_filesystem.adapter_factory', AdapterFactory::class);
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->register('.zenstruck_filesystem.data_collector', FilesystemDataCollector::class)
+                ->addTag('data_collector', [
+                    'template' => '@ZenstruckFilesystem/Collector/filesystem.html.twig',
+                    'id' => 'filesystem',
+                ])
+            ;
+        }
 
         foreach ($mergedConfig['filesystems'] as $name => $config) {
             $this->addFilesystem($name, $config, $container);
@@ -104,7 +117,16 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
-        // todo traceable filesystem if debug
+        if ($container->hasDefinition('.zenstruck_filesystem.data_collector')) {
+            $container->register('.zenstruck_filesystem.filesystem.traceable_'.$name, TraceableFilesystem::class)
+                ->setDecoratedService($filesystem)
+                ->setArguments([new Reference('.inner')])
+            ;
+
+            $container->getDefinition('.zenstruck_filesystem.data_collector')
+                ->addMethodCall('addFilesystem', [new Reference('.zenstruck_filesystem.filesystem.traceable_'.$name)])
+            ;
+        }
 
         $container->registerAliasForArgument($filesystem, Filesystem::class, $name);
     }

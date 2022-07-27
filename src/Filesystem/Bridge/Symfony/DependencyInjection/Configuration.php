@@ -8,6 +8,8 @@ use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class Configuration implements ConfigurationInterface
 {
@@ -45,7 +47,7 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultFalse()
                                 ->info('Set to true to create a "readonly" filesystem (write operations will fail)')
                             ->end()
-                            ->variableNode('log') // todo log levels
+                            ->booleanNode('log') // todo log levels
                                 ->defaultTrue()
                                 ->info('Whether or not to log filesystem operations')
                             ->end()

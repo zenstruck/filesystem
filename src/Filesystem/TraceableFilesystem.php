@@ -22,11 +22,41 @@ final class TraceableFilesystem implements Filesystem
     public const CHMOD = 'chmod';
     public const MKDIR = 'mkdir';
 
-    /** @var array<self::*,array<int,array{0:string,1:string|null}>> */
+    /** @var array<self::*,list<array{0:string,1:string|null}>> */
     public array $operations = [];
 
     public function __construct(private Filesystem $inner)
     {
+    }
+
+    /**
+     * @return array<self::*,list<array{0:string,1:string|null}>>
+     */
+    public function operations(): array
+    {
+        return $this->operations;
+    }
+
+    public function totalOperations(): int
+    {
+        return $this->totalReads() + $this->totalWrites();
+    }
+
+    public function totalReads(): int
+    {
+        return \count($this->operations[self::READ] ?? []);
+    }
+
+    public function totalWrites(): int
+    {
+        return \array_sum(
+            \array_map(fn($type) => \count($this->operations[$type] ?? []), [self::WRITE, self::MOVE, self::COPY, self::DELETE, self::CHMOD, self::MKDIR])
+        );
+    }
+
+    public function reset(): void
+    {
+        $this->operations = [];
     }
 
     public function node(string $path): File|Directory
