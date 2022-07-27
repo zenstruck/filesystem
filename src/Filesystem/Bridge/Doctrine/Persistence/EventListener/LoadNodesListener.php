@@ -20,7 +20,7 @@ final class LoadNodesListener
     /**
      * @param LifecycleEventArgs<ObjectManager> $event
      */
-    public function onLoad(LifecycleEventArgs $event): void
+    public function postLoad(LifecycleEventArgs $event): void
     {
         $this->nodeLoader->load($event->getObject());
     }

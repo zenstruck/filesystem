@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final class ORMNodeConfigProvider implements NodeConfigProvider
 {
-    private function __construct(private EntityManagerInterface $em)
+    public function __construct(private EntityManagerInterface $em)
     {
     }
 

@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Bridge\Symfony\DependencyInjection;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -70,6 +71,32 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('default_filesystem')
                     ->defaultNull()
                     ->info('Default filesystem name, if not configured, use first one')
+                ->end()
+                ->arrayNode('doctrine')
+                    ->{\interface_exists(ManagerRegistry::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->arrayNode('events')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('load')
+                                    ->defaultTrue()
+                                    ->info('Whether to load filesystem files by default')
+                                ->end()
+                                ->booleanNode('persist')
+                                    ->defaultTrue()
+                                    ->info('Whether to save filesystem files on entity persist')
+                                ->end()
+                                ->booleanNode('update')
+                                    ->defaultTrue()
+                                    ->info('Whether to save filesystem files on entity update')
+                                ->end()
+                                ->booleanNode('delete')
+                                    ->defaultTrue()
+                                    ->info('Whether to delete filesystem files on entity remove')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

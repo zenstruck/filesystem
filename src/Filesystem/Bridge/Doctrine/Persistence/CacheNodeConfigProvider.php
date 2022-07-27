@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence;
 
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  *
  * @phpstan-import-type ConfigMapping from NodeConfigProvider
  */
-final class CacheNodeConfigProvider implements NodeConfigProvider
+final class CacheNodeConfigProvider implements NodeConfigProvider, CacheWarmerInterface
 {
     /** @var array<class-string,list<ConfigMapping>> */
     private array $localCache;
@@ -30,10 +31,20 @@ final class CacheNodeConfigProvider implements NodeConfigProvider
         return $this->inner->managedClasses();
     }
 
-    public function warmup(): void
+    /**
+     * @return string[]
+     */
+    public function warmup(string $cacheDir): array
     {
         foreach ($this->managedClasses() as $class) {
             $this->configFor($class);
         }
+
+        return [];
+    }
+
+    public function isOptional(): bool
+    {
+        return false;
     }
 }

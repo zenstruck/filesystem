@@ -12,6 +12,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Bridge\Doctrine\ObjectNodeLoader;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\CacheNodeConfigProvider;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener\LoadNodesListener;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
@@ -60,6 +64,30 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         ;
 
         $container->setAlias(Filesystem::class, MultiFilesystem::class);
+
+        if ($mergedConfig['doctrine']['enabled']) {
+            $this->addDoctrineConfig($mergedConfig['doctrine'], $container);
+        }
+    }
+
+    private function addDoctrineConfig(array $config, ContainerBuilder $container): void
+    {
+        $container->register('.zenstruck_filesystem.doctrine.node_config_provider', ORMNodeConfigProvider::class)
+            ->setArguments([new Reference('doctrine.orm.entity_manager')])
+        ;
+        $container->register('.zenstruck_filesystem.doctrine._cache_node_config_provider', CacheNodeConfigProvider::class)
+            ->setDecoratedService('.zenstruck_filesystem.doctrine.node_config_provider')
+            ->setArguments([new Reference('.inner'), new Reference('cache.system')])
+            ->addTag('kernel.cache_warmer', ['optional' => false])
+        ;
+        $container->register(ObjectNodeLoader::class)
+            ->setArguments([new Reference(MultiFilesystem::class), new Reference('.zenstruck_filesystem.doctrine.node_config_provider')])
+        ;
+
+        $container->register('.zenstruck_filesystem.doctrine.load_nodes_listener', LoadNodesListener::class)
+            ->setArguments([new Reference(ObjectNodeLoader::class)])
+            ->addTag('doctrine.event_listener', ['event' => 'postLoad'])
+        ;
     }
 
     private function addFilesystem(string $name, array $config, ContainerBuilder $container): void
