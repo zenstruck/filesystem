@@ -9,6 +9,8 @@ use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class TraceableFilesystem implements Filesystem
 {
@@ -20,7 +22,7 @@ final class TraceableFilesystem implements Filesystem
     public const CHMOD = 'chmod';
     public const MKDIR = 'mkdir';
 
-    /** @var array<self::*,array<int,string|string[]>> */
+    /** @var array<self::*,array<int,array{0:string,1:string|null}>> */
     public array $operations = [];
 
     public function __construct(private Filesystem $inner)
@@ -67,7 +69,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->exists($path);
 
-        $this->operations[self::READ][] = $path;
+        $this->operations[self::READ][] = [$path, null];
 
         return $ret;
     }
@@ -94,7 +96,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->delete($path, $config);
 
-        $this->operations[self::DELETE][] = $path;
+        $this->operations[self::DELETE][] = [(string) $path, null];
 
         return $this;
     }
@@ -103,7 +105,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->mkdir($path, $config);
 
-        $this->operations[self::MKDIR][] = $path;
+        $this->operations[self::MKDIR][] = [$path, null];
 
         return $this;
     }
