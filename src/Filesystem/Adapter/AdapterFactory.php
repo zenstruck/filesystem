@@ -4,8 +4,6 @@ namespace Zenstruck\Filesystem\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
-use Zenstruck\Dsn\Parser;
-use Zenstruck\Dsn\Parser\ChainParser;
 use Zenstruck\Uri;
 
 /**
@@ -13,22 +11,9 @@ use Zenstruck\Uri;
  */
 final class AdapterFactory
 {
-    private Parser $parser;
-
-    public function __construct(?Parser $parser = null)
+    public function create(string|Uri $dsn, ?string $name = null): FilesystemAdapter
     {
-        $this->parser = $parser ?? new ChainParser();
-    }
-
-    public function create(string|\Stringable $dsn, ?string $name = null): FilesystemAdapter
-    {
-        if (\is_string($dsn)) {
-            $dsn = $this->parser->parse($dsn);
-        }
-
-        if (!$dsn instanceof Uri) {
-            throw new \InvalidArgumentException(\sprintf('Could not create filesystem from DSN "%s".', $dsn));
-        }
+        $dsn = Uri::new($dsn);
 
         return match ($dsn->scheme()->toString()) {
             'in-memory' => self::createInMemoryFilesystem($dsn, $name ?? $dsn->fragment() ?? 'default'),
