@@ -37,9 +37,9 @@ trait WrappedFilesystem
         return $this->inner()->directory($path);
     }
 
-    public function exists(string $path): bool
+    public function has(string $path): bool
     {
-        return $this->inner()->exists($path);
+        return $this->inner()->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static

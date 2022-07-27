@@ -65,9 +65,9 @@ final class TraceableFilesystem implements Filesystem
         return $ret;
     }
 
-    public function exists(string $path): bool
+    public function has(string $path): bool
     {
-        $ret = $this->inner->exists($path);
+        $ret = $this->inner->has($path);
 
         $this->operations[self::READ][] = [$path, null];
 

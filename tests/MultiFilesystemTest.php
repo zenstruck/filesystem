@@ -56,13 +56,13 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $filesystem = $this->createFilesystem();
         $filesystem->write('first://foo/bar.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/bar.txt'));
 
         $filesystem->copy('first://foo/bar.txt', 'second://baz/bar.txt');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/bar.txt'));
     }
 
     /**
@@ -73,13 +73,13 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $filesystem = $this->createFilesystem();
         $filesystem->write('first://foo/bar.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/bar.txt'));
 
         $filesystem->move('first://foo/bar.txt', 'second://baz/bar.txt');
 
-        $this->assertFalse($filesystem->exists('first://foo/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/bar.txt'));
+        $this->assertFalse($filesystem->has('first://foo/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/bar.txt'));
     }
 
     /**
@@ -91,17 +91,17 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $filesystem->write('first://foo/bar.txt', 'contents');
         $filesystem->write('first://foo/nested/bar.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertTrue($filesystem->exists('first://foo/nested/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/nested/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/nested/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/nested/bar.txt'));
 
         $filesystem->copy('first://foo', 'second://baz');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertTrue($filesystem->exists('first://foo/nested/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/nested/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/nested/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/nested/bar.txt'));
     }
 
     /**
@@ -113,17 +113,17 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $filesystem->write('first://foo/bar.txt', 'contents');
         $filesystem->write('first://foo/nested/bar.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists('first://foo/bar.txt'));
-        $this->assertTrue($filesystem->exists('first://foo/nested/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/bar.txt'));
-        $this->assertFalse($filesystem->exists('second://baz/nested/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/bar.txt'));
+        $this->assertTrue($filesystem->has('first://foo/nested/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/bar.txt'));
+        $this->assertFalse($filesystem->has('second://baz/nested/bar.txt'));
 
         $filesystem->move('first://foo', 'second://baz');
 
-        $this->assertFalse($filesystem->exists('first://foo/bar.txt'));
-        $this->assertFalse($filesystem->exists('first://foo/nested/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/bar.txt'));
-        $this->assertTrue($filesystem->exists('second://baz/nested/bar.txt'));
+        $this->assertFalse($filesystem->has('first://foo/bar.txt'));
+        $this->assertFalse($filesystem->has('first://foo/nested/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/bar.txt'));
+        $this->assertTrue($filesystem->has('second://baz/nested/bar.txt'));
     }
 
     final protected function createFilesystem(?array $filesystems = null, ?string $default = null): Filesystem

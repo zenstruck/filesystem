@@ -46,8 +46,8 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('file.txt', 'file1');
 
-        $this->assertTrue($filesystem->exists('file.txt'));
-        $this->assertFalse($filesystem->exists('non-existent'));
+        $this->assertTrue($filesystem->has('file.txt'));
+        $this->assertFalse($filesystem->has('non-existent'));
     }
 
     /**
@@ -167,7 +167,7 @@ abstract class FilesystemTest extends TestCase
 
         $filesystem->delete('non-existent');
 
-        $this->assertTrue($filesystem->exists('file.txt'));
+        $this->assertTrue($filesystem->has('file.txt'));
     }
 
     /**
@@ -242,7 +242,7 @@ abstract class FilesystemTest extends TestCase
     {
         $this->expectException(PathTraversalDetected::class);
 
-        $this->createFilesystem()->exists('../../../some-dir');
+        $this->createFilesystem()->has('../../../some-dir');
     }
 
     /**
@@ -296,11 +296,11 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('file1.txt', 'contents');
 
-        $this->assertFalse($filesystem->exists('file2.txt'));
+        $this->assertFalse($filesystem->has('file2.txt'));
 
         $filesystem->copy('/file1.txt', 'file2.txt');
 
-        $this->assertTrue($filesystem->exists('file2.txt'));
+        $this->assertTrue($filesystem->has('file2.txt'));
         $this->assertSame('contents', $filesystem->file('file2.txt')->contents());
     }
 
@@ -359,11 +359,11 @@ abstract class FilesystemTest extends TestCase
     {
         $filesystem = $this->createFilesystem();
 
-        $this->assertFalse($filesystem->exists('subdir'));
+        $this->assertFalse($filesystem->has('subdir'));
 
         $filesystem->mkdir('/subdir');
 
-        $this->assertTrue($filesystem->exists('subdir'));
+        $this->assertTrue($filesystem->has('subdir'));
         $this->assertInstanceOf(Directory::class, $filesystem->node('subdir'));
     }
 
@@ -374,14 +374,14 @@ abstract class FilesystemTest extends TestCase
     {
         $filesystem = $this->createFilesystem();
 
-        $this->assertFalse($filesystem->exists('subdir'));
-        $this->assertFalse($filesystem->exists('subdir/nested'));
+        $this->assertFalse($filesystem->has('subdir'));
+        $this->assertFalse($filesystem->has('subdir/nested'));
 
         $filesystem->mkdir('/subdir/nested');
 
-        $this->assertTrue($filesystem->exists('subdir'));
+        $this->assertTrue($filesystem->has('subdir'));
         $this->assertInstanceOf(Directory::class, $filesystem->node('subdir'));
-        $this->assertTrue($filesystem->exists('subdir/nested'));
+        $this->assertTrue($filesystem->has('subdir/nested'));
         $this->assertInstanceOf(Directory::class, $filesystem->node('subdir/nested'));
     }
 
@@ -430,13 +430,13 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('subdir/file.txt', 'file1');
 
-        $this->assertTrue($filesystem->exists('/subdir/file.txt'));
-        $this->assertTrue($filesystem->exists('/subdir'));
+        $this->assertTrue($filesystem->has('/subdir/file.txt'));
+        $this->assertTrue($filesystem->has('/subdir'));
 
         $filesystem->delete('subdir');
 
-        $this->assertFalse($filesystem->exists('/subdir/file.txt'));
-        $this->assertFalse($filesystem->exists('/subdir'));
+        $this->assertFalse($filesystem->has('/subdir/file.txt'));
+        $this->assertFalse($filesystem->has('/subdir'));
     }
 
     /**
@@ -447,11 +447,11 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->mkdir('subdir');
 
-        $this->assertTrue($filesystem->exists('/subdir'));
+        $this->assertTrue($filesystem->has('/subdir'));
 
         $filesystem->delete('subdir');
 
-        $this->assertFalse($filesystem->exists('/subdir'));
+        $this->assertFalse($filesystem->has('/subdir'));
     }
 
     /**
@@ -462,13 +462,13 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('file.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists(Filesystem::ROOT));
-        $this->assertTrue($filesystem->exists('file.txt'));
+        $this->assertTrue($filesystem->has(Filesystem::ROOT));
+        $this->assertTrue($filesystem->has('file.txt'));
 
         $filesystem->delete(Filesystem::ROOT); // delete root
 
-        $this->assertFalse($filesystem->exists('file.txt'));
-        $this->assertFalse($filesystem->exists(Filesystem::ROOT));
+        $this->assertFalse($filesystem->has('file.txt'));
+        $this->assertFalse($filesystem->has(Filesystem::ROOT));
     }
 
     /**
@@ -479,11 +479,11 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('subdir/file.txt', 'file1');
 
-        $this->assertTrue($filesystem->exists('/subdir/file.txt'));
+        $this->assertTrue($filesystem->has('/subdir/file.txt'));
 
         $filesystem->delete('subdir/file.txt');
 
-        $this->assertFalse($filesystem->exists('/subdir/file.txt'));
+        $this->assertFalse($filesystem->has('/subdir/file.txt'));
     }
 
     /**
@@ -494,13 +494,13 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('file.txt', 'contents');
 
-        $this->assertTrue($filesystem->exists('file.txt'));
+        $this->assertTrue($filesystem->has('file.txt'));
         $this->assertSame('contents', $filesystem->file('file.txt')->contents());
 
         $filesystem->move('file.txt', 'new-file.txt');
 
-        $this->assertFalse($filesystem->exists('file.txt'));
-        $this->assertTrue($filesystem->exists('new-file.txt'));
+        $this->assertFalse($filesystem->has('file.txt'));
+        $this->assertTrue($filesystem->has('new-file.txt'));
         $this->assertSame('contents', $filesystem->file('new-file.txt')->contents());
     }
 
@@ -549,8 +549,8 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->mkdir('subdir');
 
-        $this->assertTrue($filesystem->exists('subdir'));
-        $this->assertFalse($filesystem->exists('non-existent'));
+        $this->assertTrue($filesystem->has('subdir'));
+        $this->assertFalse($filesystem->has('non-existent'));
     }
 
     /**
@@ -665,7 +665,7 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem();
         $filesystem->write('subdir/file1.txt', 'file1');
 
-        $this->assertTrue($filesystem->exists(Filesystem::ROOT));
+        $this->assertTrue($filesystem->has(Filesystem::ROOT));
     }
 
     /**
@@ -872,15 +872,15 @@ abstract class FilesystemTest extends TestCase
         $filesystem->write('subdir1/file1.txt', 'file1');
         $filesystem->write('subdir1/nested/file2.txt', 'file2');
 
-        $this->assertTrue($filesystem->exists('subdir1'));
-        $this->assertFalse($filesystem->exists('subdir2'));
+        $this->assertTrue($filesystem->has('subdir1'));
+        $this->assertFalse($filesystem->has('subdir2'));
         $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir1/nested/file2.txt')->contents());
 
         $filesystem->copy('subdir1', 'subdir2');
 
-        $this->assertTrue($filesystem->exists('subdir1'));
-        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertTrue($filesystem->has('subdir1'));
+        $this->assertTrue($filesystem->has('subdir2'));
         $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir1/nested/file2.txt')->contents());
         $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
@@ -899,17 +899,17 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
-        $this->assertTrue($filesystem->exists('subdir2/file3.txt'));
+        $this->assertTrue($filesystem->has('subdir2/file3.txt'));
 
         $filesystem->copy('subdir1', 'subdir2');
 
-        $this->assertTrue($filesystem->exists('subdir1'));
-        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertTrue($filesystem->has('subdir1'));
+        $this->assertTrue($filesystem->has('subdir2'));
         $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
         $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir2/file2.txt')->contents());
-        $this->assertFalse($filesystem->exists('subdir2/file3.txt'));
+        $this->assertFalse($filesystem->has('subdir2/file3.txt'));
     }
 
     /**
@@ -924,8 +924,8 @@ abstract class FilesystemTest extends TestCase
         try {
             $filesystem->move('dir', 'file.txt');
         } catch (UnableToMoveDirectory) {
-            $this->assertTrue($filesystem->exists('dir'));
-            $this->assertTrue($filesystem->exists('file.txt'));
+            $this->assertTrue($filesystem->has('dir'));
+            $this->assertTrue($filesystem->has('file.txt'));
 
             return;
         }
@@ -942,14 +942,14 @@ abstract class FilesystemTest extends TestCase
         $filesystem->write('subdir/file1.txt', 'file1');
         $filesystem->write('subdir/file2.txt', 'file2');
 
-        $this->assertTrue($filesystem->exists('subdir'));
+        $this->assertTrue($filesystem->has('subdir'));
         $this->assertSame('file1', $filesystem->file('subdir/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir/file2.txt')->contents());
 
         $filesystem->move('subdir', 'new-subdir');
 
-        $this->assertFalse($filesystem->exists('subdir'));
-        $this->assertTrue($filesystem->exists('new-subdir'));
+        $this->assertFalse($filesystem->has('subdir'));
+        $this->assertTrue($filesystem->has('new-subdir'));
         $this->assertSame('file1', $filesystem->file('new-subdir/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('new-subdir/file2.txt')->contents());
     }
@@ -966,15 +966,15 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertSame('file1', $filesystem->file('subdir1/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir1/file2.txt')->contents());
-        $this->assertTrue($filesystem->exists('subdir2/file3.txt'));
+        $this->assertTrue($filesystem->has('subdir2/file3.txt'));
 
         $filesystem->move('subdir1', 'subdir2');
 
-        $this->assertFalse($filesystem->exists('subdir1'));
-        $this->assertTrue($filesystem->exists('subdir2'));
+        $this->assertFalse($filesystem->has('subdir1'));
+        $this->assertTrue($filesystem->has('subdir2'));
         $this->assertSame('file1', $filesystem->file('subdir2/file1.txt')->contents());
         $this->assertSame('file2', $filesystem->file('subdir2/file2.txt')->contents());
-        $this->assertFalse($filesystem->exists('subdir2/file3.txt'));
+        $this->assertFalse($filesystem->has('subdir2/file3.txt'));
     }
 
     /**

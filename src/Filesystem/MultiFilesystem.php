@@ -86,11 +86,11 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->directory($path);
     }
 
-    public function exists(string $path): bool
+    public function has(string $path): bool
     {
         [$filesystem, $path] = $this->parsePath($path);
 
-        return $filesystem->exists($path);
+        return $filesystem->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static

@@ -40,7 +40,7 @@ final class TestFilesystem implements Filesystem
 
     public function assertNotExists(string $path): self
     {
-        Assert::false($this->exists($path), 'Node at path "%s" exists but it should not.', [$path]);
+        Assert::false($this->has($path), 'Node at path "%s" exists but it should not.', [$path]);
 
         return $this;
     }

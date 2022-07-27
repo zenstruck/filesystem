@@ -52,7 +52,7 @@ final class ArchiveFileTest extends FilesystemTest
 
         $this->assertFileDoesNotExist(self::FILE);
 
-        $this->assertFalse($filesystem->exists('foo.txt'));
+        $this->assertFalse($filesystem->has('foo.txt'));
 
         $this->assertFileDoesNotExist(self::FILE);
     }
@@ -68,7 +68,7 @@ final class ArchiveFileTest extends FilesystemTest
 
         $this->expectException(UnableToOpenZipArchive::class);
 
-        $filesystem->exists('foo');
+        $filesystem->has('foo');
     }
 
     /**
@@ -78,9 +78,9 @@ final class ArchiveFileTest extends FilesystemTest
     {
         $filesystem = new ArchiveFile(self::FIXTURE_DIR.'/archive.zip');
 
-        $this->assertTrue($filesystem->exists(Filesystem::ROOT));
-        $this->assertTrue($filesystem->exists('file1.txt'));
-        $this->assertTrue($filesystem->exists('nested/file2.txt'));
+        $this->assertTrue($filesystem->has(Filesystem::ROOT));
+        $this->assertTrue($filesystem->has('file1.txt'));
+        $this->assertTrue($filesystem->has('nested/file2.txt'));
         $this->assertCount(3, $filesystem->directory(Filesystem::ROOT)->recursive());
         $this->assertSame('contents 2', $filesystem->file('nested/file2.txt')->contents());
     }
@@ -108,8 +108,8 @@ final class ArchiveFileTest extends FilesystemTest
             ++$count;
         });
 
-        $this->assertTrue($filesystem->exists('file1.txt'));
-        $this->assertTrue($filesystem->exists('sub/file2.txt'));
+        $this->assertTrue($filesystem->has('file1.txt'));
+        $this->assertTrue($filesystem->has('sub/file2.txt'));
         $this->assertCount(3, $filesystem->directory(Filesystem::ROOT)->recursive());
         $this->assertSame(4, $count);
         $this->assertSame(0.0, $first);

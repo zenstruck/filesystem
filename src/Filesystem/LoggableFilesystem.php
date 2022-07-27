@@ -110,9 +110,9 @@ final class LoggableFilesystem implements Filesystem
         return $ret;
     }
 
-    public function exists(string $path): bool
+    public function has(string $path): bool
     {
-        $ret = $this->inner->exists($path);
+        $ret = $this->inner->has($path);
 
         $this->log(
             $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],

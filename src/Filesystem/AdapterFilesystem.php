@@ -75,7 +75,7 @@ final class AdapterFilesystem implements Filesystem
             return new File($this->operator->fileAttributesFor($path), $this->operator);
         }
 
-        if ($this->exists($path)) {
+        if ($this->has($path)) {
             throw NodeTypeMismatch::expectedFileAt($path);
         }
 
@@ -97,7 +97,7 @@ final class AdapterFilesystem implements Filesystem
             return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
-        if ($this->exists($path)) {
+        if ($this->has($path)) {
             throw NodeTypeMismatch::expectedDirectoryAt($path);
         }
 
@@ -109,14 +109,14 @@ final class AdapterFilesystem implements Filesystem
         return \is_string($this->last) ? $this->node($this->last) : throw $this->last;
     }
 
-    public function exists(string $path): bool
+    public function has(string $path): bool
     {
         return $this->operator->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
     {
-        if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
+        if (($config['fail_if_exists'] ?? false) && $this->has($destination)) {
             throw NodeExists::forCopy($source, $this->node($destination));
         }
 
@@ -154,7 +154,7 @@ final class AdapterFilesystem implements Filesystem
 
     public function move(string $source, string $destination, array $config = []): static
     {
-        if (($config['fail_if_exists'] ?? false) && $this->exists($destination)) {
+        if (($config['fail_if_exists'] ?? false) && $this->has($destination)) {
             throw NodeExists::forMove($source, $this->node($destination));
         }
 

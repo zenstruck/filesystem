@@ -128,9 +128,9 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         return $this->inner()->directory($path);
     }
 
-    public function exists(string $path = Filesystem::ROOT): bool
+    public function has(string $path = Filesystem::ROOT): bool
     {
-        return $this->inner()->exists($path);
+        return $this->inner()->has($path);
     }
 
     public function delete(Directory|string $path = Filesystem::ROOT, array $config = []): static

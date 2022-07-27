@@ -24,8 +24,8 @@ final class StaticInMemoryAdapterTest extends FilesystemTest
         $filesystem2 = $this->createFilesystem();
         $filesystem1->write('file.txt', 'contents');
 
-        $this->assertTrue($filesystem1->exists('file.txt'));
-        $this->assertTrue($filesystem2->exists('file.txt'));
+        $this->assertTrue($filesystem1->has('file.txt'));
+        $this->assertTrue($filesystem2->has('file.txt'));
     }
 
     /**
@@ -37,8 +37,8 @@ final class StaticInMemoryAdapterTest extends FilesystemTest
         $filesystem2 = $this->createFilesystem('second');
         $filesystem1->write('file.txt', 'contents');
 
-        $this->assertTrue($filesystem1->exists('file.txt'));
-        $this->assertFalse($filesystem2->exists('file.txt'));
+        $this->assertTrue($filesystem1->has('file.txt'));
+        $this->assertFalse($filesystem2->has('file.txt'));
     }
 
     protected function createFilesystem(?string $name = null): Filesystem

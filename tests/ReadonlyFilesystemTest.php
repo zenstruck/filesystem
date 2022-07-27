@@ -20,7 +20,7 @@ final class ReadonlyFilesystemTest extends TestCase
     {
         $filesystem = new ReadonlyFilesystem($this->filesystem()->write('foo/bar.txt', 'content'));
 
-        $this->assertTrue($filesystem->exists('foo/bar.txt'));
+        $this->assertTrue($filesystem->has('foo/bar.txt'));
         $this->assertSame('foo/bar.txt', $filesystem->node('foo/bar.txt')->path());
         $this->assertSame('foo/bar.txt', $filesystem->file('foo/bar.txt')->path());
         $this->assertSame('foo', $filesystem->directory('foo')->path());

@@ -43,7 +43,7 @@ final class AdapterFactoryTest extends TestCase
 
         $first->write('foo', 'bar');
 
-        $this->assertTrue($first->exists('foo'));
-        $this->assertFalse($second->exists('foo'));
+        $this->assertTrue($first->has('foo'));
+        $this->assertFalse($second->has('foo'));
     }
 }

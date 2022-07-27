@@ -81,7 +81,7 @@ interface Filesystem
      *
      * @throws FilesystemException
      */
-    public function exists(string $path): bool;
+    public function has(string $path): bool;
 
     /**
      * Copy a file or directory.
