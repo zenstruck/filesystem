@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Bridge\Symfony\DependencyInjection;
 
+use League\Flysystem\FilesystemAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -9,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
+use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
@@ -30,6 +31,8 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         if (!$mergedConfig['filesystems']) {
             return; // no filesystems registered
         }
+
+        $container->register('.zenstruck_filesystem.adapter_factory', AdapterFactory::class);
 
         foreach ($mergedConfig['filesystems'] as $name => $config) {
             $this->addFilesystem($name, $config, $container);
@@ -53,31 +56,44 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
     private function addFilesystem(string $name, array $config, ContainerBuilder $container): void
     {
-        $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.filesystem_'.$name, AdapterFilesystem::class)
+        if (\str_starts_with($config['dsn'], '@')) {
+            $config['dsn'] = new Reference(\mb_substr($config['dsn'], 1));
+        } else {
+            $container->register($adapterId = '.zenstruck_filesystem.adapter.'.$name, FilesystemAdapter::class)
+                ->setFactory([new Reference('.zenstruck_filesystem.adapter_factory'), 'create'])
+                ->setArguments([$config['dsn'], $name])
+            ;
+            $config['dsn'] = new Reference($adapterId);
+        }
+
+        $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.filesystem.'.$name, AdapterFilesystem::class)
             ->setArguments([$config['dsn'], $config['config'], $name])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
 
         if ($config['readonly']) {
-            $container->register('zenstruck_filesystem.filesystem.readonly_'.$name, ReadonlyFilesystem::class)
+            $container->register('.zenstruck_filesystem.filesystem.readonly_'.$name, ReadonlyFilesystem::class)
                 ->setDecoratedService($filesystem)
                 ->setArguments([new Reference('.inner')])
             ;
         }
 
         if ($config['test']) {
-            // todo allow dsn here and default to static/filesystem
-            StaticInMemoryAdapter::ensureSupported();
+            if (\str_starts_with($config['test'], '@')) {
+                $config['test'] = new Reference(\mb_substr($config['test'], 1));
+            } else {
+                $container->register($adapterId = '.zenstruck_filesystem.test_adapter.'.$name, FilesystemAdapter::class)
+                    ->setFactory([new Reference('.zenstruck_filesystem.adapter_factory'), 'create'])
+                    ->setArguments([$config['test'], $name])
+                ;
+                $config['test'] = new Reference($adapterId);
+            }
 
-            $container->register($testName = 'zenstruck_filesystem.filesystem.test_'.$name, StaticInMemoryAdapter::class)
-                ->setArguments([$name])
-            ;
-
-            $filesystemDef->addMethodCall('swap', [new Reference($testName)]);
+            $filesystemDef->addMethodCall('swap', [new Reference($config['test'])]);
         }
 
         if ($config['log']) {
-            $container->register('zenstruck_filesystem.filesystem.log_'.$name, LoggableFilesystem::class)
+            $container->register('.zenstruck_filesystem.filesystem.log_'.$name, LoggableFilesystem::class)
                 ->setDecoratedService($filesystem)
                 ->setArguments([new Reference('.inner'), new Reference('logger')])
                 ->addTag('monolog.logger', ['channel' => 'filesystem'])

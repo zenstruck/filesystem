@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Bridge\Symfony\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -43,14 +44,25 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultTrue()
                                 ->info('Whether or not to log filesystem operations')
                             ->end()
-                            ->booleanNode('test') // todo swap with static-in-memory
-                                ->defaultValue('test' === $this->env)
-                                ->info('When true, swaps the real filesystem adapter with an in-memory one, defaults to true in your test env')
+                            ->scalarNode('test')
+                                ->validate()
+                                    ->ifTrue(fn($v) => !\is_string($v) && false !== $v)
+                                    ->thenInvalid('%s is invalid, must be either string or false')
+                                ->end()
+                                ->defaultValue($this->defaultTestValue())
+                                ->info(<<<EOF
+                                        If false, disable
+                                        If string, use as filesystem DSN and swap real adapter with this
+                                        Defaults to false in "test" env
+                                        If not configured and in "test" env:
+                                            1. If league/flysystem-memory is available, swap real adapter with static in-memory one
+                                            2. Swaps real adapter with local filesystem in var/testfiles
+                                        EOF)
                             ->end()
                             ->variableNode('config')
                                 ->defaultValue([])
                                 ->info('Extra global adapter filesystem config')
-                                ->example(['image_check_mime' => true])
+                                ->example(['image_check_mime' => true, 'url_prefixes' => ['https://cdn1.example.com', 'https://cdn1.example.com']])
                             ->end()
                         ->end()
                     ->end()
@@ -63,5 +75,14 @@ final class Configuration implements ConfigurationInterface
         ;
 
         return $treeBuilder;
+    }
+
+    private function defaultTestValue(): string|bool
+    {
+        if ('test' !== $this->env) {
+            return false;
+        }
+
+        return StaticInMemoryAdapter::isSupported() ? 'in-memory:?static' : '%kernel.project_dir%/var/testfiles%env(default::TEST_TOKEN)%';
     }
 }
