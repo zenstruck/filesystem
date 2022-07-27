@@ -22,6 +22,9 @@ final class TestFilesystem implements Filesystem
 
     public function __construct(private Filesystem $inner)
     {
+        if (!\class_exists(Assert::class)) {
+            throw new \LogicException('zenstruck/assert is required to use the test filesystem. Install with "composer require --dev zenstruck/assert".');
+        }
     }
 
     /**
@@ -135,7 +138,7 @@ final class TestFilesystem implements Filesystem
         return new TestDirectory($this->inner()->directory($path));
     }
 
-    protected function inner(): Filesystem
+    public function inner(): Filesystem
     {
         return $this->inner;
     }

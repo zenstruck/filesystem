@@ -41,6 +41,13 @@ trait InteractsWithFilesystem
             } catch (NotFoundExceptionInterface $e) {
                 throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
             }
+
+            if (self::getContainer()->hasParameter('zenstruck_filesystem.test_filesystems')) {
+                // delete all test filesystems
+                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $id) {
+                    self::getContainer()->get($id)->delete(Filesystem::ROOT);
+                }
+            }
         } else {
             $filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
         }

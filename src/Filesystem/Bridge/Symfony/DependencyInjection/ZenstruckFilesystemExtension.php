@@ -25,11 +25,6 @@ use Zenstruck\Filesystem\TraceableFilesystem;
  */
 final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
-    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
-    {
-        return new Configuration($container->getParameter('kernel.environment'));
-    }
-
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
         if (!$mergedConfig['filesystems']) {
@@ -95,7 +90,11 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
-        if ($config['test']) {
+        if (\is_string($config['test']) || (null === $config['test'] && 'test' === $container->getParameter('kernel.environment'))) {
+            if (null === $config['test']) {
+                $config['test'] = '%kernel.project_dir%/var/testfiles%env(default::TEST_TOKEN)%/'.$name;
+            }
+
             if (\str_starts_with($config['test'], '@')) {
                 $config['test'] = new Reference(\mb_substr($config['test'], 1));
             } else {
@@ -107,6 +106,15 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             }
 
             $filesystemDef->addMethodCall('swap', [new Reference($config['test'])]);
+
+            if (!$container->hasParameter('zenstruck_filesystem.test_filesystems')) {
+                $container->setParameter('zenstruck_filesystem.test_filesystems', []);
+            }
+
+            $container->setParameter(
+                'zenstruck_filesystem.test_filesystems',
+                \array_merge($container->getParameter('zenstruck_filesystem.test_filesystems'), [$filesystem])
+            );
         }
 
         if ($config['log']) {

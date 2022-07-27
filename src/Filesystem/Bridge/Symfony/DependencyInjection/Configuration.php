@@ -4,7 +4,6 @@ namespace Zenstruck\Filesystem\Bridge\Symfony\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -13,10 +12,6 @@ use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
  */
 final class Configuration implements ConfigurationInterface
 {
-    public function __construct(private string $env)
-    {
-    }
-
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('zenstruck_filesystem');
@@ -56,15 +51,13 @@ final class Configuration implements ConfigurationInterface
                                     ->ifTrue(fn($v) => !\is_string($v) && false !== $v)
                                     ->thenInvalid('%s is invalid, must be either string or false')
                                 ->end()
-                                ->defaultValue($this->defaultTestValue())
+                                ->defaultNull()
                                 ->info(<<<EOF
-                                        If false, disable
-                                        If string, use as filesystem DSN and swap real adapter with this
-                                        Defaults to false in "test" env
-                                        If not configured and in "test" env:
-                                            1. If league/flysystem-memory is available, swap real adapter with static in-memory one
-                                            2. Swaps real adapter with local filesystem in var/testfiles
-                                        EOF)
+                                    If false, disable
+                                    If string, use as filesystem DSN and swap real adapter with this
+                                    Defaults to false in env's other than "test"
+                                    If not explicitly configured, in "test" env, defaults to "var/testfiles"
+                                    EOF)
                             ->end()
                             ->variableNode('config')
                                 ->defaultValue([])
@@ -82,14 +75,5 @@ final class Configuration implements ConfigurationInterface
         ;
 
         return $treeBuilder;
-    }
-
-    private function defaultTestValue(): string|bool
-    {
-        if ('test' !== $this->env) {
-            return false;
-        }
-
-        return StaticInMemoryAdapter::isSupported() ? 'in-memory:?static' : '%kernel.project_dir%/var/testfiles%env(default::TEST_TOKEN)%';
     }
 }
