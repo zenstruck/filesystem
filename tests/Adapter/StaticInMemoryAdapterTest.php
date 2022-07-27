@@ -3,7 +3,9 @@
 namespace Zenstruck\Filesystem\Tests\Adapter;
 
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
@@ -11,13 +13,7 @@ use Zenstruck\Filesystem\Tests\FilesystemTest;
  */
 final class StaticInMemoryAdapterTest extends FilesystemTest
 {
-    /**
-     * @before
-     */
-    public static function resetAdapter(): void
-    {
-        Filesystem\Adapter\StaticInMemoryAdapter::reset();
-    }
+    use InteractsWithFilesystem;
 
     /**
      * @test
@@ -47,6 +43,6 @@ final class StaticInMemoryAdapterTest extends FilesystemTest
 
     protected function createFilesystem(?string $name = null): Filesystem
     {
-        return new AdapterFilesystem(new Filesystem\Adapter\StaticInMemoryAdapter($name ?? 'default'));
+        return new AdapterFilesystem(new StaticInMemoryAdapter($name ?? 'default'));
     }
 }

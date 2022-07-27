@@ -31,7 +31,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
     public function __construct(?string $filename = null, array $config = [])
     {
         if (!\class_exists(FlysystemAdapter::class)) {
-            throw new \LogicException(\sprintf('league/flysystem-ziparchive is required to use %s as a filesystem. Install with "composer require (--dev) league/flysystem-ziparchive".', self::class));
+            throw new \LogicException(\sprintf('league/flysystem-ziparchive is required to use %s as a filesystem. Install with "composer require league/flysystem-ziparchive".', self::class));
         }
 
         if (!$filename) {
