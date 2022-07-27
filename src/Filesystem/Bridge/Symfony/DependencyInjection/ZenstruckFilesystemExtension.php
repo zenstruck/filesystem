@@ -66,6 +66,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $config['dsn'] = new Reference($adapterId);
         }
 
+        if ($config['url_prefix']) {
+            $config['config']['url_prefixes'] = (array) $config['url_prefix'];
+        }
+
         $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.filesystem.'.$name, AdapterFilesystem::class)
             ->setArguments([$config['dsn'], $config['config'], $name])
             ->addTag('zenstruck_filesystem', ['key' => $name])
