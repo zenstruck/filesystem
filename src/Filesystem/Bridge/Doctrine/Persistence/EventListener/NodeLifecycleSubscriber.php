@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ObjectReflector;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\PendingNode;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -124,7 +124,7 @@ final class NodeLifecycleSubscriber
             $ref ??= new ObjectReflector($object, $configs);
             $node = $ref->get($property);
 
-            if (!$node instanceof PendingNode) {
+            if (!$node instanceof PendingFile) {
                 continue;
             }
 
@@ -170,7 +170,7 @@ final class NodeLifecycleSubscriber
 
             $ref ??= new ObjectReflector($object, $configs);
 
-            if ($new instanceof PendingNode && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
+            if ($new instanceof PendingFile && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
                 // user is adding a new file
                 $this->addPendingRecomputeOperation($object, function() use ($config, $object, $new, $property, $ref) {
                     $new = $this->filesystem->get($config['filesystem'])->write(

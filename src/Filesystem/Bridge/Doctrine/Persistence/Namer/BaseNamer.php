@@ -8,7 +8,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\PendingNode;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,7 +26,7 @@ abstract class BaseNamer implements Namer
 
     final protected static function extensionWithDot(Node $node): string
     {
-        if ($node instanceof PendingNode) {
+        if ($node instanceof PendingFile) {
             return '.'.\mb_strtolower((string) $node->originalExtension());
         }
 
@@ -35,7 +35,7 @@ abstract class BaseNamer implements Namer
 
     final protected static function nameWithoutExtension(Node $node): string
     {
-        if ($node instanceof PendingNode) {
+        if ($node instanceof PendingFile) {
             return $node->originalNameWithoutExtension();
         }
 
