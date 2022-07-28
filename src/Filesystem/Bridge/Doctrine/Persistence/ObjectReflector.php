@@ -5,7 +5,6 @@ namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\FileCollection;
 use Zenstruck\Filesystem\Node\File\LazyFileCollection;
 use Zenstruck\Filesystem\Node\LazyNode;
@@ -49,17 +48,11 @@ final class ObjectReflector
         }
     }
 
-    /**
-     * @param Node|FileCollection<File> $node
-     */
     public function set(string $property, Node|FileCollection $node): void
     {
         $this->property($property)->setValue($this->object, $node);
     }
 
-    /**
-     * @return Node|FileCollection<File>|null
-     */
     public function get(string $property): Node|FileCollection|null
     {
         $ref = $this->property($property);

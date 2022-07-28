@@ -6,7 +6,6 @@ use Doctrine\DBAL\Types\Type;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileCollectionType;
 use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileType;
-use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\ImageCollectionType;
 use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\ImageType;
 
 /**
@@ -22,7 +21,7 @@ final class ZenstruckFilesystemBundle extends Bundle
             return;
         }
 
-        foreach ([FileType::class, ImageType::class, FileCollectionType::class, ImageCollectionType::class] as $type) {
+        foreach ([FileType::class, ImageType::class, FileCollectionType::class] as $type) {
             if (!Type::hasType($type::NAME)) {
                 Type::addType($type::NAME, $type);
             }

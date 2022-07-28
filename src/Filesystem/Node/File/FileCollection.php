@@ -7,13 +7,12 @@ use Zenstruck\Filesystem\Node\File;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @template T of File
- * @implements \IteratorAggregate<int,T>
+ * @implements \IteratorAggregate<int,File>
  */
 class FileCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @param list<T> $files
+     * @param File[] $files
      *
      * @internal
      */
@@ -22,11 +21,9 @@ class FileCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param T $file
-     *
-     * @return self<T>
+     * @return $this
      */
-    final public function add(File $file): self
+    final public function add(File $file): static
     {
         $this->files[] = $file;
 
@@ -34,11 +31,9 @@ class FileCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param T $file
-     *
-     * @return self<T>
+     * @return $this
      */
-    final public function remove(File $file): self
+    final public function remove(File $file): static
     {
         foreach ($this->files as $i => $existingFile) {
             if ($file->path() === $existingFile->path()) {
@@ -50,7 +45,7 @@ class FileCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return T[]
+     * @return File[]
      */
     public function all(): array
     {
@@ -58,7 +53,7 @@ class FileCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \Traversable<T>|T[]
+     * @return \Traversable<File>|File[]
      */
     final public function getIterator(): \Traversable
     {
