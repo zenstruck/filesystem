@@ -98,7 +98,7 @@ final class TestFilesystemTest extends FilesystemTest implements FixtureFilesyst
         $this->assertTrue($this->filesystem()->has('fixture://symfony.png'));
     }
 
-    public function fixtureFilesystem(): string|Filesystem
+    public function getFixtureFilesystem(): string|Filesystem
     {
         return self::FIXTURE_DIR;
     }

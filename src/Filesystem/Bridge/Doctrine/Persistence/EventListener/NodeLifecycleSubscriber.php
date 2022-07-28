@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs as ORMPreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\Event\PreUpdateEventArgs;
@@ -27,7 +29,10 @@ use Zenstruck\Filesystem\Node\PendingNode;
  */
 final class NodeLifecycleSubscriber
 {
-    /** @var list<callable> */
+    /** @var \WeakMap<object,callable[]> */
+    private \WeakMap $pendingRecomputeOperations;
+
+    /** @var callable[] */
     private array $pendingOperations = [];
 
     /**
@@ -40,6 +45,7 @@ final class NodeLifecycleSubscriber
         private array $globalConfig = [],
         private ContainerInterface|array|null $namers = null,
     ) {
+        $this->pendingRecomputeOperations = new \WeakMap();
     }
 
     /**
@@ -128,6 +134,12 @@ final class NodeLifecycleSubscriber
             );
 
             $ref->set($property, $node->last()->ensureFile());
+
+            $changed = true;
+        }
+
+        if (isset($changed)) {
+            self::clearChangeSet($object, $event->getObjectManager());
         }
     }
 
@@ -164,14 +176,14 @@ final class NodeLifecycleSubscriber
 
             if ($new instanceof PendingNode && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
                 // user is adding a new file
-                $this->pendingOperations[] = function() use ($config, $object, $new, $property, $ref) {
+                $this->addPendingRecomputeOperation($object, function() use ($config, $object, $new, $property, $ref) {
                     $new = $this->filesystem->get($config['filesystem'])->write(
                         $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),
                         $new->localFile()
                     );
 
                     $ref->set($property, $new->last()->ensureFile());
-                };
+                });
             }
 
             if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path() && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
@@ -181,13 +193,30 @@ final class NodeLifecycleSubscriber
         }
     }
 
-    public function postFlush(): void
+    public function postFlush(PostFlushEventArgs $event): void
     {
+        foreach ($this->pendingRecomputeOperations as $object => $operations) {
+            foreach ($operations as $operation) {
+                $operation();
+            }
+
+            self::clearChangeSet($object, $event->getEntityManager());
+        }
+
         foreach ($this->pendingOperations as $operation) {
             $operation();
         }
 
-        $this->pendingOperations = [];
+        $this->pendingRecomputeOperations = new \WeakMap();
+    }
+
+    private function addPendingRecomputeOperation(object $object, callable $callback): void
+    {
+        if (!isset($this->pendingRecomputeOperations[$object])) {
+            $this->pendingRecomputeOperations[$object] = [];
+        }
+
+        $this->pendingRecomputeOperations[$object][] = $callback;
     }
 
     /**
@@ -222,5 +251,21 @@ final class NodeLifecycleSubscriber
         }
 
         throw new \LogicException(\sprintf('Namer "%s" is not registered.', $name), previous: $e ?? null);
+    }
+
+    /**
+     * We need to clear changes as swapping the Node objects triggers a "change".
+     *
+     * TODO: I think this can be improved with another event (prePersist) and calculate
+     */
+    private static function clearChangeSet(object $object, ObjectManager $om): void
+    {
+        if (!$om instanceof EntityManagerInterface) {
+            return;
+        }
+
+        $uow = $om->getUnitOfWork();
+        $uow->computeChangeSet($om->getClassMetadata($object::class), $object);
+        $uow->clearEntityChangeSet(\spl_object_id($object));
     }
 }

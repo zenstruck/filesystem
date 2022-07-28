@@ -32,7 +32,7 @@ final class TestFilesystem implements Filesystem
      */
     public function assertExists(string $path, ?callable $callback = null): self
     {
-        $node = Assert::try(fn() => $this->node($path), 'Node at path "%s" does not exist.', [$path]);
+        $node = Assert::try(fn() => $this->node($path), 'Node at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
             $callback($node); // @phpstan-ignore-line
@@ -43,7 +43,7 @@ final class TestFilesystem implements Filesystem
 
     public function assertNotExists(string $path): self
     {
-        Assert::false($this->has($path), 'Node at path "%s" exists but it should not.', [$path]);
+        Assert::false($this->has($path), 'Node at path "{path}" exists but it should not.', ['path' => $path]);
 
         return $this;
     }
@@ -53,7 +53,7 @@ final class TestFilesystem implements Filesystem
      */
     public function assertFileExists(string $path, ?callable $callback = null): self
     {
-        $node = Assert::try(fn() => $this->file($path), 'File at path "%s" does not exist.', [$path]);
+        $node = Assert::try(fn() => $this->file($path), 'File at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
             $callback($node); // @phpstan-ignore-line
@@ -67,7 +67,7 @@ final class TestFilesystem implements Filesystem
      */
     public function assertImageExists(string $path, ?callable $callback = null): self
     {
-        $node = Assert::try(fn() => $this->image($path), 'Image at path "%s" does not exist.', [$path]);
+        $node = Assert::try(fn() => $this->image($path), 'Image at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
             $callback($node); // @phpstan-ignore-line
@@ -81,7 +81,7 @@ final class TestFilesystem implements Filesystem
      */
     public function assertDirectoryExists(string $path, ?callable $callback = null): self
     {
-        $node = Assert::try(fn() => $this->directory($path), 'Directory at path "%s" does not exist.', [$path]);
+        $node = Assert::try(fn() => $this->directory($path), 'Directory at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
             $callback($node); // @phpstan-ignore-line
@@ -95,8 +95,8 @@ final class TestFilesystem implements Filesystem
      */
     public function assertSame(string $path1, string $path2): self
     {
-        $first = Assert::try(fn() => $this->file($path1), 'File at path "%s" does not exist.', [$path1]);
-        $second = Assert::try(fn() => $this->file($path1), 'File at path "%s" does not exist.', [$path2]);
+        $first = Assert::try(fn() => $this->file($path1), 'File at path "{path} does not exist.', ['path' => $path1]);
+        $second = Assert::try(fn() => $this->file($path1), 'File at path "{path}" does not exist.', ['path' => $path2]);
 
         Assert::that($first->contents())->is($second->contents());
 
@@ -108,8 +108,8 @@ final class TestFilesystem implements Filesystem
      */
     public function assertNotSame(string $path1, string $path2): self
     {
-        $first = Assert::try(fn() => $this->file($path1), 'File at path "%s" does not exist.', [$path1]);
-        $second = Assert::try(fn() => $this->file($path2), 'File at path "%s" does not exist.', [$path2]);
+        $first = Assert::try(fn() => $this->file($path1), 'File at path "{path} does not exist.', ['path' => $path1]);
+        $second = Assert::try(fn() => $this->file($path2), 'File at path "{path}" does not exist.', ['path' => $path2]);
 
         Assert::that($first->contents())->isNot($second->contents());
 

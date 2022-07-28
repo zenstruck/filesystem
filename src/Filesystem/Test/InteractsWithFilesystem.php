@@ -27,6 +27,18 @@ trait InteractsWithFilesystem
         StaticInMemoryAdapter::reset();
 
         unset($this->_testFilesystem);
+
+        if ($this instanceof KernelTestCase && !$this instanceof TestFilesystemProvider) {
+            // delete test filesystems
+            // todo add option to disable this
+            // todo on first test, detect if all test filesystems are (static) in-memory and disable
+            if (self::getContainer()->hasParameter('zenstruck_filesystem.test_filesystems')) {
+                // delete all test filesystems
+                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $id) {
+                    self::getContainer()->get($id)->delete(Filesystem::ROOT);
+                }
+            }
+        }
     }
 
     protected function filesystem(): TestFilesystem
@@ -35,25 +47,21 @@ trait InteractsWithFilesystem
             return $this->_testFilesystem;
         }
 
-        if ($this instanceof KernelTestCase) {
+        if ($this instanceof TestFilesystemProvider) {
+            $filesystem = $this->getTestFilesystem();
+            $filesystem = \is_string($filesystem) ? new AdapterFilesystem($filesystem) : $filesystem;
+        } elseif ($this instanceof KernelTestCase) {
             try {
                 $filesystem = self::getContainer()->get(Filesystem::class);
             } catch (NotFoundExceptionInterface $e) {
                 throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
-            }
-
-            if (self::getContainer()->hasParameter('zenstruck_filesystem.test_filesystems')) {
-                // delete all test filesystems
-                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $id) {
-                    self::getContainer()->get($id)->delete(Filesystem::ROOT);
-                }
             }
         } else {
             $filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
         }
 
         if ($this instanceof FixtureFilesystemProvider) {
-            $fixtures = $this->fixtureFilesystem();
+            $fixtures = $this->getFixtureFilesystem();
             $fixtures = new ReadonlyFilesystem(\is_string($fixtures) ? new AdapterFilesystem($fixtures) : $fixtures);
 
             $filesystem = new MultiFilesystem(['_default_' => $filesystem, 'fixture' => $fixtures], '_default_');

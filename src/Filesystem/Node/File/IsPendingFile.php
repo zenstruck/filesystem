@@ -15,10 +15,10 @@ trait IsPendingFile
 {
     private \SplFileInfo $file;
 
-    public function __construct(\SplFileInfo|string $file)
+    public function __construct(\SplFileInfo|string $file, ?string $path = null)
     {
         $this->file = \is_string($file) ? new \SplFileInfo($file) : $file;
-        $this->path = (string) $file;
+        $this->path = $path ?: $this->file->getFilename();
     }
 
     public function localFile(): \SplFileInfo

@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Twig\Environment;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
@@ -24,6 +25,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
+use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
@@ -89,7 +91,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         ;
         $container->register(ObjectNodeLoader::class)
             ->setArguments([new Reference(MultiFilesystem::class), new Reference('.zenstruck_filesystem.doctrine.node_config_provider')])
+            ->addTag('twig.runtime')
         ;
+
+        if (\class_exists(Environment::class)) {
+            $container->register('.zenstruck_filesystem.twig.object_node_loader', ObjectNodeLoaderExtension::class)
+                ->addTag('twig.extension')
+            ;
+        }
 
         if (!($config['events']['load']['enabled'] || $config['events']['persist']['enabled'] || $config['events']['update']['enabled'] || $config['events']['remove']['enabled'])) {
             return;

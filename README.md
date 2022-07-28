@@ -44,6 +44,8 @@ WIP...
 
 ### `TestFilesystem`
 
+_(Note about `TestFilesystemProvider|FixtureFilesystemProvider`)_
+
 ## Doctrine Integration
 
 ## Symfony Integration
@@ -59,5 +61,11 @@ WIP...
 #### Services
 
 #### Doctrine Entities
+
+#### Testing
+
+_(Note about `FixtureFilesystemProvider`)_
+_(Note about performance improvements using (static) in-memory adapters)_
+_(Note about disabling clearing test filesystems before each test if using (static) in-memory adapters)_
 
 #### Full Default Configuration

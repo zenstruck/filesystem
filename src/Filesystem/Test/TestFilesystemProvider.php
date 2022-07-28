@@ -7,7 +7,7 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-interface FixtureFilesystemProvider
+interface TestFilesystemProvider
 {
-    public function getFixtureFilesystem(): string|Filesystem;
+    public function getTestFilesystem(): string|Filesystem;
 }

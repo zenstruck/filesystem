@@ -30,6 +30,7 @@
         "symfony/mime": "^5.4|^6.0",
         "symfony/phpunit-bridge": "^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
+        "twig/twig": "^2.0|^3.0",
         "zenstruck/assert": "^1.2"
     },
     "config": {
