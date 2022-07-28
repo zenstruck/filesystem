@@ -26,9 +26,14 @@ final class ORMNodeConfigProvider implements NodeConfigProvider
                 continue;
             }
 
-            $config[] = [
+            $config[$mapping['fieldName']] = [
                 'filesystem' => $mapping['options']['filesystem'] ?? throw new \LogicException(\sprintf('Column definition for %s::$%s is missing the required "filesystem" option.', $class, $mapping['fieldName'])),
                 'property' => $mapping['fieldName'],
+                NodeConfigProvider::AUTOLOAD => $mapping['options'][NodeConfigProvider::AUTOLOAD] ?? null,
+                NodeConfigProvider::DELETE_ON_REMOVE => $mapping['options'][NodeConfigProvider::DELETE_ON_REMOVE] ?? null,
+                NodeConfigProvider::WRITE_ON_UPDATE => $mapping['options'][NodeConfigProvider::WRITE_ON_UPDATE] ?? null,
+                NodeConfigProvider::DELETE_ON_UPDATE => $mapping['options'][NodeConfigProvider::DELETE_ON_UPDATE] ?? null,
+                NodeConfigProvider::WRITE_ON_PERSIST => $mapping['options'][NodeConfigProvider::WRITE_ON_PERSIST] ?? null,
             ];
         }
 

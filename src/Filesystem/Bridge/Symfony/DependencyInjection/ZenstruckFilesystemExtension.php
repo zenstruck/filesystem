@@ -7,14 +7,21 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Bridge\Doctrine\ObjectNodeLoader;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\CacheNodeConfigProvider;
-use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener\LoadNodesListener;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener\NodeLifecycleSubscriber;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ChecksumNamer;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionLanguageNamer;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionNamer;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\LoggableFilesystem;
@@ -84,10 +91,70 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->setArguments([new Reference(MultiFilesystem::class), new Reference('.zenstruck_filesystem.doctrine.node_config_provider')])
         ;
 
-        $container->register('.zenstruck_filesystem.doctrine.load_nodes_listener', LoadNodesListener::class)
-            ->setArguments([new Reference(ObjectNodeLoader::class)])
-            ->addTag('doctrine.event_listener', ['event' => 'postLoad'])
+        if (!($config['events']['load']['enabled'] || $config['events']['persist']['enabled'] || $config['events']['update']['enabled'] || $config['events']['remove']['enabled'])) {
+            return;
+        }
+
+        $namers = [];
+
+        $container->register('.zenstruck_filesystem.namer.checksum', ChecksumNamer::class);
+        $container->register('.zenstruck_filesystem.namer.expression', ExpressionNamer::class)
+            ->addArgument(new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ;
+        $container->register('.zenstruck_filesystem.namer.slugify', SlugifyNamer::class)
+            ->addArgument(new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+        ;
+
+        $namers = [
+            'slugify' => new Reference('.zenstruck_filesystem.namer.slugify'),
+            'checksum' => new Reference('.zenstruck_filesystem.namer.checksum'),
+            'expression' => new Reference('.zenstruck_filesystem.namer.expression'),
+        ];
+
+        if (\class_exists(ExpressionLanguage::class)) {
+            $container->register('.zenstruck.filesystem.namer._expression_language', ExpressionLanguage::class)
+                ->addArgument(new Reference('cache.system'))
+            ;
+            $container->register('.zenstruck.filesystem.namer.expression_language', ExpressionLanguageNamer::class)
+                ->setArguments([new Reference('.zenstruck.filesystem.namer._expression_language'), new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
+            ;
+
+            $namers['expression_language'] = new Reference('.zenstruck.filesystem.namer.expression_language');
+        }
+
+        $subscriber = $container->register('.zenstruck_filesystem.doctrine.node_event_subscriber', NodeLifecycleSubscriber::class)
+            ->setArguments([
+                new Reference(new Reference('.zenstruck_filesystem.doctrine.node_config_provider')),
+                new Reference(MultiFilesystem::class),
+                [
+                    NodeConfigProvider::AUTOLOAD => $config['events']['load'][NodeConfigProvider::AUTOLOAD],
+                    NodeConfigProvider::WRITE_ON_PERSIST => $config['events']['persist'][NodeConfigProvider::WRITE_ON_PERSIST],
+                    NodeConfigProvider::WRITE_ON_UPDATE => $config['events']['update'][NodeConfigProvider::WRITE_ON_UPDATE],
+                    NodeConfigProvider::DELETE_ON_UPDATE => $config['events']['update'][NodeConfigProvider::DELETE_ON_UPDATE],
+                    NodeConfigProvider::DELETE_ON_REMOVE => $config['events']['remove'][NodeConfigProvider::DELETE_ON_REMOVE],
+                ],
+                new ServiceLocatorArgument($namers),
+            ])
+        ;
+
+        if ($config['events']['load']['enabled']) {
+            $subscriber->addTag('doctrine.event_listener', ['event' => 'postLoad']);
+        }
+
+        if ($config['events']['persist']['enabled']) {
+            $subscriber->addTag('doctrine.event_listener', ['event' => 'postPersist']);
+        }
+
+        if ($config['events']['update']['enabled']) {
+            $subscriber
+                ->addTag('doctrine.event_listener', ['event' => 'preUpdate'])
+                ->addTag('doctrine.event_listener', ['event' => 'postFlush'])
+            ;
+        }
+
+        if ($config['events']['remove']['enabled']) {
+            $subscriber->addTag('doctrine.event_listener', ['event' => 'postRemove']);
+        }
     }
 
     private function addFilesystem(string $name, array $config, ContainerBuilder $container): void

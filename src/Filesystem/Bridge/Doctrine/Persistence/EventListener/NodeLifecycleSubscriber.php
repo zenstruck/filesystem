@@ -13,23 +13,57 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ChecksumNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ObjectReflector;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\PendingNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
+ *
+ * @phpstan-import-type ConfigMapping from NodeConfigProvider
  */
 final class NodeLifecycleSubscriber
 {
+    /** @var list<callable> */
+    private array $pendingOperations = [];
+
     /**
-     * @param ContainerInterface|array<string,Namer>|null $namers
+     * @param ContainerInterface|array<string,Namer> $namers
+     * @param array<string,bool>                     $globalConfig
      */
     public function __construct(
         private NodeConfigProvider $configProvider,
         private MultiFilesystem $filesystem,
-        private ContainerInterface|array|null $namers,
+        private array $globalConfig = [],
+        private ContainerInterface|array|null $namers = null,
     ) {
+    }
+
+    /**
+     * @param LifecycleEventArgs<ObjectManager> $event
+     */
+    public function postLoad(LifecycleEventArgs $event): void
+    {
+        $object = $event->getObject();
+
+        if (!$configs = $this->configProvider->configFor($object::class)) {
+            return;
+        }
+
+        $ref = null;
+
+        foreach ($configs as $property => $config) {
+            if (!$this->isEnabled(NodeConfigProvider::AUTOLOAD, $config)) {
+                continue;
+            }
+
+            $ref ??= new ObjectReflector($object, $configs);
+
+            $ref->load($this->filesystem, $property);
+        }
     }
 
     /**
@@ -38,28 +72,21 @@ final class NodeLifecycleSubscriber
     public function postRemove(LifecycleEventArgs $event): void
     {
         // todo collections
+        $object = $event->getObject();
 
-        if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
+        if (!$configs = $this->configProvider->configFor($object::class)) {
             return;
         }
 
-        $refObj = new \ReflectionObject($object = $event->getObject());
+        $ref = null;
 
-        foreach ($configs as $config) {
-            // todo embedded?
-            // todo duplicated in ObjectNodeLoader
-            if (!($config['delete_on_remove'] ?? true)) {
+        foreach ($configs as $property => $config) {
+            if (!$this->isEnabled(NodeConfigProvider::DELETE_ON_REMOVE, $config)) {
                 continue;
             }
 
-            $refProp = $refObj->getProperty($config['property']);
-            $refProp->setAccessible(true);
-
-            if (!$refProp->isInitialized($object)) {
-                continue;
-            }
-
-            $node = $refProp->getValue($object);
+            $ref ??= new ObjectReflector($object, $configs);
+            $node = $ref->get($property);
 
             if (!$node instanceof Node) {
                 continue;
@@ -75,24 +102,21 @@ final class NodeLifecycleSubscriber
     public function postPersist(LifecycleEventArgs $event): void
     {
         // todo collections
+        $object = $event->getObject();
 
-        if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
+        if (!$configs = $this->configProvider->configFor($object::class)) {
             return;
         }
 
-        $refObj = new \ReflectionObject($object = $event->getObject());
+        $ref = null;
 
-        foreach ($configs as $config) {
-            // todo embedded?
-            // todo duplicated in ObjectNodeLoader
-            $refProp = $refObj->getProperty($config['property']);
-            $refProp->setAccessible(true);
-
-            if (!$refProp->isInitialized($object)) {
+        foreach ($configs as $property => $config) {
+            if (!$this->isEnabled(NodeConfigProvider::WRITE_ON_PERSIST, $config)) {
                 continue;
             }
 
-            $node = $refProp->getValue($object);
+            $ref ??= new ObjectReflector($object, $configs);
+            $node = $ref->get($property);
 
             if (!$node instanceof PendingNode) {
                 continue;
@@ -103,7 +127,7 @@ final class NodeLifecycleSubscriber
                 $node->localFile()
             );
 
-            $refProp->setValue($object, $node);
+            $ref->set($property, $node->last()->ensureFile());
         }
     }
 
@@ -113,53 +137,65 @@ final class NodeLifecycleSubscriber
     public function preUpdate(PreUpdateEventArgs|ORMPreUpdateEventArgs $event): void
     {
         // todo collections
-        // TODO save pending updates and execute in postUpdate/postFlush?
+        $object = $event->getObject();
 
-        if (!$configs = $this->configProvider->configFor($event->getObject()::class)) {
+        if (!$configs = $this->configProvider->configFor($object::class)) {
             return;
         }
 
-        $refObj = new \ReflectionObject($object = $event->getObject());
+        $ref = null;
 
-        foreach ($configs as $config) {
+        foreach ($configs as $property => $config) {
             if (!$event->hasChangedField($config['property'])) {
-                continue;
-            }
-
-            // todo embedded?
-            // todo duplicated in ObjectNodeLoader
-            $refProp = $refObj->getProperty($config['property']);
-            $refProp->setAccessible(true);
-
-            if (!$refProp->isInitialized($object)) {
                 continue;
             }
 
             $old = $event->getOldValue($config['property']);
             $new = $event->getNewValue($config['property']);
 
-            if (!$new instanceof Node && $old instanceof Node) {
+            if (!$new instanceof Node && $old instanceof Node && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // user removed node, delete file
-                $this->filesystem->get($config['filesystem'])->delete($old);
+                $this->pendingOperations[] = fn() => $this->filesystem->get($config['filesystem'])->delete($old);
 
                 continue;
             }
 
-            if ($new instanceof PendingNode) {
-                // user is adding a new file
-                $new = $this->filesystem->get($config['filesystem'])->write(
-                    $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),
-                    $new->localFile()
-                );
+            $ref ??= new ObjectReflector($object, $configs);
 
-                $refProp->setValue($object, $new);
+            if ($new instanceof PendingNode && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
+                // user is adding a new file
+                $this->pendingOperations[] = function() use ($config, $object, $new, $property, $ref) {
+                    $new = $this->filesystem->get($config['filesystem'])->write(
+                        $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),
+                        $new->localFile()
+                    );
+
+                    $ref->set($property, $new->last()->ensureFile());
+                };
             }
 
-            if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path()) {
+            if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path() && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // delete old
-                $this->filesystem->get($config['filesystem'])->delete($old->path());
+                $this->pendingOperations[] = fn() => $this->filesystem->get($config['filesystem'])->delete($old->path());
             }
         }
+    }
+
+    public function postFlush(): void
+    {
+        foreach ($this->pendingOperations as $operation) {
+            $operation();
+        }
+
+        $this->pendingOperations = [];
+    }
+
+    /**
+     * @param ConfigMapping $config
+     */
+    private function isEnabled(string $feature, array $config): bool
+    {
+        return $config[$feature] ?? $this->globalConfig[$feature] ?? true; // @phpstan-ignore-line
     }
 
     private function namer(?string $name): Namer
