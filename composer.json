@@ -20,6 +20,7 @@
         "zenstruck/uri": "^1.0"
     },
     "require-dev": {
+        "doctrine/doctrine-bundle": "^2.5",
         "doctrine/orm": "^2.12",
         "league/flysystem-memory": "^3.0",
         "league/flysystem-ziparchive": "^3.2",

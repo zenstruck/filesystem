@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Twig\Environment;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
@@ -105,13 +106,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         $namers = [];
+        $slugger = \interface_exists(LocaleAwareInterface::class) ? new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE) : null;
 
         $container->register('.zenstruck_filesystem.namer.checksum', ChecksumNamer::class);
         $container->register('.zenstruck_filesystem.namer.expression', ExpressionNamer::class)
-            ->addArgument(new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->addArgument($slugger)
         ;
         $container->register('.zenstruck_filesystem.namer.slugify', SlugifyNamer::class)
-            ->addArgument(new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->addArgument($slugger)
         ;
 
         $namers = [
@@ -125,7 +127,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 ->addArgument(new Reference('cache.system'))
             ;
             $container->register('.zenstruck.filesystem.namer.expression_language', ExpressionLanguageNamer::class)
-                ->setArguments([new Reference('.zenstruck.filesystem.namer._expression_language'), new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
+                ->setArguments([new Reference('.zenstruck.filesystem.namer._expression_language'), $slugger])
             ;
 
             $namers['expression_language'] = new Reference('.zenstruck.filesystem.namer.expression_language');
