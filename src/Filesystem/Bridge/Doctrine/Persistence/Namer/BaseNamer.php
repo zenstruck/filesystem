@@ -29,6 +29,6 @@ abstract class BaseNamer implements Namer
 
     final protected function slugify(string $value): string
     {
-        return $this->slugger ? $this->slugger->slug($value) : \mb_strtolower(\str_replace(' ', '-', $value)); // quick and dirty
+        return \mb_strtolower($this->slugger ? $this->slugger->slug($value) : \str_replace(' ', '-', $value)); // quick and dirty
     }
 }

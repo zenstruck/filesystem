@@ -188,4 +188,12 @@ final class FileTypeTest extends KernelTestCase
     {
         $this->markTestIncomplete();
     }
+
+    /**
+     * @test
+     */
+    public function twig_namer(): void
+    {
+        $this->markTestIncomplete();
+    }
 }

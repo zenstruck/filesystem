@@ -19,6 +19,7 @@ use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Bridge\Doctrine\ObjectNodeLoader;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\CacheNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener\NodeLifecycleSubscriber;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ChecksumNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionLanguageNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionNamer;
@@ -105,22 +106,19 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             return;
         }
 
-        $namers = [];
         $slugger = \interface_exists(LocaleAwareInterface::class) ? new Reference('slugger', ContainerInterface::NULL_ON_INVALID_REFERENCE) : null;
 
-        $container->register('.zenstruck_filesystem.namer.checksum', ChecksumNamer::class);
+        $container->register('.zenstruck_filesystem.namer.checksum', ChecksumNamer::class)
+            ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'checksum'])
+        ;
         $container->register('.zenstruck_filesystem.namer.expression', ExpressionNamer::class)
             ->addArgument($slugger)
+            ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'expression'])
         ;
         $container->register('.zenstruck_filesystem.namer.slugify', SlugifyNamer::class)
+            ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'slugify'])
             ->addArgument($slugger)
         ;
-
-        $namers = [
-            'slugify' => new Reference('.zenstruck_filesystem.namer.slugify'),
-            'checksum' => new Reference('.zenstruck_filesystem.namer.checksum'),
-            'expression' => new Reference('.zenstruck_filesystem.namer.expression'),
-        ];
 
         if (\class_exists(ExpressionLanguage::class)) {
             $container->register('.zenstruck.filesystem.namer._expression_language', ExpressionLanguage::class)
@@ -128,9 +126,15 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
             $container->register('.zenstruck.filesystem.namer.expression_language', ExpressionLanguageNamer::class)
                 ->setArguments([new Reference('.zenstruck.filesystem.namer._expression_language'), $slugger])
+                ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'expression_language'])
             ;
+        }
 
-            $namers['expression_language'] = new Reference('.zenstruck.filesystem.namer.expression_language');
+        if (\class_exists(Environment::class)) {
+            $container->register('.zenstruck.filesystem.namer.twig', ExpressionLanguage::class)
+                ->setArguments([new Reference('twig'), $slugger])
+                ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'twig'])
+            ;
         }
 
         $subscriber = $container->register('.zenstruck_filesystem.doctrine.node_event_subscriber', NodeLifecycleSubscriber::class)
@@ -144,8 +148,12 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                     NodeConfigProvider::DELETE_ON_UPDATE => $config['events']['update'][NodeConfigProvider::DELETE_ON_UPDATE],
                     NodeConfigProvider::DELETE_ON_REMOVE => $config['events']['remove'][NodeConfigProvider::DELETE_ON_REMOVE],
                 ],
-                new ServiceLocatorArgument($namers),
+                new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem.doctrine_namer', 'key')),
             ])
+        ;
+
+        $container->registerForAutoconfiguration(Namer::class)
+            ->addTag('zenstruck_filesystem.doctrine_namer')
         ;
 
         if ($config['events']['load']['enabled']) {

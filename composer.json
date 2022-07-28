@@ -16,6 +16,7 @@
         "league/flysystem": "^3.0",
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
+        "symfony/twig-bundle": "^5.4|^6.0",
         "zenstruck/dimension": "^0.1.0",
         "zenstruck/uri": "^1.0"
     },

@@ -62,6 +62,8 @@ _(Note about `TestFilesystemProvider|FixtureFilesystemProvider`)_
 
 #### Doctrine Entities
 
+##### `PendingFile` Namers
+
 #### Testing
 
 _(Note about `FixtureFilesystemProvider`)_
