@@ -23,7 +23,7 @@ final class CacheNodeConfigProvider implements NodeConfigProvider, CacheWarmerIn
 
     public function configFor(string $class): array
     {
-        return $this->localCache[$class] ??= $this->cache->get('zs_node_cache_'.$class, fn() => $this->inner->configFor($class));
+        return $this->localCache[$class] ??= $this->cache->get(self::createKey($class), fn() => $this->inner->configFor($class));
     }
 
     public function managedClasses(): iterable
@@ -46,5 +46,10 @@ final class CacheNodeConfigProvider implements NodeConfigProvider, CacheWarmerIn
     public function isOptional(): bool
     {
         return false;
+    }
+
+    private static function createKey(string $class): string
+    {
+        return 'zs_node_cache_'.\str_replace('\\', '', $class);
     }
 }
