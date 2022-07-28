@@ -135,11 +135,7 @@ final class NodeLifecycleSubscriber
 
             $ref->set($property, $node->last()->ensureFile());
 
-            $changed = true;
-        }
-
-        if (isset($changed)) {
-            self::clearChangeSet($object, $event->getObjectManager());
+            $this->addPendingRecomputeOperation($object, fn() => null);
         }
     }
 
