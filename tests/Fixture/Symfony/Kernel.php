@@ -9,10 +9,8 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Zenstruck\Filesystem\Bridge\Symfony\ZenstruckFilesystemBundle;
+use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
-/**
- * @author Kevin Bond <kevinbond@gmail.com>
- */
 final class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
@@ -21,6 +19,7 @@ final class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new DoctrineBundle();
+        yield new ZenstruckFoundryBundle();
         yield new ZenstruckFilesystemBundle();
     }
 
@@ -30,6 +29,10 @@ final class Kernel extends BaseKernel
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
+        ]);
+
+        $c->loadFromExtension('zenstruck_foundry', [
+            'auto_refresh_proxies' => true,
         ]);
 
         $c->loadFromExtension('doctrine', [

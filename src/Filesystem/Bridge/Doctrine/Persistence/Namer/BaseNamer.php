@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
@@ -18,7 +19,7 @@ abstract class BaseNamer implements Namer
 
     public function __construct(protected ?SluggerInterface $slugger = null)
     {
-        if (!$this->slugger && \class_exists(AsciiSlugger::class)) {
+        if (!$this->slugger && \interface_exists(LocaleAwareInterface::class) && \class_exists(AsciiSlugger::class)) {
             $this->slugger = self::$asciiSlugger ??= new AsciiSlugger();
         }
     }
