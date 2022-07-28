@@ -2,21 +2,16 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 
-use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class ChecksumNamer extends BaseNamer
 {
-    public function generateName(Node $node, object $object, array $config = []): string
+    public function generateName(PendingFile $file, object $object, array $config = []): string
     {
-        if (!$node instanceof File) {
-            throw new \InvalidArgumentException('Cannot generate checksum for directory.');
-        }
-
         // todo customize algorithm
-        return $node->checksum()->toString().self::extensionWithDot($node);
+        return $file->checksum()->toString().self::extensionWithDot($file);
     }
 }

@@ -2,15 +2,15 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 
-use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class SlugifyNamer extends BaseNamer
 {
-    public function generateName(Node $node, object $object, array $config = []): string
+    public function generateName(PendingFile $file, object $object, array $config = []): string
     {
-        return $this->slugify(self::nameWithoutExtension($node)).self::extensionWithDot($node);
+        return $this->slugify($file->originalNameWithoutExtension()).self::extensionWithDot($file);
     }
 }

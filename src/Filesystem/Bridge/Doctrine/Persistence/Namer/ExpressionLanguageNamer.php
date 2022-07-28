@@ -4,7 +4,7 @@ namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -16,16 +16,15 @@ final class ExpressionLanguageNamer extends BaseNamer
         parent::__construct($slugger);
     }
 
-    public function generateName(Node $node, object $object, array $config = []): string
+    public function generateName(PendingFile $file, object $object, array $config = []): string
     {
         return $this->expr->evaluate(
             $config['expression'] ?? throw new \LogicException('An "expression" option must be added to your column options.'),
             [
-                'node' => $node,
-                'file' => $node,
+                'file' => $file,
                 'this' => $object,
-                'ext' => self::extensionWithDot($node),
-                'name' => $this->slugify(self::nameWithoutExtension($node)),
+                'ext' => self::extensionWithDot($file),
+                'name' => $this->slugify($file->originalNameWithoutExtension()),
                 'slugger' => $this->slugger,
             ]
         );

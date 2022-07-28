@@ -20,6 +20,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileType;
  *      write_on_persist: bool|null,
  *      namer?: string,
  *      expression?: string,
+ *      template?: string,
  * }
  */
 interface NodeConfigProvider

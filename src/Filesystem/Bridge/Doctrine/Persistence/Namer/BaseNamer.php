@@ -6,8 +6,6 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
-use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -24,22 +22,9 @@ abstract class BaseNamer implements Namer
         }
     }
 
-    final protected static function extensionWithDot(Node $node): string
+    final protected static function extensionWithDot(PendingFile $file): string
     {
-        if ($node instanceof PendingFile) {
-            return '.'.\mb_strtolower((string) $node->originalExtension());
-        }
-
-        return $node instanceof File ? '.'.\mb_strtolower((string) $node->extension()) : '';
-    }
-
-    final protected static function nameWithoutExtension(Node $node): string
-    {
-        if ($node instanceof PendingFile) {
-            return $node->originalNameWithoutExtension();
-        }
-
-        return $node instanceof File ? $node->nameWithoutExtension() : $node->name();
+        return '.'.\mb_strtolower((string) $file->originalExtension());
     }
 
     final protected function slugify(string $value): string
