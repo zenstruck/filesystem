@@ -4,7 +4,9 @@ namespace Zenstruck\Filesystem\Test\Node;
 
 use Zenstruck\Assert;
 use Zenstruck\Dimension\Information;
+use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Node\File\Checksum;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -91,7 +93,25 @@ trait IsTestFile
 
     public function dump(): self
     {
-        \function_exists('dump') ? dump($this) : \var_dump($this);
+        $what = [
+            'path' => $this->path,
+            'mimeType' => $this->mimeType(),
+            'lastModified' => $this->lastModified(),
+            'size' => $this->size()->humanize(),
+        ];
+
+        try {
+            $what['url'] = $this->url()->toString();
+        } catch (UnsupportedFeature) {
+        }
+
+        if ($this instanceof Image) {
+            $what['image']['height'] = $this->height();
+            $what['image']['width'] = $this->width();
+            $what['image']['aspectRatio'] = \round($this->aspectRatio(), 2);
+        }
+
+        \function_exists('dump') ? dump($what) : \var_dump($what);
 
         return $this;
     }
