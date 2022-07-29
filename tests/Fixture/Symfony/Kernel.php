@@ -54,6 +54,10 @@ final class Kernel extends BaseKernel
             ],
         ]);
 
+        $c->loadFromExtension('twig', [
+            'default_path' => __DIR__.'/templates',
+        ]);
+
         $c->loadFromExtension('zenstruck_filesystem', [
             'filesystems' => [
                 'public' => '%kernel.project_dir%/var/public',

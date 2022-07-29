@@ -24,6 +24,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ChecksumNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionLanguageNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
+use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\TwigNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
@@ -131,7 +132,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         if (\class_exists(Environment::class)) {
-            $container->register('.zenstruck.filesystem.namer.twig', ExpressionLanguage::class)
+            $container->register('.zenstruck.filesystem.namer.twig', TwigNamer::class)
                 ->setArguments([new Reference('twig'), $slugger])
                 ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'twig'])
             ;

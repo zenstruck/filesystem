@@ -26,4 +26,25 @@ final class TestDirectory extends Directory
 
         return $this;
     }
+
+    /**
+     * @return self<T>
+     */
+    public function dump(): self
+    {
+        $files = \array_map(static fn($d) => (string) $d, \iterator_to_array($this));
+
+        \function_exists('dump') ? dump($files) : \var_dump($files);
+
+        return $this;
+    }
+
+    /**
+     * @return no-return
+     */
+    public function dd(): void
+    {
+        $this->dump();
+        exit(1);
+    }
 }

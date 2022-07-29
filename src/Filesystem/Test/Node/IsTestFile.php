@@ -88,4 +88,20 @@ trait IsTestFile
 
         return $this;
     }
+
+    public function dump(): self
+    {
+        \function_exists('dump') ? dump($this) : \var_dump($this);
+
+        return $this;
+    }
+
+    /**
+     * @return no-return
+     */
+    public function dd(): void
+    {
+        $this->dump();
+        exit(1);
+    }
 }

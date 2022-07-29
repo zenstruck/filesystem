@@ -145,55 +145,43 @@ final class FileTypeTest extends KernelTestCase
 
     /**
      * @test
+     * @dataProvider namerProvider
      */
-    public function default_namer(): void
+    public function namers($property, $filename, $expected): void
     {
-        $this->filesystem()->assertNotExists('some-crazy-file.png');
+        $this->filesystem()->assertNotExists($expected);
 
         Entity1Factory::createOne([
-            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.png'),
+            $property => new PendingFile(FilesystemTest::FIXTURE_DIR.'/'.$filename),
         ]);
 
-        $this->filesystem()->assertExists('some-crazy-file.png');
+        $this->filesystem()->assertExists($expected);
     }
 
-    /**
-     * @test
-     */
-    public function slugify_namer(): void
+    public static function namerProvider(): iterable
     {
-        $this->markTestIncomplete();
-    }
+        // default (slugify)
+        yield ['file', 'some CRazy file.pNg', 'some-crazy-file.png'];
+        yield ['file', 'file no extension', 'file-no-extension'];
 
-    /**
-     * @test
-     */
-    public function checksum_namer(): void
-    {
-        $this->markTestIncomplete();
-    }
+        // slugify
+        yield ['fileSlugify', 'some CRazy file.pNg', 'some-crazy-file.png'];
+        yield ['fileSlugify', 'file no extension', 'file-no-extension'];
 
-    /**
-     * @test
-     */
-    public function expression_namer(): void
-    {
-        $this->markTestIncomplete();
-    }
+        // checksum
+        yield ['fileChecksum', 'some CRazy file.pNg', 'f75b8179e4bbe7e2b4a074dcef62de95.png'];
+        yield ['fileChecksum', 'file no extension', '68aebfb83ffdc6bf16e17a8ebd3b8c35'];
 
-    /**
-     * @test
-     */
-    public function expression_language_namer(): void
-    {
-        $this->markTestIncomplete();
-    }
+        // expression
+        yield ['fileExpression', 'some CRazy file.pNg', 'foo/bar/some-crazy-file.png'];
+        yield ['fileExpression', 'file no extension', 'foo/bar/file-no-extension'];
 
-    /**
-     * @test
-     */
-    public function twig_namer(): void
-    {
-        $this->markTestIncomplete();
+        // twig
+        yield ['fileTwig', 'some CRazy file.pNg', 'foo/bar/1/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileTwig', 'file no extension', 'foo/bar/1/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
+
+        // expression language
+        yield ['fileExpressionLanguage', 'some CRazy file.pNg', 'foo/bar/1/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileExpressionLanguage', 'file no extension', 'foo/bar/1/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
     }
 }

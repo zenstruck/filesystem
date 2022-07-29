@@ -22,7 +22,7 @@ final class ExpressionLanguageNamer extends BaseNamer
             $config['expression'] ?? throw new \LogicException('An "expression" option must be added to your column options.'),
             [
                 'file' => $file,
-                'this' => $object,
+                'object' => $object,
                 'ext' => self::extensionWithDot($file),
                 'name' => $this->slugify($file->originalNameWithoutExtension()),
                 'slugger' => $this->slugger,

@@ -5,9 +5,7 @@ namespace Zenstruck\Filesystem\Test;
 use Zenstruck\Assert;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
 use Zenstruck\Filesystem\Test\Node\TestImage;
@@ -35,7 +33,7 @@ final class TestFilesystem implements Filesystem
         $node = Assert::try(fn() => $this->node($path), 'Node at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
-            $callback($node); // @phpstan-ignore-line
+            $callback($node);
         }
 
         return $this;
@@ -56,7 +54,7 @@ final class TestFilesystem implements Filesystem
         $node = Assert::try(fn() => $this->file($path), 'File at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
-            $callback($node); // @phpstan-ignore-line
+            $callback($node);
         }
 
         return $this;
@@ -70,7 +68,7 @@ final class TestFilesystem implements Filesystem
         $node = Assert::try(fn() => $this->image($path), 'Image at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
-            $callback($node); // @phpstan-ignore-line
+            $callback($node);
         }
 
         return $this;
@@ -84,7 +82,7 @@ final class TestFilesystem implements Filesystem
         $node = Assert::try(fn() => $this->directory($path), 'Directory at path "{path}" does not exist.', ['path' => $path]);
 
         if ($callback) {
-            $callback($node); // @phpstan-ignore-line
+            $callback($node);
         }
 
         return $this;
@@ -116,26 +114,47 @@ final class TestFilesystem implements Filesystem
         return $this;
     }
 
-    public function node(string $path): File|Directory
+    /**
+     * @return TestFile|TestDirectory<Node>
+     */
+    public function node(string $path): TestFile|TestDirectory
     {
         $node = $this->inner()->node($path);
 
         return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
     }
 
-    public function file(string $path): File
+    public function file(string $path): TestFile
     {
         return new TestFile($this->inner()->file($path));
     }
 
-    public function image(string $path, array $config = []): Image
+    public function image(string $path, array $config = []): TestImage
     {
         return new TestImage($this->inner()->image($path));
     }
 
-    public function directory(string $path): Directory
+    /**
+     * @return TestDirectory<Node>
+     */
+    public function directory(string $path): TestDirectory
     {
         return new TestDirectory($this->inner()->directory($path));
+    }
+
+    public function dump(): self
+    {
+        $this->directory(self::ROOT)->recursive()->dump();
+
+        return $this;
+    }
+
+    /**
+     * @return no-return
+     */
+    public function dd(): void
+    {
+        $this->directory(self::ROOT)->recursive()->dd();
     }
 
     public function inner(): Filesystem

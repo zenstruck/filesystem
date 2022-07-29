@@ -24,7 +24,11 @@ abstract class BaseNamer implements Namer
 
     final protected static function extensionWithDot(PendingFile $file): string
     {
-        return '.'.\mb_strtolower((string) $file->originalExtension());
+        if (!$ext = $file->originalExtension()) {
+            return '';
+        }
+
+        return '.'.\mb_strtolower($ext);
     }
 
     final protected function slugify(string $value): string
