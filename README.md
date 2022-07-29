@@ -28,7 +28,7 @@ WIP...
 
 ##### `LocalAdapter`
 
-##### `UrlPrefixAdapter`
+##### `FileUrlPrefixAdapter`
 
 ##### `StaticInMemoryAdapter`
 

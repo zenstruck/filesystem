@@ -38,7 +38,7 @@ final class Operator extends Filesystem implements All
         }
 
         if ($prefixes = $config['url_prefix'] ?? $config['url_prefixes'] ?? null) {
-            $adapter = new UrlPrefixAdapter($adapter, $prefixes);
+            $adapter = new FileUrlPrefixAdapter($adapter, $prefixes);
         }
 
         parent::__construct($this->adapter = $adapter, $config, $this->normalizer = $config['path_normalizer'] ?? new WhitespacePathNormalizer());

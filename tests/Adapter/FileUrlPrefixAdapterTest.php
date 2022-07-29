@@ -10,7 +10,7 @@ use Zenstruck\Filesystem\Tests\FilesystemTest;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class UrlPrefixAdapterTest extends FilesystemTest
+final class FileUrlPrefixAdapterTest extends FilesystemTest
 {
     /**
      * @test
