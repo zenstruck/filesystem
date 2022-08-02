@@ -60,7 +60,10 @@ final class Kernel extends BaseKernel
 
         $c->loadFromExtension('zenstruck_filesystem', [
             'filesystems' => [
-                'public' => '%kernel.project_dir%/var/public',
+                'public' => [
+                    'dsn' => '%kernel.project_dir%/var/public',
+                    'url_prefix' => '/files',
+                ],
                 'private' => '%kernel.project_dir%/var/private',
             ],
         ]);
