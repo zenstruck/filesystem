@@ -126,6 +126,32 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $this->assertTrue($filesystem->has('second://baz/nested/bar.txt'));
     }
 
+    /**
+     * @test
+     */
+    public function can_get_last(): void
+    {
+        $filesystem = $this->createFilesystem()->write('foo.txt', 'content');
+
+        $this->assertSame('content', $filesystem->last()->ensureFile()->contents());
+
+        $filesystem->write('second://bar.txt', 'bar');
+
+        $this->assertSame('bar', $filesystem->last()->ensureFile()->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function last_with_no_operation(): void
+    {
+        $filesystem = $this->createFilesystem();
+
+        $this->expectException(\LogicException::class);
+
+        $filesystem->last();
+    }
+
     final protected function createFilesystem(?array $filesystems = null, ?string $default = null): Filesystem
     {
         if (!$filesystems) {

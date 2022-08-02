@@ -15,6 +15,8 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class MultiFilesystem implements Filesystem
 {
+    private ?Filesystem $last = null;
+
     /**
      * @param array<string,Filesystem>|ContainerInterface $filesystems
      * @param string|null                                 $default     Default filesystem to use if no scheme provided
@@ -178,7 +180,11 @@ final class MultiFilesystem implements Filesystem
 
     public function last(?string $name = null): File|Directory
     {
-        return $this->get($name)->last();
+        if ($name) {
+            return $this->get($name)->last();
+        }
+
+        return $this->last?->last() ?? $this->get()->last();
     }
 
     private function getFromNested(?string $key): ?Filesystem
@@ -214,9 +220,9 @@ final class MultiFilesystem implements Filesystem
         $parts = \explode('://', $path, 2);
 
         if (2 !== \count($parts)) {
-            return [$this->get(), $path];
+            return [$this->last = $this->get(), $path];
         }
 
-        return [$this->get($parts[0]), $parts[1]];
+        return [$this->last = $this->get($parts[0]), $parts[1]];
     }
 }
