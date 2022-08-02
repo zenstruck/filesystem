@@ -72,7 +72,7 @@ final class Operator extends Filesystem implements All
         return \sha1($file->contents());
     }
 
-    public function urlFor(File $file, array $options = []): Uri
+    public function urlFor(File $file, mixed $options = []): Uri
     {
         return $this->adapter->urlFor($file, $options);
     }

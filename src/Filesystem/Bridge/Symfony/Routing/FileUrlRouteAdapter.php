@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Zenstruck\Filesystem\Adapter\FeatureAwareAdapter;
+use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Uri;
@@ -34,8 +35,12 @@ final class FileUrlRouteAdapter extends FeatureAwareAdapter implements ServiceSu
         parent::__construct($next);
     }
 
-    public function urlFor(File $file, array $options = []): Uri
+    public function urlFor(File $file, mixed $options = []): Uri
     {
+        if (!\is_array($options)) {
+            throw new UnsupportedFeature(\sprintf('Can only use array for $options in %s. "%s" given.', self::class, \get_debug_type($options)));
+        }
+
         $url = $this->container->get(UrlGeneratorInterface::class)->generate(
             $this->config['route'] ?? throw new \InvalidArgumentException('A route was not set.'),
             \array_merge($this->config['parameters'] ?? [], $options),

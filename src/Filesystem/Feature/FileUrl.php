@@ -10,8 +10,5 @@ use Zenstruck\Uri;
  */
 interface FileUrl
 {
-    /**
-     * @param array<string,mixed> $options
-     */
-    public function urlFor(File $file, array $options = []): Uri;
+    public function urlFor(File $file, mixed $options = []): Uri;
 }
