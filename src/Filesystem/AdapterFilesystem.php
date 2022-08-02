@@ -27,6 +27,7 @@ use Zenstruck\Uri\Path;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @phpstan-type GlobalConfig = array{
+ *     name?: string,
  *     url_prefix?: string,
  *     url_prefixes?: array,
  *     path_normalizer?: PathNormalizer,
@@ -36,18 +37,20 @@ use Zenstruck\Uri\Path;
 final class AdapterFilesystem implements Filesystem
 {
     private Operator $operator;
+    private string $name;
     private string|\LogicException $last;
 
     /**
      * @param GlobalConfig|array<string,mixed> $config
      */
-    public function __construct(FilesystemAdapter|string $adapter, private array $config = [], private string $name = 'default')
+    public function __construct(FilesystemAdapter|string $adapter, private array $config = [])
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
         }
 
         $this->operator = new Operator($adapter, $config);
+        $this->name = $this->config['name'] ?? 'default';
         $this->last = new \LogicException('No operations have been performed.');
     }
 

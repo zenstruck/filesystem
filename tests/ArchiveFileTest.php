@@ -18,6 +18,18 @@ final class ArchiveFileTest extends FilesystemTest
     /**
      * @test
      */
+    public function can_access_name(): void
+    {
+        $filesystem1 = new ArchiveFile('/foo/bar/baz.zip');
+        $filesystem2 = new ArchiveFile('/foo/bar/baz.zip', ['name' => 'foo']);
+
+        $this->assertSame('zip:///foo/bar/baz.zip', $filesystem1->name());
+        $this->assertSame('foo', $filesystem2->name());
+    }
+
+    /**
+     * @test
+     */
     public function can_create_archive_file_in_non_existent_directory(): void
     {
         Util::fs()->remove(\dirname(self::FILE));

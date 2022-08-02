@@ -40,10 +40,11 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
 
         parent::__construct($filename);
 
+        $config['name'] ??= 'zip://'.$filename;
+
         $this->inner = new AdapterFilesystem(
             $this->adapter = new ZipArchiveAdapter($filename),
             $config,
-            'zip://'.$filename
         );
     }
 
