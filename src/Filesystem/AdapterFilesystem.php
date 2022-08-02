@@ -8,6 +8,7 @@ use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToWriteFile;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
@@ -28,11 +29,10 @@ use Zenstruck\Uri\Path;
  *
  * @phpstan-type GlobalConfig = array{
  *     name?: string,
- *     url_prefix?: string,
- *     url_prefixes?: array,
  *     path_normalizer?: PathNormalizer,
  *     image_check_mime?: bool,
  * }
+ * @phpstan-type Features = ContainerInterface|array<class-string,object>
  */
 final class AdapterFilesystem implements Filesystem
 {
@@ -42,14 +42,15 @@ final class AdapterFilesystem implements Filesystem
 
     /**
      * @param GlobalConfig|array<string,mixed> $config
+     * @param Features                         $features
      */
-    public function __construct(FilesystemAdapter|string $adapter, private array $config = [])
+    public function __construct(FilesystemAdapter|string $adapter, private array $config = [], array|ContainerInterface $features = [])
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
         }
 
-        $this->operator = new Operator($adapter, $config);
+        $this->operator = new Operator($adapter, $config, $features);
         $this->name = $this->config['name'] ?? 'default';
         $this->last = new \LogicException('No operations have been performed.');
     }

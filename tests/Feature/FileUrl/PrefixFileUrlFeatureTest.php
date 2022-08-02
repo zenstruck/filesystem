@@ -1,16 +1,18 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Adapter;
+namespace Zenstruck\Filesystem\Tests\Feature\FileUrl;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Feature\FileUrl;
+use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FileUrlPrefixAdapterTest extends FilesystemTest
+final class PrefixFileUrlFeatureTest extends FilesystemTest
 {
     /**
      * @test
@@ -30,9 +32,7 @@ final class FileUrlPrefixAdapterTest extends FilesystemTest
      */
     public function can_use_multiple_prefixes_to_provide_a_deterministic_distribution_strategy(): void
     {
-        $filesystem = new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
-            'url_prefixes' => ['https://sub1.example.com', 'https://sub2.example.com'],
-        ]);
+        $filesystem = $this->createFilesystem(['https://sub1.example.com', 'https://sub2.example.com']);
         $filesystem->write('some-file.txt', 'contents');
         $filesystem->write('baz.txt', 'contents');
 
@@ -40,10 +40,12 @@ final class FileUrlPrefixAdapterTest extends FilesystemTest
         $this->assertSame('https://sub1.example.com/baz.txt', $filesystem->file('baz.txt')->url()->toString());
     }
 
-    protected function createFilesystem(): Filesystem
+    protected function createFilesystem(?array $prefixes = null): Filesystem
     {
-        return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
-            'url_prefix' => 'https://example.com/sub/',
+        $prefixes ??= 'https://example.com/sub/';
+
+        return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), features: [
+            FileUrl::class => new PrefixFileUrlFeature($prefixes),
         ]);
     }
 }

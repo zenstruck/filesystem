@@ -1,8 +1,7 @@
 <?php
 
-namespace Zenstruck\Filesystem\Adapter;
+namespace Zenstruck\Filesystem\Feature\FileUrl;
 
-use League\Flysystem\FilesystemAdapter;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Uri;
@@ -10,20 +9,16 @@ use Zenstruck\Uri;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FileUrlPrefixAdapter extends FeatureAwareAdapter
+final class PrefixFileUrlFeature implements FileUrl
 {
-    protected const FEATURES_ADDED = [FileUrl::class];
-
     /** @var string[]|Uri[] */
     private array $prefixes;
 
     /**
      * @param string[]|Uri[]|Uri|string $prefix
      */
-    public function __construct(FilesystemAdapter $next, array|string|Uri $prefix)
+    public function __construct(array|string|Uri $prefix)
     {
-        parent::__construct($next);
-
         $this->prefixes = \array_values(!\is_array($prefix) ? [$prefix] : $prefix);
     }
 

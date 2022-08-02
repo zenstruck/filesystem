@@ -29,6 +29,8 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
+use Zenstruck\Filesystem\Feature\FileUrl;
+use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
@@ -189,14 +191,20 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $config['dsn'] = new Reference($adapterId);
         }
 
+        $features = [];
+
         if ($config['url_prefix']) {
-            $config['config']['url_prefixes'] = (array) $config['url_prefix'];
+            $container->register($id = '.zenstruck_filesystem.feature.'.$name.'_url_prefix', PrefixFileUrlFeature::class)
+                ->setArguments([$config['url_prefix']])
+            ;
+
+            $features[FileUrl::class] = new Reference($id);
         }
 
         $config['config']['name'] = $name;
 
         $filesystemDef = $container->register($filesystem = 'zenstruck_filesystem.filesystem.'.$name, AdapterFilesystem::class)
-            ->setArguments([$config['dsn'], $config['config']])
+            ->setArguments([$config['dsn'], $config['config'], new ServiceLocatorArgument($features)])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
 

@@ -28,9 +28,11 @@ WIP...
 
 ##### `LocalAdapter`
 
-##### `FileUrlPrefixAdapter`
-
 ##### `StaticInMemoryAdapter`
+
+#### Features
+
+##### `PrefixFileUrlFeature`
 
 ### `MultiFilesystem`
 
@@ -57,6 +59,8 @@ _(Note about `TestFilesystemProvider|FixtureFilesystemProvider`)_
 ### Symfony Bundle
 
 #### Configuration
+
+##### `RouteFileUrlFeature`
 
 #### Services
 

@@ -2,12 +2,10 @@
 
 namespace Zenstruck\Filesystem\Bridge\Symfony\Routing;
 
-use League\Flysystem\FilesystemAdapter;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Zenstruck\Filesystem\Adapter\FeatureAwareAdapter;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node\File;
@@ -18,10 +16,8 @@ use Zenstruck\Uri;
  *
  * @internal
  */
-final class FileUrlRouteAdapter extends FeatureAwareAdapter implements ServiceSubscriberInterface
+final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
 {
-    protected const FEATURES_ADDED = [FileUrl::class];
-
     /**
      * @param array{
      *     route: string,
@@ -30,9 +26,8 @@ final class FileUrlRouteAdapter extends FeatureAwareAdapter implements ServiceSu
      *     sign?: bool
      * } $config
      */
-    public function __construct(FilesystemAdapter $next, private array $config, private ContainerInterface $container)
+    public function __construct(private array $config, private ContainerInterface $container)
     {
-        parent::__construct($next);
     }
 
     public function urlFor(File $file, mixed $options = []): Uri
