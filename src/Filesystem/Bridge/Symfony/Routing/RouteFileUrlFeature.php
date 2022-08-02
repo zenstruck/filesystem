@@ -20,7 +20,7 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
 {
     /**
      * @param array{
-     *     route: string,
+     *     name: string,
      *     parameters?: array<string,mixed>,
      *     reference_type?: int,
      *     sign?: bool
@@ -37,8 +37,8 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
         }
 
         $url = $this->container->get(UrlGeneratorInterface::class)->generate(
-            $this->config['route'] ?? throw new \InvalidArgumentException('A route was not set.'),
-            \array_merge($this->config['parameters'] ?? [], $options),
+            $this->config['name'] ?? throw new \InvalidArgumentException('A route was not set.'),
+            \array_merge($this->config['parameters'] ?? [], $options, ['path' => $file->path()]),
             $this->config['reference_type'] ?? UrlGeneratorInterface::ABSOLUTE_URL
         );
 

@@ -43,6 +43,9 @@ final class ServiceTest extends KernelTestCase
      */
     public function can_get_route_urls(): void
     {
-        $this->markTestIncomplete();
+        $file = $this->filesystem()->write('private://nested/file.txt', 'content')->last()->ensureFile();
+
+        $this->assertSame('http://localhost/some/prefix/nested/file.txt', $file->url()->toString());
+        $this->assertSame('http://localhost/some/prefix/nested/file.txt?foo=bar', $file->url(['foo' => 'bar'])->toString());
     }
 }

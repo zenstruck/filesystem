@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Bridge\Symfony\DependencyInjection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 
 /**
@@ -39,6 +40,32 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultNull()
                                 ->info('Url prefix or multiple prefixes to use for this filesystem (can be an array)')
                                 ->example(['/files', 'https://cdn1.example.com', 'https://cdn2.example.com'])
+                            ->end()
+                            ->arrayNode('route')
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(fn($v) => ['name' => $v])
+                                ->end()
+                                ->addDefaultsIfNotSet()
+                                ->info('Route to use for file urls')
+                                ->children()
+                                    ->scalarNode('name')
+                                        ->defaultNull()
+                                        ->info('The route name')
+                                    ->end()
+                                    ->booleanNode('sign')
+                                        ->defaultFalse()
+                                        ->info('Signed?')
+                                    ->end()
+                                    ->enumNode('reference_type')
+                                        ->values([UrlGeneratorInterface::ABSOLUTE_PATH, UrlGeneratorInterface::ABSOLUTE_URL, UrlGeneratorInterface::NETWORK_PATH, UrlGeneratorInterface::RELATIVE_PATH])
+                                        ->cannotBeEmpty()
+                                        ->defaultValue(UrlGeneratorInterface::ABSOLUTE_URL)
+                                    ->end()
+                                    ->variableNode('parameters')
+                                        ->defaultValue([])
+                                    ->end()
+                                ->end()
                             ->end()
                             ->booleanNode('readonly')
                                 ->defaultFalse()

@@ -28,6 +28,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\TwigNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
+use Zenstruck\Filesystem\Bridge\Symfony\Routing\RouteFileUrlFeature;
 use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
@@ -196,6 +197,15 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         if ($config['url_prefix']) {
             $container->register($id = '.zenstruck_filesystem.feature.'.$name.'_url_prefix', PrefixFileUrlFeature::class)
                 ->setArguments([$config['url_prefix']])
+            ;
+
+            $features[FileUrl::class] = new Reference($id);
+        }
+
+        if ($config['route']['name']) {
+            $container->register($id = '.zenstruck_filesystem.feature.'.$name.'_route', RouteFileUrlFeature::class)
+                ->setArguments([$config['route']])
+                ->addTag('container.service_subscriber')
             ;
 
             $features[FileUrl::class] = new Reference($id);
