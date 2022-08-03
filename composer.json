@@ -16,7 +16,6 @@
         "league/flysystem": "^3.0",
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
-        "symfony/twig-bundle": "^5.4|^6.0",
         "zenstruck/dimension": "^0.1.0",
         "zenstruck/uri": "^1.0"
     },
@@ -31,8 +30,9 @@
         "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
         "symfony/phpunit-bridge": "^6.0",
+        "symfony/twig-bundle": "^5.4|^6.0",
+        "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
-        "twig/twig": "^2.0|^3.0",
         "zenstruck/assert": "^1.2",
         "zenstruck/foundry": "^1.21"
     },

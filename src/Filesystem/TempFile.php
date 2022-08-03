@@ -43,6 +43,8 @@ final class TempFile extends \SplFileInfo
     {
         ResourceWrapper::open($file = new self(), 'w')->write($contents)->close();
 
+        \clearstatcache(false, $file);
+
         return $file;
     }
 
