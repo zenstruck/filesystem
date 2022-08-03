@@ -20,22 +20,42 @@ class Image extends File
         $this->path = $path;
     }
 
-    public function height(): int
+    final public function height(): int
     {
         return $this->imageSize()[1];
     }
 
-    public function width(): int
+    final public function width(): int
     {
         return $this->imageSize()[0];
     }
 
-    public function aspectRatio(): float
+    final public function aspectRatio(): float
     {
         return $this->width() / $this->height();
     }
 
-    public function refresh(): static
+    final public function pixels(): int
+    {
+        return $this->width() * $this->height();
+    }
+
+    final public function isSquare(): bool
+    {
+        return $this->width() === $this->height();
+    }
+
+    final public function isPortrait(): bool
+    {
+        return $this->height() > $this->width();
+    }
+
+    final public function isLandscape(): bool
+    {
+        return $this->width() > $this->height();
+    }
+
+    final public function refresh(): static
     {
         unset($this->imageSize);
 
