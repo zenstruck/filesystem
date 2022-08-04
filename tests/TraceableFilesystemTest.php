@@ -3,6 +3,9 @@
 namespace Zenstruck\Filesystem\Tests;
 
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\Node\TestDirectory;
+use Zenstruck\Filesystem\Test\Node\TestFile;
+use Zenstruck\Filesystem\Test\Node\TestImage;
 use Zenstruck\Filesystem\TraceableFilesystem;
 
 /**
@@ -15,7 +18,7 @@ final class TraceableFilesystemTest extends FilesystemTest
     /**
      * @test
      */
-    public function can_access_statistics(): void
+    public function can_access_statistics_and_operations(): void
     {
         $filesystem = $this->createFilesystem()
             ->write('foo', 'bar')
@@ -35,14 +38,25 @@ final class TraceableFilesystemTest extends FilesystemTest
         $this->assertSame(11, $filesystem->totalOperations());
         $this->assertSame(5, $filesystem->totalReads());
         $this->assertSame(6, $filesystem->totalWrites());
-    }
 
-    /**
-     * @test
-     */
-    public function can_access_operations(): void
-    {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            [
+                'write' => [['foo', 'string']],
+                'mkdir' => [['bar', null]],
+                'chmod' => [['foo', 'public']],
+                'copy' => [['foo', 'file.png']],
+                'delete' => [['foo', null]],
+                'move' => [['file.png', 'file2.png']],
+                'read' => [
+                    ['file2.png', TestFile::class],
+                    ['file2.png', TestFile::class],
+                    ['file2.png', TestImage::class],
+                    ['bar', TestDirectory::class],
+                    ['file2.png', null],
+                ],
+            ],
+            $filesystem->operations()
+        );
     }
 
     protected function createFilesystem(): TraceableFilesystem
