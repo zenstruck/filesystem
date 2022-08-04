@@ -4,7 +4,6 @@ namespace Zenstruck\Filesystem\Tests\Fixture\Symfony\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\FileCollection;
 
 #[ORM\Entity]
 class Entity1
@@ -34,7 +33,4 @@ class Entity1
 
     #[ORM\Column(type: 'file', nullable: true, options: ['filesystem' => 'public', 'namer' => 'expression_language', 'expression' => '"foo/bar/"~object.id~"/"~file.checksum()~"-"~name~ext'])]
     public ?File $fileExpressionLanguage = null;
-
-    #[ORM\Column(type: 'file_collection', nullable: true, options: ['filesystem' => 'public'])]
-    public ?FileCollection $collection;
 }

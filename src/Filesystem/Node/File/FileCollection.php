@@ -44,17 +44,6 @@ class FileCollection implements \IteratorAggregate, \Countable
         return $this;
     }
 
-    final public function has(File $file): bool
-    {
-        foreach ($this->files as $existingFile) {
-            if ($existingFile->path() === $file->path()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * @return File[]
      */
