@@ -34,7 +34,7 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
      * @param GlobalConfig|array<string,mixed> $config
      * @param Features                         $features
      */
-    public function __construct(private FilesystemAdapter $adapter, private array $config = [], private array|ContainerInterface $features = [])
+    public function __construct(private FilesystemAdapter $adapter, private array $config = [], private iterable|ContainerInterface $features = [])
     {
         parent::__construct($adapter, $config, $this->normalizer = $config['path_normalizer'] ?? new WhitespacePathNormalizer());
     }
@@ -103,12 +103,14 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
             return $this->adapter;
         }
 
-        if (\is_array($this->features)) {
-            return $this->features[$name] ?? null; // @phpstan-ignore-line
+        if ($this->features instanceof ContainerInterface) {
+            return $this->features->has($name) ? $this->features->get($name) : null;
         }
 
-        if ($this->features->has($name)) {
-            return $this->features->get($name);
+        foreach ($this->features as $feature) {
+            if ($feature instanceof $name) {
+                return $feature;
+            }
         }
 
         return null;

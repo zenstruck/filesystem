@@ -45,7 +45,7 @@ final class PrefixFileUrlFeatureTest extends FilesystemTest
         $prefixes ??= 'https://example.com/sub/';
 
         return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), features: [
-            FileUrl::class => new PrefixFileUrlFeature($prefixes),
+            new PrefixFileUrlFeature($prefixes),
         ]);
     }
 }

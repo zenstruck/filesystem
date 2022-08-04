@@ -19,7 +19,7 @@ final class AdapterFilesystemTest extends TestCase
     public function can_swap_inner_most_adapter_with_a_different_one(): void
     {
         $filesystem = new AdapterFilesystem(FilesystemTest::TEMP_DIR, features: [
-            FileUrl::class => new PrefixFileUrlFeature('http://localhost'),
+            new PrefixFileUrlFeature('http://localhost'),
         ]);
         $filesystem->write('file.txt', 'content');
 

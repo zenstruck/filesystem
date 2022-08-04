@@ -32,7 +32,7 @@ use Zenstruck\Uri\Path;
  *     path_normalizer?: PathNormalizer,
  *     image_check_mime?: bool,
  * }
- * @phpstan-type Features = ContainerInterface|array<class-string,object>
+ * @phpstan-type Features = ContainerInterface|object[]
  */
 final class AdapterFilesystem implements Filesystem
 {
@@ -44,7 +44,7 @@ final class AdapterFilesystem implements Filesystem
      * @param GlobalConfig|array<string,mixed> $config
      * @param Features                         $features
      */
-    public function __construct(FilesystemAdapter|string $adapter, private array $config = [], array|ContainerInterface $features = [])
+    public function __construct(FilesystemAdapter|string $adapter, private array $config = [], iterable|ContainerInterface $features = [])
     {
         if (\is_string($adapter)) {
             $adapter = new LocalAdapter($adapter);
