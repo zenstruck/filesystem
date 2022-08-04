@@ -18,6 +18,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ObjectReflector;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\FileCollection;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -77,7 +78,6 @@ final class NodeLifecycleSubscriber
      */
     public function postRemove(LifecycleEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
@@ -92,13 +92,16 @@ final class NodeLifecycleSubscriber
             }
 
             $ref ??= new ObjectReflector($object, $configs);
-            $node = $ref->get($property);
 
-            if (!$node instanceof Node) {
+            if (!$item = $ref->get($property)) {
                 continue;
             }
 
-            $this->filesystem->get($config['filesystem'])->delete($node->path());
+            $nodes = $item instanceof Node ? [$item] : $item->all();
+
+            foreach ($nodes as $node) {
+                $this->filesystem->get($config['filesystem'])->delete($node->path());
+            }
         }
     }
 
@@ -107,7 +110,6 @@ final class NodeLifecycleSubscriber
      */
     public function postPersist(LifecycleEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
@@ -122,18 +124,39 @@ final class NodeLifecycleSubscriber
             }
 
             $ref ??= new ObjectReflector($object, $configs);
-            $node = $ref->get($property);
+            $item = $ref->get($property);
 
-            if (!$node instanceof PendingFile) {
+            if ($item instanceof PendingFile) {
+                $item = $this->filesystem->get($config['filesystem'])->write(
+                    $this->namer($config['namer'] ?? null)->generateName($item, $object, $config),
+                    $item->localFile()
+                );
+
+                $ref->set($property, $item->last()->ensureFile());
+
+                $this->addPendingRecomputeOperation($object, fn() => null);
+
                 continue;
             }
 
-            $node = $this->filesystem->get($config['filesystem'])->write(
-                $this->namer($config['namer'] ?? null)->generateName($node, $object, $config),
-                $node->localFile()
-            );
+            if (!$item instanceof FileCollection) {
+                continue;
+            }
 
-            $ref->set($property, $node->last()->ensureFile());
+            $files = [];
+
+            foreach ($item as $file) {
+                if ($file instanceof PendingFile) {
+                    $file = $this->filesystem->get($config['filesystem'])->write(
+                        $this->namer($config['namer'] ?? null)->generateName($file, $object, $config),
+                        $file->localFile()
+                    )->last()->ensureFile();
+                }
+
+                $files[] = $file;
+            }
+
+            $ref->set($property, new FileCollection($files));
 
             $this->addPendingRecomputeOperation($object, fn() => null);
         }
@@ -144,7 +167,6 @@ final class NodeLifecycleSubscriber
      */
     public function preUpdate(PreUpdateEventArgs|ORMPreUpdateEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
@@ -160,6 +182,15 @@ final class NodeLifecycleSubscriber
 
             $old = $event->getOldValue($config['property']);
             $new = $event->getNewValue($config['property']);
+
+            if (null === $new && $old instanceof FileCollection && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
+                // user removed collection, delete files
+                foreach ($old as $file) {
+                    $this->pendingOperations[] = fn() => $this->filesystem->get($config['filesystem'])->delete($file);
+                }
+
+                continue;
+            }
 
             if (!$new instanceof Node && $old instanceof Node && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // user removed node, delete file
