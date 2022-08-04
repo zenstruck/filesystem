@@ -49,6 +49,34 @@ final class TempFile extends \SplFileInfo
     }
 
     /**
+     * Create temporary image file.
+     *
+     * @source https://github.com/laravel/framework/blob/183d38f18c0ea9fe13b6d10a6d8360be881d096c/src/Illuminate/Http/Testing/FileFactory.php#L68
+     */
+    public static function image(int $width = 10, int $height = 10, string $type = 'jpeg'): self
+    {
+        $file = new self();
+
+        if (false === $image = \imagecreatetruecolor($width, $height)) {
+            throw new \RuntimeException('Error creating temporary image.');
+        }
+
+        match (\strtolower($type)) {
+            'jpeg', 'jpg' => \imagejpeg($image, (string) $file),
+            'png' => \imagepng($image, (string) $file),
+            'gif' => \imagegif($image, (string) $file),
+            'bmp' => \imagebmp($image, (string) $file),
+            'webp' => \imagewebp($image, (string) $file),
+            'wbmp' => \imagewbmp($image, (string) $file),
+            default => throw new \InvalidArgumentException(\sprintf('"%s" is an invalid image type.', $type)),
+        };
+
+        \clearstatcache(false, $file);
+
+        return $file;
+    }
+
+    /**
      * Manually delete all created temp files. Useful for long-running
      * processes.
      */

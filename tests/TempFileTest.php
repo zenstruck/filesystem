@@ -110,4 +110,22 @@ final class TempFileTest extends TestCase
         $this->assertFileDoesNotExist($file1);
         $this->assertFileDoesNotExist($file2);
     }
+
+    /**
+     * @test
+     */
+    public function can_create_image(): void
+    {
+        $imageSize = \getimagesize(TempFile::image());
+
+        $this->assertSame(10, $imageSize[0]);
+        $this->assertSame(10, $imageSize[1]);
+        $this->assertSame('image/jpeg', $imageSize['mime']);
+
+        $imageSize = \getimagesize(TempFile::image(5, 6, 'PNG'));
+
+        $this->assertSame(5, $imageSize[0]);
+        $this->assertSame(6, $imageSize[1]);
+        $this->assertSame('image/png', $imageSize['mime']);
+    }
 }
