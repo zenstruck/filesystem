@@ -63,7 +63,7 @@ final class TempFileTest extends TestCase
      */
     public function can_create_for_stream(): void
     {
-        $file = TempFile::with(ResourceWrapper::inMemory()->write('file contents')->rewind());
+        $file = TempFile::for(ResourceWrapper::inMemory()->write('file contents')->rewind());
 
         $this->assertFileExists($file);
         $this->assertStringEqualsFile($file, 'file contents');
@@ -74,7 +74,7 @@ final class TempFileTest extends TestCase
      */
     public function can_create_for_string(): void
     {
-        $file = TempFile::with('file contents');
+        $file = TempFile::for('file contents');
 
         $this->assertFileExists($file);
         $this->assertStringEqualsFile($file, 'file contents');
@@ -85,7 +85,7 @@ final class TempFileTest extends TestCase
      */
     public function can_get_size(): void
     {
-        $file = TempFile::with('foobar');
+        $file = TempFile::for('foobar');
 
         $this->assertSame(6, $file->getSize());
 
@@ -99,8 +99,8 @@ final class TempFileTest extends TestCase
      */
     public function can_purge_created_files(): void
     {
-        $file1 = TempFile::with('contents');
-        $file2 = TempFile::with('contents');
+        $file1 = TempFile::for('contents');
+        $file2 = TempFile::for('contents');
 
         $this->assertFileExists($file1);
         $this->assertFileExists($file2);

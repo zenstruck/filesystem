@@ -9,7 +9,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Zenstruck\Filesystem\Bridge\Symfony\Validator\Constraints\Image;
 use Zenstruck\Filesystem\Node\File as FileNode;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\TempFile;
 
 /**
@@ -39,10 +38,6 @@ final class ImageValidator extends BaseImageValidator
             return;
         }
 
-        $resource = ResourceWrapper::wrap($value->read());
-        $file = TempFile::with($resource);
-        $resource->close();
-
-        parent::validate($file, $constraint);
+        parent::validate(TempFile::for($value), $constraint);
     }
 }

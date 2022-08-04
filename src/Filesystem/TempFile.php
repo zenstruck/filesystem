@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Filesystem;
 
+use Zenstruck\Filesystem\Node\File;
+
 /**
  * Creates a temporary file or wraps an existing file to be deleted
  * at the end of the script.
@@ -37,15 +39,24 @@ final class TempFile extends \SplFileInfo
     }
 
     /**
-     * @param string|resource|ResourceWrapper $contents
+     * @param string|resource|ResourceWrapper|File $contents
      */
-    public static function with(mixed $contents): self
+    public static function for(mixed $contents): self
     {
+        $close = false;
+
+        if ($contents instanceof File) {
+            $contents = ResourceWrapper::wrap($contents->read());
+            $close = true;
+        }
+
         ResourceWrapper::open($file = new self(), 'w')->write($contents)->close();
 
-        \clearstatcache(false, $file);
+        if ($close && $contents instanceof ResourceWrapper) {
+            $contents->close();
+        }
 
-        return $file;
+        return $file->refresh();
     }
 
     /**
@@ -61,7 +72,7 @@ final class TempFile extends \SplFileInfo
             throw new \RuntimeException('Error creating temporary image.');
         }
 
-        match (\strtolower($type)) {
+        match (\mb_strtolower($type)) {
             'jpeg', 'jpg' => \imagejpeg($image, (string) $file),
             'png' => \imagepng($image, (string) $file),
             'gif' => \imagegif($image, (string) $file),
@@ -71,9 +82,7 @@ final class TempFile extends \SplFileInfo
             default => throw new \InvalidArgumentException(\sprintf('"%s" is an invalid image type.', $type)),
         };
 
-        \clearstatcache(false, $file);
-
-        return $file;
+        return $file->refresh();
     }
 
     /**
@@ -89,6 +98,13 @@ final class TempFile extends \SplFileInfo
         }
     }
 
+    public function refresh(): self
+    {
+        \clearstatcache(false, $this);
+
+        return $this;
+    }
+
     public function delete(): self
     {
         if (\file_exists($this)) {
@@ -100,7 +116,7 @@ final class TempFile extends \SplFileInfo
 
     public function getSize(): int
     {
-        \clearstatcache(false, $this);
+        $this->refresh();
 
         return parent::getSize();
     }

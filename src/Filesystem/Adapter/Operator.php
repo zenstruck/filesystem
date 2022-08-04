@@ -82,7 +82,7 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
             return $feature->realFile($file);
         }
 
-        return TempFile::with($file->read());
+        return TempFile::for($file);
     }
 
     public function swap(FilesystemAdapter $adapter): void
