@@ -5,8 +5,6 @@ namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File\FileCollection;
-use Zenstruck\Filesystem\Node\File\LazyFileCollection;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
@@ -40,7 +38,7 @@ final class ObjectReflector
         foreach ($property ? [$property => $this->config[$property]] : $this->config as $name => $config) {
             $node = $this->get($name);
 
-            if (!$node instanceof LazyNode && !$node instanceof LazyFileCollection) {
+            if (!$node instanceof LazyNode) {
                 continue;
             }
 
@@ -48,12 +46,12 @@ final class ObjectReflector
         }
     }
 
-    public function set(string $property, Node|FileCollection $node): void
+    public function set(string $property, Node $node): void
     {
         $this->property($property)->setValue($this->object, $node);
     }
 
-    public function get(string $property): Node|FileCollection|null
+    public function get(string $property): ?Node
     {
         $ref = $this->property($property);
 
@@ -63,7 +61,7 @@ final class ObjectReflector
 
         $node = $ref->getValue($this->object);
 
-        return ($node instanceof Node || $node instanceof FileCollection) ? $node : null;
+        return ($node instanceof Node) ? $node : null;
     }
 
     private function property(string $name): \ReflectionProperty

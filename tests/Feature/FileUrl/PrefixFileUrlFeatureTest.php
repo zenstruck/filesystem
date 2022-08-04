@@ -5,7 +5,6 @@ namespace Zenstruck\Filesystem\Tests\Feature\FileUrl;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
-use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 

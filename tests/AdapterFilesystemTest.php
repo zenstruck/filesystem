@@ -5,7 +5,6 @@ namespace Zenstruck\Filesystem\Tests;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\AdapterFilesystem;
-use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
 
 /**

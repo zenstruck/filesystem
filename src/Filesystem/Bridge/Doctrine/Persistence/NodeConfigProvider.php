@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence;
 
-use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileCollectionType;
 use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileType;
 
 /**
@@ -25,7 +24,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\DBAL\Types\FileType;
  */
 interface NodeConfigProvider
 {
-    public const NODE_TYPES = [FileType::NAME, FileCollectionType::NAME];
+    public const NODE_TYPES = [FileType::NAME];
 
     public const AUTOLOAD = 'autoload';
     public const WRITE_ON_PERSIST = 'write_on_persist';
