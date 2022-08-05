@@ -1,7 +1,7 @@
 # zenstruck/filesystem
 
 This library is a wrapper for the excellent [league/flysystem](https://flysystem.thephpleague.com/docs/)
-_File Storage Abstraction_ library. It provides an _alternate_ [API](#api) including some of the following
+_File Storage Abstraction_ library. It provides an _alternate_ [API](#api) with the following major
 changes:
 
 1. The main difference is the concept of [`Directory`](#directory), [`File`](#file) and [`Image`](#image) objects.
@@ -124,68 +124,1000 @@ $image = $filesystem->image('some/file.txt'); // Zenstruck\Node\File\Image (see 
  * @throws \Zenstruck\Filesystem\Exception\NodeNotFound If does not exist
  */
 $node = $filesystem->node('some/node'); // Zenstruck\Node\File|Zenstruck\Node\Directory (see below)
+
+/**
+ * get last operated on node
+ *
+ * @throws \LogicException If there was no last operation or the last operation was a delete
+ */
+$node = $filesystem->write('file.txt', 'content')->last(); // Zenstruck\Node\File (for "file.txt")
 ```
 
 ### Nodes
 
 #### `File`
 
+```php
+/** @var Zenstruck\Filesystem $filesystem */
+
+$file = $filesystem->file('nested/file.txt');
+
+$file->path(); // "nested/file.txt"
+(string) $file; // "nested/file.txt"
+$file->name(); // "file.txt"
+$file->dirname(); // "nested"
+$file->extension(); // "txt"
+$file->nameWithoutExtension(); // "file"
+
+$file->directory(); // Zenstruck\Node\Directory (for "nested")
+
+$file->contents(); // string of the file's contents
+$file->read(); // resource stream of the file's contents
+
+/**
+ * get the url
+ *
+ * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support urls
+ */
+$url = $file->url(); // Zenstruck\Uri
+(string) $url; // string (ie https://example.com/nested/file.txt)
+
+// metadata
+$file->lastModified(); // \DateTimeImmutable
+$file->mimeType(); // string (ie text/plain)
+$file->visibility(); // string (ie public/private)
+
+// size
+$size = $file->size(); // Zenstruck\Dimension\Information
+(string) $size; // string (ie 23234 B)
+$size->bytes(); // int (file size in bytes)
+$size->humanize(); // string (ie 1.1 kB)
+$size->asDecimal()->humanize(); // string (ie 1.1 KiB)
+$size->isLargerThan('1.0 kB'); // bool
+$size->isSmallerThan('1.0 kB'); // bool
+
+// checksum
+$checksum = $file->checksum(); // Zenstruck\Filesystem\Node\File\Checksum
+(string) $checksum; // md5 hash of file contents
+(string) $checksum->useSha1(); // sha1 hash of file contents
+(string) $checksum->forMetadata(); // md5 hash of file's metadata (size, mime-type, last-modified)
+(string) $checksum->forMetadata()->useSha1(); // sha1 hash of file's metadata (size, mime-type, last-modified)
+
+$checksum->equals($anotherChecksum); // bool
+```
+
 #### `Image`
 
+The `Image` node extends `File` so all it's methods are available.
+
+```php
+/** @var Zenstruck\Filesystem $filesystem */
+
+$image = $filesystem->image('nested/image.png');
+
+// image metadata
+$image->width(); // int
+$image->height(); // int
+$image->pixels(); // int - width x height
+$image->aspectRatio(); // float
+$image->isLandscape(); // bool
+$image->isPortrait(); // bool
+$image->isSquare(); // bool
+```
+
 #### `Directory`
+
+```php
+/** @var Zenstruck\Filesystem $filesystem */
+
+$dir = $filesystem->directory('nested/dir');
+
+$dir->path(); // "nested/dir"
+(string) $dir; // "nested/dir"
+$dir->name(); // "dir"
+$dir->dirname(); // "nested"
+
+// create a zip archive
+$archive = $dir->zip(); // Zenstruck\Filesystem\ArchiveFile (see below)
+
+// metadata
+$file->lastModified(); // \DateTimeImmutable
+$file->visibility(); // string (ie public/private)
+
+// iterable (non-recursive by default)
+foreach ($dir as $node) {
+    // $node = Zenstruck\Filesystem\Node\File|Zenstruck\Filesystem\Node\Directory
+}
+
+// iterable - recursive
+foreach ($dir->recursive() as $node) {
+    // $node = Zenstruck\Filesystem\Node\File|Zenstruck\Filesystem\Node\Directory
+}
+
+// iterable - recursive, files only
+foreach ($dir->recursive()->files() as $file) {
+    // $file = Zenstruck\Filesystem\Node\File
+}
+
+// iterable - recursive, directories only
+foreach ($dir->recursive()->directories() as $directory) {
+    // $directory = Zenstruck\Filesystem\Node\Directory
+}
+
+// advanced filters
+$filtered = $dir
+    ->recursive()
+    ->files()
+    ->olderThan('yesterday')
+    ->newerThan('-1 year')
+    ->largerThan('1mb')
+    ->smallerThan('1gb')
+    ->matchingName('*.txt')
+    ->notMatchingName(['foo*', 'bar*'])
+;
+
+foreach ($filtered as $file) {
+    // $file = Zenstruck\Filesystem\Node\File
+}
+```
 
 ## Filesystems
 
 ### `AdapterFilesystem`
 
+This is the primary filesystem, it can be created with any Flysystem Adapter (object that
+implements `League\Flysystem\FilesystemAdapter`). Alternatively, it can be created with a
+string for a local file path to create a `LocalFilesystemAdapter`.
+
+```php
+use Zenstruck\Filesystem\AdapterFilesystem;
+
+/** @var League\Flysystem\FilesystemAdapter $adapter */
+
+$filesystem = new AdapterFilesystem($adapter);
+
+// give your filesystem a name (used for logging, etc)
+$filesystem = new AdapterFilesystem($adapter, ['name' => 'public']);
+
+// create from local path
+$filesystem = new AdapterFilesystem('/some/local/path');
+```
+
 #### Flysystem Adapters
 
-##### `LocalAdapter`
+While any League adapter can be used, this library comes with some additional ones:
 
 ##### `StaticInMemoryAdapter`
 
+> **Note**: Requires `league/flysystem-memory`.
+
+This works like `InMemoryFilesystemAdapter` but stores the filesystem data in a static
+variable. This is useful when writing Symfony tests that reset services between requests.
+
+```php
+use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
+
+$filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
+$filesystem->write('file.txt', 'content');
+
+// create a new one
+$filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
+$filesystem->file('file.txt'); // works!
+
+// create with different names for multiple static filesystems
+$filesystem1 = new AdapterFilesystem(new StaticInMemoryAdapter('first'));
+$filesystem2 = new AdapterFilesystem(new StaticInMemoryAdapter('second'));
+
+// reset all data
+StaticInMemoryAdapter::reset();
+```
+
 #### Features
+
+Features are a set of interfaces that can be used to add/improve the functionality of your filesystem. These can be
+implemented by League adapters themselves or a separate object that's added to `AdapterFilesystem`. Here are the
+currently available features:
+
+- `Zenstruck\Filesystem\Feature\FileUrl`: enables the usage of `File::url()` (implemented by
+  [`PrefixFileUrlFeature`](#prefixfileurlfeature)).
+- `Zenstruck\Filesystem\Feature\ModifyFile`: provides a real file for modification/metadata. If not implemented,
+  creates/uses a temporary file on the filesystem. This is implemented by the default `LocalAdapter` provided by
+  this library.
+- `Zenstruck\Filesystem\Feature\FileChecksum`: provides efficient file content checksum calculations. If not
+  implemented, calculates based on the file content string, which, depending on the adapter/file size, could
+  be slow. This is implemented by the default `LocalAdapter` provided by this library.
 
 ##### `PrefixFileUrlFeature`
 
+Use this to prefix you filesystem file path's with one or more prefixes:
+
+```php
+use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
+
+$filesystem = new AdapterFilesystem('/path/to/root', features: [
+    new PrefixFileUrlFeature('/files'),
+]);
+
+(string) $filesystem->file('some/file.txt')->url(); // "/files/some/file.txt"
+
+// use an array of prefixes to alternate (deterministically) between prefixes
+
+$filesystem = new AdapterFilesystem('/path/to/root', features: [
+    new PrefixFileUrlFeature(['https://cdn1.example.com/files', 'https://cdn2.example.com/files']),
+]);
+
+(string) $filesystem->file('some/file.txt')->url(); // "https://cdn1.example.com/files/some/file.txt"
+(string) $filesystem->file('another/file.txt')->url(); // "https://cdn2.example.com/files/another/file.txt"
+```
+
 ### `MultiFilesystem`
+
+This filesystem wraps multiple filesystems and allows operations across them by prefixing the path
+with a _scheme_ (ie `first://some/file.txt`):
+
+```php
+use Zenstruck\Filesystem\MultiFilesystem;
+
+/** @var \Zenstruck\Filesystem $first */
+/** @var \Zenstruck\Filesystem $second */
+
+$filesystem = new MultiFilesystem([
+    'first' => $first,
+    'second' => $second,
+]);
+
+$filesystem->file('first://some/file.txt'); // get the file from the first filesystem
+$filesystem->file('second://some/file.txt'); // get the file from the second filesystem
+
+$filesystem->copy('first://some/file.txt', 'first://another/file.txt');
+
+// you can even copy/move across filesystems
+$filesystem->copy('first://some/file.txt', 'second://another/file.txt');
+
+// access the underlying filesystems by name:
+$first = $filesystem->get('first');
+```
+
+A default can be provided - this removes the need to prefix path's with a scheme for this filesystem:
+
+```php
+use Zenstruck\Filesystem\MultiFilesystem;
+
+/** @var \Zenstruck\Filesystem $first */
+/** @var \Zenstruck\Filesystem $second */
+
+$filesystem = new MultiFilesystem([
+    'first' => $first,
+    'second' => $second,
+], default: 'first');
+
+$filesystem->file('some/file.txt'); // get the file from the first filesystem
+$filesystem->file('second://some/file.txt'); // get the file from the second filesystem
+```
 
 ### `ReadonlyFilesystem`
 
+Filesystem wrapper that prevents write operations (throws `\BadMethodCallException`'s if attempted):
+
+```php
+use Zenstruck\Filesystem\ReadonlyFilesystem;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+
+$filesystem = new ReadonlyFilesystem($filesystem);
+
+$filesystem->file('some/file.txt'); // ok
+$filesystem->delete('some/file.txt'); // throws \BadMethodCallException
+```
+
 ### `LoggableFilesystem`
+
+Filesystem wrapper that enables logging operations.
+
+> **Note**: If using multiple filesystems, it's important they are named to distinguish in logs.
+
+```php
+use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\LoggableFilesystem;
+
+/** @var \Psr\Log\LoggerInterface $logger */
+
+$filesystem = new AdapterFilesystem('/some/root', ['name' => 'public']); // note the name "public"
+$filesystem = new LoggableFilesystem($filesystem, $logger);
+
+$filesystem->file('some/file.txt'); // logs "[debug] Read "some/file.txt" (file) on filesystem "public""
+$filesystem->write('file1.txt', 'content'); // logs "[info] Wrote "string" to "file1.txt" on filesystem "public""
+$filesystem->delete('file1.txt'); // logs "[info] Deleted "file1.txt" on filesystem "public""
+```
+
+By default, read operations are logged at the _debug_ level and write operations are logged at the _info_ level.
+This can be customized:
+
+```php
+use Zenstruck\Filesystem\LoggableFilesystem;
+use Psr\Log\LogLevel
+
+/** @var \Zenstruck\Filesystem $filesystem */
+/** @var \Psr\Log\LoggerInterface $logger */
+
+$filesystem = new LoggableFilesystem($filesystem, $logger, [
+    'read' => false, // disable logging read operations
+    'delete' => LogLevel::NOTICE, // use the "notice" level for delete operations
+]);
+```
 
 ### `ArchiveFile`
 
+This is a special filesystem wrapping a zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
+
+```php
+use Zenstruck\Filesystem\ArchiveFile;
+
+$archive = new ArchiveFile('/local/path/to/archive.zip');
+$archive->file('some/file.txt');
+$archive->write('another/file.txt', 'content');
+
+(string) $archive; // /local/path/to/archive.zip
+```
+
+When creating without a path, creates a temporary archive file (that's deleted at the end of the script):
+
+```php
+use Zenstruck\Filesystem\ArchiveFile;
+
+$archive = new ArchiveFile();
+
+$archive->write('some/file.txt', 'content');
+$archive->write('another/file.txt', 'content');
+
+(string) $archive; // /tmp/...
+```
+
+Write operations can be queued and committed via a _transaction_:
+
+```php
+use Zenstruck\Filesystem\ArchiveFile;
+
+$archive = new ArchiveFile();
+
+$archive->beginTransaction(); // start the transaction
+$archive->write('some/file.txt', 'content');
+$archive->write('another/file.txt', 'content');
+$archive->commit(); // actually writes the above files
+
+// optionally pass a progress callback to commit
+$archive->commit(function() use ($progress) { // callback is called at most, 100 times
+    $progress->advance();
+});
+```
+
+Static helpers for quickly creating `zip`, `tar`, `tar.gz` and `tar.bz2` archives:
+
+```php
+use Zenstruck\Filesystem\ArchiveFile;
+
+$zipFile = ArchiveFile::zip('/some/local/file.txt');
+$tarFile = ArchiveFile::tar('/some/local/file.txt');
+$tarGzFile = ArchiveFile::tarGz('/some/local/file.txt');
+$tarBz2File = ArchiveFile::tarBz2('/some/local/file.txt');
+
+// the above methods can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
+$zipFile = ArchiveFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+```
+
 ### `TestFilesystem`
+
+> **Note**: `zenstruck/assert` is required to use the assertions (`composer require --dev zenstruck/assert`).
+
+This filesystem wraps another and provides assertions for your tests. When using PHPUnit, these assertions
+are converted to PHPUnit assertions.
+
+```php
+use Zenstruck\Filesystem\Test\TestFilesystem;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+
+$filesystem = new TestFilesystem($filesystem);
+
+$filesystem
+    ->assertExists('foo')
+    ->assertNotExists('invalid')
+    ->assertFileExists('file1.txt')
+    ->assertDirectoryExists('foo')
+    ->assertImageExists('symfony.png')
+    ->assertSame('symfony.png', 'fixture://symfony.png')
+    ->assertNotSame('file1.txt', 'fixture://symfony.png')
+    ->assertDirectoryExists('foo', function(TestDirectory $dir) {
+        $dir
+            ->assertCount(4)
+            ->files()->assertCount(2)
+        ;
+
+        $dir
+            ->recursive()
+            ->assertCount(5)
+            ->files()->assertCount(3)
+        ;
+    })
+    ->assertFileExists('file1.txt', function(TestFile $file) {
+        $file
+            ->assertVisibilityIs('public')
+            ->assertChecksum($file->checksum()->toString())
+            ->assertChecksum(function(Checksum $actual) use ($file) {
+                $this->assertSame($file->checksum()->useSha1()->toString(), $actual->useSha1()->toString());
+            })
+            ->assertContentIs('contents1')
+            ->assertContentIsNot('foo')
+            ->assertContentContains('1')
+            ->assertContentDoesNotContain('foo')
+            ->assertMimeTypeIs('text/plain')
+            ->assertMimeTypeIsNot('foo')
+            ->assertLastModified(function(\DateTimeInterface $actual) {
+                $this->assertTrue($actual->getTimestamp() > 0);
+            })
+            ->assertSize(9)
+            ->assertSize(function(Information $actual) {
+                $this->assertTrue($actual->isSmallerThan('1mb'));
+            })
+        ;
+    })
+    ->assertImageExists('symfony.png', function(TestImage $image) {
+        $image
+            ->assertHeight(678)
+            ->assertWidth(563)
+            ->assertHeight(function($actual) {
+                $this->assertGreaterThan(600, $actual);
+                $this->assertLessThan(700, $actual);
+            })
+            ->assertWidth(function($actual) {
+                $this->assertGreaterThan(500, $actual);
+                $this->assertLessThan(600, $actual);
+            })
+        ;
+    })
+;
+```
 
 #### `InteractsWithFilesystem`
 
-_(Note about `TestFilesystemProvider|FixtureFilesystemProvider`)_
+Use the `InteractsWithFilesystem` trait in your unit tests to quickly provide an in-memory filesystem
+that is reset before each test:
+
+> **Note**: By default, `league/flysystem-memory` is required: `composer require --dev league/flysystem-memory`.
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+
+class MyTest extends TestCase
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $this->filesystem() // instance of TestFilesystem wrapping an in-memory filesystem
+            ->write('file.txt', 'content')
+            ->assertExists('file.txt')
+        ;
+    }
+}
+```
+
+##### `TestFilesystemProvider`
+
+To use a different filesystem for your tests, have your test's (or base class) implement `TestFilesystemProvider`:
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\TestFilesystemProvider;
+
+class MyTest extends TestCase implements TestFilesystemProvider
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $this->filesystem() // instance of TestFilesystem wrapping the AdapterFilesystem defined below
+            ->write('file.txt', 'content')
+            ->assertExists('file.txt')
+        ;
+    }
+
+    public function getTestFilesystem(): string|Filesystem
+    {
+        return '/some/temp/dir'; // creates an AdapterFilesystem using the LocalAdapter for this directory
+    }
+}
+```
+
+##### `FixtureFilesystemProvider`
+
+A common requirement for filesystem tests, is to have a set of known fixture files that are used in your tests.
+Have your test's (or base class) implement `FixtureFilesystemProvider` to provide in your tests:
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\FixtureFilesystemProvider;
+
+class MyTest extends TestCase implements FixtureFilesystemProvider
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping a MultiFilesystem
+
+        $filesystem
+            ->write('file.txt', 'content') // accesses your test filesystem
+            ->assertExists('file.txt')
+            ->copy('fixture://some/file.txt', 'file.txt') // copy a fixture to your test filesystem
+        ;
+    }
+
+    public function getFixtureFilesystem(): string|Filesystem
+    {
+        return __DIR__.'/../fixtures';
+    }
+}
+```
+
+> **Note**: The fixture filesystem is readonly so you don't accidentally override your fixture files.
 
 ## Doctrine Integration
+
+> **Note**: Currently, Doctrine integration is only documented in the context of the [Symfony Bundle](#doctrine-entities).
 
 ## Symfony Integration
 
 ### Responses
 
+Helpful custom Symfony responses are provided:
+
+#### `FileResponse`
+
+Take a filesystem [`File`](#file) and send as a response:
+
+```php
+use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\FileResponse;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+
+$file = $filesystem->file('some/file.txt');
+
+$response = new FileResponse($file); // auto-adds content-type/last-modified headers
+
+// create inline/attachment responses
+$response = FileResponse::attachment($file); // auto names by the filename (file.txt)
+$response = FileResponse::inline($file); // auto names by the filename (file.txt)
+
+// customize the filename used for the content-disposition header
+$response = FileResponse::attachment($file, 'different-name.txt');
+$response = FileResponse::inline($file, 'different-name.txt');
+```
+
+#### `ArchiveFileResponse`
+
+Quickly zip file(s) and send as a response. Can be created with a local file, local directory, instance of
+[`File`](#file) or instance of [`Directory`](#directory).
+
+```php
+use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\ArchiveFileResponse;
+
+/** @var \SplFileInfo|\Zenstruck\Filesystem\Node\File|\Zenstruck\Filesystem\Node\Directory $what */
+
+$response = ArchiveFileResponse::zip($what);
+$response = ArchiveFileResponse::zip($what, 'data.zip'); // customize the content-disposition name (defaults to archive.zip)
+
+$response = ArchiveFileResponse::tarGz($what);
+$response = ArchiveFileResponse::tarGz($what, 'data.tar.gz'); // customize the content-disposition name (defaults to archive.tar.gz)
+
+$response = ArchiveFileResponse::tarBz2($what);
+$response = ArchiveFileResponse::tarBz2($what, 'data.tar.bz2'); // customize the content-disposition name (defaults to archive.tar.bz2)
+```
+
 ### Validators
+
+Both a file and image validator is provided. The constraints have the same API as Symfony's native
+[File](https://symfony.com/doc/current/reference/constraints/File.html) and
+[Image](https://symfony.com/doc/current/reference/constraints/Image.html) constraints.
+
+```php
+use Zenstruck\Filesystem\Bridge\Symfony\Validator\Constraints\File;
+use Zenstruck\Filesystem\Bridge\Symfony\Validator\Constraints\Image;
+
+/** @var \Symfony\Component\Validator\Validator\ValidatorInterface $validator */
+/** @var \Zenstruck\Filesystem $filesystem */
+
+$validator->validate($filesystem->file('file.txt', new File(maxSize: '1M')));
+
+$validator->validate($filesystem->image('image.png', new Image(maxWidth: 200, maxHeight: 200)));
+```
 
 ### Symfony Bundle
 
+A bundle is available to configure different filesystems for your application. Enable in your `config/bundles.php`:
+
+```php
+// config/bundles.php
+
+return [
+    // ...
+    Zenstruck\Filesystem\Bridge\Symfony\ZenstruckFilesystemBundle::class => ['all' => true]
+];
+```
+
 #### Configuration
 
-##### `RouteFileUrlFeature`
+Configure your application's filesystems:
+
+```yaml
+# config/packages/zenstruck_filesystem.yaml
+
+zenstruck_filesystem:
+    filesystems:
+        public: # create a public filesystem that has a public url
+            dsn: '%kernel.project_dir%/public/files'
+            url_prefix: /files # prefix File::url() path's with "/files"
+
+        private: # create a private filesystem that is readonly
+            dsn: '%kernel.project_dir%/var/files'
+            readonly: true
+
+    default_filesystem: public # set the "default" filesystem (defaults to first one defined above)
+```
+
+By default, defined filesystems have logging enabled. In your development environment, a profiler toolbar item
+is available summarizing the operations made across your filesystem(s):
+
+![toolbar screenshot](docs/assets/toolbar.png)
 
 #### Services
 
-#### Doctrine Entities
+Your defined filesystems can be autowired:
 
-##### `PendingFile` Namers
+```php
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\MultiFilesystem;
+
+class SomeController
+{
+    public function someAction(
+        Filesystem $public, // the public filesystem as defined in your config
+        Filesystem $private, // the private filesystem as defined in your config
+        Filesystem $filesystem, // an instance of MultiFilesystem wrapping both public/private filesystems
+        MultiFilesystem $multiFilesystem, // same as above
+    ) {
+        $public->file('some/file.txt')->url()->toString(); // "/files/some/file.txt"
+
+        $filesystem->copy('private://file.txt', 'public://file.txt'); // copy a private file to the public filesystem
+        $filesystem->copy('private://file.txt', 'file.txt'); // (same as above) default filesystem scheme can be omitted
+
+        $multiFilesystem->get('public'); // access the public filesystem
+        $multiFilesystem->get('private'); // access the private filesystem
+
+        // ...
+    }
+}
+```
 
 #### Testing
 
-_(Note about `FixtureFilesystemProvider`)_
-_(Note about performance improvements using (static) in-memory adapters)_
-_(Note about disabling clearing test filesystems before each test if using (static) in-memory adapters)_
+By default, in your `test` environment, your defined filesystem adapters are swapped with local adapters whose
+files live in `var/testfiles/{filesystem-name}`. When creating integration/functional tests (tests that extend
+`KernelTestCase`), use the [`InteractsWithFilesystem`](#interactswithfilesystem) trait to access your test
+filesystems.
+
+This trait automatically detects of you are in an integration/functional tests and makes your filesystems available.
+Additionally, it deletes the files before each test. This allows you to run a single test and debug the created
+files after.
+
+```php
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+
+class MyTest extends KernelTestCase
+{
+    use InteractsWithFilesystem;
+
+    public function test_something(): void
+    {
+        $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping a MultiFilesystem containing defined test filesystems
+
+        $filesystem->file('public://some/file.txt'); // access file from public filesystem
+        $filesystem->file('some/file.txt'); // (same as above) default filesystem scheme can be omitted
+
+        $filesystem->file('private://another/file.txt'); // access file from private filesystem
+    }
+}
+```
+
+> **Note**: See the primary [testing documentation](#testfilesystem) to see all available assertions.
+
+You can have your integration tests implement the [`FixtureFilesystemProvider`](#fixturefilesystemprovider)
+interface to provide fixtures:
+
+```php
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Filesystem\Test\FixtureFilesystemProvider;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+
+class MyTest extends KernelTestCase implements FixtureFilesystemProvider
+{
+    use InteractsWithFilesystem;
+
+    public function test_something(): void
+    {
+        $this->filesystem()->file('fixture://file.txt'); // access fixture files
+    }
+
+    public function getFixtureFilesystem(): string|Filesystem
+    {
+        return return __DIR__.'/../fixtures';
+    }
+}
+```
+
+##### Test Performance
+
+You can increase the speed of your tests by switching your test filesystems to use an in-memory adapter:
+
+> **Note**: `league/flysystem-memory` is required: `composer require --dev league/flysystem-memory`.
+
+```yaml
+# config/packages/zenstruck_filesystem.yaml
+
+when@test:
+    zenstruck_filesystem:
+        filesystems:
+            public:
+                test: 'in-memory:?static'
+            private:
+                test: 'in-memory:?static'
+```
+
+> **Note** the `?static` flag. This ensures the files persist between requests during each test.
+
+#### `RouteFileUrlFeature`
+
+A Symfony-specific `FileUrl` [feature](#features) is available to create `File::url()`'s using a route. This can
+be useful for serving private files via a signed url.
+
+First, create a controller to serve your private files:
+
+```php
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\FileResponse;
+
+class MyController
+{
+    #[Route('/private/file/{path<.+>}', name: 'private_file')]
+    public function myAction(string $path, Filesystem $private, UriSigner $signer, Request $request): FileResponse
+    {
+        if (!$signer->checkRequest($request)) {
+            throw new BadRequestHttpException('signing verification failed');
+        }
+
+        try {
+            $file = $private->file($path);
+        } catch (NodeNotFound) {
+            throw new NotFoundHttpException('file not found');
+        }
+
+        return FileResponse::attachment($file);
+    }
+}
+```
+
+Next, configure this feature:
+
+```yaml
+# config/packages/zenstruck_filesystem.yaml
+
+zenstruck_filesystem:
+    filesystems:
+        # ...
+
+        private:
+            # ...
+            route:
+                name: private_file
+                sign: true
+```
+
+Now, when generating URL's for your private filesystem files, they will use this route and sign them.
+
+#### Doctrine Entities
+
+If using the Doctrine ORM, you can add filesystem [`File`](#file)'s as columns on your entity's. This
+is done via a custom Doctrine DBAL type and is auto-configured when using the bundle. The File's path
+is stored as a string in your database. A Doctrine event subscriber takes care of loading/updating/removing
+the filesystem file.
+
+First, add to your entity:
+
+```php
+use Doctrine\ORM\Mapping as ORM;
+use Zenstruck\Filesystem\Node\File;
+
+#[ORM\Entity]
+class User
+{
+    // ...
+
+    #[ORM\Column(type: 'file', nullable: true, options: ['filesystem' => 'public'])]
+    public ?File $profileImage = null;
+}
+```
+
+Usage:
+
+```php
+/** @var \Doctrine\ORM\EntityManagerInterface $em */
+/** @var \Zenstruck\Filesystem $public */
+
+$user = $em->find(User::class, 1);
+$user->profileImage->mimeType() // string - lazily loads the file from the filesystem
+
+$user->profileImage = null;
+$em->flush(); // deletes the profile image from the filesystem
+
+$em->remove($user);
+$em->flush(); // deletes the profile image from the filesystem after deleting entity
+```
+
+##### `PendingFile`
+
+A special `PendingFile` object (extends `File`) is available for creating/updating entity `File`'s.
+
+```php
+use Zenstruck\Filesystem\Node\File\PendingFile;
+
+/** @var \Doctrine\ORM\EntityManagerInterface $em */
+/** @var \Symfony\Component\HttpFoundation\Request $request */
+
+$user = new User();
+$user->profileImage = new PendingFile('/local/filesystem/image.png');
+
+// PendingFile can be created with a Symfony\Component\HttpFoundation\File\UploadedFile
+$user->profileImage = new PendingFile($request->files->get('profile_image'));
+
+$em->persist($user);
+$em->flush(); // auto saves the pending file to the filesystem
+
+$user->profileImage = new PendingFile('/new/image.jpg');
+
+$em->flush(); // auto-removes old image and saves the new
+```
+
+##### Namer's
+
+By default, saving a `PendingFile` takes the original filename, slugifies it, and saves it to the root of the
+configured filesystem. This behaviour can be customized with namers that are defined on your column:
+
+```php
+use Doctrine\ORM\Mapping as ORM;
+use Zenstruck\Filesystem\Node\File;
+
+#[ORM\Entity]
+class User
+{
+    // ...
+
+    // Checksum Namer
+    #[ORM\Column(type: 'file', nullable: true, options: ['filesystem' => 'public', 'namer' => 'checksum'])]
+    public ?File $profileImage = null; // PendingFile's are saved as "<file-contents-checksum>.<original-extension>"
+
+    // ExpressionLanguage Namer
+    #[ORM\Column(
+        type: 'file',
+        nullable: true,
+        options: [
+            'filesystem' => 'public',
+            'namer' => 'expression_language',
+            'expression' => '"foo/bar/"~object.id~"/"~file.checksum()~"-"~name~ext'
+        ]
+    )]
+    public ?File $profileImage = null; // PendingFile's are saved as "foo/bar/<object id>/<file-contents-checksum>-<original-name-slug>.<original-extension>"
+}
+```
 
 #### Full Default Configuration
+
+```yaml
+zenstruck_filesystem:
+
+    # Filesystem configurations
+    filesystems:
+
+        # Prototype
+        name:
+
+            # Filesystem adapter DSN or, if prefixed with "@" filesystem adapter service id
+            dsn:                  ~ # Required, Example: '%kernel.project_dir%/public/files OR @my_adapter_service'
+
+            # Url prefix or multiple prefixes to use for this filesystem (can be an array)
+            url_prefix:
+
+                # Examples:
+                - /files
+                - 'https://cdn1.example.com'
+                - 'https://cdn2.example.com'
+
+            # Route to use for file urls
+            route:
+
+                # The route name
+                name:                 null
+
+                # Signed?
+                sign:                 false
+                reference_type:       0 # One of 1; 0; 3; 2
+                parameters:           []
+
+            # Set to true to create a "readonly" filesystem (write operations will fail)
+            readonly:             false
+
+            # Whether or not to log filesystem operations
+            log:                  true
+
+            # If false, disable
+            # If string, use as filesystem DSN and swap real adapter with this
+            # Defaults to false in env's other than "test"
+            # If not explicitly configured, in "test" env, defaults to "var/testfiles"
+            test:                 null
+
+            # Extra global adapter filesystem config
+            config:
+
+                # Example:
+                image_check_mime:    true
+
+    # Default filesystem name, if not configured, use first one
+    default_filesystem:   null
+    doctrine:
+        enabled:              true
+        events:
+
+            # Whether to register the post-load event listener
+            load:
+                enabled:              true
+
+                # Whether to load filesystem files by default
+                autoload:             true
+
+            # Whether to register the post-persist event listener
+            persist:
+                enabled:              true
+
+                # Whether to write pending filesystem files on entity persist
+                write_on_persist:     true
+
+            # Whether to register the pre/post-update event listeners
+            update:
+                enabled:              true
+
+                # Whether to save pending filesystem files on entity update
+                write_on_update:      true
+
+                # Whether to delete removed filesystem files on entity update
+                delete_on_update:     true
+
+            # Whether to register the post-remove event listener
+            remove:
+                enabled:              true
+
+                # Whether to delete filesystem files on entity remove by default
+                delete_on_remove:     true
+```

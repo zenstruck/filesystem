@@ -116,7 +116,8 @@ final class LoggableFilesystemTest extends FilesystemTest
             ->chmod('foo', 'public')
             ->copy('foo', 'file.png')
             ->delete('foo')
-            ->move('file.png', 'file2.png');
+            ->move('file.png', 'file2.png')
+        ;
 
         $filesystem->node('file2.png');
         $filesystem->file('file2.png');
