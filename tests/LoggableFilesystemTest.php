@@ -102,6 +102,43 @@ final class LoggableFilesystemTest extends FilesystemTest
         $this->assertStringContainsString('[emergency] Deleted "foo" on filesystem "default"', $log);
     }
 
+    /**
+     * @test
+     */
+    public function can_disable_logging_for_operations(): void
+    {
+        $resource = ResourceWrapper::inMemory();
+        $logger = new Logger(LogLevel::DEBUG, $resource->get());
+
+        $filesystem = (new LoggableFilesystem($this->filesystem(), $logger, ['read' => false]))
+            ->write('foo', 'bar')
+            ->mkdir('bar')
+            ->chmod('foo', 'public')
+            ->copy('foo', 'file.png')
+            ->delete('foo')
+            ->move('file.png', 'file2.png');
+
+        $filesystem->node('file2.png');
+        $filesystem->file('file2.png');
+        $filesystem->image('file2.png');
+        $filesystem->directory('bar');
+        $filesystem->has('file2.png');
+
+        $log = $resource->contents();
+        $resource->close();
+
+        $this->assertStringNotContainsString('Read "file2.png" (file) on filesystem "default"', $log);
+        $this->assertStringNotContainsString('Read "file2.png" (image) on filesystem "default"', $log);
+        $this->assertStringNotContainsString('Read "bar" (directory) on filesystem "default"', $log);
+        $this->assertStringNotContainsString('Checked existence of "file2.png" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Wrote "string" to "foo" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Created directory "bar" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Set visibility of "foo" to "public" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Copied "foo" to "file.png" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Moved "file.png" to "file2.png" on filesystem "default"', $log);
+        $this->assertStringContainsString('[info] Deleted "foo" on filesystem "default"', $log);
+    }
+
     protected function createFilesystem(): Filesystem
     {
         return new LoggableFilesystem($this->filesystem(), new NullLogger());
