@@ -781,14 +781,15 @@ is available summarizing the operations made across your filesystem(s):
 
 The following can be used for a filesystem adapter _DSN's_:
 
-| DSN                                 | Adapter                     |
-|-------------------------------------|-----------------------------|
-| `%kernel.project_dir%/public/files` | `LocalAdapter`              |
-| `in-memory:`                        | `InMemoryFilesystemAdapter` |
-| `in-memory:?static#name`            | `StaticInMemoryAdapter`     |
-| `ftp://user:pass@host.com:21/root`  | `FtpAdapter`                |
-| `ftps://user:pass@host.com:21/root` | `FtpAdapter`                |
-| `@service_id`                       | _any_                       |
+| DSN                                                        | Adapter                              |
+|------------------------------------------------------------|--------------------------------------|
+| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                       |
+| `in-memory:`                                               | `InMemoryFilesystemAdapter`          |
+| `in-memory:?static#name`                                   | `StaticInMemoryAdapter`              |
+| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter`                         |
+| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter`                         |
+| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` |
+| `@service_id`                                              | _any_                                |
 
 #### Services
 
