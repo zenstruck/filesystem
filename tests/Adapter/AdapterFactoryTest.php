@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Tests\Adapter;
 
+use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
@@ -30,6 +31,8 @@ final class AdapterFactoryTest extends TestCase
         yield ['file:///tmp', LocalAdapter::class];
         yield ['in-memory:', InMemoryFilesystemAdapter::class];
         yield ['in-memory:?static', StaticInMemoryAdapter::class];
+        yield ['ftp://foo:bar@example.com/path', FtpAdapter::class];
+        yield ['ftps://foo:bar@example.com/path', FtpAdapter::class];
     }
 
     /**

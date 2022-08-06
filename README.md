@@ -777,6 +777,19 @@ is available summarizing the operations made across your filesystem(s):
 
 ![toolbar screenshot](docs/assets/toolbar.png)
 
+##### Available DSN's
+
+The following can be used for a filesystem adapter _DSN's_:
+
+| DSN                                 | Adapter                     |
+|-------------------------------------|-----------------------------|
+| `%kernel.project_dir%/public/files` | `LocalAdapter`              |
+| `in-memory:`                        | `InMemoryFilesystemAdapter` |
+| `in-memory:?static#name`            | `StaticInMemoryAdapter`     |
+| `ftp://user:pass@host.com:21/root`  | `FtpAdapter`                |
+| `ftps://user:pass@host.com:21/root` | `FtpAdapter`                |
+| `@service_id`                       | _any_                       |
+
 #### Services
 
 Your defined filesystems can be autowired:
