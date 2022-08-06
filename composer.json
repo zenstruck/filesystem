@@ -26,7 +26,7 @@
         "league/flysystem-ftp": "^3.0",
         "league/flysystem-memory": "^3.0",
         "league/flysystem-sftp-v3": "^3.0",
-        "league/flysystem-ziparchive": "^3.0",
+        "league/flysystem-ziparchive": "^3.2",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
         "symfony/expression-language": "^5.4|^6.0",
