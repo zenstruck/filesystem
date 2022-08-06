@@ -788,6 +788,7 @@ The following can be used for a filesystem adapter _DSN's_:
 | `in-memory:?static#name`                                   | `StaticInMemoryAdapter`              |
 | `ftp://user:pass@host.com:21/root`                         | `FtpAdapter`                         |
 | `ftps://user:pass@host.com:21/root`                        | `FtpAdapter`                         |
+| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter`                        |
 | `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` |
 | `@service_id`                                              | _any_                                |
 

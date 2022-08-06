@@ -10,6 +10,8 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use League\Flysystem\PhpseclibV3\SftpAdapter;
+use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use Zenstruck\Uri;
 
 /**
@@ -23,10 +25,30 @@ final class AdapterFactory
 
         return match ($dsn->scheme()->toString()) {
             'ftp', 'ftps' => self::createFtpAdapter($dsn),
+            'sftp' => self::createSftpAdapter($dsn),
             's3' => self::createS3Adapter($dsn),
             'in-memory' => self::createInMemoryAdapter($dsn, $name ?? $dsn->fragment() ?? 'default'),
             default => new LocalAdapter($dsn->path()->absolute()),
         };
+    }
+
+    private static function createSftpAdapter(Uri $dsn): FilesystemAdapter
+    {
+        if (!\class_exists(SftpAdapter::class)) {
+            throw new \LogicException('league/flysystem-sftp-v3 is required to use the SFTP adapter. Install with "composer require league/flysystem-sftp-v3".');
+        }
+
+        return new SftpAdapter(
+            new SftpConnectionProvider(
+                host: $dsn->host(),
+                username: $dsn->user() ?? throw new \InvalidArgumentException('Username is required for SftpAdapter.'),
+                password: $dsn->pass(),
+                privateKey: $dsn->query()->get('private-key'),
+                passphrase: $dsn->query()->get('passphrase'),
+                port: $dsn->port() ?? 22,
+            ),
+            $dsn->path()->absolute(),
+        );
     }
 
     private static function createS3Adapter(Uri $dsn): FilesystemAdapter
