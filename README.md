@@ -162,7 +162,7 @@ $file->dirname(); // "nested"
 $file->extension(); // "txt"
 $file->nameWithoutExtension(); // "file"
 
-$file->directory(); // Zenstruck\Node\Directory (for "nested")
+$file->directory(); // Zenstruck\Node\Directory for the file's parent directory (ie "nested")
 
 $file->contents(); // string of the file's contents
 $file->read(); // resource stream of the file's contents
@@ -270,6 +270,9 @@ $filtered = $dir
     ->smallerThan('1gb')
     ->matchingName('*.txt')
     ->notMatchingName(['foo*', 'bar*'])
+    ->filter(function(\Zenstruck\Filesystem\Node\File|\Zenstruck\Filesystem\Node\File $node) {
+        // add your own filter, return true if should be included
+    })
 ;
 
 foreach ($filtered as $file) {
