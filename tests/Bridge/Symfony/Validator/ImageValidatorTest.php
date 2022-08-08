@@ -35,7 +35,7 @@ final class ImageValidatorTest extends KernelTestCase
     public function successful_file(): void
     {
         $violations = self::getContainer()->get(ValidatorInterface::class)->validate(
-            $this->filesystem()->write('foo.gif', FilesystemTest::FIXTURE_DIR.'/symfony.gif')->last(),
+            $this->filesystem()->write('foo.gif', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.gif'))->last(),
             new Image()
         );
 

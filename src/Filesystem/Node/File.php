@@ -9,6 +9,7 @@ use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
+use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Uri;
 
 /**
@@ -47,6 +48,15 @@ class File implements Node
         if ($mimeType = $attributes->mimeType()) {
             $this->mimeType = $mimeType;
         }
+    }
+
+    /**
+     * Create a temporary, "real, local file". This file is deleted at the
+     * end of the script.
+     */
+    final public function tempFile(): \SplFileInfo
+    {
+        return TempFile::for($this);
     }
 
     final public function size(): Information

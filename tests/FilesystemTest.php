@@ -106,7 +106,7 @@ abstract class FilesystemTest extends TestCase
     public function can_get_image(): void
     {
         $filesystem = $this->createFilesystem();
-        $filesystem->write('images', self::FIXTURE_DIR);
+        $filesystem->write('images', new \SplFileInfo(self::FIXTURE_DIR));
 
         foreach (['jpg', 'gif', 'png'] as $ext) {
             $image = $filesystem->image('images/symfony.'.$ext);
@@ -152,7 +152,7 @@ abstract class FilesystemTest extends TestCase
      */
     public function can_get_image_for_image_file_without_extension(): void
     {
-        $filesystem = $this->createFilesystem()->write('foo', self::FIXTURE_DIR.'/symfony.png');
+        $filesystem = $this->createFilesystem()->write('foo', new \SplFileInfo(self::FIXTURE_DIR.'/symfony.png'));
 
         $this->assertSame('image/png', $filesystem->image('foo')->mimeType());
     }
@@ -719,7 +719,7 @@ abstract class FilesystemTest extends TestCase
     {
         $filesystem = $this->createFilesystem();
 
-        $filesystem->write('file.txt', __FILE__);
+        $filesystem->write('file.txt', new \SplFileInfo(__FILE__));
 
         $this->assertStringContainsString('<?php', $filesystem->file('file.txt')->contents());
     }
@@ -735,7 +735,7 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertStringNotContainsString('<?php', $filesystem->file('file.txt')->contents());
 
-        $filesystem->write('file.txt', __FILE__);
+        $filesystem->write('file.txt', new \SplFileInfo(__FILE__));
 
         $this->assertStringContainsString('<?php', $filesystem->file('file.txt')->contents());
     }

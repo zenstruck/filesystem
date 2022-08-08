@@ -9,7 +9,6 @@ use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToWriteFile;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\LocalAdapter;
@@ -278,16 +277,6 @@ final class AdapterFilesystem implements Filesystem
             }
 
             return $this->write($path, $file, $config);
-        }
-
-        if (\is_string($value)) { // check if local filename
-            try {
-                if (Util::fs()->exists($value)) {
-                    $value = new \SplFileInfo($value);
-                }
-            } catch (IOException) {
-                // value length was too long to be a filename, keep as string
-            }
         }
 
         if ($value instanceof \SplFileInfo && $value->isDir()) { // check if local directory
