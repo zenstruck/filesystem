@@ -14,7 +14,7 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
  */
 final class FileType extends StringType
 {
-    public const NAME = 'file';
+    public const NAME = File::class;
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {

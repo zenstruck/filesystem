@@ -990,7 +990,7 @@ class User
 {
     // ...
 
-    #[ORM\Column(type: 'file', nullable: true, options: ['filesystem' => 'public'])]
+    #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public'])]
     public ?File $profileImage = null;
 }
 ```
@@ -1050,12 +1050,12 @@ class User
     // ...
 
     // Checksum Namer
-    #[ORM\Column(type: 'file', nullable: true, options: ['filesystem' => 'public', 'namer' => 'checksum'])]
+    #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'checksum'])]
     public ?File $profileImage = null; // PendingFile's are saved as "<file-contents-checksum>.<original-extension>"
 
     // ExpressionLanguage Namer
     #[ORM\Column(
-        type: 'file',
+        type: File::class,
         nullable: true,
         options: [
             'filesystem' => 'public',
