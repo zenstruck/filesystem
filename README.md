@@ -371,6 +371,46 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
 (string) $filesystem->file('another/file.txt')->url(); // "https://cdn2.example.com/files/another/file.txt"
 ```
 
+##### Custom Features
+
+You can add your own custom features by:
+
+1. Creating a `FilesystemAdapter` that implements the feature's interface and creating your `AdapterFilesystem` with
+   this adapter.
+2. Creating a class that implements the feature's interface and adding to the `AdapterFilesystem`'s feature set.
+
+Let's look at a _meta-code_ example that creates a (optionally temporary) signed file url from S3:
+
+```php
+use Zenstruck\Filesystem\Feature\FileUrl;
+use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Uri;
+
+class S3FileUrlFeature implements FileUrl
+{
+    public function __construct(private $someS3Client) {}
+
+    public function urlFor(File $file, mixed $options = []): Uri
+    {
+        $url = $this->someS3Client->createSignedUrl($file->path(), ['expires' => $options['expiry'] ?? null]);
+
+        return Uri::new($url);
+    }
+}
+```
+
+Create your adapter with this feature and use:
+
+```php
+use Zenstruck\Filesystem\AdapterFilesystem;
+
+$filesystem = new AdapterFilesystem($yourAdapter, features: [new S3FileUrlFeature($s3Client)]);
+
+$filesystem->file('some/file.txt')->url(); // creates a signed url from your feature
+
+$filesystem->file('some/file.txt')->url(['expires' => 'tomorrow']); // creates a temporary signed url from your feature
+```
+
 ### `MultiFilesystem`
 
 This filesystem wraps multiple filesystems and allows operations across them by prefixing the path
