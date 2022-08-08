@@ -34,7 +34,12 @@ final class Configuration implements ConfigurationInterface
                                 ->isRequired()
                                 ->cannotBeEmpty()
                                 ->info('Filesystem adapter DSN or, if prefixed with "@" filesystem adapter service id')
-                                ->example('%kernel.project_dir%/public/files OR @my_adapter_service')
+                                ->example([
+                                    '%kernel.project_dir%/public/files',
+                                    'ftp://foo:bar@example.com/path',
+                                    's3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1',
+                                    '@my_adapter_service',
+                                ])
                             ->end()
                             ->variableNode('url_prefix')
                                 ->defaultNull()

@@ -1078,8 +1078,14 @@ zenstruck_filesystem:
         # Prototype
         name:
 
-            # Filesystem adapter DSN or, if prefixed with "@" filesystem adapter service id
-            dsn:                  ~ # Required, Example: '%kernel.project_dir%/public/files OR @my_adapter_service'
+        # Filesystem adapter DSN or, if prefixed with "@" filesystem adapter service id
+            dsn: ~ # Required
+
+                # Examples:
+                # - '%kernel.project_dir%/public/files'
+                # - 'ftp://foo:bar@example.com/path'
+                # - 's3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1'
+                # - '@my_adapter_service'
 
             # Url prefix or multiple prefixes to use for this filesystem (can be an array)
             url_prefix:
