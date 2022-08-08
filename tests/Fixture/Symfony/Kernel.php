@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Filesystem\Bridge\Symfony\ZenstruckFilesystemBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
+use Zenstruck\ZenstruckSignedUrlBundle;
 
 final class Kernel extends BaseKernel
 {
@@ -29,6 +30,7 @@ final class Kernel extends BaseKernel
         yield new DoctrineBundle();
         yield new TwigBundle();
         yield new ZenstruckFoundryBundle();
+        yield new ZenstruckSignedUrlBundle();
         yield new ZenstruckFilesystemBundle();
     }
 
@@ -73,7 +75,10 @@ final class Kernel extends BaseKernel
                 ],
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',
-                    'route' => 'private',
+                    'route' => [
+                        'name' => 'private',
+                        'sign' => true,
+                    ],
                 ],
             ],
         ]);

@@ -960,7 +960,10 @@ when@test:
 #### `RouteFileUrlFeature`
 
 A Symfony-specific `FileUrl` [feature](#features) is available to create `File::url()`'s using a route. This can
-be useful for serving private files via a signed url.
+be useful for serving private files via a signed/expiring url.
+
+> **Note**: to create expiring urls, [zenstruck/signed-url-bundle](https://github.com/zenstruck/signed-url-bundle)
+> is required (`composer require zenstruck/signed-url-bundle`).
 
 First, create a controller to serve your private files:
 
@@ -973,13 +976,42 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\FileResponse;
+use Zenstruck\SignedUrl\Verifier;
+use Zenstruck\SignedUrl\Exception\UrlHasExpired;
+use Zenstruck\SignedUrl\Exception\UrlVerificationFailed;
 
 class MyController
 {
+    /**
+     * Standard Symfony signed urls.
+     */
     #[Route('/private/file/{path<.+>}', name: 'private_file')]
     public function myAction(string $path, Filesystem $private, UriSigner $signer, Request $request): FileResponse
     {
         if (!$signer->checkRequest($request)) {
+            throw new BadRequestHttpException('signing verification failed');
+        }
+
+        try {
+            $file = $private->file($path);
+        } catch (NodeNotFound) {
+            throw new NotFoundHttpException('file not found');
+        }
+
+        return FileResponse::attachment($file);
+    }
+
+    /**
+     * Expiring URL support. See
+     */
+    #[Route('/private/file/{path<.+>}', name: 'private_file')]
+    public function myAction(string $path, Filesystem $private, Verifier $verifier, Request $request): FileResponse
+    {
+        try {
+            $verifier->verify($request);
+        } catch (UrlHasExpired) {
+            throw new BadRequestHttpException('url has expired');
+        } catch (UrlVerificationFailed) {
             throw new BadRequestHttpException('signing verification failed');
         }
 
@@ -1010,7 +1042,20 @@ zenstruck_filesystem:
                 sign: true
 ```
 
-Now, when generating URL's for your private filesystem files, they will use this route and sign them.
+Now, when generating URL's for your private filesystem files, they will use this route and sign them:
+
+```php
+/** @var \Zenstruck\Filesystem $filesystem */
+
+// create a signed url
+$filesystem->file('some/file.txt')->url()->toString(); // "http://localhost/private/file/some/file.txt?_hash=..."
+
+// create a temporary signed url
+$filesystem->file('some/file.txt')
+    ->url(['expires' => '+30 minutes'])
+    ->toString() // "http://localhost/private/file/some/file.txt?_hash=...&_expires=..."
+;
+```
 
 #### Doctrine Entities
 
@@ -1120,7 +1165,6 @@ zenstruck_filesystem:
 
         # Filesystem adapter DSN or, if prefixed with "@" filesystem adapter service id
             dsn: ~ # Required
-
                 # Examples:
                 # - '%kernel.project_dir%/public/files'
                 # - 'ftp://foo:bar@example.com/path'
@@ -1143,6 +1187,13 @@ zenstruck_filesystem:
 
                 # Signed?
                 sign:                 false
+
+                # Expire the link after x seconds or a relative datetime string (requires zenstruck/signed-url-bundle)
+                expires:              null
+                    # Examples:
+                    # - '1800'
+                    # - '+1 day'
+
                 reference_type:       0 # One of 1; 0; 3; 2
                 parameters:           []
 

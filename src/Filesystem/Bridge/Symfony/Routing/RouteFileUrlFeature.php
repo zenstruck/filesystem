@@ -9,6 +9,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\SignedUrl\Generator;
 use Zenstruck\Uri;
 
 /**
@@ -23,7 +24,8 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
      *     name: string,
      *     parameters?: array<string,mixed>,
      *     reference_type?: int,
-     *     sign?: bool
+     *     sign?: bool,
+     *     expires?: int|string,
      * } $config
      */
     public function __construct(private array $config, private ContainerInterface $container)
@@ -36,13 +38,30 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
             throw new UnsupportedFeature(\sprintf('Can only use array for $options in %s. "%s" given.', self::class, \get_debug_type($options)));
         }
 
-        $url = $this->container->get(UrlGeneratorInterface::class)->generate(
-            $this->config['name'] ?? throw new \InvalidArgumentException('A route was not set.'),
-            \array_merge($this->config['parameters'] ?? [], $options, ['path' => $file->path()]),
-            $this->config['reference_type'] ?? UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        $sign = $this->config['sign'] ?? false;
+        $expires = $options['expires'] ?? $this->config['expires'] ?? null;
 
-        if ($this->config['sign'] ?? false) {
+        unset($options['expires']);
+
+        if ($expires) {
+            $sign = true;
+        }
+
+        $name = $this->config['name'] ?? throw new \InvalidArgumentException('A route was not set.');
+        $parameters = \array_merge($this->config['parameters'] ?? [], $options, ['path' => $file->path()]);
+        $ref = $this->config['reference_type'] ?? UrlGeneratorInterface::ABSOLUTE_URL;
+
+        if ($expires) {
+            if (!$this->container->has(Generator::class)) {
+                throw new \LogicException('zenstruck/signed-url-bundle is required to create expiring URLs (composer require zenstruck/signed-url-bundle)');
+            }
+
+            return Uri::new($this->container->get(Generator::class)->build($name, $parameters, $ref)->expires($expires));
+        }
+
+        $url = $this->container->get(UrlGeneratorInterface::class)->generate($name, $parameters, $ref);
+
+        if ($sign) {
             $url = $this->container->get(UriSigner::class)->sign($url);
         }
 
@@ -54,6 +73,7 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
         return [
             UrlGeneratorInterface::class,
             UriSigner::class,
+            '?'.Generator::class,
         ];
     }
 }

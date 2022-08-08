@@ -45,7 +45,19 @@ final class ServiceTest extends KernelTestCase
     {
         $file = $this->filesystem()->write('private://nested/file.txt', 'content')->last()->ensureFile();
 
-        $this->assertSame('http://localhost/some/prefix/nested/file.txt', $file->url()->toString());
-        $this->assertSame('http://localhost/some/prefix/nested/file.txt?foo=bar', $file->url(['foo' => 'bar'])->toString());
+        $url = $file->url();
+        $this->assertStringContainsString('http://localhost/some/prefix/nested/file.txt', $url->toString());
+        $this->assertTrue($url->query()->has('_hash'));
+
+        $url = $file->url(['foo' => 'bar']);
+        $this->assertStringContainsString('http://localhost/some/prefix/nested/file.txt', $url->toString());
+        $this->assertStringContainsString('?_hash=', $url->toString());
+        $this->assertStringContainsString('&foo=bar', $url->toString());
+
+        // enable expiring url
+        $url = $file->url(['expires' => '+30 minutes']);
+        $this->assertStringContainsString('http://localhost/some/prefix/nested/file.txt', $url->toString());
+        $this->assertTrue($url->query()->has('_hash'));
+        $this->assertTrue($url->query()->has('_expires'));
     }
 }

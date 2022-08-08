@@ -37,7 +37,8 @@
         "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
         "zenstruck/assert": "^1.2",
-        "zenstruck/foundry": "^1.21"
+        "zenstruck/foundry": "^1.21",
+        "zenstruck/signed-url-bundle": "^0.1.0"
     },
     "config": {
         "preferred-install": "dist",
