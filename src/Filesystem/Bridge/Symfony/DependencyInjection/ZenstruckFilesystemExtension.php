@@ -271,6 +271,6 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
-        $container->registerAliasForArgument($filesystem, Filesystem::class, $name);
+        $container->registerAliasForArgument($filesystem, Filesystem::class, $name.'Filesystem');
     }
 }

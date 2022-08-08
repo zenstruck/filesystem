@@ -800,16 +800,16 @@ is available summarizing the operations made across your filesystem(s):
 
 The following can be used for a filesystem adapter _DSN's_:
 
-| DSN                                                        | Adapter                              |
-|------------------------------------------------------------|--------------------------------------|
-| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                       |
-| `in-memory:`                                               | `InMemoryFilesystemAdapter`          |
-| `in-memory:?static#name`                                   | `StaticInMemoryAdapter`              |
-| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter`                         |
-| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter`                         |
-| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter`                        |
-| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` |
-| `@service_id`                                              | _any_                                |
+| DSN                                                        | Adapter                                                 |
+|------------------------------------------------------------|---------------------------------------------------------|
+| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                                          |
+| `in-memory:`                                               | `InMemoryFilesystemAdapter`                             |
+| `in-memory:?static#name`                                   | `StaticInMemoryAdapter`                                 |
+| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter`                                            |
+| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter`                                            |
+| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter`                                           |
+| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter`                    |
+| `@service_id`                                              | _Custom service id that implements `FilesystemAdapter`_ |
 
 #### Services
 
@@ -822,12 +822,12 @@ use Zenstruck\Filesystem\MultiFilesystem;
 class SomeController
 {
     public function someAction(
-        Filesystem $public, // the public filesystem as defined in your config
-        Filesystem $private, // the private filesystem as defined in your config
+        Filesystem $publicFilesystem, // the public filesystem as defined in your config
+        Filesystem $privateFilesystem, // the private filesystem as defined in your config
         Filesystem $filesystem, // an instance of MultiFilesystem wrapping both public/private filesystems
         MultiFilesystem $multiFilesystem, // same as above
     ) {
-        $public->file('some/file.txt')->url()->toString(); // "/files/some/file.txt"
+        $publicFilesystem->file('some/file.txt')->url()->toString(); // "/files/some/file.txt"
 
         $filesystem->copy('private://file.txt', 'public://file.txt'); // copy a private file to the public filesystem
         $filesystem->copy('private://file.txt', 'file.txt'); // (same as above) default filesystem scheme can be omitted

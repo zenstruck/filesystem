@@ -8,8 +8,8 @@ final class Service
 {
     public function __construct(
         public Filesystem $general,
-        public Filesystem $public,
-        public Filesystem $private,
+        public Filesystem $publicFilesystem,
+        public Filesystem $privateFilesystem,
     ) {
     }
 }

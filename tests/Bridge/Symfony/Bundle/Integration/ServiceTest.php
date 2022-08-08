@@ -24,8 +24,8 @@ final class ServiceTest extends KernelTestCase
 
         $this->assertInstanceOf(MultiFilesystem::class, $service->general);
         $this->assertSame('public', $service->general->name());
-        $this->assertSame('public', $service->public->name());
-        $this->assertSame('private', $service->private->name());
+        $this->assertSame('public', $service->publicFilesystem->name());
+        $this->assertSame('private', $service->privateFilesystem->name());
     }
 
     /**
