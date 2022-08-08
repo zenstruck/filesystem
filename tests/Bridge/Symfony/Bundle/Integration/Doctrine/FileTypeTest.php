@@ -25,7 +25,7 @@ final class FileTypeTest extends KernelTestCase
         $this->filesystem()->assertNotExists('nested/file.png');
 
         $post = Entity1Factory::createOne([
-            'file' => $this->filesystem()->write('nested/file.png', FilesystemTest::FIXTURE_DIR.'/symfony.png')->last(),
+            'file' => $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last(),
         ]);
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
@@ -45,7 +45,7 @@ final class FileTypeTest extends KernelTestCase
         $this->filesystem()->assertNotExists('nested/file.png');
 
         $post = Entity1Factory::createOne([
-            'file' => $this->filesystem()->write('nested/file.png', FilesystemTest::FIXTURE_DIR.'/symfony.png')->last(),
+            'file' => $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last(),
         ]);
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
@@ -69,7 +69,7 @@ final class FileTypeTest extends KernelTestCase
             'file' => null,
         ]);
 
-        $post->file = $this->filesystem()->write('nested/file.png', FilesystemTest::FIXTURE_DIR.'/symfony.png')->last();
+        $post->file = $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
         $post->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
@@ -85,7 +85,7 @@ final class FileTypeTest extends KernelTestCase
             'file' => $this->filesystem()->write('nested/file1.png', 'content')->last(),
         ]);
 
-        $post->file = $this->filesystem()->write('nested/file2.png', FilesystemTest::FIXTURE_DIR.'/symfony.png')->last();
+        $post->file = $this->filesystem()->write('nested/file2.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
         $post->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
