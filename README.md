@@ -184,7 +184,7 @@ $file->mimeType(); // string (ie text/plain)
 $file->visibility(); // string (ie public/private)
 
 // size
-$size = $file->size(); // Zenstruck\Dimension\Information
+$size = $file->size(); // Zenstruck\Dimension\Information (see https://github.com/zenstruck/dimension#information-object)
 (string) $size; // string (ie 23234 B)
 $size->bytes(); // int (file size in bytes)
 $size->humanize(); // string (ie 1.1 kB)

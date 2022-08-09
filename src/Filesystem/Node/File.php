@@ -59,6 +59,9 @@ class File implements Node
         return TempFile::for($this);
     }
 
+    /**
+     * @see https://github.com/zenstruck/dimension#information-object
+     */
     final public function size(): Information
     {
         return $this->size ??= Information::binary($this->operator()->fileSize($this->path()));
