@@ -33,7 +33,7 @@ final class ExpressionNamerTest extends KernelTestCase
         $file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg');
 
         yield ['foo/{name}{ext}', $file, 'foo/some-crazy-file.png'];
-        yield ['foo/{checksum}-{name}{ext}', $file, 'foo/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['foo/{checksum}-{name}{ext}', $file, 'foo/ac6884fc84724d792649552e7211843a-some-crazy-file.png'];
     }
 
     /**

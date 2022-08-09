@@ -202,7 +202,7 @@ final class FileTypeTest extends KernelTestCase
         yield ['fileSlugify', 'file no extension', 'file-no-extension'];
 
         // checksum
-        yield ['fileChecksum', 'some CRazy file.pNg', 'f75b8179e4bbe7e2b4a074dcef62de95.png'];
+        yield ['fileChecksum', 'some CRazy file.pNg', 'ac6884fc84724d792649552e7211843a.png'];
         yield ['fileChecksum', 'file no extension', '68aebfb83ffdc6bf16e17a8ebd3b8c35'];
 
         // custom expression
@@ -210,11 +210,11 @@ final class FileTypeTest extends KernelTestCase
         yield ['fileExpression', 'file no extension', 'foo/bar/file-no-extension'];
 
         // twig
-        yield ['fileTwig', 'some CRazy file.pNg', 'foo/bar/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileTwig', 'some CRazy file.pNg', 'foo/bar/ac6884fc84724d792649552e7211843a-some-crazy-file.png'];
         yield ['fileTwig', 'file no extension', 'foo/bar/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
 
         // expression language
-        yield ['fileExpressionLanguage', 'some CRazy file.pNg', 'foo/bar/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileExpressionLanguage', 'some CRazy file.pNg', 'foo/bar/ac6884fc84724d792649552e7211843a-some-crazy-file.png'];
         yield ['fileExpressionLanguage', 'file no extension', 'foo/bar/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
     }
 }
