@@ -14,9 +14,13 @@ trait IsLazyFile
 {
     private Filesystem $filesystem;
 
-    public function __construct(string $path)
+    public function __construct(string $path, ?Filesystem $filesystem = null)
     {
         $this->path = $path;
+
+        if ($filesystem) {
+            $this->filesystem = $filesystem;
+        }
     }
 
     public function setFilesystem(Filesystem $filesystem): void

@@ -100,12 +100,13 @@ final class FileTypeTest extends KernelTestCase
     {
         $this->filesystem()->assertNotExists('composer.json');
 
-        Entity1Factory::createOne([
-            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png'),
+        $entity = Entity1Factory::createOne([
+            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']),
         ]);
 
-        $this->filesystem()->assertExists('symfony.png');
-        $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
+        $this->filesystem()->assertExists($entity->file->path());
+        $this->filesystem()->assertExists('some-crazy-file.png');
+        $this->assertSame('image/png', $entity->file->mimeType());
     }
 
     /**
@@ -117,11 +118,12 @@ final class FileTypeTest extends KernelTestCase
             'file' => null,
         ]);
 
-        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png');
+        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
         $post->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
-        $this->filesystem()->assertExists('symfony.png');
+        $this->filesystem()->assertExists('some-crazy-file.png');
+        $this->filesystem()->assertExists(Entity1Factory::first()->file->path());
     }
 
     /**
@@ -135,12 +137,36 @@ final class FileTypeTest extends KernelTestCase
 
         $this->filesystem()->assertExists('nested/file1.png');
 
-        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png');
+        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
         $post->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertNotExists('nested/file1.png');
-        $this->filesystem()->assertExists('symfony.png');
+        $this->filesystem()->assertExists('some-crazy-file.png');
+        $this->filesystem()->assertExists(Entity1Factory::first()->file->path());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_callback_for_pending_file_namer(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function default_namer(): void
+    {
+        $this->markTestIncomplete();
+
+        $entity = Entity1Factory::createOne([
+            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png'),
+        ]);
+
+        $this->filesystem()->assertExists($entity->file->path());
+        $this->assertMatchesRegularExpression('#symfony-1-[0-9a-z]{6}\.png#', $entity->file->path());
     }
 
     /**
@@ -156,14 +182,11 @@ final class FileTypeTest extends KernelTestCase
         ]);
 
         $this->filesystem()->assertExists($expected);
+        $this->filesystem()->assertExists(Entity1Factory::first()->{$property}->path());
     }
 
     public static function namerProvider(): iterable
     {
-        // default (slugify)
-        yield ['file', 'some CRazy file.pNg', 'some-crazy-file.png'];
-        yield ['file', 'file no extension', 'file-no-extension'];
-
         // slugify
         yield ['fileSlugify', 'some CRazy file.pNg', 'some-crazy-file.png'];
         yield ['fileSlugify', 'file no extension', 'file-no-extension'];
@@ -172,16 +195,16 @@ final class FileTypeTest extends KernelTestCase
         yield ['fileChecksum', 'some CRazy file.pNg', 'f75b8179e4bbe7e2b4a074dcef62de95.png'];
         yield ['fileChecksum', 'file no extension', '68aebfb83ffdc6bf16e17a8ebd3b8c35'];
 
-        // expression
+        // custom expression
         yield ['fileExpression', 'some CRazy file.pNg', 'foo/bar/some-crazy-file.png'];
         yield ['fileExpression', 'file no extension', 'foo/bar/file-no-extension'];
 
         // twig
-        yield ['fileTwig', 'some CRazy file.pNg', 'foo/bar/1/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
-        yield ['fileTwig', 'file no extension', 'foo/bar/1/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
+        yield ['fileTwig', 'some CRazy file.pNg', 'foo/bar/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileTwig', 'file no extension', 'foo/bar/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
 
         // expression language
-        yield ['fileExpressionLanguage', 'some CRazy file.pNg', 'foo/bar/1/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
-        yield ['fileExpressionLanguage', 'file no extension', 'foo/bar/1/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
+        yield ['fileExpressionLanguage', 'some CRazy file.pNg', 'foo/bar/f75b8179e4bbe7e2b4a074dcef62de95-some-crazy-file.png'];
+        yield ['fileExpressionLanguage', 'file no extension', 'foo/bar/68aebfb83ffdc6bf16e17a8ebd3b8c35-file-no-extension'];
     }
 }

@@ -31,6 +31,6 @@ class Entity1
     #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'twig', 'template' => 'file_twig.twig'])]
     public ?File $fileTwig = null;
 
-    #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'expression_language', 'expression' => '"foo/bar/"~object.id~"/"~file.checksum()~"-"~name~ext'])]
+    #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'expression_language', 'expression' => '"foo/bar/"~file.checksum()~"-"~name~ext'])]
     public ?File $fileExpressionLanguage = null;
 }

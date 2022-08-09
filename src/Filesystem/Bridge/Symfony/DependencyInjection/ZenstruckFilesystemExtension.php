@@ -116,7 +116,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'checksum'])
         ;
         $container->register('.zenstruck_filesystem.namer.expression', ExpressionNamer::class)
-            ->setArguments([new Reference('doctrine'), $slugger])
+            ->addArgument($slugger)
             ->addTag('zenstruck_filesystem.doctrine_namer', ['key' => 'expression'])
         ;
         $container->register('.zenstruck_filesystem.namer.slugify', SlugifyNamer::class)
@@ -165,7 +165,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         if ($config['events']['persist']['enabled']) {
-            $subscriber->addTag('doctrine.event_listener', ['event' => 'postPersist']);
+            $subscriber->addTag('doctrine.event_listener', ['event' => 'prePersist']);
         }
 
         if ($config['events']['update']['enabled']) {

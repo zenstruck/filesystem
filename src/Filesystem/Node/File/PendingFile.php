@@ -14,10 +14,27 @@ final class PendingFile extends File
 {
     private \SplFileInfo $file;
 
-    public function __construct(\SplFileInfo|string $file)
+    /** @var callable(self,object):string|array<string,mixed> */
+    private mixed $config;
+
+    /**
+     * @param callable(self,object):string|array<string,mixed> $config
+     */
+    public function __construct(\SplFileInfo|string $file, callable|array $config = [])
     {
         $this->file = \is_string($file) ? new \SplFileInfo($file) : $file;
         $this->path = $this->file->getFilename();
+        $this->config = $config;
+    }
+
+    /**
+     * @internal
+     *
+     * @return callable(self,object):string|array<string,mixed>
+     */
+    public function config(): mixed
+    {
+        return $this->config;
     }
 
     public function localFile(): \SplFileInfo

@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs as ORMPreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -11,13 +10,11 @@ use Doctrine\Persistence\ObjectManager;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
-use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ChecksumNamer;
-use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\ExpressionNamer;
-use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ObjectReflector;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -29,9 +26,6 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
  */
 final class NodeLifecycleSubscriber
 {
-    /** @var \WeakMap<object,callable[]> */
-    private \WeakMap $pendingRecomputeOperations;
-
     /** @var callable[] */
     private array $pendingOperations = [];
 
@@ -45,7 +39,6 @@ final class NodeLifecycleSubscriber
         private array $globalConfig = [],
         private ContainerInterface|array|null $namers = null,
     ) {
-        $this->pendingRecomputeOperations = new \WeakMap();
     }
 
     /**
@@ -105,7 +98,7 @@ final class NodeLifecycleSubscriber
     /**
      * @param LifecycleEventArgs<ObjectManager> $event
      */
-    public function postPersist(LifecycleEventArgs $event): void
+    public function prePersist(LifecycleEventArgs $event): void
     {
         // todo collections
         $object = $event->getObject();
@@ -128,14 +121,16 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $node = $this->filesystem->get($config['filesystem'])->write(
-                $this->namer($config['namer'] ?? null)->generateName($node, $object, $config),
-                $node->localFile()
-            );
+            $filesystem = $this->filesystem->get($config['filesystem']);
 
-            $ref->set($property, $node->last()->ensureFile());
+            $ref->set($property, new LazyFile(
+                $name = $this->generateName($node, $object, $config),
+                $filesystem
+            ));
 
-            $this->addPendingRecomputeOperation($object, fn() => null);
+            $this->pendingOperations[] = static function() use ($filesystem, $name, $node) {
+                $filesystem->write($name, $node->localFile());
+            };
         }
     }
 
@@ -168,18 +163,16 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $ref ??= new ObjectReflector($object, $configs);
-
             if ($new instanceof PendingFile && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
                 // user is adding a new file
-                $this->addPendingRecomputeOperation($object, function() use ($config, $object, $new, $property, $ref) {
-                    $new = $this->filesystem->get($config['filesystem'])->write(
-                        $this->namer($config['namer'] ?? null)->generateName($new, $object, $config),
-                        $new->localFile()
-                    );
+                $name = $this->generateName($new, $object, $config);
+                $filesystem = $this->filesystem->get($config['filesystem']);
 
-                    $ref->set($property, $new->last()->ensureFile());
-                });
+                $event->setNewValue($property, new LazyFile($name, $filesystem));
+
+                $this->pendingOperations[] = static function() use ($name, $filesystem, $new) {
+                    $filesystem->write($name, $new->localFile());
+                };
             }
 
             if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path() && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
@@ -191,28 +184,11 @@ final class NodeLifecycleSubscriber
 
     public function postFlush(PostFlushEventArgs $event): void
     {
-        foreach ($this->pendingRecomputeOperations as $object => $operations) {
-            foreach ($operations as $operation) {
-                $operation();
-            }
-
-            self::clearChangeSet($object, $event->getEntityManager());
-        }
-
         foreach ($this->pendingOperations as $operation) {
             $operation();
         }
 
-        $this->pendingRecomputeOperations = new \WeakMap();
-    }
-
-    private function addPendingRecomputeOperation(object $object, callable $callback): void
-    {
-        if (!isset($this->pendingRecomputeOperations[$object])) {
-            $this->pendingRecomputeOperations[$object] = [];
-        }
-
-        $this->pendingRecomputeOperations[$object][] = $callback;
+        $this->pendingOperations = [];
     }
 
     /**
@@ -223,16 +199,26 @@ final class NodeLifecycleSubscriber
         return $config[$feature] ?? $this->globalConfig[$feature] ?? true; // @phpstan-ignore-line
     }
 
-    private function namer(?string $name): Namer
+    /**
+     * @param ConfigMapping $defaultConfig
+     */
+    private function generateName(PendingFile $file, object $object, array $defaultConfig): string
     {
-        $name ??= 'slugify';
+        $config = $file->config();
 
+        if (\is_callable($config)) {
+            return $config($file, $object);
+        }
+
+        $name = $config['namer'] ?? $defaultConfig['namer'] ?? 'expression';
+
+        return $this->namer($name)->generateName($file, $object, \array_merge($defaultConfig, $config));
+    }
+
+    private function namer(string $name): Namer
+    {
         if (null === $this->namers) {
-            $this->namers = [
-                'slugify' => new SlugifyNamer(),
-                'checksum' => new ChecksumNamer(),
-                'expression' => new ExpressionNamer(),
-            ];
+            throw new \RuntimeException('No namers registered.');
         }
 
         if ($this->namers instanceof ContainerInterface) {
@@ -247,21 +233,5 @@ final class NodeLifecycleSubscriber
         }
 
         throw new \LogicException(\sprintf('Namer "%s" is not registered.', $name), previous: $e ?? null);
-    }
-
-    /**
-     * We need to clear changes as swapping the Node objects triggers a "change".
-     *
-     * TODO: I think this can be improved with another event (prePersist) and calculate
-     */
-    private static function clearChangeSet(object $object, ObjectManager $om): void
-    {
-        if (!$om instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $uow = $om->getUnitOfWork();
-        $uow->computeChangeSet($om->getClassMetadata($object::class), $object);
-        $uow->clearEntityChangeSet(\spl_object_id($object));
     }
 }
