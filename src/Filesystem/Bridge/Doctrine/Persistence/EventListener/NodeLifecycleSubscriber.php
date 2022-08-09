@@ -30,14 +30,13 @@ final class NodeLifecycleSubscriber
     private array $pendingOperations = [];
 
     /**
-     * @param ContainerInterface|array<string,Namer> $namers
-     * @param array<string,bool>                     $globalConfig
+     * @param array<string,bool> $globalConfig
      */
     public function __construct(
         private NodeConfigProvider $configProvider,
         private MultiFilesystem $filesystem,
-        private array $globalConfig = [],
-        private ContainerInterface|array|null $namers = null,
+        private array $globalConfig,
+        private ContainerInterface $namers,
     ) {
     }
 
@@ -70,7 +69,6 @@ final class NodeLifecycleSubscriber
      */
     public function postRemove(LifecycleEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
@@ -100,7 +98,6 @@ final class NodeLifecycleSubscriber
      */
     public function prePersist(LifecycleEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
@@ -139,14 +136,11 @@ final class NodeLifecycleSubscriber
      */
     public function preUpdate(PreUpdateEventArgs|ORMPreUpdateEventArgs $event): void
     {
-        // todo collections
         $object = $event->getObject();
 
         if (!$configs = $this->configProvider->configFor($object::class)) {
             return;
         }
-
-        $ref = null;
 
         foreach ($configs as $property => $config) {
             if (!$event->hasChangedField($config['property'])) {
@@ -217,21 +211,10 @@ final class NodeLifecycleSubscriber
 
     private function namer(string $name): Namer
     {
-        if (null === $this->namers) {
-            throw new \RuntimeException('No namers registered.');
+        try {
+            return $this->namers->get($name);
+        } catch (NotFoundExceptionInterface $e) {
+            throw new \LogicException(\sprintf('Namer "%s" is not registered.', $name), previous: $e);
         }
-
-        if ($this->namers instanceof ContainerInterface) {
-            try {
-                return $this->namers->get($name);
-            } catch (NotFoundExceptionInterface $e) {
-            }
-        }
-
-        if (\is_array($this->namers) && \array_key_exists($name, $this->namers)) {
-            return $this->namers[$name];
-        }
-
-        throw new \LogicException(\sprintf('Namer "%s" is not registered.', $name), previous: $e ?? null);
     }
 }
