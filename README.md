@@ -1122,8 +1122,13 @@ $em->flush(); // auto-removes old image and saves the new
 
 ##### Namer's
 
-By default, saving a `PendingFile` takes the original filename, slugifies it, and saves it to the root of the
-configured filesystem. This behaviour can be customized with namers that are defined on your column:
+By default, saving a `PendingFile` names the file with the following template:
+
+```
+<original-name-slugified>-<6-random-characters>.<original-extension>
+```
+
+This behaviour can be customized with namers that are defined on your column:
 
 ```php
 use Doctrine\ORM\Mapping as ORM;
@@ -1134,9 +1139,25 @@ class User
 {
     // ...
 
+    // Slugify Namer
+    #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'slugify'])]
+    public ?File $profileImage = null; // PendingFile's are saved as "<original-name-slugified>.<original-extension>"
+
     // Checksum Namer
     #[ORM\Column(type: File::class, nullable: true, options: ['filesystem' => 'public', 'namer' => 'checksum'])]
     public ?File $profileImage = null; // PendingFile's are saved as "<file-contents-checksum>.<original-extension>"
+
+    // Expression Namer
+    #[ORM\Column(
+        type: File::class,
+        nullable: true,
+        options: [
+            'filesystem' => 'public',
+            'namer' => 'expression',
+            'expression' => '"foo/bar/{checksum}-{name}{ext}'
+        ]
+    )]
+    public ?File $profileImage = null; // PendingFile's are saved as "foo/bar/<file-contents-checksum>-<original-name-slug>.<original-extension>"
 
     // ExpressionLanguage Namer
     #[ORM\Column(
@@ -1145,11 +1166,44 @@ class User
         options: [
             'filesystem' => 'public',
             'namer' => 'expression_language',
-            'expression' => '"foo/bar/"~object.id~"/"~file.checksum()~"-"~name~ext'
+            'expression' => '"foo/bar/"~file.checksum()~"-"~name~ext'
         ]
     )]
-    public ?File $profileImage = null; // PendingFile's are saved as "foo/bar/<object id>/<file-contents-checksum>-<original-name-slug>.<original-extension>"
+    public ?File $profileImage = null; // PendingFile's are saved as "foo/bar/<file-contents-checksum>-<original-name-slug>.<original-extension>"
 }
+```
+
+Alternatively, you can define the _namer_ when creating a `PendingFile`:
+
+```php
+use Zenstruck\Filesystem\Node\File\PendingFile;
+
+/** @var \Doctrine\ORM\EntityManagerInterface $em */
+
+$user = new User();
+$user->profileImage = new PendingFile('/local/filesystem/image.png', [
+    'namer' => 'expression',
+    'expression' => '{checksum}-{name}{ext}',
+]); // saved as "<file-contents-checksum>-<original-name-slug>.<original-extension>"
+
+$em->persist($user);
+$em->flush();
+```
+
+Or even with a callback:
+
+```php
+use Zenstruck\Filesystem\Node\File\PendingFile;
+
+/** @var \Doctrine\ORM\EntityManagerInterface $em */
+
+$user = new User();
+$user->profileImage = new PendingFile('/local/filesystem/image.png', function(PendingFile $file, User $user) {
+    return "profile-images/{$user->username}-{$file->checksum()}.{$file->originalExtension()}";
+}); // saved as "profile-images/<username>-<file-contents-checksum>.<original-extension>"
+
+$em->persist($user);
+$em->flush();
 ```
 
 #### Full Default Configuration
