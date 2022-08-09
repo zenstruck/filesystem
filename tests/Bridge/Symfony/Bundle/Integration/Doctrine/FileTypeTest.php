@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
+use Zenstruck\Filesystem\Tests\Fixture\Symfony\Entity\Entity1;
 use Zenstruck\Filesystem\Tests\Fixture\Symfony\Factory\Entity1Factory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -24,17 +25,17 @@ final class FileTypeTest extends KernelTestCase
     {
         $this->filesystem()->assertNotExists('nested/file.png');
 
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last(),
         ]);
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertExists('nested/file.png');
 
-        $post->remove();
+        $entity->remove();
 
         $this->filesystem()->assertNotExists('nested/file.png');
-        $post->assertNotPersisted();
+        $entity->assertNotPersisted();
     }
 
     /**
@@ -44,18 +45,18 @@ final class FileTypeTest extends KernelTestCase
     {
         $this->filesystem()->assertNotExists('nested/file.png');
 
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last(),
         ]);
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertExists('nested/file.png');
 
-        $post->file = null;
-        $post->save();
+        $entity->file = null;
+        $entity->save();
 
         $this->filesystem()->assertNotExists('nested/file.png');
-        $post->assertPersisted();
+        $entity->assertPersisted();
     }
 
     /**
@@ -65,12 +66,12 @@ final class FileTypeTest extends KernelTestCase
     {
         $this->filesystem()->assertNotExists('nested/file.png');
 
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => null,
         ]);
 
-        $post->file = $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
-        $post->save();
+        $entity->file = $this->filesystem()->write('nested/file.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
+        $entity->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertExists('nested/file.png');
@@ -81,12 +82,12 @@ final class FileTypeTest extends KernelTestCase
      */
     public function can_update_file_on_existing_file(): void
     {
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => $this->filesystem()->write('nested/file1.png', 'content')->last(),
         ]);
 
-        $post->file = $this->filesystem()->write('nested/file2.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
-        $post->save();
+        $entity->file = $this->filesystem()->write('nested/file2.png', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
+        $entity->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertNotExists('nested/file1.png');
@@ -114,12 +115,12 @@ final class FileTypeTest extends KernelTestCase
      */
     public function can_update_pending_file_on_null_file(): void
     {
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => null,
         ]);
 
-        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
-        $post->save();
+        $entity->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
+        $entity->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertExists('some-crazy-file.png');
@@ -131,19 +132,20 @@ final class FileTypeTest extends KernelTestCase
      */
     public function can_update_pending_file_on_existing_file(): void
     {
-        $post = Entity1Factory::createOne([
+        $entity = Entity1Factory::createOne([
             'file' => $this->filesystem()->write('nested/file1.png', 'content')->last(),
         ]);
 
         $this->filesystem()->assertExists('nested/file1.png');
 
-        $post->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
-        $post->save();
+        $entity->file = new PendingFile(FilesystemTest::FIXTURE_DIR.'/some CRazy file.pNg', ['namer' => 'slugify']);
+        $entity->save();
 
         $this->assertSame('image/png', Entity1Factory::first()->file->mimeType());
         $this->filesystem()->assertNotExists('nested/file1.png');
         $this->filesystem()->assertExists('some-crazy-file.png');
         $this->filesystem()->assertExists(Entity1Factory::first()->file->path());
+        $this->filesystem()->assertExists($entity->file);
     }
 
     /**
@@ -151,7 +153,17 @@ final class FileTypeTest extends KernelTestCase
      */
     public function can_use_callback_for_pending_file_namer(): void
     {
-        $this->markTestIncomplete();
+        $entity = Entity1Factory::createOne([
+            'title' => 'foo-bar',
+            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png', function(PendingFile $file, Entity1 $object) {
+                return 'baz/'.$file->checksum().'-'.$object->title.'.png';
+            }),
+        ]);
+
+        $expected = 'baz/ac6884fc84724d792649552e7211843a-foo-bar.png';
+
+        $this->assertSame($expected, $entity->file->path());
+        $this->filesystem()->assertExists($expected);
     }
 
     /**
@@ -159,14 +171,12 @@ final class FileTypeTest extends KernelTestCase
      */
     public function default_namer(): void
     {
-        $this->markTestIncomplete();
-
         $entity = Entity1Factory::createOne([
             'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png'),
         ]);
 
         $this->filesystem()->assertExists($entity->file->path());
-        $this->assertMatchesRegularExpression('#symfony-1-[0-9a-z]{6}\.png#', $entity->file->path());
+        $this->assertMatchesRegularExpression('#symfony-[0-9a-z]{6}\.png#', $entity->file->path());
     }
 
     /**
