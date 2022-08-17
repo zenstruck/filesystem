@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Tests\Fixture\Symfony;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use League\Glide\Urls\UrlBuilder;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -67,11 +68,16 @@ final class Kernel extends BaseKernel
             'default_path' => __DIR__.'/templates',
         ]);
 
+        $c->register(UrlBuilder::class)
+            ->setArguments(['/glide/'])
+        ;
+
         $c->loadFromExtension('zenstruck_filesystem', [
             'filesystems' => [
                 'public' => [
                     'dsn' => '%kernel.project_dir%/var/public',
                     'url_prefix' => '/files',
+                    'glide_url_builder' => UrlBuilder::class,
                 ],
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',

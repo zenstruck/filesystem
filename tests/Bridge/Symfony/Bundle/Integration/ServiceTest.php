@@ -41,6 +41,17 @@ final class ServiceTest extends KernelTestCase
     /**
      * @test
      */
+    public function can_get_glide_urls(): void
+    {
+        $file = $this->filesystem()->write('nested/image.png', '')->last()->ensureImage();
+
+        $this->assertSame('/glide/nested/image.png', $file->glideUrl()->toString());
+        $this->assertSame('/glide/nested/image.png?w=100&h=100', $file->glideUrl(['w' => 100, 'h' => 100])->toString());
+    }
+
+    /**
+     * @test
+     */
     public function can_get_route_urls(): void
     {
         $file = $this->filesystem()->write('private://nested/file.txt', 'content')->last()->ensureFile();
