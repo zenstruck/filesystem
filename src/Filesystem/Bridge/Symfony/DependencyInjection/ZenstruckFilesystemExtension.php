@@ -29,6 +29,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\Bridge\Symfony\Routing\RouteFileUrlFeature;
+use Zenstruck\Filesystem\Bridge\Symfony\Serializer\NodeNormalizer;
 use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
@@ -51,6 +52,11 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         $container->register('.zenstruck_filesystem.adapter_factory', AdapterFactory::class);
+
+        $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
+            ->addTag('serializer.normalizer')
+            ->addTag('container.service_subscriber')
+        ;
 
         if ($container->getParameter('kernel.debug')) {
             $container->register('.zenstruck_filesystem.data_collector', FilesystemDataCollector::class)
