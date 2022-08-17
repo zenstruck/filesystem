@@ -211,6 +211,14 @@ The `Image` node extends `File` so all it's methods are available.
 
 $image = $filesystem->image('nested/image.png');
 
+/**
+ * get the url to Glide server
+ *
+ * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support Glide URLs
+ */
+$url = $file->glideUrl(['w' => 100, 'h' => 100]); // Zenstruck\Uri
+(string) $url; // string (ie https://example.com/glide/image.png?w=100&h=100)
+
 // image metadata
 $image->width(); // int
 $image->height(); // int
@@ -340,6 +348,8 @@ currently available features:
 
 - `Zenstruck\Filesystem\Feature\FileUrl`: enables the usage of `File::url()` (implemented by
   [`PrefixFileUrlFeature`](#prefixfileurlfeature)).
+- `Zenstruck\Filesystem\Feature\GlideUrl`: enables the usage of `Image::glideUrl()` (implemented by
+    [`UrlBuilderGlideUrlFeature`](#urlbuilderglideurlfeature)).
 - `Zenstruck\Filesystem\Feature\ModifyFile`: provides a real file for modification/metadata. If not implemented,
   creates/uses a temporary file on the filesystem. This is implemented by the default `LocalAdapter` provided by
   this library.
@@ -369,6 +379,24 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
 
 (string) $filesystem->file('some/file.txt')->url(); // "https://cdn1.example.com/files/some/file.txt"
 (string) $filesystem->file('another/file.txt')->url(); // "https://cdn2.example.com/files/another/file.txt"
+```
+
+##### `UrlBuilderGlideUrlFeature`
+
+> **Note**: Requires `league/glide`.
+
+Use this to build paths to Glide server for image manipulation (thumbnails etc.):
+
+```php
+use League\Glide\Urls\UrlBuilderFactory;
+use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
+
+$filesystem = new AdapterFilesystem('/path/to/root', features: [
+    new UrlBuilderGlideUrlFeature(UrlBuilderFactory::create('/glide/', 'signature')),
+]);
+
+(string) $filesystem->image('some/image.png')->glideUrl(['w' => 100, 'h' => 100]); // "/glide/some/image.png?w=100&h=100&s=3a82607a9517525d0a98de4548e10917"
 ```
 
 ##### Custom Features
@@ -1232,6 +1260,9 @@ zenstruck_filesystem:
                 - /files
                 - 'https://cdn1.example.com'
                 - 'https://cdn2.example.com'
+
+            # Service ID of Glide URL builder
+            glide_url_builder:    null
 
             # Route to use for file urls
             route:
