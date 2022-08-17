@@ -32,6 +32,8 @@ use Zenstruck\Filesystem\Bridge\Symfony\Routing\RouteFileUrlFeature;
 use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
+use Zenstruck\Filesystem\Feature\GlideUrl;
+use Zenstruck\Filesystem\Feature\GlideUrl\UrlBuilderGlideUrlFeature;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
@@ -200,6 +202,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
 
             $features[FileUrl::class] = new Reference($id);
+        }
+
+        if ($config['glide_url_builder']) {
+            $container->register($id = '.zenstruck_filesystem.feature.'.$name.'_glide_url_builder', UrlBuilderGlideUrlFeature::class)
+                      ->setArguments([new Reference($config['glide_url_builder'])])
+            ;
+
+            $features[GlideUrl::class] = new Reference($id);
         }
 
         if ($config['route']['name']) {

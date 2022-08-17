@@ -46,6 +46,14 @@ final class Configuration implements ConfigurationInterface
                                 ->info('Url prefix or multiple prefixes to use for this filesystem (can be an array)')
                                 ->example(['/files', 'https://cdn1.example.com', 'https://cdn2.example.com'])
                             ->end()
+                            ->scalarNode('glide_url_builder')
+                                ->defaultNull()
+                                ->info('Glide URL builder service to be used for image previews')
+                                ->example([
+                                    'League\Glide\Urls\UrlBuilder',
+                                    'my_urlbuilder_service'
+                                ])
+                            ->end()
                             ->arrayNode('route')
                                 ->beforeNormalization()
                                     ->ifString()

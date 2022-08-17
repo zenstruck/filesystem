@@ -3,7 +3,10 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use League\Flysystem\UnableToRetrieveMetadata;
+use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Feature\GlideUrl;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,6 +21,16 @@ class Image extends File
     protected function __construct(string $path)
     {
         $this->path = $path;
+    }
+    /**
+     *
+     * @param array<string,mixed> $options
+     *
+     * @throws UnsupportedFeature If your adapter does not support {@see GlideUrl}
+     */
+    final public function glideUrl(array $options = []): Uri
+    {
+        return $this->operator()->glideUrlFor($this, $options);
     }
 
     final public function height(): int
