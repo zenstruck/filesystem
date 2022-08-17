@@ -82,4 +82,11 @@ interface Node extends \Stringable
      * @param ImageConfig $config
      */
     public function isImage(array $config = []): bool;
+
+    public function serialize(): string;
+
+    /**
+     * @return File|Image|Directory<Node>
+     */
+    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File|Image|Directory;
 }

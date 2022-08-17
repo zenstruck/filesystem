@@ -3,7 +3,6 @@
 namespace Zenstruck\Filesystem\Tests\Node\File;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
@@ -11,7 +10,7 @@ use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class LazyNodeTest extends TestCase
+class LazyFileTest extends TestCase
 {
     use InteractsWithFilesystem;
 
@@ -45,7 +44,7 @@ class LazyNodeTest extends TestCase
         $node->lastModified();
     }
 
-    protected function createNode(string $path): LazyNode|File
+    protected function createNode(string $path): LazyNode
     {
         return new LazyFile($path);
     }

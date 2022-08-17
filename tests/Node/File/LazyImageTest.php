@@ -2,14 +2,13 @@
 
 namespace Zenstruck\Filesystem\Tests\Node\File;
 
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyImage;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LazyImageTest extends LazyNodeTest
+final class LazyImageTest extends LazyFileTest
 {
     /**
      * @test
@@ -19,7 +18,7 @@ final class LazyImageTest extends LazyNodeTest
         $this->assertTrue($this->createNode('foo/bar.txt')->isImage());
     }
 
-    protected function createNode(string $path): LazyNode|File
+    protected function createNode(string $path): LazyNode
     {
         return new LazyImage($path);
     }

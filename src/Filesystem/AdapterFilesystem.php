@@ -49,8 +49,8 @@ final class AdapterFilesystem implements Filesystem
             $adapter = new LocalAdapter($adapter);
         }
 
-        $this->operator = new Operator($adapter, $config, $features);
         $this->name = $this->config['name'] ?? 'default';
+        $this->operator = new Operator($adapter, $this->name, $config, $features);
         $this->last = new \LogicException('No operations have been performed.');
     }
 
