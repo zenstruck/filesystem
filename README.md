@@ -202,6 +202,8 @@ $checksum = $file->checksum(); // Zenstruck\Filesystem\Node\File\Checksum
 $checksum->equals($anotherChecksum); // bool
 ```
 
+> **Note**: `File` should be considered _final_ and is not meant to be extended.
+
 #### `Image`
 
 The `Image` node extends `File` so all it's methods are available.
@@ -220,6 +222,8 @@ $image->isLandscape(); // bool
 $image->isPortrait(); // bool
 $image->isSquare(); // bool
 ```
+
+> **Note**: `Image` should be considered _final_ and is not meant to be extended.
 
 #### `Directory`
 
@@ -279,6 +283,8 @@ foreach ($filtered as $file) {
     // $file = Zenstruck\Filesystem\Node\File
 }
 ```
+
+> **Note**: `Directory` should be considered _final_ and is not meant to be extended.
 
 ## Filesystems
 
@@ -880,6 +886,25 @@ class SomeController
 }
 ```
 
+#### `NodeNormalizer`
+
+If using `symfony/serializer` in your app, a `NodeNormalizer` is auto-registered/configured and can
+normalizer/denormalize `File|Image|Directory` nodes. Nodes are normalized into a string in the format:
+`<filesystem-name>://<path/to/node>`:
+
+```php
+use Zenstruck\Filesystem\Node\File;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+/** @var \Symfony\Component\Serializer\Serializer $serializer */
+
+$file = $filesystem->file('some/file.txt');
+
+$encoded = $serializer->serialize($file, 'json'); // "public://some/file.txt" (json encoded)
+
+$decoded = $serializer->decode($encoded, File::class); // File
+```
+
 #### Testing
 
 By default, in your `test` environment, your defined filesystem adapters are swapped with local adapters whose
@@ -1119,6 +1144,9 @@ $user->profileImage = new PendingFile('/new/image.jpg');
 
 $em->flush(); // auto-removes old image and saves the new
 ```
+
+> **Note**: `PendingFile` is not meant to be used as a property typehint on your entity's. Be sure to use `File`
+> as the typehint.
 
 ##### Namer's
 

@@ -34,9 +34,14 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
      * @param GlobalConfig|array<string,mixed> $config
      * @param Features                         $features
      */
-    public function __construct(private FilesystemAdapter $adapter, private array $config = [], private iterable|ContainerInterface $features = [])
+    public function __construct(private FilesystemAdapter $adapter, private string $name, private array $config = [], private iterable|ContainerInterface $features = [])
     {
         parent::__construct($adapter, $config, $this->normalizer = $config['path_normalizer'] ?? new WhitespacePathNormalizer());
+    }
+
+    public function serialize(string $path): string
+    {
+        return "{$this->name}://{$path}";
     }
 
     public function fileAttributesFor(string $path): FileAttributes

@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Iterator\LazyIterator;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\ArchiveFile;
+use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingNameFilter;
 use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
@@ -24,7 +25,7 @@ use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
 class Directory implements Node, \IteratorAggregate
 {
     use IsNode {
-        __construct as traitConstruct;
+        __construct as private traitConstruct;
     }
 
     private bool $recursive = false;
@@ -50,6 +51,14 @@ class Directory implements Node, \IteratorAggregate
     public function __construct(DirectoryAttributes $attributes, Operator $operator)
     {
         $this->traitConstruct($attributes, $operator);
+    }
+
+    /**
+     * @return self<Node>
+     */
+    final public static function unserialize(string $serialized, MultiFilesystem $filesystem): self
+    {
+        return $filesystem->directory($serialized);
     }
 
     final public function mimeType(): string

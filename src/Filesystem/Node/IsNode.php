@@ -37,6 +37,11 @@ trait IsNode
         return $this->path;
     }
 
+    public function serialize(): string
+    {
+        return $this->operator()->serialize($this->path);
+    }
+
     final public function path(): string
     {
         return $this->path;

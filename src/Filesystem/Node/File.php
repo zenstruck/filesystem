@@ -7,6 +7,7 @@ use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
+use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Filesystem\TempFile;
@@ -18,8 +19,8 @@ use Zenstruck\Uri;
 class File implements Node
 {
     use IsNode {
-        __construct as traitConstruct;
-        refresh as traitRefresh;
+        __construct as private traitConstruct;
+        refresh as private traitRefresh;
     }
 
     protected const MULTI_EXTENSIONS = ['gz' => 'tar.gz', 'bz2' => 'tar.bz2'];
@@ -48,6 +49,11 @@ class File implements Node
         if ($mimeType = $attributes->mimeType()) {
             $this->mimeType = $mimeType;
         }
+    }
+
+    public static function unserialize(string $serialized, MultiFilesystem $filesystem): self
+    {
+        return $filesystem->file($serialized);
     }
 
     /**

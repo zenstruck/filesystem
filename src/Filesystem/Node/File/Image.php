@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use League\Flysystem\UnableToRetrieveMetadata;
+use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -18,6 +19,11 @@ class Image extends File
     protected function __construct(string $path)
     {
         $this->path = $path;
+    }
+
+    final public static function unserialize(string $serialized, MultiFilesystem $filesystem): self
+    {
+        return parent::unserialize($serialized, $filesystem)->ensureImage();
     }
 
     final public function height(): int
