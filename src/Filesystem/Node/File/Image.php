@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use League\Flysystem\UnableToRetrieveMetadata;
+use Zenstruck\Filesystem\ImageTransformer\ImageTransformer;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -60,6 +61,14 @@ class Image extends File
         unset($this->imageSize);
 
         return parent::refresh();
+    }
+
+    final public function transform(): ImageTransformer
+    {
+        return new ImageTransformer(
+            $this,
+            $this->operator()
+        );
     }
 
     /**
