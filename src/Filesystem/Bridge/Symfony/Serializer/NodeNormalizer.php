@@ -33,7 +33,10 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $object->serialize();
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null): bool
+    /**
+     * @param mixed[] $context
+     */
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Node;
     }
@@ -54,7 +57,10 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $type::unserialize($data, $this->container->get(MultiFilesystem::class));
     }
 
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null): bool
+    /**
+     * @param mixed[] $context
+     */
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return \in_array($type, [File::class, Image::class, Directory::class], true);
     }
