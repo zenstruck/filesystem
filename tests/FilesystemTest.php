@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Filesystem\Tests;
 
+use Imagine\Image\ImageInterface;
+use Intervention\Image\Image as InterventionImage;
 use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
@@ -162,6 +164,89 @@ abstract class FilesystemTest extends TestCase
         $filesystem = $this->createFilesystem()->write('foo', new \SplFileInfo(self::FIXTURE_DIR.'/symfony.png'));
 
         $this->assertSame('image/png', $filesystem->image('foo')->mimeType());
+    }
+
+    /**
+     * @test
+     * @dataProvider manipulateImageProvider
+     */
+    public function can_manipulate_image(string $ext, callable $manipulator): void
+    {
+        $filesystem = $this->createFilesystem()->write("original.{$ext}", new \SplFileInfo(
+            \sprintf('%s/symfony.%s', self::FIXTURE_DIR, $ext)
+        ));
+
+        $pending = $filesystem->image("original.{$ext}")->transform($manipulator);
+
+        $filesystem->write("resized.{$ext}", $pending);
+        $original = $filesystem->image("original.{$ext}");
+        $resized = $filesystem->image("resized.{$ext}");
+        $ext = \str_replace('jpg', 'jpeg', $ext);
+
+        $this->assertSame(563, $original->width());
+        $this->assertSame(678, $original->height());
+        $this->assertSame(100, $resized->width());
+        $this->assertSame(120, $resized->height());
+        $this->assertSame("image/{$ext}", $resized->mimeType());
+    }
+
+    /**
+     * @test
+     * @dataProvider manipulateImageProvider
+     */
+    public function can_manipulate_image_and_change_format(string $ext, callable $manipulator): void
+    {
+        $filesystem = $this->createFilesystem()->write("original.{$ext}", new \SplFileInfo(
+            \sprintf('%s/symfony.%s', self::FIXTURE_DIR, $ext)
+        ));
+
+        $pending = $filesystem->image("original.{$ext}")->transform($manipulator, ['format' => 'png']);
+        $filesystem->write('resized', $pending);
+
+        $resized = $filesystem->image('resized');
+
+        $this->assertSame(100, $resized->width());
+        $this->assertSame(120, $resized->height());
+        $this->assertSame('image/png', $resized->mimeType());
+    }
+
+    public static function manipulateImageProvider(): iterable
+    {
+        $callback = function(\GdImage $image) {
+            return \imagescale($image, 100);
+        };
+
+        yield ['png', $callback];
+        yield ['gif', $callback];
+        yield ['jpg', $callback];
+
+        if (\class_exists(\Imagick::class)) {
+            $callback = function(\Imagick $image) {
+                $image->scaleImage(100, 0);
+
+                return $image;
+            };
+
+            yield ['png', $callback];
+            yield ['gif', $callback];
+            yield ['jpg', $callback];
+        }
+
+        $callback = function(ImageInterface $image) {
+            return $image->thumbnail($image->getSize()->widen(100));
+        };
+
+        yield ['png', $callback];
+        yield ['gif', $callback];
+        yield ['jpg', $callback];
+
+        $callback = function(InterventionImage $image) {
+            return $image->widen(100);
+        };
+
+        yield ['png', $callback];
+        yield ['gif', $callback];
+        yield ['jpg', $callback];
     }
 
     /**

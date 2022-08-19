@@ -4,11 +4,14 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use League\Flysystem\UnableToRetrieveMetadata;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type TransformOptions from ImageTransformer
  */
 class Image extends File
 {
@@ -32,6 +35,15 @@ class Image extends File
     final public static function unserialize(string $serialized, MultiFilesystem $filesystem): self
     {
         return parent::unserialize($serialized, $filesystem)->ensureImage();
+    }
+
+    /**
+     * @param callable(object):object $manipulator
+     * @param TransformOptions        $options
+     */
+    final public function transform(callable $manipulator, array $options = []): PendingFile
+    {
+        return new PendingFile($this->operator()->transform($this, $manipulator, $options));
     }
 
     final public function height(): int

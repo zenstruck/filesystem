@@ -11,10 +11,13 @@ use League\Flysystem\WhitespacePathNormalizer;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Feature\DefaultSet;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\FileUrl;
+use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Feature\ModifyFile;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Uri;
 
@@ -23,10 +26,13 @@ use Zenstruck\Uri;
  *
  * @internal
  *
+ * @implements ImageTransformer<object>
+ *
  * @phpstan-import-type GlobalConfig from AdapterFilesystem
  * @phpstan-import-type Features from AdapterFilesystem
+ * @phpstan-import-type TransformOptions from ImageTransformer
  */
-final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl
+final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl, ImageTransformer
 {
     private PathNormalizer $normalizer;
 
@@ -86,6 +92,14 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
         return TempFile::for($file);
     }
 
+    /**
+     * @param TransformOptions $options
+     */
+    public function transform(Image $image, callable $manipulator, array $options): \SplFileInfo
+    {
+        return $this->featureOrFail(ImageTransformer::class)->transform($image, $manipulator, $options);
+    }
+
     public function swap(FilesystemAdapter $adapter): void
     {
         parent::__construct($this->adapter = $adapter, $this->config, $this->normalizer);
@@ -116,7 +130,7 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
             }
         }
 
-        return null;
+        return DefaultSet::get($name);
     }
 
     /**

@@ -17,19 +17,19 @@ use Zenstruck\Filesystem\Node\File\Image;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @phpstan-type CopyConfig = array{
- *     fail_if_exists: bool,
- *     progress: callable(File):void,
+ *     fail_if_exists?: bool,
+ *     progress?: callable(File):void,
  * }
  * @phpstan-type MoveConfig = array{
- *     fail_if_exists: bool,
- *     progress: callable(File):void,
+ *     fail_if_exists?: bool,
+ *     progress?: callable(File):void,
  * }
  * @phpstan-type DeleteConfig = array{
- *     progress: callable(Node):void,
+ *     progress?: callable(Node):void,
  * }
  * @phpstan-type WriteConfig = array{
- *     progress: callable(File):void,
- *     fail_if_exists: bool,
+ *     progress?: callable(File):void,
+ *     fail_if_exists?: bool,
  * }
  * @phpstan-type ImageConfig = array{
  *     check_mime?:bool,
@@ -195,11 +195,11 @@ interface Filesystem
      * A callback provided for $values allows for "manipulating" an "existing"
      * file in place. A "real" {@see \SplFileInfo} is passed and must be returned.
      *
-     * EXAMPLE - Manipulate an image:
+     * EXAMPLE - Manipulate an existing file:
      *
      * ```php
-     * $filesystem->write('path/to/image.jpg', function(\SplFileInfo $file) {
-     *      $this->imageManipulator()->load($file)->sharpen();
+     * $filesystem->write('some/file.csv', function(\SplFileInfo $file) {
+     *      $some3rdPartyService->manipulate($file);
      *
      *      return $file;
      * });
@@ -226,8 +226,8 @@ interface Filesystem
      * @see FilesystemWriter::write()
      * @see FilesystemWriter::writeStream()
      *
-     * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(\SplFileInfo):\SplFileInfo $value
-     * @param array<string,mixed>|WriteConfig                                                       $config
+     * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(object):object $value
+     * @param array<string,mixed>|WriteConfig                                           $config
      *
      * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
      * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
