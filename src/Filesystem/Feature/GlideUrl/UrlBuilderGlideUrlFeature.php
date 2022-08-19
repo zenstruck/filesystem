@@ -12,7 +12,6 @@ use Zenstruck\Uri;
  */
 class UrlBuilderGlideUrlFeature implements GlideUrl
 {
-
     public function __construct(private UrlBuilder $urlBuilder)
     {
     }

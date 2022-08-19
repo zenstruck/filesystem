@@ -22,8 +22,8 @@ class Image extends File
     {
         $this->path = $path;
     }
+
     /**
-     *
      * @param array<string,mixed> $options
      *
      * @throws UnsupportedFeature If your adapter does not support {@see GlideUrl}

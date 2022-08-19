@@ -51,7 +51,7 @@ final class Configuration implements ConfigurationInterface
                                 ->info('Glide URL builder service to be used for image previews')
                                 ->example([
                                     'League\Glide\Urls\UrlBuilder',
-                                    'my_urlbuilder_service'
+                                    'my_urlbuilder_service',
                                 ])
                             ->end()
                             ->arrayNode('route')
