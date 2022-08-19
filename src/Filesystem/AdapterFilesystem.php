@@ -21,6 +21,7 @@ use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Uri\Path;
 
 /**
@@ -310,6 +311,10 @@ final class AdapterFilesystem implements Filesystem
             $this->last = $path;
 
             return $this;
+        }
+
+        if ($value instanceof PendingFile) {
+            $value = $value->localFile();
         }
 
         if ($value instanceof File) { // check if File node

@@ -126,7 +126,7 @@ final class NodeLifecycleSubscriber
             ));
 
             $this->pendingOperations[] = static function() use ($filesystem, $name, $node) {
-                $filesystem->write($name, $node->localFile());
+                $filesystem->write($name, $node);
             };
         }
     }
@@ -165,7 +165,7 @@ final class NodeLifecycleSubscriber
                 $event->setNewValue($property, new LazyFile($name, $filesystem));
 
                 $this->pendingOperations[] = static function() use ($name, $filesystem, $new) {
-                    $filesystem->write($name, $new->localFile());
+                    $filesystem->write($name, $new);
                 };
             }
 
