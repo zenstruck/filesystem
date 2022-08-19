@@ -864,7 +864,7 @@ class SomeController
     public function someAction(
         Filesystem $publicFilesystem, // the public filesystem as defined in your config
         Filesystem $privateFilesystem, // the private filesystem as defined in your config
-        Filesystem $filesystem, // an instance of MultiFilesystem wrapping both public/private filesystems
+        Filesystem $filesystem, // "default" filesystem as defined in your config (public in this case)
         MultiFilesystem $multiFilesystem, // same as above
     ) {
         $publicFilesystem->file('some/file.txt')->url()->toString(); // "/files/some/file.txt"
