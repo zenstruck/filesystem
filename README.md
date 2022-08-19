@@ -886,6 +886,25 @@ class SomeController
 }
 ```
 
+#### `NodeNormalizer`
+
+If using `symfony/serializer` in your app, a `NodeNormalizer` is auto-registered/configured and can
+normalizer/denormalize `File|Image|Directory` nodes. Nodes are normalized into a string in the format:
+`<filesystem-name>://<path/to/node>`:
+
+```php
+use Zenstruck\Filesystem\Node\File;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+/** @var \Symfony\Component\Serializer\Serializer $serializer */
+
+$file = $filesystem->file('some/file.txt');
+
+$encoded = $serializer->serialize($file, 'json'); // "public://some/file.txt" (json encoded)
+
+$decoded = $serializer->decode($encoded, File::class); // File
+```
+
 #### Testing
 
 By default, in your `test` environment, your defined filesystem adapters are swapped with local adapters whose
