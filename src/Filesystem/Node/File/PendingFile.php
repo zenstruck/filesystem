@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Node\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -25,6 +26,16 @@ final class PendingFile extends File
         $this->file = \is_string($file) ? new \SplFileInfo($file) : $file;
         $this->path = $this->file->getFilename();
         $this->config = $config;
+    }
+
+    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File
+    {
+        throw new \BadMethodCallException(\sprintf('%s cannot be unserialized.', self::class));
+    }
+
+    public function serialize(): string
+    {
+        throw new \BadMethodCallException(\sprintf('%s cannot be serialized.', self::class));
     }
 
     /**
