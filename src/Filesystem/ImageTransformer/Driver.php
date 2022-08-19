@@ -1,9 +1,7 @@
 <?php
-declare(strict_types=1);
 
 namespace Zenstruck\Filesystem\ImageTransformer;
 
-use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Node\File\Image;
 
 /**
