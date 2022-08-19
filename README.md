@@ -202,6 +202,8 @@ $checksum = $file->checksum(); // Zenstruck\Filesystem\Node\File\Checksum
 $checksum->equals($anotherChecksum); // bool
 ```
 
+> **Note**: `File` should be considered _final_ and is not meant to be extended.
+
 #### `Image`
 
 The `Image` node extends `File` so all it's methods are available.
@@ -220,6 +222,8 @@ $image->isLandscape(); // bool
 $image->isPortrait(); // bool
 $image->isSquare(); // bool
 ```
+
+> **Note**: `Image` should be considered _final_ and is not meant to be extended.
 
 #### `Directory`
 
@@ -279,6 +283,8 @@ foreach ($filtered as $file) {
     // $file = Zenstruck\Filesystem\Node\File
 }
 ```
+
+> **Note**: `Directory` should be considered _final_ and is not meant to be extended.
 
 ## Filesystems
 
@@ -1119,6 +1125,9 @@ $user->profileImage = new PendingFile('/new/image.jpg');
 
 $em->flush(); // auto-removes old image and saves the new
 ```
+
+> **Note**: `PendingFile` is not meant to be used as a property typehint on your entity's. Be sure to use `File`
+> as the typehint.
 
 ##### Namer's
 
