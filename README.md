@@ -212,12 +212,14 @@ The `Image` node extends `File` so all it's methods are available.
 $image = $filesystem->image('nested/image.png');
 
 /**
- * get the url to Glide server
+ * get the url to transformed image
  *
- * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support Glide URLs
+ * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support transformed image URLs
  */
-$url = $file->glideUrl(['w' => 100, 'h' => 100]); // Zenstruck\Uri
+$url = $file->transformUrl(['w' => 100, 'h' => 100]); // Zenstruck\Uri
 (string) $url; // string (ie https://example.com/glide/image.png?w=100&h=100)
+/** You can also use shorter alias */
+$url = $file->thumbUrl(['w' => 100, 'h' => 100]);
 
 // image metadata
 $image->width(); // int
@@ -348,8 +350,8 @@ currently available features:
 
 - `Zenstruck\Filesystem\Feature\FileUrl`: enables the usage of `File::url()` (implemented by
   [`PrefixFileUrlFeature`](#prefixfileurlfeature)).
-- `Zenstruck\Filesystem\Feature\GlideUrl`: enables the usage of `Image::glideUrl()` (implemented by
-    [`UrlBuilderGlideUrlFeature`](#urlbuilderglideurlfeature)).
+- `Zenstruck\Filesystem\Feature\TransformImageUrl`: enables the usage of `Image::transformUrl()` (implemented by
+    [`GlideTransformImageUrl`](#glidetransformimageurl)).
 - `Zenstruck\Filesystem\Feature\ModifyFile`: provides a real file for modification/metadata. If not implemented,
   creates/uses a temporary file on the filesystem. This is implemented by the default `LocalAdapter` provided by
   this library.
@@ -381,7 +383,7 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
 (string) $filesystem->file('another/file.txt')->url(); // "https://cdn2.example.com/files/another/file.txt"
 ```
 
-##### `UrlBuilderGlideUrlFeature`
+##### `GlideTransformImageUrl`
 
 > **Note**: Requires `league/glide`.
 
@@ -396,7 +398,7 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
     new UrlBuilderGlideUrlFeature(UrlBuilderFactory::create('/glide/', 'signature')),
 ]);
 
-(string) $filesystem->image('some/image.png')->glideUrl(['w' => 100, 'h' => 100]); // "/glide/some/image.png?w=100&h=100&s=3a82607a9517525d0a98de4548e10917"
+(string) $filesystem->image('some/image.png')->transformUrl(['w' => 100, 'h' => 100]); // "/glide/some/image.png?w=100&h=100&s=3a82607a9517525d0a98de4548e10917"
 ```
 
 ##### Custom Features

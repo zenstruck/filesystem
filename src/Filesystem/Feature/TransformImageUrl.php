@@ -8,7 +8,7 @@ use Zenstruck\Uri;
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
-interface GlideUrl
+interface TransformImageUrl
 {
-    public function glideUrlFor(Image $image, mixed $options = []): Uri;
+    public function transformUrlFor(Image $image, mixed $options = []): Uri;
 }

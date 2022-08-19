@@ -45,8 +45,8 @@ final class ServiceTest extends KernelTestCase
     {
         $file = $this->filesystem()->write('nested/image.png', '')->last()->ensureImage();
 
-        $this->assertSame('/glide/nested/image.png', $file->glideUrl()->toString());
-        $this->assertSame('/glide/nested/image.png?w=100&h=100', $file->glideUrl(['w' => 100, 'h' => 100])->toString());
+        $this->assertSame('/glide/nested/image.png', $file->transformUrl()->toString());
+        $this->assertSame('/glide/nested/image.png?w=100&h=100', $file->transformUrl(['w' => 100, 'h' => 100])->toString());
     }
 
     /**

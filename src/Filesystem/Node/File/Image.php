@@ -4,7 +4,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use League\Flysystem\UnableToRetrieveMetadata;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
-use Zenstruck\Filesystem\Feature\GlideUrl;
+use Zenstruck\Filesystem\Feature\TransformImageUrl;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Uri;
 
@@ -26,11 +26,19 @@ class Image extends File
     /**
      * @param array<string,mixed> $options
      *
-     * @throws UnsupportedFeature If your adapter does not support {@see GlideUrl}
+     * @throws UnsupportedFeature If your adapter does not support {@see transformImageUrl}
      */
-    final public function glideUrl(array $options = []): Uri
+    final public function transformUrl(array $options = []): Uri
     {
-        return $this->operator()->glideUrlFor($this, $options);
+        return $this->operator()->transformUrlFor($this, $options);
+    }
+
+    /**
+     * Alias of transformUrl for most popular use case
+     */
+    final public function thumbUrl(array $options = []): Uri
+    {
+        return $this->transformUrl($options);
     }
 
     final public function height(): int

@@ -1,19 +1,19 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests\Feature\GlideUrl;
+namespace Zenstruck\Filesystem\Tests\Feature\TransformImageUrl;
 
 use League\Glide\Urls\UrlBuilder;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\LocalAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
-use Zenstruck\Filesystem\Feature\GlideUrl\UrlBuilderGlideUrlFeature;
+use Zenstruck\Filesystem\Feature\TransformImageUrl\GlideTransformImageUrl;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
 use Zenstruck\Uri;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
-class UrlBuilderGlideUrlFeatureTest extends FilesystemTest
+class GlideTransformImageUrlFeatureTest extends FilesystemTest
 {
     /**
      * @test
@@ -23,8 +23,8 @@ class UrlBuilderGlideUrlFeatureTest extends FilesystemTest
         $filesystem = $this->createFilesystem();
         $image = $filesystem->write('foo.png', '')->image('foo.png');
 
-        $this->assertSame('/glide/foo.png', $image->glideUrl()->toString());
-        $this->assertSame('/glide/foo.png?w=100&h=100', $image->glideUrl(['w' => 100, 'h' => 100])->toString());
+        $this->assertSame('/glide/foo.png', $image->transformUrl()->toString());
+        $this->assertSame('/glide/foo.png?w=100&h=100', $image->transformUrl(['w' => 100, 'h' => 100])->toString());
     }
 
     protected function createFilesystem(): Filesystem
@@ -42,7 +42,7 @@ class UrlBuilderGlideUrlFeatureTest extends FilesystemTest
         return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
             'image_check_mime' => false
         ], [
-            new UrlBuilderGlideUrlFeature($urlBuilder),
+            new GlideTransformImageUrl($urlBuilder),
         ]);
     }
 }

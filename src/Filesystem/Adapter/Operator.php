@@ -13,7 +13,7 @@ use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\FileUrl;
-use Zenstruck\Filesystem\Feature\GlideUrl;
+use Zenstruck\Filesystem\Feature\TransformImageUrl;
 use Zenstruck\Filesystem\Feature\ModifyFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -28,7 +28,7 @@ use Zenstruck\Uri;
  * @phpstan-import-type GlobalConfig from AdapterFilesystem
  * @phpstan-import-type Features from AdapterFilesystem
  */
-final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl, GlideUrl
+final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl, TransformImageUrl
 {
     private PathNormalizer $normalizer;
 
@@ -78,13 +78,13 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
         return $feature->urlFor($file, $options);
     }
 
-    public function glideUrlFor(Image $image, mixed $options = []): Uri
+    public function transformUrlFor(Image $image, mixed $options = []): Uri
     {
-        if (!$feature = $this->feature(GlideUrl::class)) {
-            throw new UnsupportedFeature(\sprintf('"%s" is not supported.', GlideUrl::class));
+        if (!$feature = $this->feature(TransformImageUrl::class)) {
+            throw new UnsupportedFeature(\sprintf('"%s" is not supported.', TransformImageUrl::class));
         }
 
-        return $feature->glideUrlFor($image, $options);
+        return $feature->transformUrlFor($image, $options);
     }
 
     public function realFile(File $file): \SplFileInfo
