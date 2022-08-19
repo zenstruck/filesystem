@@ -40,10 +40,10 @@ interface Filesystem
     public const ROOT = '';
 
     /**
+     * @return File|Directory<Node>
+     *
      * @throws NodeNotFound        If node at path is not found
      * @throws FilesystemException {@see FilesystemReader::has()}
-     *
-     * @return File|Directory<Node>
      */
     public function node(string $path): File|Directory;
 

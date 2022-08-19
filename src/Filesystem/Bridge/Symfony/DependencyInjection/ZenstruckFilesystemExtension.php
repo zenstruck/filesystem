@@ -61,14 +61,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
-        foreach ($mergedConfig['filesystems'] as $name => $config) {
-            $this->addFilesystem($name, $config, $container);
-        }
-
         $defaultName = $mergedConfig['default_filesystem'] ?? \array_key_first($mergedConfig['filesystems']);
 
         if (!isset($mergedConfig['filesystems'][$defaultName])) {
             throw new InvalidConfigurationException('Invalid default filesystem name');
+        }
+
+        foreach ($mergedConfig['filesystems'] as $name => $config) {
+            $this->addFilesystem($name, $config, $container, $defaultName);
         }
 
         $container->register(MultiFilesystem::class)
@@ -77,8 +77,6 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 $defaultName,
             ])
         ;
-
-        $container->setAlias(Filesystem::class, MultiFilesystem::class);
 
         if ($mergedConfig['doctrine']['enabled']) {
             $this->addDoctrineConfig($mergedConfig['doctrine'], $container);
@@ -180,7 +178,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function addFilesystem(string $name, array $config, ContainerBuilder $container): void
+    private function addFilesystem(string $name, array $config, ContainerBuilder $container, string $defaultName): void
     {
         if (\str_starts_with($config['dsn'], '@')) {
             $config['dsn'] = new Reference(\mb_substr($config['dsn'], 1));
@@ -271,6 +269,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
-        $container->registerAliasForArgument($filesystem, Filesystem::class, $name.'Filesystem');
+        if ($name === $defaultName) {
+            $container->setAlias(Filesystem::class, $filesystem);
+        } else {
+            $container->registerAliasForArgument($filesystem, Filesystem::class, $name.'Filesystem');
+        }
     }
 }

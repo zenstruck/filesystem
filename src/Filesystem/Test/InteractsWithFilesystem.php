@@ -52,7 +52,7 @@ trait InteractsWithFilesystem
             $filesystem = \is_string($filesystem) ? new AdapterFilesystem($filesystem) : $filesystem;
         } elseif ($this instanceof KernelTestCase) {
             try {
-                $filesystem = self::getContainer()->get(Filesystem::class);
+                $filesystem = self::getContainer()->get(MultiFilesystem::class);
             } catch (NotFoundExceptionInterface $e) {
                 throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
             }

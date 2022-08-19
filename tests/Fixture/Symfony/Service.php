@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Tests\Fixture\Symfony;
 
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\MultiFilesystem;
 
 final class Service
 {
@@ -10,6 +11,7 @@ final class Service
         public Filesystem $general,
         public Filesystem $publicFilesystem,
         public Filesystem $privateFilesystem,
+        public MultiFilesystem $multi,
     ) {
     }
 }

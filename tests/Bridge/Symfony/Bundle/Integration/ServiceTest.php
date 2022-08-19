@@ -22,10 +22,14 @@ final class ServiceTest extends KernelTestCase
         /** @var Service $service */
         $service = self::getContainer()->get(Service::class);
 
-        $this->assertInstanceOf(MultiFilesystem::class, $service->general);
+        $this->assertNotInstanceOf(MultiFilesystem::class, $service->general);
         $this->assertSame('public', $service->general->name());
+        $this->assertNotInstanceOf(MultiFilesystem::class, $service->publicFilesystem);
         $this->assertSame('public', $service->publicFilesystem->name());
+        $this->assertNotInstanceOf(MultiFilesystem::class, $service->general);
         $this->assertSame('private', $service->privateFilesystem->name());
+        $this->assertInstanceOf(MultiFilesystem::class, $service->multi);
+        $this->assertSame('public', $service->multi->name());
     }
 
     /**
