@@ -26,7 +26,7 @@ class Image extends File
     /**
      * @param array<string,mixed> $options
      *
-     * @throws UnsupportedFeature If your adapter does not support {@see transformImageUrl}
+     * @throws UnsupportedFeature If your adapter does not support {@see TransformImageUrl}
      */
     final public function transformUrl(array $options = []): Uri
     {
