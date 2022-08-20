@@ -404,7 +404,14 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
     new UrlBuilderGlideUrlFeature(UrlBuilderFactory::create('/glide/', 'signature')),
 ]);
 
+// generate with Glide manipulation options
 (string) $filesystem->image('some/image.png')->transformUrl(['w' => 100, 'h' => 100]); // "/glide/some/image.png?w=100&h=100&s=3a82607a9517525d0a98de4548e10917"
+
+// generate with a Glide preset
+(string) $filesystem->image('some/image.png')->transformUrl('square-100'); // "/glide/some/image.png?p=square-100&s=3a82607a9517525d0a98de4548e10917"
+
+// generate with multiple Glide presets
+(string) $filesystem->image('some/image.png')->transformUrl(['square-100', 'low-quality']); // "/glide/some/image.png?p=square-100,low-quality&s=3a82607a9517525d0a98de4548e10917"
 ```
 
 ##### Custom Features
