@@ -34,7 +34,7 @@ class Image extends File
     }
 
     /**
-     * Alias of transformUrl for most popular use case
+     * Alias of {@see transformUrl()} for most popular use case.
      */
     final public function thumbUrl(array $options = []): Uri
     {
