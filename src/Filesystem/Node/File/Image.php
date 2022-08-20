@@ -36,7 +36,7 @@ class Image extends File
     /**
      * Alias of {@see transformUrl()} for most popular use case.
      */
-    final public function thumbUrl(array $options = []): Uri
+    final public function thumbUrl(mixed $options = []): Uri
     {
         return $this->transformUrl($options);
     }
