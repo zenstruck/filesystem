@@ -216,9 +216,15 @@ $image = $filesystem->image('nested/image.png');
  *
  * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support transformed image URLs
  */
+// If your filesystem supports transforming urls with a set of parameters
 $url = $file->transformUrl(['w' => 100, 'h' => 100]); // Zenstruck\Uri
 (string) $url; // string (ie https://example.com/glide/image.png?w=100&h=100)
-/** You can also use shorter alias */
+
+// If your filesystem supports transforming urls with a set of parameters
+$url = $file->transformUrl('square-100'); // Zenstruck\Uri
+(string) $url; // string (ie https://example.com/glide/image.png?p=square-200)
+
+// You can also use shorter alias
 $url = $file->thumbUrl(['w' => 100, 'h' => 100]);
 
 // image metadata
