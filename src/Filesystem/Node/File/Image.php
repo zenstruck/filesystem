@@ -28,7 +28,7 @@ class Image extends File
      *
      * @throws UnsupportedFeature If your adapter does not support {@see TransformImageUrl}
      */
-    final public function transformUrl(array $options = []): Uri
+    final public function transformUrl(mixed $options = []): Uri
     {
         return $this->operator()->transformUrlFor($this, $options);
     }
