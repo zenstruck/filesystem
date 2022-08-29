@@ -3,6 +3,8 @@
 namespace Zenstruck\Filesystem\Node;
 
 use League\Flysystem\FileAttributes;
+use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
@@ -27,6 +29,8 @@ class File implements Node
 
     /** @var array<string,Operator> */
     protected static array $localOperators = [];
+
+    private static MimeTypesInterface $mimeTypes;
 
     private Information $size;
     private string $mimeType;
@@ -131,6 +135,23 @@ class File implements Node
     final public function extension(): ?string
     {
         return $this->nameParts($this->name())[1];
+    }
+
+    /**
+     * Returns the file extension if available. If not, and symfony/mime
+     * is installed, attempt to guess from mime-type.
+     */
+    final public function guessExtension(): ?string
+    {
+        if ($ext = $this->extension()) {
+            return $ext;
+        }
+
+        if (!\interface_exists(MimeTypesInterface::class)) {
+            return null;
+        }
+
+        return (self::$mimeTypes ??= new MimeTypes())->getExtensions($this->mimeType())[0] ?? null;
     }
 
     /**

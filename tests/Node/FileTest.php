@@ -56,4 +56,16 @@ final class FileTest extends TestCase
         yield ['foo.gz', 'gz', 'foo'];
         yield ['foo.bz2', 'bz2', 'foo'];
     }
+
+    /**
+     * @test
+     */
+    public function can_guess_extension(): void
+    {
+        $file1 = $this->filesystem()->write('foo.jpg', 'content')->last();
+        $file2 = $this->filesystem()->write('foo', new \SplFileInfo(FilesystemTest::FIXTURE_DIR.'/symfony.png'))->last();
+
+        $this->assertSame('jpg', $file1->guessExtension());
+        $this->assertSame('png', $file2->guessExtension());
+    }
 }

@@ -161,6 +161,7 @@ $file->name(); // "file.txt"
 $file->dirname(); // "nested"
 $file->extension(); // "txt"
 $file->nameWithoutExtension(); // "file"
+$file->guessExtension(); // "txt" if file has no extension, attempt to guess from mime-type (requires symfony/mime)
 
 $file->directory(); // Zenstruck\Node\Directory for the file's parent directory (ie "nested")
 
