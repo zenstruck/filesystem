@@ -28,6 +28,18 @@ final class TempFileTest extends TestCase
     /**
      * @test
      */
+    public function can_create_with_extension(): void
+    {
+        $file = TempFile::withExtension('gif');
+
+        $this->assertFileExists($file);
+        $this->assertStringEndsWith('.gif', (string) $file);
+        $this->assertFileDoesNotExist(\mb_substr($file, 0, -4));
+    }
+
+    /**
+     * @test
+     */
     public function exists_when_created(): void
     {
         $this->assertFileExists(new TempFile());

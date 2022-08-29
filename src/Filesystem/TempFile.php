@@ -38,6 +38,17 @@ final class TempFile extends \SplFileInfo
         return new self($filename);
     }
 
+    public static function withExtension(string $extension): self
+    {
+        $original = self::tempFile();
+
+        if (!\rename($original, $new = "{$original}.{$extension}")) {
+            throw new \RuntimeException('Unable to create temp file with extension.');
+        }
+
+        return new self($new);
+    }
+
     /**
      * @param string|resource|ResourceWrapper|File $contents
      */
