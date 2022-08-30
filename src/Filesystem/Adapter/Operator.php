@@ -74,11 +74,7 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
 
     public function urlFor(File $file, mixed $options = []): Uri
     {
-        if (!$feature = $this->feature(FileUrl::class)) {
-            throw new UnsupportedFeature(\sprintf('"%s" is not supported.', FileUrl::class));
-        }
-
-        return $feature->urlFor($file, $options);
+        return $this->featureOrFail(FileUrl::class)->urlFor($file, $options);
     }
 
     public function realFile(File $file): \SplFileInfo
@@ -108,16 +104,30 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
             return $this->adapter;
         }
 
-        if ($this->features instanceof ContainerInterface) {
-            return $this->features->has($name) ? $this->features->get($name) : null;
+        if ($this->features instanceof ContainerInterface && $this->features->has($name)) {
+            return $this->features->get($name);
         }
 
-        foreach ($this->features as $feature) {
-            if ($feature instanceof $name) {
-                return $feature;
+        if (\is_iterable($this->features)) {
+            foreach ($this->features as $feature) {
+                if ($feature instanceof $name) {
+                    return $feature;
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $name
+     *
+     * @return T
+     */
+    private function featureOrFail(string $name): object
+    {
+        return $this->feature($name) ?? throw new UnsupportedFeature(\sprintf('Feature "%s" is not supported by filesystem "%s".', $name, $this->name));
     }
 }
