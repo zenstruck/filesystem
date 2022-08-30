@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem\Tests;
 
+use Zenstruck\Filesystem\Operation;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
@@ -41,13 +42,13 @@ final class TraceableFilesystemTest extends FilesystemTest
 
         $this->assertSame(
             [
-                'write' => [['foo', 'string']],
-                'mkdir' => [['bar', null]],
-                'chmod' => [['foo', 'public']],
-                'copy' => [['foo', 'file.png']],
-                'delete' => [['foo', null]],
-                'move' => [['file.png', 'file2.png']],
-                'read' => [
+                Operation::WRITE => [['foo', 'string']],
+                Operation::MKDIR => [['bar', null]],
+                Operation::CHMOD => [['foo', 'public']],
+                Operation::COPY => [['foo', 'file.png']],
+                Operation::DELETE => [['foo', null]],
+                Operation::MOVE => [['file.png', 'file2.png']],
+                Operation::READ => [
                     ['file2.png', TestFile::class],
                     ['file2.png', TestFile::class],
                     ['file2.png', TestImage::class],

@@ -482,7 +482,7 @@ $filesystem->delete('some/file.txt'); // throws \BadMethodCallException
 
 Filesystem wrapper that enables logging operations.
 
-> **Note**: If using multiple filesystems, it's important they are named to distinguish in logs.
+> **Note**: If using multiple filesystems, it's important they are _named_ to distinguish in logs.
 
 ```php
 use Zenstruck\Filesystem\AdapterFilesystem;
@@ -499,18 +499,19 @@ $filesystem->delete('file1.txt'); // logs "[info] Deleted "file1.txt" on filesys
 ```
 
 By default, read operations are logged at the _debug_ level and write operations are logged at the _info_ level.
-This can be customized:
+This can be customized (see `Zenstruck\Filesystem\Operation` for all available operations):
 
 ```php
 use Zenstruck\Filesystem\LoggableFilesystem;
+use Zenstruck\Filesystem\Operation;
 use Psr\Log\LogLevel
 
 /** @var \Zenstruck\Filesystem $filesystem */
 /** @var \Psr\Log\LoggerInterface $logger */
 
 $filesystem = new LoggableFilesystem($filesystem, $logger, [
-    'read' => false, // disable logging read operations
-    'delete' => LogLevel::NOTICE, // use the "notice" level for delete operations
+    Operation::READ => false, // disable logging read operations
+    Operation::DELETE => LogLevel::NOTICE, // use the "notice" level for delete operations
 ]);
 ```
 

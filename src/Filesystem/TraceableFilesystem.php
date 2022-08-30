@@ -14,15 +14,7 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class TraceableFilesystem implements Filesystem
 {
-    public const READ = 'read';
-    public const WRITE = 'write';
-    public const MOVE = 'move';
-    public const COPY = 'copy';
-    public const DELETE = 'delete';
-    public const CHMOD = 'chmod';
-    public const MKDIR = 'mkdir';
-
-    /** @var array<self::*,list<array{0:string,1:string|null}>> */
+    /** @var array<Operation::*,list<array{0:string,1:string|null}>> */
     public array $operations = [];
 
     public function __construct(private Filesystem $inner)
@@ -30,7 +22,7 @@ final class TraceableFilesystem implements Filesystem
     }
 
     /**
-     * @return array<self::*,list<array{0:string,1:string|null}>>
+     * @return array<Operation::*,list<array{0:string,1:string|null}>>
      */
     public function operations(): array
     {
@@ -44,13 +36,13 @@ final class TraceableFilesystem implements Filesystem
 
     public function totalReads(): int
     {
-        return \count($this->operations[self::READ] ?? []);
+        return \count($this->operations[Operation::READ] ?? []);
     }
 
     public function totalWrites(): int
     {
         return \array_sum(
-            \array_map(fn($type) => \count($this->operations[$type] ?? []), [self::WRITE, self::MOVE, self::COPY, self::DELETE, self::CHMOD, self::MKDIR])
+            \array_map(fn($type) => \count($this->operations[$type] ?? []), Operation::writes())
         );
     }
 
@@ -63,7 +55,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->node($path);
 
-        $this->operations[self::READ][] = [$path, $ret::class];
+        $this->operations[Operation::READ][] = [$path, $ret::class];
 
         return $ret;
     }
@@ -72,7 +64,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->file($path);
 
-        $this->operations[self::READ][] = [$path, $ret::class];
+        $this->operations[Operation::READ][] = [$path, $ret::class];
 
         return $ret;
     }
@@ -81,7 +73,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->directory($path);
 
-        $this->operations[self::READ][] = [$path, $ret::class];
+        $this->operations[Operation::READ][] = [$path, $ret::class];
 
         return $ret;
     }
@@ -90,7 +82,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->image($path);
 
-        $this->operations[self::READ][] = [$path, $ret::class];
+        $this->operations[Operation::READ][] = [$path, $ret::class];
 
         return $ret;
     }
@@ -99,7 +91,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $ret = $this->inner->has($path);
 
-        $this->operations[self::READ][] = [$path, null];
+        $this->operations[Operation::READ][] = [$path, null];
 
         return $ret;
     }
@@ -108,7 +100,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->copy($source, $destination, $config);
 
-        $this->operations[self::COPY][] = [$source, $destination];
+        $this->operations[Operation::COPY][] = [$source, $destination];
 
         return $this;
     }
@@ -117,7 +109,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->move($source, $destination, $config);
 
-        $this->operations[self::MOVE][] = [$source, $destination];
+        $this->operations[Operation::MOVE][] = [$source, $destination];
 
         return $this;
     }
@@ -126,7 +118,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->delete($path, $config);
 
-        $this->operations[self::DELETE][] = [(string) $path, null];
+        $this->operations[Operation::DELETE][] = [(string) $path, null];
 
         return $this;
     }
@@ -135,7 +127,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->mkdir($path, $config);
 
-        $this->operations[self::MKDIR][] = [$path, null];
+        $this->operations[Operation::MKDIR][] = [$path, null];
 
         return $this;
     }
@@ -144,7 +136,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->chmod($path, $visibility);
 
-        $this->operations[self::CHMOD][] = [$path, $visibility];
+        $this->operations[Operation::CHMOD][] = [$path, $visibility];
 
         return $this;
     }
@@ -153,7 +145,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->inner->write($path, $value, $config);
 
-        $this->operations[self::WRITE][] = [$path, \get_debug_type($value)];
+        $this->operations[Operation::WRITE][] = [$path, \get_debug_type($value)];
 
         return $this;
     }

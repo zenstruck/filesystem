@@ -7,6 +7,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
+use Zenstruck\Filesystem\Operation;
 use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 
@@ -63,13 +64,13 @@ final class LoggableFilesystemTest extends FilesystemTest
         $resource = ResourceWrapper::inMemory();
         $logger = new Logger(LogLevel::DEBUG, $resource->get());
         $filesystem = new LoggableFilesystem($this->filesystem(), $logger, [
-            'read' => LogLevel::INFO,
-            'write' => LogLevel::DEBUG,
-            'move' => LogLevel::ALERT,
-            'copy' => LogLevel::CRITICAL,
-            'delete' => LogLevel::EMERGENCY,
-            'chmod' => LogLevel::ERROR,
-            'mkdir' => LogLevel::NOTICE,
+            Operation::READ => LogLevel::INFO,
+            Operation::WRITE => LogLevel::DEBUG,
+            Operation::MOVE => LogLevel::ALERT,
+            Operation::COPY => LogLevel::CRITICAL,
+            Operation::DELETE => LogLevel::EMERGENCY,
+            Operation::CHMOD => LogLevel::ERROR,
+            Operation::MKDIR => LogLevel::NOTICE,
         ]);
 
         $filesystem
@@ -110,7 +111,7 @@ final class LoggableFilesystemTest extends FilesystemTest
         $resource = ResourceWrapper::inMemory();
         $logger = new Logger(LogLevel::DEBUG, $resource->get());
 
-        $filesystem = (new LoggableFilesystem($this->filesystem(), $logger, ['read' => false]))
+        $filesystem = (new LoggableFilesystem($this->filesystem(), $logger, [Operation::READ => false]))
             ->write('foo', 'bar')
             ->mkdir('bar')
             ->chmod('foo', 'public')

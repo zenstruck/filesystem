@@ -15,33 +15,17 @@ use Zenstruck\Filesystem\Node\File\Image;
 final class LoggableFilesystem implements Filesystem
 {
     public const DEFAULT_CONFIG = [
-        self::READ => LogLevel::DEBUG,
-        self::WRITE => LogLevel::INFO,
+        Operation::READ => LogLevel::DEBUG,
+        Operation::WRITE => LogLevel::INFO,
     ];
 
-    private const READ = 'read';
-    private const WRITE = 'write';
-    private const MOVE = 'move';
-    private const COPY = 'copy';
-    private const DELETE = 'delete';
-    private const CHMOD = 'chmod';
-    private const MKDIR = 'mkdir';
-
     /**
-     * @param array{
-     *     read?: false|LogLevel::*,
-     *     write?: false|LogLevel::*,
-     *     move?: false|LogLevel::*,
-     *     copy?: false|LogLevel::*,
-     *     delete?: false|LogLevel::*,
-     *     chmod?: false|LogLevel::*,
-     *     mkdir?: false|LogLevel::*,
-     * } $config
+     * @param array<Operation::*,false|LogLevel::*> $config
      */
     public function __construct(
         private Filesystem $inner,
         private LoggerInterface $logger,
-        private array $config = self::DEFAULT_CONFIG
+        private array $config = []
     ) {
     }
 
@@ -50,7 +34,7 @@ final class LoggableFilesystem implements Filesystem
         $ret = $this->inner->node($path);
 
         $this->log(
-            $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Read "{path}" ({type}) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -67,7 +51,7 @@ final class LoggableFilesystem implements Filesystem
         $ret = $this->inner->file($path);
 
         $this->log(
-            $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Read "{path}" (file) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -83,7 +67,7 @@ final class LoggableFilesystem implements Filesystem
         $ret = $this->inner->directory($path);
 
         $this->log(
-            $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Read "{path}" (directory) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -99,7 +83,7 @@ final class LoggableFilesystem implements Filesystem
         $ret = $this->inner->image($path);
 
         $this->log(
-            $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Read "{path}" (image) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -115,7 +99,7 @@ final class LoggableFilesystem implements Filesystem
         $ret = $this->inner->has($path);
 
         $this->log(
-            $this->config[self::READ] ?? self::DEFAULT_CONFIG[self::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Checked existence of "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -131,7 +115,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->copy($source, $destination, $config);
 
         $this->log(
-            $this->config[self::COPY] ?? $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::COPY] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Copied "{source}" to "{destination}" on filesystem "{filesystem}"',
             [
                 'source' => $source,
@@ -148,7 +132,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->move($source, $destination, $config);
 
         $this->log(
-            $this->config[self::MOVE] ?? $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::MOVE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Moved "{source}" to "{destination}" on filesystem "{filesystem}"',
             [
                 'source' => $source,
@@ -165,7 +149,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->delete($path, $config);
 
         $this->log(
-            $this->config[self::DELETE] ?? $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::DELETE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Deleted "{path}" on filesystem "{filesystem}"',
             [
                 'path' => (string) $path,
@@ -181,7 +165,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->mkdir($path, $config);
 
         $this->log(
-            $this->config[self::MKDIR] ?? $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Created directory "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -197,7 +181,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->chmod($path, $visibility);
 
         $this->log(
-            $this->config[self::CHMOD] ?? $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::CHMOD] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Set visibility of "{path}" to "{visibility}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -214,7 +198,7 @@ final class LoggableFilesystem implements Filesystem
         $this->inner->write($path, $value, $config);
 
         $this->log(
-            $this->config[self::WRITE] ?? self::DEFAULT_CONFIG[self::WRITE],
+            $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Wrote "{what}" to "{path}" on filesystem "{filesystem}"',
             [
                 'what' => \get_debug_type($value),
