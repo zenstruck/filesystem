@@ -114,6 +114,7 @@ abstract class FilesystemTest extends TestCase
             $this->assertSame(563, $image->width());
             $this->assertSame(678, $image->height());
             $this->assertSame(0.83, \round($image->aspectRatio(), 2));
+            $this->assertSame([], $image->iptc());
         }
 
         $image = $filesystem->image('images/symfony.svg');
@@ -121,6 +122,12 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame(202, $image->width());
         $this->assertSame(224, $image->height());
         $this->assertSame(0.90, \round($image->aspectRatio(), 2));
+        $this->assertSame([], $image->iptc());
+
+        $image = $filesystem->image('images/metadata.jpg');
+
+        $this->assertSame(16, $image->exif()['computed.Height']);
+        $this->assertSame('Lorem Ipsum', $image->iptc()['DocumentTitle']);
     }
 
     /**

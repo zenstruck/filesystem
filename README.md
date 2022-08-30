@@ -212,7 +212,7 @@ The `Image` node extends `File` so all it's methods are available.
 ```php
 /** @var Zenstruck\Filesystem $filesystem */
 
-$image = $filesystem->image('nested/image.png');
+$image = $filesystem->image('nested/image.jpg');
 
 // image metadata
 $image->width(); // int
@@ -222,6 +222,8 @@ $image->aspectRatio(); // float
 $image->isLandscape(); // bool
 $image->isPortrait(); // bool
 $image->isSquare(); // bool
+$image->iptc(); // array of IPTC data
+$image->exif(); // array of EXIF data (if the image supports)
 ```
 
 > **Note**: `Image` should be considered _final_ and is not meant to be extended.
