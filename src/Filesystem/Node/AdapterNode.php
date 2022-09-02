@@ -5,21 +5,24 @@ namespace Zenstruck\Filesystem\Node;
 use League\Flysystem\StorageAttributes;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\File\LazyImage;
+use Zenstruck\Filesystem\Node\File\Image\AdapterImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-trait IsNode
+abstract class AdapterNode implements Node
 {
-    protected string $path;
+    private const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
+
+    private string $path;
     private \DateTimeImmutable $lastModified;
     private string $visibility;
 
-    public function __construct(StorageAttributes $attributes, protected Operator $operator)
+    public function __construct(StorageAttributes $attributes, private Operator $operator)
     {
         $this->path = $attributes->path();
 
@@ -34,12 +37,12 @@ trait IsNode
 
     final public function __toString(): string
     {
-        return $this->path;
+        return $this->path();
     }
 
-    public function serialize(): string
+    final public function serialize(): string
     {
-        return $this->operator()->serialize($this->path);
+        return $this->operator()->serialize($this->path());
     }
 
     final public function path(): string
@@ -75,8 +78,6 @@ trait IsNode
         return $this->operator()->has($this->path());
     }
 
-    abstract public function mimeType(): string;
-
     public function refresh(): static
     {
         unset($this->visibility, $this->lastModified);
@@ -104,7 +105,9 @@ trait IsNode
             throw NodeTypeMismatch::expectedImageAt($this->path(), $this->mimeType());
         }
 
-        $image = isset($this->operator) ? new Image($this->path) : new LazyImage($this->path); // @phpstan-ignore-line
+        $image = $this->castToImage();
+
+        $image->path = $this->path; // @phpstan-ignore-line
 
         if (isset($this->operator)) {
             $image->operator = $this->operator; // @phpstan-ignore-line
@@ -116,18 +119,6 @@ trait IsNode
 
         if (isset($this->lastModified)) {
             $image->lastModified = $this->lastModified; // @phpstan-ignore-line
-        }
-
-        if (isset($this->size)) {
-            $image->size = $this->size; // @phpstan-ignore-line
-        }
-
-        if (isset($this->mimeType)) {
-            $image->mimeType = $this->mimeType; // @phpstan-ignore-line
-        }
-
-        if (isset($this->checksum)) {
-            $image->checksum = $this->checksum; // @phpstan-ignore-line
         }
 
         return $image;
@@ -157,10 +148,22 @@ trait IsNode
             return \str_contains($this->mimeType(), 'image/');
         }
 
-        return \in_array(\mb_strtolower($ext), Image::IMAGE_EXTENSIONS, true); // @phpstan-ignore-line
+        return \in_array(\mb_strtolower($ext), self::IMAGE_EXTENSIONS, true);
     }
 
-    final protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
+    abstract public function mimeType(): string;
+
+    final protected function operator(): Operator
+    {
+        return $this->operator;
+    }
+
+    protected function castToImage(): AdapterImage
+    {
+        throw new \BadMethodCallException();
+    }
+
+    protected static function parseDateTime(\DateTimeInterface|int|string $timestamp): \DateTimeImmutable
     {
         if (\is_numeric($timestamp)) {
             $timestamp = \DateTimeImmutable::createFromFormat('U', (string) $timestamp);
@@ -180,10 +183,5 @@ trait IsNode
 
         // ensure in the PHP default timezone
         return $timestamp->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
-    }
-
-    protected function operator(): Operator
-    {
-        return $this->operator;
     }
 }

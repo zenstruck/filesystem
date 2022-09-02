@@ -6,9 +6,9 @@ use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
-use Zenstruck\Filesystem\Node\Directory;
-use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\Directory\AdapterDirectory;
+use Zenstruck\Filesystem\Node\File\AdapterFile;
+use Zenstruck\Filesystem\Node\File\Image\AdapterImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -38,9 +38,9 @@ final class NodeTest extends TestCase
         $this->assertSame('second://sub/file.png', $image);
         $this->assertSame('first://sub', $dir);
 
-        $file = File::unserialize($file, $filesystem);
-        $image = Image::unserialize($image, $filesystem);
-        $dir = Directory::unserialize($dir, $filesystem);
+        $file = AdapterFile::unserialize($file, $filesystem);
+        $image = AdapterImage::unserialize($image, $filesystem);
+        $dir = AdapterDirectory::unserialize($dir, $filesystem);
 
         $this->assertSame('sub/file.txt', $file->path());
         $this->assertSame('sub/file.png', $image->path());

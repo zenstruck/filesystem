@@ -4,13 +4,23 @@ namespace Zenstruck\Filesystem\Test\Node;
 
 use Zenstruck\Assert;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\File\Image\WrappedImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TestImage extends Image
+final class TestImage implements Image
 {
-    use IsTestFile;
+    use IsTestFile, WrappedImage {
+        IsTestFile::ensureFile insteadof WrappedImage;
+        IsTestFile::ensureImage insteadof WrappedImage;
+        IsTestFile::ensureDirectory insteadof WrappedImage;
+        IsTestFile::directory insteadof WrappedImage;
+    }
+
+    public function __construct(private Image $image)
+    {
+    }
 
     /**
      * @param int|callable(int):void $expected
@@ -42,5 +52,10 @@ final class TestImage extends Image
         ($expected)($this->width());
 
         return $this;
+    }
+
+    protected function inner(): Image
+    {
+        return $this->image;
     }
 }

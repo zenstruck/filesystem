@@ -12,6 +12,8 @@ use Zenstruck\Filesystem\Node\File\Image;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @immutable
+ *
  * @phpstan-import-type ImageConfig from Filesystem
  */
 interface Node extends \Stringable

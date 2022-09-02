@@ -19,7 +19,9 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Exception\UnableToCopyDirectory;
 use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Directory\AdapterDirectory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\AdapterFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Util\ResourceWrapper;
@@ -61,23 +63,29 @@ final class AdapterFilesystem implements Filesystem
         return $this->name;
     }
 
+    /**
+     * @return AdapterFile|AdapterDirectory
+     */
     public function node(string $path): File|Directory
     {
         if ($this->operator->fileExists($path)) {
-            return new File($this->operator->fileAttributesFor($path), $this->operator);
+            return new AdapterFile($this->operator->fileAttributesFor($path), $this->operator);
         }
 
         if ($this->operator->directoryExists($path)) {
-            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+            return new AdapterDirectory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
         throw NodeNotFound::for($path);
     }
 
+    /**
+     * @return AdapterFile
+     */
     public function file(string $path): File
     {
         if ($this->operator->fileExists($path)) {
-            return new File($this->operator->fileAttributesFor($path), $this->operator);
+            return new AdapterFile($this->operator->fileAttributesFor($path), $this->operator);
         }
 
         if ($this->has($path)) {
@@ -99,7 +107,7 @@ final class AdapterFilesystem implements Filesystem
     public function directory(string $path): Directory
     {
         if ($this->operator->directoryExists($path)) {
-            return new Directory($this->operator->directoryAttributesFor($path), $this->operator);
+            return new AdapterDirectory($this->operator->directoryAttributesFor($path), $this->operator);
         }
 
         if ($this->has($path)) {
@@ -320,7 +328,7 @@ final class AdapterFilesystem implements Filesystem
         }
 
         if (isset($config['progress'])) {
-            $config['progress'](new File($this->operator->fileAttributesFor($path), $this->operator));
+            $config['progress'](new AdapterFile($this->operator->fileAttributesFor($path), $this->operator));
         }
 
         if ($config['set_last_path'] ?? true) {

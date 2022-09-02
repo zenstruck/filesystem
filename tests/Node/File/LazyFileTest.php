@@ -4,13 +4,12 @@ namespace Zenstruck\Filesystem\Tests\Node\File;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class LazyFileTest extends TestCase
+final class LazyFileTest extends TestCase
 {
     use InteractsWithFilesystem;
 
@@ -22,7 +21,7 @@ class LazyFileTest extends TestCase
         $filesystem = $this->filesystem();
         $filesystem->write('foo/bar.txt', 'content');
 
-        $node = $this->createNode('foo/bar.txt');
+        $node = new LazyFile('foo/bar.txt');
         $node->setFilesystem($filesystem);
 
         $this->assertSame('foo/bar.txt', $node->path());
@@ -35,17 +34,12 @@ class LazyFileTest extends TestCase
      */
     public function must_have_filesystem_set_before_performing_any_filesystem_operations(): void
     {
-        $node = $this->createNode('foo/bar.txt');
+        $node = new LazyFile('foo/bar.txt');
 
         $this->assertSame('foo/bar.txt', $node->path());
 
         $this->expectException(\LogicException::class);
 
         $node->lastModified();
-    }
-
-    protected function createNode(string $path): LazyNode
-    {
-        return new LazyFile($path);
     }
 }

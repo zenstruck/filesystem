@@ -3,17 +3,23 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\AdapterFilesystem;
-use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Util;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PendingFile extends File
+final class PendingFile implements File
 {
+    use WrappedFile;
+
+    /** @var array<string,AdapterFilesystem> */
+    private static array $filesystems;
+
+    private string $path;
     private \SplFileInfo $file;
+    private File $inner;
 
     /** @var callable(self,object):string|array<string,mixed> */
     private mixed $config;
@@ -28,14 +34,9 @@ final class PendingFile extends File
         $this->config = $config;
     }
 
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File
+    public function path(): string
     {
-        throw new \BadMethodCallException(\sprintf('%s cannot be unserialized.', self::class));
-    }
-
-    public function serialize(): string
-    {
-        throw new \BadMethodCallException(\sprintf('%s cannot be serialized.', self::class));
+        return $this->path;
     }
 
     /**
@@ -60,23 +61,26 @@ final class PendingFile extends File
 
     public function originalNameWithoutExtension(): string
     {
-        return self::parseNameParts($this->originalName())[0];
+        return Util::parseNameParts($this->originalName())[0];
     }
 
     public function originalExtension(): ?string
     {
         if ($this->file instanceof UploadedFile) {
-            return self::parseNameParts($this->file->getClientOriginalName())[1];
+            return Util::parseNameParts($this->file->getClientOriginalName())[1];
         }
 
         return $this->extension();
     }
 
-    protected function operator(): Operator
+    protected function inner(): File
     {
-        return $this->operator ??= self::$localOperators[$dir = \dirname($this->file)] ??= (new AdapterFilesystem($dir))
-            ->file($this->file->getFilename())
-            ->operator()
-        ;
+        if (isset($this->inner)) {
+            return $this->inner;
+        }
+
+        $filesystem = self::$filesystems[$dir = \dirname($this->file)] ??= new AdapterFilesystem($dir);
+
+        return $this->inner = $filesystem->file($this->file->getFilename());
     }
 }

@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Test\Node;
 use Zenstruck\Assert;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Checksum;
 use Zenstruck\Filesystem\Node\File\Image;
 
@@ -16,6 +17,11 @@ use Zenstruck\Filesystem\Node\File\Image;
 trait IsTestFile
 {
     use IsTestNode;
+
+    public function directory(): TestDirectory
+    {
+        return new TestDirectory($this->inner()->directory());
+    }
 
     public function assertContentIs(string $expected): self
     {
@@ -94,7 +100,7 @@ trait IsTestFile
     public function dump(): self
     {
         $what = [
-            'path' => $this->path,
+            'path' => $this->path(),
             'mimeType' => $this->mimeType(),
             'lastModified' => $this->lastModified(),
             'size' => $this->size()->humanize(),
@@ -124,4 +130,6 @@ trait IsTestFile
         $this->dump();
         exit(1);
     }
+
+    abstract protected function inner(): File;
 }

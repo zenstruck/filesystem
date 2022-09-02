@@ -20,6 +20,12 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, ServiceSubscriberInterface, CacheableSupportsMethodInterface
 {
+    private const TYPE_MAP = [
+        File::class => File\AdapterFile::class,
+        Directory::class => Directory\AdapterDirectory::class,
+        Image::class => Image\AdapterImage::class,
+    ];
+
     public function __construct(private ContainerInterface $container)
     {
     }
@@ -54,7 +60,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw NotNormalizableValueException::createForUnexpectedDataType('The data must be a string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
-        return $type::unserialize($data, $this->container->get(MultiFilesystem::class));
+        return (self::TYPE_MAP[$type])::unserialize($data, $this->container->get(MultiFilesystem::class));
     }
 
     /**
@@ -62,7 +68,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return \in_array($type, [File::class, Image::class, Directory::class], true);
+        return isset(self::TYPE_MAP[$type]);
     }
 
     public function hasCacheableSupportsMethod(): bool

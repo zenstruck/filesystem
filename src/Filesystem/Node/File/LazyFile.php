@@ -10,7 +10,16 @@ use Zenstruck\Filesystem\Node\LazyNode;
  *
  * @internal
  */
-final class LazyFile extends File implements LazyNode
+final class LazyFile implements File, LazyNode
 {
-    use IsLazyFile;
+    use IsLazyFile, WrappedFile {
+        IsLazyFile::path insteadof WrappedFile;
+    }
+
+    private File $inner;
+
+    protected function inner(): File
+    {
+        return $this->inner ??= $this->filesystem()->file($this->path());
+    }
 }

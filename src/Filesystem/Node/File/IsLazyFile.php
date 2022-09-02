@@ -3,7 +3,6 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Adapter\Operator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -12,15 +11,13 @@ use Zenstruck\Filesystem\Adapter\Operator;
  */
 trait IsLazyFile
 {
-    private Filesystem $filesystem;
-
-    public function __construct(string $path, ?Filesystem $filesystem = null)
+    public function __construct(private string $path, private ?Filesystem $filesystem = null)
     {
-        $this->path = $path;
+    }
 
-        if ($filesystem) {
-            $this->filesystem = $filesystem;
-        }
+    public function path(): string
+    {
+        return $this->path;
     }
 
     public function setFilesystem(Filesystem $filesystem): void
@@ -28,16 +25,8 @@ trait IsLazyFile
         $this->filesystem = $filesystem;
     }
 
-    protected function operator(): Operator
+    private function filesystem(): Filesystem
     {
-        if (isset($this->operator)) {
-            return $this->operator;
-        }
-
-        if (!isset($this->filesystem)) {
-            throw new \LogicException('The filesystem has not been set.');
-        }
-
-        return $this->operator = $this->filesystem->file($this->path)->operator();
+        return $this->filesystem ?? throw new \LogicException('The filesystem has not been set.');
     }
 }

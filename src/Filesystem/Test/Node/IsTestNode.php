@@ -4,8 +4,6 @@ namespace Zenstruck\Filesystem\Test\Node;
 
 use Zenstruck\Assert;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\Directory;
-use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -14,18 +12,33 @@ use Zenstruck\Filesystem\Node\File;
  */
 trait IsTestNode
 {
-    /**
-     * @param File|Directory<Node> $node
-     */
-    public function __construct(File|Directory $node)
+    public function ensureDirectory(): TestDirectory
     {
-        $this->operator = $node->operator; // @phpstan-ignore-line
-        $this->path = $node->path; // @phpstan-ignore-line
+        if ($this instanceof TestDirectory) {
+            return $this;
+        }
+
+        return new TestDirectory($this->inner()->ensureDirectory());
     }
 
-    /**
-     * @return $this
-     */
+    public function ensureFile(): TestFile
+    {
+        if ($this instanceof TestFile) {
+            return $this;
+        }
+
+        return new TestFile($this->inner()->ensureFile());
+    }
+
+    public function ensureImage(array $config = []): TestImage
+    {
+        if ($this instanceof TestImage) {
+            return $this;
+        }
+
+        return new TestImage($this->inner()->ensureImage($config));
+    }
+
     public function assertVisibilityIs(string $expected): self
     {
         Assert::that($this->visibility())->is($expected, 'Expected visibility to be {expected} but is actually {actual}.');
@@ -35,8 +48,6 @@ trait IsTestNode
 
     /**
      * @param string|\DateTimeInterface|callable(\DateTimeInterface):void $expected
-     *
-     * @return $this
      */
     public function assertLastModified(string|\DateTimeInterface|callable $expected): self
     {
@@ -56,4 +67,6 @@ trait IsTestNode
 
         return $this;
     }
+
+    abstract protected function inner(): Node;
 }
