@@ -7,6 +7,7 @@ use Zenstruck\Filesystem\Bridge\Symfony\Validator\FileValidator;
 
 /**
  * @Annotation
+ *
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Kevin Bond <kevinbond@gmail.com>

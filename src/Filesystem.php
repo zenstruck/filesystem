@@ -214,7 +214,7 @@ interface Filesystem
      * @see FilesystemWriter::writeStream()
      *
      * @param resource|string|\SplFileInfo|Directory<Node>|File $value
-     * @param array<string,mixed>|WriteConfig                                           $config
+     * @param array<string,mixed>|WriteConfig                   $config
      *
      * @throws NodeExists          If the $path exists and "fail_if_exists" => true
      * @throws FilesystemException

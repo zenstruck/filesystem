@@ -14,6 +14,7 @@ use Zenstruck\Filesystem\Node;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
  * @extends MultiplePcreFilterIterator<int,Node>
  *
  * @method Node current()

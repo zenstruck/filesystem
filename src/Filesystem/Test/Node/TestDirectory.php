@@ -10,7 +10,6 @@ use Zenstruck\Filesystem\Node\Directory;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @template T of Node
- *
  * @extends Directory<T>
  */
 final class TestDirectory extends Directory

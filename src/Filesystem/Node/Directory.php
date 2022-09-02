@@ -17,6 +17,7 @@ use Zenstruck\Filesystem\Node\Directory\Filter\MatchingPathFilter;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @immutable
+ *
  * @template T of Node
  * @implements \IteratorAggregate<int,T>
  *
