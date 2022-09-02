@@ -1,15 +1,16 @@
 <?php
 
-namespace Zenstruck\Filesystem;
+namespace Zenstruck\Filesystem\Util;
 
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * Creates a temporary file or wraps an existing file to be deleted
  * at the end of the script.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class TempFile extends \SplFileInfo
 {

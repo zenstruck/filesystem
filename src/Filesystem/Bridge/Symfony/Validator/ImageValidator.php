@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Zenstruck\Filesystem\Bridge\Symfony\Validator\Constraints\Image;
 use Zenstruck\Filesystem\Node\File as FileNode;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Filesystem\Util\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

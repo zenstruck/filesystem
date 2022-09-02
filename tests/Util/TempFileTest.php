@@ -1,10 +1,10 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests;
+namespace Zenstruck\Filesystem\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Filesystem\TempFile;
 use Zenstruck\Filesystem\Util\ResourceWrapper;
+use Zenstruck\Filesystem\Util\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

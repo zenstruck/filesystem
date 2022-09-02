@@ -4,7 +4,7 @@ namespace Zenstruck\Filesystem\Feature\Image;
 
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Filesystem\Util\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

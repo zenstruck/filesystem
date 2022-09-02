@@ -12,7 +12,7 @@ use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Checksum;
-use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Filesystem\Util\TempFile;
 use Zenstruck\Uri;
 
 /**

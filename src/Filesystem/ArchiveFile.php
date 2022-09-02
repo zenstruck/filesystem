@@ -8,6 +8,7 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Adapter\ZipArchiveAdapter;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Util\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
