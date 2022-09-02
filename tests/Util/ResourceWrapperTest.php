@@ -1,9 +1,9 @@
 <?php
 
-namespace Zenstruck\Filesystem\Tests;
+namespace Zenstruck\Filesystem\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Filesystem\ResourceWrapper;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

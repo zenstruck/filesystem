@@ -1,9 +1,11 @@
 <?php
 
-namespace Zenstruck\Filesystem;
+namespace Zenstruck\Filesystem\Util;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class ResourceWrapper
 {

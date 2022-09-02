@@ -12,8 +12,8 @@ use Imagine\Imagick\Image as ImagickImage;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

@@ -5,7 +5,7 @@ namespace Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\ResourceWrapper;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

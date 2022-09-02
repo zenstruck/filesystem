@@ -22,6 +22,7 @@ use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 use Zenstruck\Uri\Path;
 
 /**

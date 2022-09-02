@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem;
 
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * Creates a temporary file or wraps an existing file to be deleted

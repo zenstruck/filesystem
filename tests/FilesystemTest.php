@@ -18,9 +18,9 @@ use Zenstruck\Filesystem\Exception\UnableToMoveDirectory;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Util;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

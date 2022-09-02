@@ -8,8 +8,8 @@ use Symfony\Component\HttpKernel\Log\Logger;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\Operation;
-use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

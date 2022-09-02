@@ -3,8 +3,8 @@
 namespace Zenstruck\Filesystem\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Filesystem\ResourceWrapper;
 use Zenstruck\Filesystem\TempFile;
+use Zenstruck\Filesystem\Util\ResourceWrapper;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
