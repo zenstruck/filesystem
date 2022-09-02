@@ -192,19 +192,6 @@ interface Filesystem
      * Overrides $path if exists, pass $config "fail_if_exists" => true to instead
      * throw a {@see NodeExists} exception.
      *
-     * A callback provided for $values allows for "manipulating" an "existing"
-     * file in place. A "real" {@see \SplFileInfo} is passed and must be returned.
-     *
-     * EXAMPLE - Manipulate an existing file:
-     *
-     * ```php
-     * $filesystem->write('some/file.csv', function(\SplFileInfo $file) {
-     *      $some3rdPartyService->manipulate($file);
-     *
-     *      return $file;
-     * });
-     * ```
-     *
      * You can pass a "progress" callback to $config that is called before each
      * file is written with said file as an argument (useful when writing
      * {@see Directory} or local {@see \SplFileInfo} directories).
@@ -226,11 +213,9 @@ interface Filesystem
      * @see FilesystemWriter::write()
      * @see FilesystemWriter::writeStream()
      *
-     * @param resource|string|\SplFileInfo|Directory<Node>|File|callable(object):object $value
+     * @param resource|string|\SplFileInfo|Directory<Node>|File $value
      * @param array<string,mixed>|WriteConfig                                           $config
      *
-     * @throws NodeNotFound        If a callable is provided for $value and $path does not exist
-     * @throws NodeTypeMismatch    If a callable is provided for $value and $path is a directory
      * @throws NodeExists          If the $path exists and "fail_if_exists" => true
      * @throws FilesystemException
      */

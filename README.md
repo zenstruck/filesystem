@@ -78,26 +78,6 @@ $filesystem->write('some/file.txt', $resource);
 $filesystem->write('some/file.txt', new \SplFileInfo('/path/to/local/file.txt'));
 ```
 
-##### Modifying an Existing File
-
-Many 3rd party libraries require a _real, local file_ to perform operations. You can provide
-a callback to the second `write()` argument to manipulate a real file:
-
-```php
-/** @var Zenstruck\Filesystem $filesystem */
-
-$filesystem->write('existing/file.csv', function(\SplFileInfo $file) {
-    $some3rdPartyService->manipulate($file);
-
-    return $file; // the file returned from the callback is written to "exising/file.csv"
-});
-```
-
-> **Note**:
-> If you need a real, local file to pass around you can use `$filesystem->file('existing/file.csv')->tempFile()`.
-> This file is temporary and will be deleted at the end of the script. It is up to you to save it back to your
-> filesystem.
-
 ### Read Operations
 
 ```php

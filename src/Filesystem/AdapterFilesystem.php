@@ -262,22 +262,6 @@ final class AdapterFilesystem implements Filesystem
             throw UnableToWriteFile::atLocation($path, 'Location is a directory.');
         }
 
-        if (\is_callable($value)) {
-            $file = $this->operator->realFile($this->file($path));
-
-            if (!$file->isReadable() || $file->isDir()) {
-                throw new \LogicException(\sprintf('File "%s" is not a readable file.', $file));
-            }
-
-            $file = $value($file);
-
-            if (!$file instanceof \SplFileInfo || !$file->isReadable() || $file->isDir()) {
-                throw new \LogicException('Readable SplFileInfo (file) must be returned from callback.');
-            }
-
-            return $this->write($path, $file, $config);
-        }
-
         if ($value instanceof \SplFileInfo && $value->isDir()) { // check if local directory
             $relative = new Path($path);
 
