@@ -156,7 +156,9 @@ final class ResourceWrapper
      */
     public function close(): void
     {
-        \fclose($this->get());
+        if (\is_resource($this->resource)) {
+            \fclose($this->resource);
+        }
     }
 
     private function writeString(string $data): self

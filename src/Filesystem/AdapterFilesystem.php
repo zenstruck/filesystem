@@ -145,9 +145,7 @@ final class AdapterFilesystem implements Filesystem
         $this->delete($destination);
 
         if ($sourceNode instanceof Directory) {
-            $this->write($destination, $sourceNode->recursive(), $config);
-
-            return $this;
+            return $this->write($destination, $sourceNode->recursive(), $config);
         }
 
         $this->operator->copy($source, $destination, $config);
