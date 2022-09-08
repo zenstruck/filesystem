@@ -3,7 +3,7 @@
 namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\File\IsLazyFile;
+use Zenstruck\Filesystem\Node\IsLazyNode;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
@@ -13,8 +13,8 @@ use Zenstruck\Filesystem\Node\LazyNode;
  */
 final class LazyImage implements Image, LazyNode
 {
-    use IsLazyFile, WrappedImage {
-        IsLazyFile::path insteadof WrappedImage;
+    use IsLazyNode, WrappedImage {
+        IsLazyNode::path insteadof WrappedImage;
     }
 
     private Image $inner;

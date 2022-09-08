@@ -3,6 +3,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\IsLazyNode;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
@@ -12,8 +13,8 @@ use Zenstruck\Filesystem\Node\LazyNode;
  */
 final class LazyFile implements File, LazyNode
 {
-    use IsLazyFile, WrappedFile {
-        IsLazyFile::path insteadof WrappedFile;
+    use IsLazyNode, WrappedFile {
+        IsLazyNode::path insteadof WrappedFile;
     }
 
     private File $inner;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Filesystem\Node\File;
+namespace Zenstruck\Filesystem\Node;
 
 use Zenstruck\Filesystem;
 
@@ -9,7 +9,7 @@ use Zenstruck\Filesystem;
  *
  * @internal
  */
-trait IsLazyFile
+trait IsLazyNode
 {
     public function __construct(private string $path, private ?Filesystem $filesystem = null)
     {

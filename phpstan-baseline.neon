@@ -1,6 +1,46 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Class Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory implements generic interface Zenstruck\\\\Filesystem\\\\Node\\\\Directory but does not specify its types\\: T$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Property Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:\\$inner \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\) does not accept Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\>\\.$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Property Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:\\$inner \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\) does not accept Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\File\\>\\.$#"
+			count: 4
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:directories\\(\\) should be compatible with return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\>\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\:\\:directories\\(\\)$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:files\\(\\) should be compatible with return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\File\\>\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\:\\:files\\(\\)$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:largerThan\\(\\) should be compatible with return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\File\\>\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\:\\:largerThan\\(\\)$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:sizeWithin\\(\\) should be compatible with return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\File\\>\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\:\\:sizeWithin\\(\\)$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
+			message: "#^Return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\\\LazyDirectory\\:\\:smallerThan\\(\\) should be compatible with return type \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\File\\>\\) of method Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\:\\:smallerThan\\(\\)$#"
+			count: 1
+			path: src/Filesystem/Node/Directory/LazyDirectory.php
+
+		-
 			message: "#^Property Zenstruck\\\\Filesystem\\\\Test\\\\Node\\\\TestDirectory\\:\\:\\$inner \\(Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\) does not accept Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\\\Directory\\<Zenstruck\\\\Filesystem\\\\Node\\>\\>\\.$#"
 			count: 1
 			path: src/Filesystem/Test/Node/TestDirectory.php
