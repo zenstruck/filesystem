@@ -85,10 +85,13 @@ interface Node extends \Stringable
      */
     public function isImage(array $config = []): bool;
 
-    public function serialize(): string;
-
     /**
-     * @return File|Image|Directory<Node>
+     * Generate a string that includes the filesystem name and path in
+     * the format of "<filesystem-name>://<path>".
+     *
+     * This is useful when serializing a node to know what filesystem it's
+     * from. Especially useful when used in conjunction with the
+     * {@see MultiFilesystem}.
      */
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File|Image|Directory;
+    public function context(): string;
 }

@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Filesystem\Node;
 
-use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Image;
 
@@ -90,14 +89,9 @@ trait WrappedNode
         return $this->inner()->ensureImage($config);
     }
 
-    public function serialize(): string
+    public function context(): string
     {
-        throw new \BadMethodCallException(\sprintf('Cannot serialize %s.', static::class));
-    }
-
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File|Image|Directory
-    {
-        throw new \BadMethodCallException(\sprintf('Cannot unserialize %s.', static::class));
+        return $this->inner()->context();
     }
 
     abstract protected function inner(): Node;

@@ -8,7 +8,6 @@ use Symfony\Component\Finder\Iterator\LazyIterator;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
 use Zenstruck\Filesystem\ArchiveFile;
-use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\AdapterNode;
 use Zenstruck\Filesystem\Node\Directory;
@@ -49,14 +48,6 @@ final class AdapterDirectory extends AdapterNode implements Directory
     public function __construct(DirectoryAttributes $attributes, Operator $operator)
     {
         parent::__construct($attributes, $operator);
-    }
-
-    /**
-     * @return Directory<Node>
-     */
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): Directory
-    {
-        return $filesystem->directory($serialized);
     }
 
     public function mimeType(): string

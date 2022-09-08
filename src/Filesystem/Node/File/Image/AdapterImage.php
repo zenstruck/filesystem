@@ -5,7 +5,6 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\ImageTransformer;
-use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File\AdapterFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
@@ -29,11 +28,6 @@ final class AdapterImage extends AdapterFile implements Image
 
     protected function __construct()
     {
-    }
-
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): Image
-    {
-        return parent::unserialize($serialized, $filesystem)->ensureImage();
     }
 
     public function transform(callable $manipulator, array $options = []): PendingFile
@@ -91,7 +85,7 @@ final class AdapterImage extends AdapterFile implements Image
         }
 
         if (false === $data = @\exif_read_data($this->realImage(), as_arrays: true)) {
-            throw new \RuntimeException(\sprintf('Unable to parse EXIF data for "%s".', $this->serialize()));
+            throw new \RuntimeException(\sprintf('Unable to parse EXIF data for "%s".', $this->context()));
         }
 
         $ret = [];
@@ -130,7 +124,7 @@ final class AdapterImage extends AdapterFile implements Image
         }
 
         if (false === $iptc = \iptcparse($info['APP13'])) {
-            throw new \RuntimeException(\sprintf('Unable to parse IPTC data for "%s".', $this->serialize()));
+            throw new \RuntimeException(\sprintf('Unable to parse IPTC data for "%s".', $this->context()));
         }
 
         return $this->iptc = \array_filter([

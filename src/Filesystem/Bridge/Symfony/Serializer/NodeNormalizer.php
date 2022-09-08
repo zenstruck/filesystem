@@ -36,7 +36,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
-        return $object->serialize();
+        return $object->context();
     }
 
     /**
@@ -60,7 +60,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw NotNormalizableValueException::createForUnexpectedDataType('The data must be a string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
-        return (self::TYPE_MAP[$type])::unserialize($data, $this->container->get(MultiFilesystem::class));
+        return $this->container->get(MultiFilesystem::class)->node($data);
     }
 
     /**

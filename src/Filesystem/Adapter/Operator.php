@@ -45,7 +45,7 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
         parent::__construct($adapter, $config, $this->normalizer = $config['path_normalizer'] ?? new WhitespacePathNormalizer());
     }
 
-    public function serialize(string $path): string
+    public function context(string $path): string
     {
         return "{$this->name}://{$path}";
     }

@@ -7,7 +7,6 @@ use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Mime\MimeTypesInterface;
 use Zenstruck\Dimension\Information;
 use Zenstruck\Filesystem\Adapter\Operator;
-use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\AdapterNode;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\AdapterDirectory;
@@ -47,11 +46,6 @@ class AdapterFile extends AdapterNode implements File
         if ($mimeType = $attributes->mimeType()) {
             $this->mimeType = $mimeType;
         }
-    }
-
-    public static function unserialize(string $serialized, MultiFilesystem $filesystem): File
-    {
-        return $filesystem->file($serialized);
     }
 
     /**

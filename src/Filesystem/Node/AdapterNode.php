@@ -40,9 +40,9 @@ abstract class AdapterNode implements Node
         return $this->path();
     }
 
-    final public function serialize(): string
+    final public function context(): string
     {
-        return $this->operator()->serialize($this->path());
+        return $this->operator()->context($this->path());
     }
 
     final public function path(): string
