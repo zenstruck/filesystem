@@ -9,11 +9,16 @@ use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\File\Image\LazyImage;
+use Zenstruck\Filesystem\Node\File\LazyFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -21,9 +26,9 @@ use Zenstruck\Filesystem\Node\File\Image;
 final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, ServiceSubscriberInterface, CacheableSupportsMethodInterface
 {
     private const TYPE_MAP = [
-        File::class => File\AdapterFile::class,
-        Directory::class => Directory\AdapterDirectory::class,
-        Image::class => Image\AdapterImage::class,
+        File::class => LazyFile::class,
+        Directory::class => LazyDirectory::class,
+        Image::class => LazyImage::class,
     ];
 
     public function __construct(private ContainerInterface $container)
@@ -60,7 +65,19 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw NotNormalizableValueException::createForUnexpectedDataType('The data must be a string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
-        return $this->container->get(MultiFilesystem::class)->node($data);
+        $parts = \explode('://', $data, 2);
+        $name = 2 === \count($parts) ? $parts[0] : null;
+        $path = $parts[1] ?? $parts[0];
+
+        return new (self::TYPE_MAP[$type])($path, new LazyFilesystem(function() use ($name) {
+            $filesystem = $this->container->get(Filesystem::class);
+
+            if ($filesystem instanceof MultiFilesystem) {
+                return $filesystem->get($name);
+            }
+
+            return $filesystem;
+        }));
     }
 
     /**
@@ -78,6 +95,6 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     public static function getSubscribedServices(): array
     {
-        return [MultiFilesystem::class];
+        return [Filesystem::class];
     }
 }
