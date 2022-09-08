@@ -126,6 +126,8 @@ $node = $filesystem->node('some/node'); // Zenstruck\Node\File|Zenstruck\Node\Di
 $node = $filesystem->write('file.txt', 'content')->last(); // Zenstruck\Node\File (for "file.txt")
 ```
 
+> **Note**: The `Zenstruck/Filesystem` interface should be considered _internal_ for _implementation_.
+
 ### Nodes
 
 #### `File`
@@ -183,7 +185,7 @@ $checksum = $file->checksum(); // Zenstruck\Filesystem\Node\File\Checksum
 $checksum->equals($anotherChecksum); // bool
 ```
 
-> **Note**: `File` should be considered _final_ and is not meant to be extended.
+> **Note**: The `Zenstruck/Node/File` interface should be considered _internal_ for _implementation_.
 
 #### `Image`
 
@@ -206,7 +208,7 @@ $image->iptc(); // array of IPTC data
 $image->exif(); // array of EXIF data (if the image supports)
 ```
 
-> **Note**: `Image` should be considered _final_ and is not meant to be extended.
+> **Note**: The `Zenstruck/Node/File/Image` interface should be considered _internal_ for _implementation_.
 
 #### `Directory`
 
@@ -267,7 +269,7 @@ foreach ($filtered as $file) {
 }
 ```
 
-> **Note**: `Directory` should be considered _final_ and is not meant to be extended.
+> **Note**: The `Zenstruck/Node/Directory` interface should be considered _internal_ for _implementation_.
 
 ## Filesystems
 
@@ -1318,3 +1320,12 @@ zenstruck_filesystem:
                 # Whether to delete filesystem files on entity remove by default
                 delete_on_remove:     true
 ```
+
+## Backward Compatibility Promise
+
+This library follows [Symfony's BC Promise](https://symfony.com/doc/current/contributing/code/bc.html) with the
+following exceptions:
+1. `Zenstruck/Filesystem` is considered _internal_ for _implementation_ and should not be implemented in user-land
+   code. _This rule may change in the future once the API is considered stable._
+2. `Zenstruck/Filesystem/Node` and interfaces in the `Zenstruck/Filesystem/Node/*` namespace should be considered
+   _internal_ for implementation.
