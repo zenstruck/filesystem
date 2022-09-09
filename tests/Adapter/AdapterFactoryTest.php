@@ -9,7 +9,6 @@ use League\Flysystem\PhpseclibV3\SftpAdapter;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\Adapter\LocalAdapter;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
 
 /**
@@ -32,7 +31,7 @@ final class AdapterFactoryTest extends TestCase
         yield ['file:/tmp', LocalAdapter::class];
         yield ['file:///tmp', LocalAdapter::class];
         yield ['in-memory:', InMemoryFilesystemAdapter::class];
-        yield ['in-memory:?static', StaticInMemoryAdapter::class];
+        yield ['in-memory:?static', InMemoryFilesystemAdapter::class];
         yield ['ftp://foo:bar@example.com/path', FtpAdapter::class];
         yield ['ftps://foo:bar@example.com/path', FtpAdapter::class];
         yield ['sftp://foo:bar@example.com/path', SftpAdapter::class];

@@ -293,35 +293,32 @@ $filesystem = new AdapterFilesystem($adapter, ['name' => 'public']);
 $filesystem = new AdapterFilesystem('/some/local/path');
 ```
 
-#### Flysystem Adapters
+#### Adapter Factory
 
-While any League adapter can be used, this library comes with some additional ones:
-
-##### `StaticInMemoryAdapter`
-
-> **Note**: Requires `league/flysystem-memory`.
-
-This works like `InMemoryFilesystemAdapter` but stores the filesystem data in a static
-variable. This is useful when writing Symfony tests that reset services between requests.
+An adapter factory is available to easily create common Flysystem adapters from a _DSN string_:
 
 ```php
+use Zenstruck\Filesystem\Adapter\AdapterFactory;
 use Zenstruck\Filesystem\AdapterFilesystem;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 
-$filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
-$filesystem->write('file.txt', 'content');
+$factory = new AdapterFactory();
 
-// create a new one
-$filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
-$filesystem->file('file.txt'); // works!
+$adapter = $factory->create('ftp://user:pass@host.com:21/root'); // League\Flysystem\Ftp\FtpAdapter
 
-// create with different names for multiple static filesystems
-$filesystem1 = new AdapterFilesystem(new StaticInMemoryAdapter('first'));
-$filesystem2 = new AdapterFilesystem(new StaticInMemoryAdapter('second'));
-
-// reset all data
-StaticInMemoryAdapter::reset();
+$filesystem = new AdapterFilesystem($adapter);
 ```
+
+##### Available DSN's
+
+| DSN                                                        | Adapter                                                                                                                                                                                                                                 |
+|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                                                                                                                                                                                                                          |
+| `in-memory:`                                               | `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                          |
+| `in-memory:?static#name`                                   | _Static_ `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                 |
+| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                  |
+| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                  |
+| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter` (requires [`league/flysystem-sftp-v3`](https://flysystem.thephpleague.com/docs/adapter/sftp-v3/))                                                                                                                         |
+| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` (requires [`flysystem-async-aws-s3`](https://flysystem.thephpleague.com/docs/adapter/async-aws-s3/) or [`league/flysystem-aws-s3-v3`](https://flysystem.thephpleague.com/docs/adapter/aws-s3-v3/)) |
 
 #### Features
 
@@ -823,25 +820,13 @@ zenstruck_filesystem:
     default_filesystem: public # set the "default" filesystem (defaults to first one defined above)
 ```
 
+The `dsn` can be any of the [available adapter factory DSN's](#available-dsns) or a `FilesystemAdapter` service id
+prefixed with `@` (`@my_adapter`).
+
 By default, defined filesystems have logging enabled. In your development environment, a profiler toolbar item
 is available summarizing the operations made across your filesystem(s):
 
 ![toolbar screenshot](docs/assets/toolbar.png)
-
-##### Available DSN's
-
-The following can be used for a filesystem adapter _DSN's_:
-
-| DSN                                                        | Adapter                                                 |
-|------------------------------------------------------------|---------------------------------------------------------|
-| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                                          |
-| `in-memory:`                                               | `InMemoryFilesystemAdapter`                             |
-| `in-memory:?static#name`                                   | `StaticInMemoryAdapter`                                 |
-| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter`                                            |
-| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter`                                            |
-| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter`                                           |
-| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter`                    |
-| `@service_id`                                              | _Custom service id that implements `FilesystemAdapter`_ |
 
 #### Services
 

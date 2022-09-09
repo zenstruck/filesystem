@@ -26,7 +26,7 @@
         "intervention/image": "^2.7",
         "league/flysystem-async-aws-s3": "^3.0",
         "league/flysystem-ftp": "^3.0",
-        "league/flysystem-memory": "^3.0",
+        "league/flysystem-memory": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.2",
         "phpstan/phpstan": "^1.4",
@@ -54,7 +54,7 @@
         "psr-4": { "Zenstruck\\Filesystem\\Tests\\": ["tests/"] }
     },
     "suggest": {
-        "league/flysystem-memory": "To use the in-memory adapters",
+        "league/flysystem-memory": "To use the in-memory adapters (3.3+)",
         "league/flysystem-ziparchive": "To use ArchiveFile as a filesystem",
         "doctrine/dbal": "To use the File/Image/FileCollection types",
         "zenstruck/assert": "To use the TestFilesystem assertions",

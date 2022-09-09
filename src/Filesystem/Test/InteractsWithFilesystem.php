@@ -2,10 +2,10 @@
 
 namespace Zenstruck\Filesystem\Test;
 
+use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
@@ -24,7 +24,9 @@ trait InteractsWithFilesystem
      */
     public function _resetFilesystems(): void
     {
-        StaticInMemoryAdapter::reset();
+        if (\class_exists(StaticInMemoryAdapterRegistry::class)) {
+            StaticInMemoryAdapterRegistry::deleteAllFilesystems();
+        }
 
         unset($this->_testFilesystem);
 
@@ -57,7 +59,11 @@ trait InteractsWithFilesystem
                 throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
             }
         } else {
-            $filesystem = new AdapterFilesystem(new StaticInMemoryAdapter());
+            if (!\class_exists(StaticInMemoryAdapterRegistry::class)) {
+                throw new \LogicException(\sprintf('league/flysystem-memory v3.3+ is required to use "%s". Install with "composer require --dev league/flysystem-memory".', __TRAIT__));
+            }
+
+            $filesystem = new AdapterFilesystem(StaticInMemoryAdapterRegistry::get());
         }
 
         if ($this instanceof FixtureFilesystemProvider) {

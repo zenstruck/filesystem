@@ -10,6 +10,7 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use Zenstruck\Uri;
@@ -100,8 +101,18 @@ final class AdapterFactory
 
     private static function createInMemoryAdapter(Uri $dsn, string $name): FilesystemAdapter
     {
-        StaticInMemoryAdapter::ensureSupported();
+        if (!\class_exists(InMemoryFilesystemAdapter::class)) {
+            throw new \LogicException('league/flysystem-memory is required to use the in-memory adapter. Install with "composer require --dev league/flysystem-memory".');
+        }
 
-        return $dsn->query()->has('static') ? new StaticInMemoryAdapter($name) : new InMemoryFilesystemAdapter();
+        if ($dsn->query()->get('static', false)) {
+            return new InMemoryFilesystemAdapter();
+        }
+
+        if (!\class_exists(StaticInMemoryAdapterRegistry::class)) {
+            throw new \LogicException('league/flysystem-memory v3.3+ is required to use the static in-memory adapter.');
+        }
+
+        return StaticInMemoryAdapterRegistry::get($name);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Zenstruck\Filesystem\Tests\Adapter;
 
+use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Adapter\StaticInMemoryAdapter;
 use Zenstruck\Filesystem\AdapterFilesystem;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Tests\FilesystemTest;
@@ -43,6 +43,6 @@ final class StaticInMemoryAdapterTest extends FilesystemTest
 
     protected function createFilesystem(?string $name = null): Filesystem
     {
-        return new AdapterFilesystem(new StaticInMemoryAdapter($name ?? 'default'));
+        return new AdapterFilesystem(StaticInMemoryAdapterRegistry::get($name ?? 'default'));
     }
 }
