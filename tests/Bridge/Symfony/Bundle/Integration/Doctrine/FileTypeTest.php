@@ -155,9 +155,9 @@ final class FileTypeTest extends KernelTestCase
     {
         $entity = Entity1Factory::createOne([
             'title' => 'foo-bar',
-            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png', function(PendingFile $file, Entity1 $object) {
+            'file' => new PendingFile(FilesystemTest::FIXTURE_DIR.'/symfony.png', ['namer' => function(PendingFile $file, Entity1 $object) {
                 return 'baz/'.$file->checksum().'-'.$object->title.'.png';
-            }),
+            }]),
         ]);
 
         $expected = 'baz/ac6884fc84724d792649552e7211843a-foo-bar.png';

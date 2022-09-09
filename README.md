@@ -1197,9 +1197,11 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 /** @var \Doctrine\ORM\EntityManagerInterface $em */
 
 $user = new User();
-$user->profileImage = new PendingFile('/local/filesystem/image.png', function(PendingFile $file, User $user) {
-    return "profile-images/{$user->username}-{$file->checksum()}.{$file->originalExtension()}";
-}); // saved as "profile-images/<username>-<file-contents-checksum>.<original-extension>"
+$user->profileImage = new PendingFile('/local/filesystem/image.png', [
+    'namer' => function(PendingFile $file, User $user) {
+        return "profile-images/{$user->username}-{$file->checksum()}.{$file->originalExtension()}";
+    },
+]); // saved as "profile-images/<username>-<file-contents-checksum>.<original-extension>"
 
 $em->persist($user);
 $em->flush();

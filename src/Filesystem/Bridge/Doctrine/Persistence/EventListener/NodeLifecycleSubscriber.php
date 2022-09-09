@@ -200,13 +200,14 @@ final class NodeLifecycleSubscriber
     {
         $config = $file->config();
 
-        if (\is_callable($config)) {
-            return $config($file, $object);
+        $name = $config['namer'] ?? $defaultConfig['namer'] ?? 'expression';
+        $config = \array_merge($defaultConfig, $config);
+
+        if (\is_callable($name)) {
+            return $name($file, $object, $config);
         }
 
-        $name = $config['namer'] ?? $defaultConfig['namer'] ?? 'expression';
-
-        return $this->namer($name)->generateName($file, $object, \array_merge($defaultConfig, $config));
+        return $this->namer($name)->generateName($file, $object, $config);
     }
 
     private function namer(string $name): Namer

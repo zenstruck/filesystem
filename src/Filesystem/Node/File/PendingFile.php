@@ -21,17 +21,13 @@ final class PendingFile implements File
     private \SplFileInfo $file;
     private File $inner;
 
-    /** @var callable(self,object):string|array<string,mixed> */
-    private mixed $config;
-
     /**
-     * @param callable(self,object):string|array<string,mixed> $config
+     * @param array<string,mixed> $config
      */
-    public function __construct(\SplFileInfo|string $file, callable|array $config = [])
+    public function __construct(\SplFileInfo|string $file, private array $config = [])
     {
         $this->file = \is_string($file) ? new \SplFileInfo($file) : $file;
         $this->path = $this->file->getFilename();
-        $this->config = $config;
     }
 
     public function path(): string
@@ -40,11 +36,9 @@ final class PendingFile implements File
     }
 
     /**
-     * @internal
-     *
-     * @return callable(self,object):string|array<string,mixed>
+     * @return array<string,mixed>
      */
-    public function config(): mixed
+    public function config(): array
     {
         return $this->config;
     }
