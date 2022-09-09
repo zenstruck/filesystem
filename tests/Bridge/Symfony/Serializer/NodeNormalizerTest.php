@@ -3,8 +3,14 @@
 namespace Zenstruck\Filesystem\Tests\Bridge\Symfony\Serializer;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Bridge\Symfony\Serializer\NodeNormalizer;
+use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 
 /**
@@ -16,64 +22,104 @@ final class NodeNormalizerTest extends KernelTestCase
 
     /**
      * @test
+     * @dataProvider filesystemNodeProvider
      */
-    public function can_serialize_and_deserialize_files(): void
+    public function can_serialize_and_deserialize_nodes(callable $factory, string $type, string $path): void
     {
-        $this->markTestIncomplete();
+        $filesystem = self::getContainer()->get(Filesystem::class);
+        $container = new ServiceLocator([
+            Filesystem::class => fn() => $filesystem,
+        ]);
+
+        $serializer = new Serializer([new NodeNormalizer($container)], [new JsonEncoder()]);
+
+        $node = $factory($filesystem);
+        $modified = $node->lastModified();
+        $node = $serializer->serialize($node, 'json');
+
+        $this->assertSame(\json_encode('public://'.$path), $node);
+
+        $node = $serializer->deserialize($node, $type, 'json');
+
+        $this->assertInstanceOf($type, $node);
+        $this->assertSame($path, $node->path());
+        $this->assertEquals($modified, $node->lastModified());
+    }
+
+    public function filesystemNodeProvider(): iterable
+    {
+        yield [
+            function(Filesystem $filesystem) {
+                return $filesystem->write('sub/file.txt', 'content')->last();
+            },
+            File::class,
+            'sub/file.txt',
+        ];
+
+        yield [
+            function(Filesystem $filesystem) {
+                return $filesystem->write('sub/file.png', 'content')->last()->ensureImage();
+            },
+            Image::class,
+            'sub/file.png',
+        ];
+
+        yield [
+            function(Filesystem $filesystem) {
+                return $filesystem->mkdir('foo/bar')->last();
+            },
+            Directory::class,
+            'foo/bar',
+        ];
     }
 
     /**
      * @test
+     * @dataProvider multiFilesystemNodeProvider
      */
-    public function can_serialize_and_deserialize_files_using_multi_filesystem(): void
+    public function can_serialize_and_deserialize_nodes_using_multi_filesystem(callable $factory, string $type, string $path): void
     {
         /** @var Serializer $serializer */
         $serializer = self::getContainer()->get('serializer');
 
-        $file = $this->filesystem()->write('private://sub/file.txt', 'content')->last();
+        $node = $factory();
+        $modified = $node->lastModified();
 
-        $this->assertSame('content', $file->contents());
+        $node = $serializer->serialize($node, 'json');
 
-        $file = $serializer->serialize($file, 'json');
+        $this->assertSame(\json_encode('private://'.$path), $node);
 
-        $this->assertSame(\json_encode('private://sub/file.txt'), $file);
+        $node = $serializer->deserialize($node, $type, 'json');
 
-        $file = $serializer->deserialize($file, File::class, 'json');
-
-        $this->assertInstanceOf(File::class, $file);
-        $this->assertSame('sub/file.txt', $file->path());
-        $this->assertSame('content', $file->contents());
+        $this->assertInstanceOf($type, $node);
+        $this->assertSame($path, $node->path());
+        $this->assertEquals($modified, $node->lastModified());
     }
 
-    /**
-     * @test
-     */
-    public function can_serialize_and_deserialize_directories(): void
+    public function multiFilesystemNodeProvider(): iterable
     {
-        $this->markTestIncomplete();
-    }
+        yield [
+            function() {
+                return $this->filesystem()->write('private://sub/file.txt', 'content')->last();
+            },
+            File::class,
+            'sub/file.txt',
+        ];
 
-    /**
-     * @test
-     */
-    public function can_serialize_and_deserialize_directories_using_multi_filesystem(): void
-    {
-        $this->markTestIncomplete();
-    }
+        yield [
+            function() {
+                return $this->filesystem()->write('private://sub/file.png', 'content')->last()->ensureImage();
+            },
+            Image::class,
+            'sub/file.png',
+        ];
 
-    /**
-     * @test
-     */
-    public function can_serialize_and_deserialize_images(): void
-    {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     */
-    public function can_serialize_and_deserialize_images_using_multi_filesystem(): void
-    {
-        $this->markTestIncomplete();
+        yield [
+            function() {
+                return $this->filesystem()->mkdir('private://foo/bar')->last();
+            },
+            Directory::class,
+            'foo/bar',
+        ];
     }
 }
