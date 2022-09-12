@@ -958,9 +958,6 @@ when@test:
 A Symfony-specific `FileUrl` [feature](#features) is available to create `File::url()`'s using a route. This can
 be useful for serving private files via a signed/expiring url.
 
-> **Note**: to create expiring urls, [zenstruck/signed-url-bundle](https://github.com/zenstruck/signed-url-bundle)
-> is required (`composer require zenstruck/signed-url-bundle`).
-
 First, create a controller to serve your private files:
 
 ```php
@@ -972,9 +969,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\FileResponse;
-use Zenstruck\SignedUrl\Verifier;
-use Zenstruck\SignedUrl\Exception\UrlHasExpired;
-use Zenstruck\SignedUrl\Exception\UrlVerificationFailed;
+use Zenstruck\Uri\SignedUri;
+use Zenstruck\Uri\Signed\Exception\ExpiredUri;
+use Zenstruck\Uri\Signed\Exception\InvalidSignature;
 
 class MyController
 {
@@ -998,16 +995,18 @@ class MyController
     }
 
     /**
-     * Expiring URL support. See
+     * Expiring URL support. See https://github.com/zenstruck/uri#signed-uris.
      */
     #[Route('/private/file/{path<.+>}', name: 'private_file')]
-    public function myAction(string $path, Filesystem $private, Verifier $verifier, Request $request): FileResponse
+    public function myAction(string $path, Filesystem $private, UriSigner $signer, Request $request): FileResponse
     {
+        $uri = SignedUri::new($request);
+
         try {
-            $verifier->verify($request);
-        } catch (UrlHasExpired) {
+            $uri->verify($signer);
+        } catch (ExpiredUri) {
             throw new BadRequestHttpException('url has expired');
-        } catch (UrlVerificationFailed) {
+        } catch (InvalidSignature) {
             throw new BadRequestHttpException('signing verification failed');
         }
 
@@ -1243,7 +1242,6 @@ zenstruck_filesystem:
                 # Signed?
                 sign:                 false
 
-                # Expire the link after x seconds or a relative datetime string (requires zenstruck/signed-url-bundle)
                 expires:              null
                     # Examples:
                     # - '1800'

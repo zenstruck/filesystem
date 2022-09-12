@@ -17,7 +17,7 @@
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
         "zenstruck/dimension": "^0.1.0",
-        "zenstruck/uri": "^1.0"
+        "zenstruck/uri": "^1.1"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.5",
@@ -40,8 +40,7 @@
         "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
         "zenstruck/assert": "^1.2",
-        "zenstruck/foundry": "^1.21",
-        "zenstruck/signed-url-bundle": "^0.1.0"
+        "zenstruck/foundry": "^1.21"
     },
     "config": {
         "preferred-install": "dist",

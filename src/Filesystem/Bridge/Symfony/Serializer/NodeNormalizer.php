@@ -8,7 +8,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
@@ -21,7 +20,7 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, ServiceSubscriberInterface, CacheableSupportsMethodInterface
+final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     private const TYPE_MAP = [
         File::class => LazyFile::class,
@@ -81,10 +80,5 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [FilesystemRegistry::class];
     }
 }

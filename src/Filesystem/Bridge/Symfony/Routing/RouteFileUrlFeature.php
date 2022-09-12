@@ -5,11 +5,9 @@ namespace Zenstruck\Filesystem\Bridge\Symfony\Routing;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\SignedUrl\Generator;
 use Zenstruck\Uri;
 
 /**
@@ -17,7 +15,7 @@ use Zenstruck\Uri;
  *
  * @internal
  */
-final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
+final class RouteFileUrlFeature implements FileUrl
 {
     /**
      * @param array{
@@ -50,30 +48,18 @@ final class RouteFileUrlFeature implements FileUrl, ServiceSubscriberInterface
         $name = $this->config['name'] ?? throw new \InvalidArgumentException('A route was not set.');
         $parameters = \array_merge($this->config['parameters'] ?? [], $options, ['path' => $file->path()]);
         $ref = $this->config['reference_type'] ?? UrlGeneratorInterface::ABSOLUTE_URL;
-
-        if ($expires) {
-            if (!$this->container->has(Generator::class)) {
-                throw new \LogicException('zenstruck/signed-url-bundle is required to create expiring URLs (composer require zenstruck/signed-url-bundle)');
-            }
-
-            return Uri::new($this->container->get(Generator::class)->build($name, $parameters, $ref)->expires($expires));
-        }
-
-        $url = $this->container->get(UrlGeneratorInterface::class)->generate($name, $parameters, $ref);
+        $uri = Uri::new($this->container->get(UrlGeneratorInterface::class)->generate($name, $parameters, $ref));
 
         if ($sign) {
-            $url = $this->container->get(UriSigner::class)->sign($url);
+            $builder = $uri->sign($this->container->get(UriSigner::class));
+
+            if ($expires) {
+                $builder = $builder->expires($expires);
+            }
+
+            $uri = $builder->create();
         }
 
-        return Uri::new($url);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [
-            UrlGeneratorInterface::class,
-            UriSigner::class,
-            '?'.Generator::class,
-        ];
+        return $uri;
     }
 }

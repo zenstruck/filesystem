@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Twig\Environment;
 use Zenstruck\Filesystem;
@@ -66,8 +68,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         ;
 
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
+            ->addArgument(new ServiceLocatorArgument([
+                FilesystemRegistry::class => new Reference('.zenstruck_filesystem.filesystem_registry'),
+            ]))
             ->addTag('serializer.normalizer')
-            ->addTag('container.service_subscriber', ['key' => FilesystemRegistry::class, 'id' => '.zenstruck_filesystem.filesystem_registry'])
         ;
 
         if ($container->getParameter('kernel.debug')) {
@@ -220,8 +224,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if ($config['route']['name']) {
             $container->register($id = '.zenstruck_filesystem.feature.'.$name.'_route', RouteFileUrlFeature::class)
-                ->setArguments([$config['route']])
-                ->addTag('container.service_subscriber')
+                ->setArguments([
+                    $config['route'],
+                    new ServiceLocatorArgument([
+                        UrlGeneratorInterface::class => new Reference(UrlGeneratorInterface::class),
+                        UriSigner::class => new Reference(UriSigner::class),
+                    ]),
+                ])
             ;
 
             $features[FileUrl::class] = new Reference($id);
