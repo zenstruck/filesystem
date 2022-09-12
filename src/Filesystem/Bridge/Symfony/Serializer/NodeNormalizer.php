@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node;
@@ -69,15 +70,20 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         $name = 2 === \count($parts) ? $parts[0] : null;
         $path = $parts[1] ?? $parts[0];
 
-        return new (self::TYPE_MAP[$type])($path, new LazyFilesystem(function() use ($name) {
-            $filesystem = $this->container->get(Filesystem::class);
+        $filesystem = $this->container->get(FilesystemRegistry::class)->get(
+            "lazy-{$name}",
+            fn() => new LazyFilesystem(function() use ($name) {
+                $filesystem = $this->container->get(Filesystem::class);
 
-            if ($filesystem instanceof MultiFilesystem) {
-                return $filesystem->get($name);
-            }
+                if ($filesystem instanceof MultiFilesystem) {
+                    return $filesystem->get($name);
+                }
 
-            return $filesystem;
-        }));
+                return $filesystem;
+            })
+        );
+
+        return new (self::TYPE_MAP[$type])($path, $filesystem);
     }
 
     /**
@@ -95,6 +101,6 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     public static function getSubscribedServices(): array
     {
-        return [Filesystem::class];
+        return [Filesystem::class, FilesystemRegistry::class];
     }
 }

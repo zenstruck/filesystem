@@ -33,6 +33,7 @@ use Zenstruck\Filesystem\Bridge\Symfony\Serializer\NodeNormalizer;
 use Zenstruck\Filesystem\Bridge\Twig\ObjectNodeLoaderExtension;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\FileUrl\PrefixFileUrlFeature;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\ReadonlyFilesystem;
@@ -53,9 +54,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $container->register('.zenstruck_filesystem.adapter_factory', AdapterFactory::class);
 
+        $container->register('.zenstruck_filesystem.filesystem_registry', FilesystemRegistry::class)
+            ->addTag('kernel.reset', ['method' => 'reset'])
+        ;
+
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
             ->addTag('serializer.normalizer')
             ->addTag('container.service_subscriber', ['key' => Filesystem::class, 'id' => MultiFilesystem::class])
+            ->addTag('container.service_subscriber', ['key' => FilesystemRegistry::class, 'id' => '.zenstruck_filesystem.filesystem_registry'])
         ;
 
         if ($container->getParameter('kernel.debug')) {

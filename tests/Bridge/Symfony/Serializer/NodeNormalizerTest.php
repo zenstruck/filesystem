@@ -8,6 +8,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Bridge\Symfony\Serializer\NodeNormalizer;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -27,8 +28,10 @@ final class NodeNormalizerTest extends KernelTestCase
     public function can_serialize_and_deserialize_nodes(callable $factory, string $type, string $path): void
     {
         $filesystem = self::getContainer()->get(Filesystem::class);
+        $registry = new FilesystemRegistry();
         $container = new ServiceLocator([
             Filesystem::class => fn() => $filesystem,
+            FilesystemRegistry::class => fn() => $registry,
         ]);
 
         $serializer = new Serializer([new NodeNormalizer($container)], [new JsonEncoder()]);

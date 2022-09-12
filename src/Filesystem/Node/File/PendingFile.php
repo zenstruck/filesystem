@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Util;
 
@@ -14,8 +15,7 @@ final class PendingFile implements File
 {
     use WrappedFile;
 
-    /** @var array<string,AdapterFilesystem> */
-    private static array $filesystems;
+    private static FilesystemRegistry $filesystems;
 
     private string $path;
     private \SplFileInfo $file;
@@ -73,7 +73,11 @@ final class PendingFile implements File
             return $this->inner;
         }
 
-        $filesystem = self::$filesystems[$dir = \dirname($this->file)] ??= new AdapterFilesystem($dir);
+        if (!isset(self::$filesystems)) {
+            self::$filesystems = new FilesystemRegistry();
+        }
+
+        $filesystem = self::$filesystems->get($dir = \dirname($this->file), fn() => new AdapterFilesystem($dir));
 
         return $this->inner = $filesystem->file($this->file->getFilename());
     }
