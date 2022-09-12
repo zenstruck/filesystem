@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence\EventListener;
 
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs as ORMPreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\Event\PreUpdateEventArgs;
@@ -33,10 +32,9 @@ final class NodeLifecycleSubscriber
      * @param array<string,bool> $globalConfig
      */
     public function __construct(
+        private ContainerInterface $container,
         private NodeConfigProvider $configProvider,
-        private FilesystemRegistry $registry,
         private array $globalConfig,
-        private ContainerInterface $namers,
     ) {
     }
 
@@ -60,7 +58,7 @@ final class NodeLifecycleSubscriber
 
             $ref ??= new ObjectReflector($object, $configs);
 
-            $ref->load($this->registry, $property);
+            $ref->load($this->registry(), $property);
         }
     }
 
@@ -89,7 +87,7 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $this->registry->get($config['filesystem'])->delete($node->path());
+            $this->registry()->get($config['filesystem'])->delete($node->path());
         }
     }
 
@@ -118,7 +116,7 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $filesystem = $this->registry->get($config['filesystem']);
+            $filesystem = $this->registry()->get($config['filesystem']);
 
             $ref->set($property, new LazyFile(
                 $name = $this->generateName($node, $object, $config),
@@ -152,7 +150,7 @@ final class NodeLifecycleSubscriber
 
             if (!$new instanceof Node && $old instanceof Node && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // user removed node, delete file
-                $this->pendingOperations[] = fn() => $this->registry->get($config['filesystem'])->delete($old);
+                $this->pendingOperations[] = fn() => $this->registry()->get($config['filesystem'])->delete($old);
 
                 continue;
             }
@@ -160,7 +158,7 @@ final class NodeLifecycleSubscriber
             if ($new instanceof PendingFile && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
                 // user is adding a new file
                 $name = $this->generateName($new, $object, $config);
-                $filesystem = $this->registry->get($config['filesystem']);
+                $filesystem = $this->registry()->get($config['filesystem']);
 
                 $event->setNewValue($property, new LazyFile($name, $filesystem));
 
@@ -171,12 +169,12 @@ final class NodeLifecycleSubscriber
 
             if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path() && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // delete old
-                $this->pendingOperations[] = fn() => $this->registry->get($config['filesystem'])->delete($old->path());
+                $this->pendingOperations[] = fn() => $this->registry()->get($config['filesystem'])->delete($old->path());
             }
         }
     }
 
-    public function postFlush(PostFlushEventArgs $event): void
+    public function postFlush(): void
     {
         foreach ($this->pendingOperations as $operation) {
             $operation();
@@ -213,9 +211,19 @@ final class NodeLifecycleSubscriber
     private function namer(string $name): Namer
     {
         try {
-            return $this->namers->get($name);
+            return $this->namers()->get($name);
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException(\sprintf('Namer "%s" is not registered.', $name), previous: $e);
         }
+    }
+
+    private function namers(): ContainerInterface
+    {
+        return $this->container->get('namers');
+    }
+
+    private function registry(): FilesystemRegistry
+    {
+        return $this->container->get(FilesystemRegistry::class);
     }
 }

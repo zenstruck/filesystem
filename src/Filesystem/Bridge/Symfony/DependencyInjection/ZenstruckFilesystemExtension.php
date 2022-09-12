@@ -161,10 +161,18 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
+        $container->register('.zenstruck_filesystem.doctrine.namer_locator', ServiceLocator::class)
+            ->addArgument(new TaggedIteratorArgument('zenstruck_filesystem.doctrine_namer', 'key'))
+            ->addTag('container.service_locator')
+        ;
+
         $subscriber = $container->register('.zenstruck_filesystem.doctrine.node_event_subscriber', NodeLifecycleSubscriber::class)
             ->setArguments([
+                new ServiceLocatorArgument([
+                    FilesystemRegistry::class => new Reference('.zenstruck_filesystem.filesystem_registry'),
+                    'namers' => new Reference('.zenstruck_filesystem.doctrine.namer_locator'),
+                ]),
                 new Reference('.zenstruck_filesystem.doctrine.node_config_provider'),
-                new Reference('.zenstruck_filesystem.filesystem_registry'),
                 [
                     NodeConfigProvider::AUTOLOAD => $config['events']['load'][NodeConfigProvider::AUTOLOAD],
                     NodeConfigProvider::WRITE_ON_PERSIST => $config['events']['persist'][NodeConfigProvider::WRITE_ON_PERSIST],
@@ -172,7 +180,6 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                     NodeConfigProvider::DELETE_ON_UPDATE => $config['events']['update'][NodeConfigProvider::DELETE_ON_UPDATE],
                     NodeConfigProvider::DELETE_ON_REMOVE => $config['events']['remove'][NodeConfigProvider::DELETE_ON_REMOVE],
                 ],
-                new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem.doctrine_namer', 'key')),
             ])
         ;
 
