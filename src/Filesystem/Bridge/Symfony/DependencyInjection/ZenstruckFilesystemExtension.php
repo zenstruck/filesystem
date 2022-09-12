@@ -60,7 +60,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
             ->addTag('serializer.normalizer')
-            ->addTag('container.service_subscriber', ['key' => Filesystem::class, 'id' => MultiFilesystem::class])
+            ->addTag('container.service_subscriber')
             ->addTag('container.service_subscriber', ['key' => FilesystemRegistry::class, 'id' => '.zenstruck_filesystem.filesystem_registry'])
         ;
 

@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
@@ -73,13 +72,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         $filesystem = $this->container->get(FilesystemRegistry::class)->get(
             "lazy-{$name}",
             fn() => new LazyFilesystem(function() use ($name) {
-                $filesystem = $this->container->get(Filesystem::class);
-
-                if ($filesystem instanceof MultiFilesystem) {
-                    return $filesystem->get($name);
-                }
-
-                return $filesystem;
+                return $this->container->get(MultiFilesystem::class)->get($name);
             })
         );
 
@@ -101,6 +94,6 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     public static function getSubscribedServices(): array
     {
-        return [Filesystem::class, FilesystemRegistry::class];
+        return [MultiFilesystem::class, FilesystemRegistry::class];
     }
 }
