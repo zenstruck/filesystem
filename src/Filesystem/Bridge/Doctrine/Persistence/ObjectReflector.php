@@ -2,8 +2,7 @@
 
 namespace Zenstruck\Filesystem\Bridge\Doctrine\Persistence;
 
-use Zenstruck\Filesystem\LazyFilesystem;
-use Zenstruck\Filesystem\MultiFilesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\LazyNode;
 
@@ -29,7 +28,7 @@ final class ObjectReflector
         $this->ref = new \ReflectionObject($object);
     }
 
-    public function load(MultiFilesystem $filesystem, ?string $property): void
+    public function load(FilesystemRegistry $registry, ?string $property): void
     {
         if ($property && !isset($this->config[$property])) {
             throw new \InvalidArgumentException(\sprintf('Property "%s" is not configured as a file node on "%s".', $property, $this->object::class));
@@ -42,7 +41,7 @@ final class ObjectReflector
                 continue;
             }
 
-            $node->setFilesystem(new LazyFilesystem(fn() => $filesystem->get($config['filesystem'])));
+            $node->setFilesystem($registry->get($config['filesystem']));
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Filesystem;
 
+use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
 
 /**
@@ -10,7 +11,17 @@ use Zenstruck\Filesystem;
 final class FilesystemRegistry
 {
     /** @var array<string,Filesystem> */
-    private array $filesystems = [];
+    private array $filesystems;
+    private ?ContainerInterface $locator;
+
+    /**
+     * @param ContainerInterface|array<string,Filesystem> $filesystems
+     */
+    public function __construct(ContainerInterface|array $filesystems = [])
+    {
+        $this->filesystems = \is_array($filesystems) ? $filesystems : [];
+        $this->locator = $filesystems instanceof ContainerInterface ? $filesystems : null;
+    }
 
     public function set(Filesystem $filesystem, ?string $name = null): void
     {
@@ -24,7 +35,19 @@ final class FilesystemRegistry
      */
     public function get(string $name, ?callable $factory = null): Filesystem
     {
-        return $this->filesystems[$name] ??= $factory ? $factory() : throw new \RuntimeException(\sprintf('Filesystem "%s" is not registered.', $name));
+        if (isset($this->filesystems[$name])) {
+            return $this->filesystems[$name];
+        }
+
+        if ($factory) {
+            return $this->filesystems[$name] = new LazyFilesystem($factory);
+        }
+
+        if ($this->locator) {
+            return $this->filesystems[$name] = new LazyFilesystem(fn() => $this->locator->get($name));
+        }
+
+        throw new \RuntimeException(\sprintf('Filesystem "%s" is not registered.', $name));
     }
 
     public function reset(): void

@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -54,13 +55,18 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $container->register('.zenstruck_filesystem.adapter_factory', AdapterFactory::class);
 
+        $container->register('.zenstruck_filesystem.filesystem_locator', ServiceLocator::class)
+            ->addArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key'))
+            ->addTag('container.service_locator')
+        ;
+
         $container->register('.zenstruck_filesystem.filesystem_registry', FilesystemRegistry::class)
+            ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
 
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
             ->addTag('serializer.normalizer')
-            ->addTag('container.service_subscriber')
             ->addTag('container.service_subscriber', ['key' => FilesystemRegistry::class, 'id' => '.zenstruck_filesystem.filesystem_registry'])
         ;
 
@@ -85,7 +91,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $container->register(MultiFilesystem::class)
             ->setArguments([
-                new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key')),
+                new Reference('.zenstruck_filesystem.filesystem_locator'),
                 $defaultName,
             ])
         ;
@@ -106,7 +112,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('kernel.cache_warmer', ['optional' => false])
         ;
         $container->register(ObjectNodeLoader::class)
-            ->setArguments([new Reference(MultiFilesystem::class), new Reference('.zenstruck_filesystem.doctrine.node_config_provider')])
+            ->setArguments([new Reference('.zenstruck_filesystem.filesystem_registry'), new Reference('.zenstruck_filesystem.doctrine.node_config_provider')])
             ->addTag('twig.runtime')
         ;
 
@@ -153,8 +159,8 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $subscriber = $container->register('.zenstruck_filesystem.doctrine.node_event_subscriber', NodeLifecycleSubscriber::class)
             ->setArguments([
-                new Reference(new Reference('.zenstruck_filesystem.doctrine.node_config_provider')),
-                new Reference(MultiFilesystem::class),
+                new Reference('.zenstruck_filesystem.doctrine.node_config_provider'),
+                new Reference('.zenstruck_filesystem.filesystem_registry'),
                 [
                     NodeConfigProvider::AUTOLOAD => $config['events']['load'][NodeConfigProvider::AUTOLOAD],
                     NodeConfigProvider::WRITE_ON_PERSIST => $config['events']['persist'][NodeConfigProvider::WRITE_ON_PERSIST],

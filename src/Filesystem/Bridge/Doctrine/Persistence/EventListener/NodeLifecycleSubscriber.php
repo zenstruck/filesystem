@@ -12,7 +12,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ObjectReflector;
-use Zenstruck\Filesystem\MultiFilesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
@@ -34,7 +34,7 @@ final class NodeLifecycleSubscriber
      */
     public function __construct(
         private NodeConfigProvider $configProvider,
-        private MultiFilesystem $filesystem,
+        private FilesystemRegistry $registry,
         private array $globalConfig,
         private ContainerInterface $namers,
     ) {
@@ -60,7 +60,7 @@ final class NodeLifecycleSubscriber
 
             $ref ??= new ObjectReflector($object, $configs);
 
-            $ref->load($this->filesystem, $property);
+            $ref->load($this->registry, $property);
         }
     }
 
@@ -89,7 +89,7 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $this->filesystem->get($config['filesystem'])->delete($node->path());
+            $this->registry->get($config['filesystem'])->delete($node->path());
         }
     }
 
@@ -118,7 +118,7 @@ final class NodeLifecycleSubscriber
                 continue;
             }
 
-            $filesystem = $this->filesystem->get($config['filesystem']);
+            $filesystem = $this->registry->get($config['filesystem']);
 
             $ref->set($property, new LazyFile(
                 $name = $this->generateName($node, $object, $config),
@@ -152,7 +152,7 @@ final class NodeLifecycleSubscriber
 
             if (!$new instanceof Node && $old instanceof Node && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // user removed node, delete file
-                $this->pendingOperations[] = fn() => $this->filesystem->get($config['filesystem'])->delete($old);
+                $this->pendingOperations[] = fn() => $this->registry->get($config['filesystem'])->delete($old);
 
                 continue;
             }
@@ -160,7 +160,7 @@ final class NodeLifecycleSubscriber
             if ($new instanceof PendingFile && $this->isEnabled(NodeConfigProvider::WRITE_ON_UPDATE, $config)) {
                 // user is adding a new file
                 $name = $this->generateName($new, $object, $config);
-                $filesystem = $this->filesystem->get($config['filesystem']);
+                $filesystem = $this->registry->get($config['filesystem']);
 
                 $event->setNewValue($property, new LazyFile($name, $filesystem));
 
@@ -171,7 +171,7 @@ final class NodeLifecycleSubscriber
 
             if ($old instanceof Node && $new instanceof Node && $old->path() !== $new->path() && $this->isEnabled(NodeConfigProvider::DELETE_ON_UPDATE, $config)) {
                 // delete old
-                $this->pendingOperations[] = fn() => $this->filesystem->get($config['filesystem'])->delete($old->path());
+                $this->pendingOperations[] = fn() => $this->registry->get($config['filesystem'])->delete($old->path());
             }
         }
     }
