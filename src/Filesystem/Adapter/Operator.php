@@ -16,6 +16,7 @@ use Zenstruck\Filesystem\Feature\FileChecksum;
 use Zenstruck\Filesystem\Feature\FileUrl;
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Feature\ModifyFile;
+use Zenstruck\Filesystem\Feature\TransformImageUrl;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Util\TempFile;
@@ -32,7 +33,7 @@ use Zenstruck\Uri;
  * @phpstan-import-type Features from AdapterFilesystem
  * @phpstan-import-type TransformOptions from ImageTransformer
  */
-final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl, ImageTransformer
+final class Operator extends Filesystem implements FileChecksum, ModifyFile, FileUrl, ImageTransformer, TransformImageUrl
 {
     private PathNormalizer $normalizer;
 
@@ -81,6 +82,11 @@ final class Operator extends Filesystem implements FileChecksum, ModifyFile, Fil
     public function urlFor(File $file, mixed $options = []): Uri
     {
         return $this->featureOrFail(FileUrl::class)->urlFor($file, $options);
+    }
+
+    public function transformUrlFor(Image $image, mixed $options = []): Uri
+    {
+        return $this->featureOrFail(TransformImageUrl::class)->transformUrlFor($image, $options);
     }
 
     public function realFile(File $file): \SplFileInfo

@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -19,6 +20,10 @@ interface Image extends File
      * @param TransformOptions        $options
      */
     public function transform(callable $manipulator, array $options = []): PendingFile;
+
+    public function transformUrl(mixed $options = []): Uri;
+
+    public function thumbUrl(mixed $options = []): Uri;
 
     public function height(): int;
 

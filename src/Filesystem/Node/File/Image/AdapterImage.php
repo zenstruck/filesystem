@@ -8,6 +8,7 @@ use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File\AdapterFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -33,6 +34,16 @@ final class AdapterImage extends AdapterFile implements Image
     public function transform(callable $manipulator, array $options = []): PendingFile
     {
         return new PendingFile($this->operator()->transform($this, $manipulator, $options));
+    }
+
+    public function transformUrl(mixed $options = []): Uri
+    {
+        return $this->operator()->transformUrlFor($this, $options);
+    }
+
+    public function thumbUrl(mixed $options = []): Uri
+    {
+        return $this->transformUrl($options);
     }
 
     public function height(): int

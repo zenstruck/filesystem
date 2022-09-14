@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\WrappedFile;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,6 +19,16 @@ trait WrappedImage
     public function transform(callable $manipulator, array $options = []): PendingFile
     {
         return $this->inner()->transform($manipulator, $options);
+    }
+
+    public function transformUrl(mixed $options = []): Uri
+    {
+        return $this->inner()->transformUrl($options);
+    }
+
+    public function thumbUrl(mixed $options = []): Uri
+    {
+        return $this->transformUrl($options);
     }
 
     public function height(): int
