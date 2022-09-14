@@ -15,7 +15,7 @@ trait WrappedImage
 {
     use WrappedFile;
 
-    public function transform(callable $manipulator, array $options = []): PendingFile
+    public function transform(callable $manipulator, array $options = []): PendingImage
     {
         return $this->inner()->transform($manipulator, $options);
     }

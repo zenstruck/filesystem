@@ -30,9 +30,12 @@ final class AdapterImage extends AdapterFile implements Image
     {
     }
 
-    public function transform(callable $manipulator, array $options = []): PendingFile
+    public function transform(callable $manipulator, array $options = []): PendingImage
     {
-        return new PendingFile($this->operator()->transform($this, $manipulator, $options));
+        return new PendingImage(
+            $this,
+            fn () => $this->operator()->transform($this, $manipulator, $options)
+        );
     }
 
     public function height(): int

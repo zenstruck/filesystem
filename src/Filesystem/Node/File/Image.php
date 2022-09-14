@@ -4,6 +4,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,7 +19,7 @@ interface Image extends File
      * @param callable(object):object $manipulator
      * @param TransformOptions        $options
      */
-    public function transform(callable $manipulator, array $options = []): PendingFile;
+    public function transform(callable $manipulator, array $options = []): PendingImage;
 
     public function height(): int;
 
