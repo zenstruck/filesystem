@@ -18,7 +18,7 @@ class GlideTransformImageUrl implements TransformImageUrl
 
     public function transformUrlFor(Image $image, mixed $options = []): Uri
     {
-        $options = match(true) {
+        $options = match (true) {
             \is_string($options) => ['p' => $options], // is glide "preset"
             \is_array($options) && !array_is_list($options) => $options, // is standard glide parameters
             \is_array($options) => ['p' => \implode(',', $options)], // is array of "presets"

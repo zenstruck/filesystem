@@ -40,7 +40,7 @@ class GlideTransformImageUrlFeatureTest extends FilesystemTest
         ;
 
         return new AdapterFilesystem(new LocalAdapter(self::TEMP_DIR), [
-            'image_check_mime' => false
+            'image_check_mime' => false,
         ], [
             new GlideTransformImageUrl($urlBuilder),
         ]);
