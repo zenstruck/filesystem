@@ -196,6 +196,20 @@ The `Image` node extends `File` so all it's methods are available.
 
 $image = $filesystem->image('nested/image.jpg');
 
+/**
+ * get the url to transformed image
+ *
+ * @throws \Zenstruck\Filesystem\Exception\UnsupportedFeature If your filesystem does not support transformed image URLs
+ */
+// If your filesystem supports transforming urls with a set of parameters
+$url = $file->transformUrl(['w' => 100, 'h' => 100]); // Zenstruck\Uri
+(string) $url; // string (ie https://example.com/glide/image.png?w=100&h=100)
+// If your filesystem supports transforming urls with a set of parameters
+$url = $file->transformUrl('square-100'); // Zenstruck\Uri
+(string) $url; // string (ie https://example.com/glide/image.png?p=square-200)
+// You can also use shorter alias
+$url = $file->thumbUrl(['w' => 100, 'h' => 100]);
+
 // image metadata
 $image->width(); // int
 $image->height(); // int
@@ -328,6 +342,8 @@ currently available features:
 
 - `Zenstruck\Filesystem\Feature\FileUrl`: enables the usage of `File::url()` (implemented by
   [`PrefixFileUrlFeature`](#prefixfileurlfeature)).
+- `Zenstruck\Filesystem\Feature\TransformImageUrl`: enables the usage of `Image::transformUrl()` (implemented by
+    [`GlideTransformImageUrl`](#glidetransformimageurl)).
 - `Zenstruck\Filesystem\Feature\ModifyFile`: provides a real file for modification/metadata. If not implemented,
   creates/uses a temporary file on the filesystem. This is implemented by the default `LocalAdapter` provided by
   this library.
@@ -357,6 +373,26 @@ $filesystem = new AdapterFilesystem('/path/to/root', features: [
 
 (string) $filesystem->file('some/file.txt')->url(); // "https://cdn1.example.com/files/some/file.txt"
 (string) $filesystem->file('another/file.txt')->url(); // "https://cdn2.example.com/files/another/file.txt"
+```
+
+##### `GlideTransformImageUrl`
+
+> **Note**: Requires `league/glide`.
+Use this to build paths to Glide server for image manipulation (thumbnails etc.):
+
+```php
+use League\Glide\Urls\UrlBuilderFactory;
+use Zenstruck\Filesystem\AdapterFilesystem;
+use Zenstruck\Filesystem\Feature\TransformImageUrl\UrlBuilderGlideUrlFeature;
+$filesystem = new AdapterFilesystem('/path/to/root', features: [
+    new UrlBuilderGlideUrlFeature(UrlBuilderFactory::create('/glide/', 'signature')),
+]);
+// generate with Glide manipulation options
+(string) $filesystem->image('some/image.png')->transformUrl(['w' => 100, 'h' => 100]); // "/glide/some/image.png?w=100&h=100&s=3a82607a9517525d0a98de4548e10917"
+// generate with a Glide preset
+(string) $filesystem->image('some/image.png')->transformUrl('square-100'); // "/glide/some/image.png?p=square-100&s=3a82607a9517525d0a98de4548e10917"
+// generate with multiple Glide presets
+(string) $filesystem->image('some/image.png')->transformUrl(['square-100', 'low-quality']); // "/glide/some/image.png?p=square-100,low-quality&s=3a82607a9517525d0a98de4548e10917"
 ```
 
 ##### Custom Features
