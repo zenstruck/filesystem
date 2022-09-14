@@ -36,10 +36,10 @@ final class RouteFileUrlFeature implements FileUrl
             throw new UnsupportedFeature(\sprintf('Can only use array for $options in %s. "%s" given.', self::class, \get_debug_type($options)));
         }
 
-        $sign = $this->config['sign'] ?? false;
+        $sign = $options['sign'] ?? $this->config['sign'] ?? false;
         $expires = $options['expires'] ?? $this->config['expires'] ?? null;
 
-        unset($options['expires']);
+        unset($options['expires'], $options['sign']);
 
         if ($expires) {
             $sign = true;
@@ -50,16 +50,16 @@ final class RouteFileUrlFeature implements FileUrl
         $ref = $this->config['reference_type'] ?? UrlGeneratorInterface::ABSOLUTE_URL;
         $uri = Uri::new($this->container->get(UrlGeneratorInterface::class)->generate($name, $parameters, $ref));
 
-        if ($sign) {
-            $builder = $uri->sign($this->container->get(UriSigner::class));
-
-            if ($expires) {
-                $builder = $builder->expires($expires);
-            }
-
-            $uri = $builder->create();
+        if (!$sign) {
+            return $uri;
         }
 
-        return $uri;
+        $builder = $uri->sign($this->container->get(UriSigner::class));
+
+        if ($expires) {
+            $builder = $builder->expires($expires);
+        }
+
+        return $builder->create();
     }
 }

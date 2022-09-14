@@ -17,7 +17,7 @@
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
         "zenstruck/dimension": "^0.1.0",
-        "zenstruck/uri": "^1.1"
+        "zenstruck/uri": "^1.2"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.5",

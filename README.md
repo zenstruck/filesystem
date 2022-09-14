@@ -969,7 +969,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpFoundation\FileResponse;
-use Zenstruck\Uri\SignedUri;
+use Zenstruck\Uri;
 use Zenstruck\Uri\Signed\Exception\ExpiredUri;
 use Zenstruck\Uri\Signed\Exception\InvalidSignature;
 
@@ -1000,10 +1000,8 @@ class MyController
     #[Route('/private/file/{path<.+>}', name: 'private_file')]
     public function myAction(string $path, Filesystem $private, UriSigner $signer, Request $request): FileResponse
     {
-        $uri = SignedUri::new($request);
-
         try {
-            $uri->verify($signer);
+            Uri::new($request)->verify($signer);
         } catch (ExpiredUri) {
             throw new BadRequestHttpException('url has expired');
         } catch (InvalidSignature) {

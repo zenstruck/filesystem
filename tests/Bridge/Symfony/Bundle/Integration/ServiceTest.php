@@ -49,6 +49,10 @@ final class ServiceTest extends KernelTestCase
     {
         $file = $this->filesystem()->write('private://nested/file.txt', 'content')->last()->ensureFile();
 
+        $url = $file->url(['sign' => false]);
+        $this->assertSame('http://localhost/some/prefix/nested/file.txt', $url->toString());
+        $this->assertFalse($url->query()->has('_hash'));
+
         $url = $file->url();
         $this->assertStringContainsString('http://localhost/some/prefix/nested/file.txt', $url->toString());
         $this->assertTrue($url->query()->has('_hash'));
