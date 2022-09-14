@@ -3,7 +3,6 @@
 namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\WrappedFile;
 
 /**

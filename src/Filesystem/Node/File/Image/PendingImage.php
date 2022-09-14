@@ -33,11 +33,6 @@ class PendingImage implements Image
     ) {
     }
 
-    private function file(): \SplFileInfo
-    {
-        return $this->file ??= ($this->generator)();
-    }
-
     /**
      * @return array<string,mixed>
      */
@@ -46,7 +41,7 @@ class PendingImage implements Image
         return $this->config;
     }
 
-    public function localFile(): \SplFileInfo
+    public function localFile(): SplFileInfo
     {
         return $this->file();
     }
@@ -85,5 +80,10 @@ class PendingImage implements Image
         $filesystem = self::$filesystems->get($dir = \dirname($file), fn() => new AdapterFilesystem($dir));
 
         return $this->inner = $filesystem->file($file->getFilename())->ensureImage($this->config);
+    }
+
+    private function file(): SplFileInfo
+    {
+        return $this->file ??= ($this->generator)();
     }
 }

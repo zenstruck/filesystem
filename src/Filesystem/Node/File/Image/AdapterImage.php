@@ -7,7 +7,6 @@ use Zenstruck\Filesystem\Exception\UnsupportedFeature;
 use Zenstruck\Filesystem\Feature\ImageTransformer;
 use Zenstruck\Filesystem\Node\File\AdapterFile;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,7 +33,7 @@ final class AdapterImage extends AdapterFile implements Image
     {
         return new PendingImage(
             $this,
-            fn () => $this->operator()->transform($this, $manipulator, $options)
+            fn() => $this->operator()->transform($this, $manipulator, $options)
         );
     }
 
