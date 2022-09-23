@@ -22,7 +22,7 @@ class FilesystemFileType extends AbstractType
     {
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($options) {
+            function(FormEvent $event) use ($options) {
                 if ($formData = $event->getData()) {
                     if ($options['multiple']) {
                         $data = [];
@@ -37,7 +37,6 @@ class FilesystemFileType extends AbstractType
                             new PendingFile($formData, $options['filesystem_options'])
                         );
                     }
-
                 }
             },
             -10
@@ -47,8 +46,8 @@ class FilesystemFileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => fn (Options $options) => $options['multiple'] ? null : File::class,
-            'filesystem_options' => []
+            'data_class' => fn(Options $options) => $options['multiple'] ? null : File::class,
+            'filesystem_options' => [],
         ]);
 
         $resolver->setAllowedTypes('filesystem_options', 'array');

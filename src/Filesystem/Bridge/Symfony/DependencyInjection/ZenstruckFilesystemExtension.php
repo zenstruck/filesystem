@@ -208,7 +208,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $subscriber->addTag('doctrine.event_listener', ['event' => 'postRemove']);
         }
 
-        if (class_exists(FormType::class)) {
+        if (\class_exists(FormType::class)) {
             $container->register(
                 '.zenstruck_filesystem.form.filesystem_file',
                 FilesystemFileType::class

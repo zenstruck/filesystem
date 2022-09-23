@@ -14,27 +14,25 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
  */
 class FilesystemFileTest extends TypeTestCase
 {
-    private function testFile(): File
+    /**
+     * @test
+     */
+    public function set_data(): void
     {
-        return new File(__DIR__.'/../../../Fixture/files/symfony.png');
-    }
-
-    private function uploadedFile(): UploadedFile
-    {
-        return new UploadedFile(__DIR__.'/../../../Fixture/files/symfony.png', 'symfony.png', null, 0, true);
-    }
-
-    public function testSetData(): void {
         $form = $this->factory->create(FilesystemFileType::class);
 
-        $data = new PendingFile($this->testFile());
+        $data = new PendingFile($this->file());
 
         $form->setData($data);
 
         self::assertSame($data, $form->getData());
     }
 
-    public function testSubmit(): void {
+    /**
+     * @test
+     */
+    public function submit(): void
+    {
         $requestHandler = new HttpFoundationRequestHandler();
         $form = $this->factory->createBuilder(FilesystemFileType::class)->setRequestHandler($requestHandler)->getForm();
         $data = $this->uploadedFile();
@@ -43,5 +41,15 @@ class FilesystemFileTest extends TypeTestCase
 
         self::assertInstanceOf(PendingFile::class, $form->getData());
         $this->assertSame($data->getClientOriginalName(), $form->getData()->originalName());
+    }
+
+    private function file(): File
+    {
+        return new File(__DIR__.'/../../../Fixture/files/symfony.png');
+    }
+
+    private function uploadedFile(): UploadedFile
+    {
+        return new UploadedFile(__DIR__.'/../../../Fixture/files/symfony.png', 'symfony.png', null, 0, true);
     }
 }
