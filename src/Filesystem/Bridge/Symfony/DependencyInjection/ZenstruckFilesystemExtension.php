@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -30,6 +31,7 @@ use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\SlugifyNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\Namer\TwigNamer;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\NodeConfigProvider;
 use Zenstruck\Filesystem\Bridge\Doctrine\Persistence\ORMNodeConfigProvider;
+use Zenstruck\Filesystem\Bridge\Symfony\Form\Type\FilesystemFileType;
 use Zenstruck\Filesystem\Bridge\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\Bridge\Symfony\Routing\RouteFileUrlFeature;
 use Zenstruck\Filesystem\Bridge\Symfony\Serializer\NodeNormalizer;
@@ -204,6 +206,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if ($config['events']['remove']['enabled']) {
             $subscriber->addTag('doctrine.event_listener', ['event' => 'postRemove']);
+        }
+
+        if (class_exists(FormType::class)) {
+            $container->register(
+                '.zenstruck_filesystem.form.filesystem_file',
+                FilesystemFileType::class
+            );
         }
     }
 
