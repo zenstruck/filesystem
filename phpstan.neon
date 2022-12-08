@@ -1,0 +1,7 @@
+parameters:
+    level: 8
+    treatPhpDocTypesAsCertain: false
+    paths:
+        - src
+    ignoreErrors:
+        - '#no value type specified in iterable type array#'

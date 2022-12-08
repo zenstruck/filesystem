@@ -1,0 +1,467 @@
+<?php
+
+namespace Zenstruck\Tests;
+
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Stream;
+use Zenstruck\TempFile;
+
+/**
+ * @author Kevin Bond <kevinbond@gmail.com>
+ */
+abstract class FilesystemTest extends TestCase
+{
+    /**
+     * @test
+     */
+    public function can_get_node(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $file = $fs->node('some/file.txt');
+        $dir = $fs->node('some');
+
+        $this->assertInstanceOf(File::class, $file);
+        $this->assertTrue($file->exists());
+        $this->assertSame('content', $file->contents());
+        $this->assertInstanceOf(Directory::class, $dir);
+        $this->assertTrue($dir->exists());
+        $this->assertCount(1, $dir);
+    }
+
+    /**
+     * @test
+     */
+    public function node_not_found(): void
+    {
+        $fs = $this->createFilesystem();
+
+        $this->expectException(NodeNotFound::class);
+
+        $fs->node('invalid');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $file = $fs->file('some/file.txt');
+
+        // node metadata
+        $this->assertTrue($file->exists());
+        $this->assertSame('some/file.txt', $file->path());
+        $this->assertSame('file.txt', $file->name());
+        $this->assertSame('some', $file->directory()->path());
+        $this->assertSame('public', $file->visibility());
+        $this->assertSame('text/plain', $file->mimeType());
+        $this->assertSame(\date_default_timezone_get(), $file->lastModified()->getTimezone()->getName());
+
+        // file metadata
+        $this->assertSame('txt', $file->extension());
+        $this->assertSame('txt', $file->guessExtension());
+        $this->assertSame('file', $file->nameWithoutExtension());
+        $this->assertSame(7, $file->size());
+        $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $file->checksum());
+        $this->assertSame('040f06fd774092478d450774f5ba30c5da78acc8', $file->checksum('sha1'));
+
+        // file urls
+        $this->assertSame('/prefix/some/file.txt', $file->publicUrl());
+        $this->assertSame('/temp/some/file.txt?expires=1640995200', $file->temporaryUrl(new \DateTime('2022-01-01')));
+
+        // file content
+        $this->assertSame('content', $file->contents());
+        $this->assertSame('content', \stream_get_contents($file->read()->get()));
+        $this->assertSame('content', \file_get_contents($file->tempFile()));
+
+        // no extension
+        $file = $fs->write('some/file', fixture_file('symfony.png'));
+
+        $this->assertNull($file->extension());
+        $this->assertSame('png', $file->guessExtension());
+        $this->assertSame('image/png', $file->mimeType());
+
+        // caching
+        $originalValues = [
+            $file->mimeType(),
+            $file->size(),
+            $file->checksum(),
+            $file->checksum('sha1'),
+        ];
+
+        $fs->write('some/file', fixture_file('symfony.jpg'));
+
+        $this->assertSame($originalValues, [
+            $file->mimeType(),
+            $file->size(),
+            $file->checksum(),
+            $file->checksum('sha1'),
+        ]);
+
+        $file->refresh();
+
+        $this->assertNotSame($originalValues, [
+            $file->mimeType(),
+            $file->size(),
+            $file->checksum(),
+            $file->checksum('sha1'),
+        ]);
+        $this->assertSame(
+            [
+                'image/jpeg',
+                25884,
+                '42890a25562a1803949caa09d235f242',
+                '4dadf4a29cdc3b57ab8564f5651b30e236ca536d',
+            ],
+            [
+                $file->mimeType(),
+                $file->size(),
+                $file->checksum(),
+                $file->checksum('sha1'),
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->mkdir('dir');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $fs->file('dir');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_image(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.png', 'content');
+
+        $image = $fs->image('some/file.png');
+
+        // node metadata
+        $this->assertTrue($image->exists());
+        $this->assertSame('some/file.png', $image->path());
+        $this->assertSame('file.png', $image->name());
+        $this->assertSame('some', $image->directory()->path());
+        $this->assertSame('public', $image->visibility());
+        $this->assertSame('image/png', $image->mimeType());
+        $this->assertSame(\date_default_timezone_get(), $image->lastModified()->getTimezone()->getName());
+
+        // file metadata
+        $this->assertSame('png', $image->extension());
+        $this->assertSame('png', $image->guessExtension());
+        $this->assertSame('file', $image->nameWithoutExtension());
+        $this->assertSame(7, $image->size());
+        $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $image->checksum());
+        $this->assertSame('040f06fd774092478d450774f5ba30c5da78acc8', $image->checksum('sha1'));
+
+        // file urls
+        $this->assertSame('/prefix/some/file.png', $image->publicUrl());
+        $this->assertSame('/temp/some/file.png?expires=1640995200', $image->temporaryUrl(new \DateTime('2022-01-01')));
+
+        // file content
+        $this->assertSame('content', $image->contents());
+        $this->assertSame('content', \stream_get_contents($image->read()->get()));
+        $this->assertSame('content', \file_get_contents($image->tempFile()));
+
+        // no extension
+        $image = $fs->write('some/file', fixture_file('symfony.png'));
+
+        $this->assertNull($image->extension());
+        $this->assertSame('png', $image->guessExtension());
+        $this->assertSame('image/png', $image->mimeType());
+
+        // caching
+        $originalValues = [
+            $image->mimeType(),
+            $image->size(),
+            $image->checksum(),
+            $image->checksum('sha1'),
+        ];
+
+        $fs->write('some/file', fixture_file('symfony.jpg'));
+
+        $this->assertSame($originalValues, [
+            $image->mimeType(),
+            $image->size(),
+            $image->checksum(),
+            $image->checksum('sha1'),
+        ]);
+
+        $image->refresh();
+
+        $this->assertNotSame($originalValues, [
+            $image->mimeType(),
+            $image->size(),
+            $image->checksum(),
+            $image->checksum('sha1'),
+        ]);
+        $this->assertSame(
+            [
+                'image/jpeg',
+                25884,
+                '42890a25562a1803949caa09d235f242',
+                '4dadf4a29cdc3b57ab8564f5651b30e236ca536d',
+            ],
+            [
+                $image->mimeType(),
+                $image->size(),
+                $image->checksum(),
+                $image->checksum('sha1'),
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_image(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->mkdir('dir');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $fs->image('dir');
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_image_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $fs->image('some/file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_directory(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file1.txt', 'content');
+        $fs->write('some/file2.txt', 'content');
+        $fs->write('some/sub/file3.txt', 'content');
+        $fs->mkdir('some/sub/sub');
+
+        $dir = $fs->directory('some');
+
+        // node metadata
+        $this->assertTrue($dir->exists());
+        $this->assertSame('some', $dir->path());
+        $this->assertSame('some', $dir->name());
+        $this->assertNull($dir->directory());
+        $this->assertSame('dir', $dir->mimeType());
+
+        $this->assertCount(3, $dir);
+        $this->assertCount(2, $dir->files());
+        $this->assertCount(1, $dir->directories());
+        $this->assertCount(5, $dir->recursive());
+        $this->assertCount(3, $dir->recursive()->files());
+        $this->assertCount(2, $dir->recursive()->directories());
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_directory(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->expectException(NodeTypeMismatch::class);
+
+        $fs->directory('some/file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function can_check_for_existence(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('some'));
+        $this->assertFalse($fs->has('invalid'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_copy_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertFalse($fs->has('another/file.txt'));
+
+        $fs->copy('some/file.txt', 'another/file.txt');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('another/file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_move_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertFalse($fs->has('another/file.txt'));
+
+        $fs->move('some/file.txt', 'another/file.txt');
+
+        $this->assertFalse($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('another/file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_delete_file(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+
+        $fs->delete('some/file.txt');
+
+        $this->assertFalse($fs->has('some/file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_delete_directory(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+        $fs->write('some/sub/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('some/sub/file.txt'));
+
+        $fs->delete('some/sub');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertFalse($fs->has('some/sub'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_delete_directory_object(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+        $fs->write('some/sub/file.txt', 'content');
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('some/sub/file.txt'));
+
+        $fs->delete($fs->directory('some')->files());
+
+        $this->assertFalse($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('some/sub'));
+        $this->assertTrue($fs->has('some/sub/file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_make_directory(): void
+    {
+        $fs = $this->createFilesystem();
+
+        $this->assertFalse($fs->has('dir'));
+
+        $fs->mkdir('dir');
+
+        $this->assertTrue($fs->has('dir'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_chmod(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
+
+        $this->assertSame('public', $fs->file('some/file.txt')->visibility());
+
+        $fs->chmod('some/file.txt', 'private');
+
+        $this->assertSame('private', $fs->file('some/file.txt')->visibility());
+    }
+
+    /**
+     * @test
+     * @dataProvider writeValueProvider
+     */
+    public function can_write(mixed $value): void
+    {
+        $fs = $this->createFilesystem();
+
+        $file = $fs->write('some/file.txt', $value);
+
+        $this->assertSame('content', $file->contents());
+    }
+
+    public static function writeValueProvider(): iterable
+    {
+        yield ['content'];
+        yield [TempFile::for('content')];
+        yield [Stream::inMemory()->write('content')->rewind()->get()];
+        yield [in_memory_filesystem()->write('file.txt', 'content')];
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidWriteValueProvider
+     */
+    public function invalid_write_value(mixed $value): void
+    {
+        $fs = $this->createFilesystem();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $fs->write('some/file.txt', $value);
+    }
+
+    public static function invalidWriteValueProvider(): iterable
+    {
+        yield [['array']];
+        yield [new \SplFileInfo(__DIR__)];
+        yield [in_memory_filesystem()->mkdir('foo')->directory('foo')];
+    }
+
+    abstract protected function createFilesystem(): Filesystem;
+}

@@ -1,0 +1,39 @@
+{
+    "name": "zenstruck/filesystem",
+    "description": "Wrapper for league/flysystem with alternate API and added functionality.",
+    "homepage": "https://github.com/zenstruck/filesystem",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "Kevin Bond",
+            "email": "kevinbond@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "league/flysystem": "^3.11",
+        "zenstruck/stream": "^1.0",
+        "zenstruck/temp-file": "^1.0"
+    },
+    "require-dev": {
+        "league/flysystem-memory": "^3.10",
+        "phpstan/phpstan": "^1.4",
+        "phpunit/phpunit": "^9.5.0",
+        "symfony/phpunit-bridge": "^6.1",
+        "symfony/var-dumper": "^5.4|^6.0"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Zenstruck\\": ["src/"] }
+    },
+    "autoload-dev": {
+        "psr-4": { "Zenstruck\\Tests\\": ["tests/"] }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
