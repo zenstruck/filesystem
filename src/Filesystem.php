@@ -57,7 +57,7 @@ interface Filesystem
     public function chmod(string $path, string $visibility): static;
 
     /**
-     * @param resource|string|\SplFileInfo|File $value
+     * @param resource|string|\SplFileInfo|File|Directory<Node> $value
      */
     public function write(string $path, mixed $value, array $config = []): static;
 

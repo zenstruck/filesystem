@@ -2,7 +2,10 @@
 
 namespace Zenstruck\Filesystem;
 
+use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\PathPrefixer;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Node\Directory;
@@ -118,13 +121,26 @@ final class FlysystemFilesystem implements Filesystem
 
     public function write(string $path, mixed $value, array $config = []): static
     {
+        if ($value instanceof \SplFileInfo && $value->isDir()) {
+            $value = (new self(new Flysystem(new LocalFilesystemAdapter($value))))->directory()->recursive();
+        }
+
+        if ($value instanceof Directory) {
+            $prefixer = new PathPrefixer($path);
+            $prefixLength = \mb_strlen($value->path());
+
+            foreach ($value->files() as $file) {
+                $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config);
+            }
+
+            $this->last = $path;
+
+            return $this;
+        }
+
         $closeStream = false;
 
         if ($value instanceof \SplFileInfo) {
-            if ($value->isDir()) {
-                throw new \InvalidArgumentException('Cannot write local directory.');
-            }
-
             $value = Stream::open($value, 'r');
             $closeStream = true;
         }

@@ -84,7 +84,7 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame('content', \file_get_contents($file->tempFile()));
 
         // no extension
-        $file = $fs->write('some/file', fixture_file('symfony.png'))->last()->ensureFile();
+        $file = $fs->write('some/file', fixture('symfony.png'))->last()->ensureFile();
 
         $this->assertNull($file->extension());
         $this->assertSame('png', $file->guessExtension());
@@ -98,7 +98,7 @@ abstract class FilesystemTest extends TestCase
             $file->checksum('sha1'),
         ];
 
-        $fs->write('some/file', fixture_file('symfony.jpg'));
+        $fs->write('some/file', fixture('symfony.jpg'));
 
         $this->assertSame($originalValues, [
             $file->mimeType(),
@@ -181,7 +181,7 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame('content', \file_get_contents($image->tempFile()));
 
         // no extension
-        $image = $fs->write('some/file', fixture_file('symfony.png'))->last()->ensureImage();
+        $image = $fs->write('some/file', fixture('symfony.png'))->last()->ensureImage();
 
         $this->assertNull($image->extension());
         $this->assertSame('png', $image->guessExtension());
@@ -195,7 +195,7 @@ abstract class FilesystemTest extends TestCase
             $image->checksum('sha1'),
         ];
 
-        $fs->write('some/file', fixture_file('symfony.jpg'));
+        $fs->write('some/file', fixture('symfony.jpg'));
 
         $this->assertSame($originalValues, [
             $image->mimeType(),
@@ -445,7 +445,7 @@ abstract class FilesystemTest extends TestCase
      * @test
      * @dataProvider writeValueProvider
      */
-    public function can_write(mixed $value): void
+    public function can_write_file(mixed $value): void
     {
         $fs = $this->createFilesystem();
 
@@ -465,6 +465,29 @@ abstract class FilesystemTest extends TestCase
 
     /**
      * @test
+     * @dataProvider writeDirectoryProvider
+     */
+    public function can_write_directory(mixed $value): void
+    {
+        $fs = $this->createFilesystem();
+
+        $fs->write('foo', $value);
+
+        $this->assertTrue($fs->has('foo'));
+        $this->assertTrue($fs->has('foo/file1.txt'));
+        $this->assertTrue($fs->has('foo/sub2'));
+        $this->assertTrue($fs->has('foo/sub2/file2.txt'));
+        $this->assertSame('foo', $fs->last()->ensureDirectory()->path());
+    }
+
+    public static function writeDirectoryProvider(): iterable
+    {
+        yield [fixture_filesystem()->directory('sub1')->recursive()];
+        yield [fixture('sub1')];
+    }
+
+    /**
+     * @test
      * @dataProvider invalidWriteValueProvider
      */
     public function invalid_write_value(mixed $value): void
@@ -478,8 +501,6 @@ abstract class FilesystemTest extends TestCase
     public static function invalidWriteValueProvider(): iterable
     {
         yield [['array']];
-        yield [new \SplFileInfo(__DIR__)];
-        yield [in_memory_filesystem()->mkdir('foo')->directory('foo')];
     }
 
     /**

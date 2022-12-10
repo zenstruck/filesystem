@@ -19,6 +19,7 @@
     },
     "require-dev": {
         "league/flysystem-memory": "^3.10",
+        "league/flysystem-read-only": "^3.10",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
         "symfony/phpunit-bridge": "^6.1",

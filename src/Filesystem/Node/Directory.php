@@ -29,12 +29,12 @@ interface Directory extends Node, \IteratorAggregate
     public function filter(callable $predicate): self;
 
     /**
-     * @return self<File>
+     * @return self<File>|File[]
      */
     public function files(): self;
 
     /**
-     * @return self<Directory<Node>>
+     * @return self<Directory<Node>>|Directory<Node>[]
      */
     public function directories(): self;
 }
