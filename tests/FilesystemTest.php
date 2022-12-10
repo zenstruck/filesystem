@@ -80,7 +80,7 @@ abstract class FilesystemTest extends TestCase
 
         // file content
         $this->assertSame('content', $file->contents());
-        $this->assertSame('content', \stream_get_contents($file->read()->get()));
+        $this->assertSame('content', $file->read()->contents());
         $this->assertSame('content', \file_get_contents($file->tempFile()));
 
         // no extension
@@ -177,7 +177,7 @@ abstract class FilesystemTest extends TestCase
 
         // file content
         $this->assertSame('content', $image->contents());
-        $this->assertSame('content', \stream_get_contents($image->read()->get()));
+        $this->assertSame('content', $image->read()->contents());
         $this->assertSame('content', \file_get_contents($image->tempFile()));
 
         // no extension
