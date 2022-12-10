@@ -11,7 +11,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 const FIXTURE_DIR = __DIR__.'/Fixtures';
 
-function fixture_file(string $name): SplFileInfo
+function fixture_file(string $name): \SplFileInfo
 {
     return new \SplFileInfo(FIXTURE_DIR.'/'.$name);
 }

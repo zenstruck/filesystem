@@ -17,8 +17,11 @@ use Zenstruck\Stream;
  */
 final class FlysystemFilesystem implements Filesystem
 {
+    private string|\LogicException $last;
+
     public function __construct(private FilesystemOperator $flysystem)
     {
+        $this->last = new \LogicException('No operations have been performed.');
     }
 
     public function node(string $path): File|Directory
@@ -58,6 +61,7 @@ final class FlysystemFilesystem implements Filesystem
     {
         // todo: copy dir?
         $this->flysystem->copy($source, $destination, $config);
+        $this->last = $destination;
 
         return $this;
     }
@@ -66,12 +70,15 @@ final class FlysystemFilesystem implements Filesystem
     {
         // todo: move dir?
         $this->flysystem->move($source, $destination, $config);
+        $this->last = $destination;
 
         return $this;
     }
 
     public function delete(Directory|string $path, array $config = []): static
     {
+        $this->last = new \LogicException('Last operation was a delete so no last node is available.');
+
         if ($path instanceof Directory) {
             foreach ($path as $node) {
                 $this->delete($node->path(), $config);
@@ -96,6 +103,7 @@ final class FlysystemFilesystem implements Filesystem
     public function mkdir(string $path, array $config = []): static
     {
         $this->flysystem->createDirectory($path, $config);
+        $this->last = $path;
 
         return $this;
     }
@@ -103,11 +111,12 @@ final class FlysystemFilesystem implements Filesystem
     public function chmod(string $path, string $visibility): static
     {
         $this->flysystem->setVisibility($path, $visibility);
+        $this->last = $path;
 
         return $this;
     }
 
-    public function write(string $path, mixed $value, array $config = []): File
+    public function write(string $path, mixed $value, array $config = []): static
     {
         $closeStream = false;
 
@@ -144,6 +153,13 @@ final class FlysystemFilesystem implements Filesystem
             $closeStream && $value->close();
         }
 
-        return $this->file($path);
+        $this->last = $path;
+
+        return $this;
+    }
+
+    public function last(): File|Directory
+    {
+        return \is_string($this->last) ? $this->node($this->last) : throw $this->last;
     }
 }

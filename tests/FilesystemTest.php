@@ -84,7 +84,7 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame('content', \file_get_contents($file->tempFile()));
 
         // no extension
-        $file = $fs->write('some/file', fixture_file('symfony.png'));
+        $file = $fs->write('some/file', fixture_file('symfony.png'))->last()->ensureFile();
 
         $this->assertNull($file->extension());
         $this->assertSame('png', $file->guessExtension());
@@ -181,7 +181,7 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame('content', \file_get_contents($image->tempFile()));
 
         // no extension
-        $image = $fs->write('some/file', fixture_file('symfony.png'));
+        $image = $fs->write('some/file', fixture_file('symfony.png'))->last()->ensureImage();
 
         $this->assertNull($image->extension());
         $this->assertSame('png', $image->guessExtension());
@@ -323,6 +323,7 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertTrue($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
+        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path());
     }
 
     /**
@@ -340,6 +341,7 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertFalse($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
+        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path());
     }
 
     /**
@@ -355,6 +357,20 @@ abstract class FilesystemTest extends TestCase
         $fs->delete('some/file.txt');
 
         $this->assertFalse($fs->has('some/file.txt'));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_access_last_after_delete(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->mkdir('foo');
+        $fs->delete('foo');
+
+        $this->expectException(\LogicException::class);
+
+        $fs->last();
     }
 
     /**
@@ -406,6 +422,7 @@ abstract class FilesystemTest extends TestCase
         $fs->mkdir('dir');
 
         $this->assertTrue($fs->has('dir'));
+        $this->assertSame('dir', $fs->last()->ensureDirectory()->path());
     }
 
     /**
@@ -421,6 +438,7 @@ abstract class FilesystemTest extends TestCase
         $fs->chmod('some/file.txt', 'private');
 
         $this->assertSame('private', $fs->file('some/file.txt')->visibility());
+        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path());
     }
 
     /**
@@ -431,9 +449,10 @@ abstract class FilesystemTest extends TestCase
     {
         $fs = $this->createFilesystem();
 
-        $file = $fs->write('some/file.txt', $value);
+        $file = $fs->write('some/file.txt', $value)->last()->ensureFile();
 
         $this->assertSame('content', $file->contents());
+        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path());
     }
 
     public static function writeValueProvider(): iterable
@@ -441,7 +460,7 @@ abstract class FilesystemTest extends TestCase
         yield ['content'];
         yield [TempFile::for('content')];
         yield [Stream::inMemory()->write('content')->rewind()->get()];
-        yield [in_memory_filesystem()->write('file.txt', 'content')];
+        yield [in_memory_filesystem()->write('file.txt', 'content')->last()];
     }
 
     /**
@@ -461,6 +480,18 @@ abstract class FilesystemTest extends TestCase
         yield [['array']];
         yield [new \SplFileInfo(__DIR__)];
         yield [in_memory_filesystem()->mkdir('foo')->directory('foo')];
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_access_last_if_no_operation_performed(): void
+    {
+        $fs = $this->createFilesystem();
+
+        $this->expectException(\LogicException::class);
+
+        $fs->last();
     }
 
     abstract protected function createFilesystem(): Filesystem;

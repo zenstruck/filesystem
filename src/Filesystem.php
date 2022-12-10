@@ -59,5 +59,12 @@ interface Filesystem
     /**
      * @param resource|string|\SplFileInfo|File $value
      */
-    public function write(string $path, mixed $value, array $config = []): File;
+    public function write(string $path, mixed $value, array $config = []): static;
+
+    /**
+     * @return File|Directory<Node>
+     *
+     * @throws \LogicException if no last node available
+     */
+    public function last(): File|Directory;
 }
