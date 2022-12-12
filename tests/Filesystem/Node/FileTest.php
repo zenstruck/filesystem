@@ -3,6 +3,7 @@
 namespace Zenstruck\Tests\Filesystem\Node;
 
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -10,6 +11,13 @@ use Zenstruck\Filesystem\Node\File;
  */
 abstract class FileTest extends TestCase
 {
+    protected Filesystem $filesystem;
+
+    protected function setUp(): void
+    {
+        $this->filesystem = in_memory_filesystem();
+    }
+
     /**
      * @test
      */
@@ -96,7 +104,10 @@ abstract class FileTest extends TestCase
         $this->assertSame('4dadf4a29cdc3b57ab8564f5651b30e236ca536d', $file->checksum('sha1'));
     }
 
-    abstract protected function modifyFile(File $file, \SplFileInfo $new): void;
+    protected function modifyFile(File $file, \SplFileInfo $new): void
+    {
+        $this->filesystem->write($file->path(), $new);
+    }
 
     abstract protected function createFile(\SplFileInfo $file, string $path): File;
 }
