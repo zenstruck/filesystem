@@ -13,13 +13,16 @@ use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
 final class FilesystemRegistry
 {
     /** @var array<string,Filesystem> */
-    private array $cache = [];
+    private array $filesystems;
+    private ?ContainerInterface $locator;
 
     /**
      * @param ContainerInterface|array<string,Filesystem> $filesystems
      */
-    public function __construct(private ContainerInterface|array $filesystems = [])
+    public function __construct(ContainerInterface|array $filesystems)
     {
+        $this->filesystems = \is_array($filesystems) ? $filesystems : [];
+        $this->locator = $filesystems instanceof ContainerInterface ? $filesystems : null;
     }
 
     /**
@@ -27,24 +30,30 @@ final class FilesystemRegistry
      */
     public function get(string $name): Filesystem
     {
-        return $this->cache[$name] ??= new LazyFilesystem(fn() => $this->resolveFilesystem($name));
+        if (isset($this->filesystems[$name])) {
+            return $this->filesystems[$name];
+        }
+
+        if (!$this->locator) {
+            throw new UnregisteredFilesystem($name);
+        }
+
+        return $this->filesystems[$name] = new LazyFilesystem(fn() => $this->resolveFilesystem($name));
     }
 
     public function reset(): void
     {
-        $this->cache = [];
+        if ($this->locator) {
+            $this->filesystems = [];
+        }
     }
 
     private function resolveFilesystem(string $name): Filesystem
     {
-        if ($this->filesystems instanceof ContainerInterface) {
-            try {
-                return $this->filesystems->get($name);
-            } catch (NotFoundExceptionInterface $e) {
-                throw new UnregisteredFilesystem($name, $e);
-            }
+        try {
+            return $this->locator?->get($name) ?: throw new UnregisteredFilesystem($name);
+        } catch (NotFoundExceptionInterface $e) {
+            throw new UnregisteredFilesystem($name, $e);
         }
-
-        return $this->filesystems[$name] ?? throw new UnregisteredFilesystem($name);
     }
 }
