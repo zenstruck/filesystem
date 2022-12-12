@@ -22,9 +22,14 @@ final class FlysystemFilesystem implements Filesystem
 {
     private string|\LogicException $last;
 
-    public function __construct(private FilesystemOperator $flysystem)
+    public function __construct(private FilesystemOperator $flysystem, private string $name = 'default')
     {
         $this->last = new \LogicException('No operations have been performed.');
+    }
+
+    public function name(): string
+    {
+        return $this->name;
     }
 
     public function node(string $path): File|Directory

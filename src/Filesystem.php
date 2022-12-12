@@ -14,6 +14,8 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 interface Filesystem
 {
+    public function name(): string;
+
     /**
      * @return File|Directory<Node>
      *
