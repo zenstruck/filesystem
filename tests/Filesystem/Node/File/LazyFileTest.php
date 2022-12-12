@@ -2,25 +2,33 @@
 
 namespace Zenstruck\Tests\Filesystem\Node\File;
 
+use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Tests\Filesystem\Node\FileTest;
+use Zenstruck\Tests\Filesystem\Node\FileTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LazyFileTest extends FileTest
+class LazyFileTest extends TestCase
 {
+    use FileTests;
+
     /**
      * @test
      */
     public function filesystem_must_be_set_for_non_lazy_methods(): void
     {
-        $file = new LazyFile('some/path.txt');
+        $file = $this->createLazyFile('some/path.txt');
 
         $this->expectException(\RuntimeException::class);
 
         $file->contents();
+    }
+
+    protected function createLazyFile(string $path): LazyFile
+    {
+        return new LazyFile($path);
     }
 
     protected function createFile(\SplFileInfo $file, string $path): File

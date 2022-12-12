@@ -2,14 +2,13 @@
 
 namespace Zenstruck\Tests\Filesystem\Node;
 
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class FileTest extends TestCase
+trait FileTests
 {
     protected Filesystem $filesystem;
 

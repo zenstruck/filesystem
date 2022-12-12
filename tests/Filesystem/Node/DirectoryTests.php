@@ -2,13 +2,12 @@
 
 namespace Zenstruck\Tests\Filesystem\Node;
 
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Directory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class DirectoryTest extends TestCase
+trait DirectoryTests
 {
     /**
      * @test
