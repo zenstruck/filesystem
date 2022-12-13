@@ -8,8 +8,10 @@ use League\Flysystem\UnableToReadFile;
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\Path;
 use Zenstruck\Stream;
 use Zenstruck\TempFile;
@@ -144,19 +146,29 @@ class PendingFile extends \SplFileInfo implements File
         return $this->localFlysystem()->visibility($this->getFilename());
     }
 
-    public function ensureFile(): File
+    public function ensureFile(): self
     {
-        throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
+        return $this;
     }
 
     public function ensureDirectory(): Directory
     {
-        throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
+        throw NodeTypeMismatch::expectedDirectoryAt($this->path());
     }
 
-    public function ensureImage(): Image
+    public function ensureImage(): PendingImage
     {
-        throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
+        if ($this instanceof PendingImage) {
+            return $this;
+        }
+
+        $image = new PendingImage($this);
+
+        if (isset($this->symfonyFile)) {
+            $image->symfonyFile = $this->symfonyFile;
+        }
+
+        return $image;
     }
 
     private function localFlysystem(): Flysystem
