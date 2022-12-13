@@ -5,6 +5,7 @@ namespace Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\DecoratedNode;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\Path;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -15,6 +16,7 @@ class LazyFile implements File
 
     private ?Filesystem $filesystem = null;
     private File $inner;
+    private Path $pathObject;
 
     public function __construct(private string $path)
     {
@@ -25,9 +27,14 @@ class LazyFile implements File
         $this->filesystem = $filesystem;
     }
 
-    public function path(): string
+    public function path(): Path
     {
-        return $this->path;
+        return $this->pathObject ??= new Path($this->path);
+    }
+
+    public function guessExtension(): ?string
+    {
+        return $this->path()->extension() ?? $this->inner()->guessExtension();
     }
 
     protected function inner(): File

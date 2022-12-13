@@ -12,8 +12,6 @@ use Zenstruck\Stream;
  */
 trait DecoratedFile
 {
-    use PathMethods;
-
     public function size(): int
     {
         return $this->inner()->size();

@@ -12,11 +12,6 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 trait DecoratedNode
 {
-    public function path(): string
-    {
-        return $this->inner()->path();
-    }
-
     public function directory(): ?Directory
     {
         return $this->inner()->directory();

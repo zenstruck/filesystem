@@ -14,22 +14,24 @@ abstract class FlysystemNode implements Node
 {
     protected ?\DateTimeImmutable $lastModified = null;
     protected ?string $visibility = null;
+    private Path $path;
 
     /**
      * @internal
      */
-    public function __construct(private string $path, protected FilesystemOperator $flysystem)
+    public function __construct(string $path, protected FilesystemOperator $flysystem)
     {
+        $this->path = new Path($path);
     }
 
-    public function path(): string
+    public function path(): Path
     {
         return $this->path;
     }
 
     public function directory(): ?Directory
     {
-        $dirname = \pathinfo($this->path(), \PATHINFO_DIRNAME);
+        $dirname = $this->path()->dirname();
 
         return '.' === $dirname ? null : new FlysystemDirectory($dirname, $this->flysystem);
     }

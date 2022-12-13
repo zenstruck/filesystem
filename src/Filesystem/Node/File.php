@@ -10,19 +10,11 @@ use Zenstruck\Stream;
  */
 interface File extends Node
 {
-    public function extension(): ?string;
-
     /**
      * Returns the file extension if available. If not, attempt to
      * guess from mime-type.
      */
     public function guessExtension(): ?string;
-
-    /**
-     * @example If path is "foo/bar/baz.txt", returns "baz"
-     * @example If path is "foo/bar/baz", returns "baz"
-     */
-    public function nameWithoutExtension(): string;
 
     public function size(): int;
 

@@ -157,7 +157,7 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertTrue($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
-        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path());
+        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -175,7 +175,7 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertFalse($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
-        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path());
+        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -256,7 +256,7 @@ abstract class FilesystemTest extends TestCase
         $fs->mkdir('dir');
 
         $this->assertTrue($fs->has('dir'));
-        $this->assertSame('dir', $fs->last()->ensureDirectory()->path());
+        $this->assertSame('dir', $fs->last()->ensureDirectory()->path()->toString());
     }
 
     /**
@@ -272,7 +272,7 @@ abstract class FilesystemTest extends TestCase
         $fs->chmod('some/file.txt', 'private');
 
         $this->assertSame('private', $fs->file('some/file.txt')->visibility());
-        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path());
+        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -286,7 +286,7 @@ abstract class FilesystemTest extends TestCase
         $file = $fs->write('some/file.txt', $value)->last()->ensureFile();
 
         $this->assertSame('content', $file->contents());
-        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path());
+        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     public static function writeValueProvider(): iterable
@@ -311,7 +311,7 @@ abstract class FilesystemTest extends TestCase
         $this->assertTrue($fs->has('foo/file1.txt'));
         $this->assertTrue($fs->has('foo/sub2'));
         $this->assertTrue($fs->has('foo/sub2/file2.txt'));
-        $this->assertSame('foo', $fs->last()->ensureDirectory()->path());
+        $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
     }
 
     public static function writeDirectoryProvider(): iterable

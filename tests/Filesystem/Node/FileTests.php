@@ -25,15 +25,15 @@ trait FileTests
         $file = $this->createFile(fixture('symfony.png'), 'some/file.png');
 
         $this->assertTrue($file->exists());
-        $this->assertSame('some/file.png', $file->path());
-        $this->assertSame('file.png', $file->name());
-        $this->assertSame('some', $file->directory()->path());
+        $this->assertSame('some/file.png', $file->path()->toString());
+        $this->assertSame('file.png', $file->path()->name());
+        $this->assertSame('some', $file->directory()->path()->toString());
         $this->assertSame('public', $file->visibility());
         $this->assertSame('image/png', $file->mimeType());
         $this->assertSame(\date_default_timezone_get(), $file->lastModified()->getTimezone()->getName());
-        $this->assertSame('png', $file->extension());
+        $this->assertSame('png', $file->path()->extension());
         $this->assertSame('png', $file->guessExtension());
-        $this->assertSame('file', $file->nameWithoutExtension());
+        $this->assertSame('file', $file->path()->basename());
         $this->assertSame(10862, $file->size());
         $this->assertSame('ac6884fc84724d792649552e7211843a', $file->checksum());
         $this->assertSame('ad94b8d14313713d2c8ac619f1d055bc499e3cd0', $file->checksum('sha1'));
@@ -46,7 +46,7 @@ trait FileTests
     {
         $file = $this->createFile(fixture('symfony.png'), 'some/file');
 
-        $this->assertNull($file->extension());
+        $this->assertNull($file->path()->extension());
         $this->assertSame('png', $file->guessExtension());
         $this->assertSame('image/png', $file->mimeType());
     }

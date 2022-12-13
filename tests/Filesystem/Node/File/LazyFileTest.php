@@ -33,10 +33,10 @@ class LazyFileTest extends TestCase
     {
         $file = $this->createLazyFile('some/path.txt');
 
-        $this->assertSame('txt', $file->extension());
+        $this->assertSame('txt', $file->path()->extension());
         $this->assertSame('txt', $file->guessExtension());
-        $this->assertSame('path.txt', $file->name());
-        $this->assertSame('path', $file->nameWithoutExtension());
+        $this->assertSame('path.txt', $file->path()->name());
+        $this->assertSame('path', $file->path()->basename());
     }
 
     protected function createLazyFile(string $path): LazyFile

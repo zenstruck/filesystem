@@ -9,7 +9,6 @@ use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\FlysystemFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\FlysystemNode;
-use Zenstruck\Filesystem\Node\ProvidesName;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,8 +17,6 @@ use Zenstruck\Filesystem\Node\ProvidesName;
  */
 final class FlysystemDirectory extends FlysystemNode implements Directory
 {
-    use ProvidesName;
-
     private bool $recursive = false;
 
     /** @var array<callable(Node):bool> */

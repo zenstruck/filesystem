@@ -6,21 +6,14 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\Path;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 interface Node
 {
-    public function path(): string;
-
-    /**
-     * Returns the file or directory name (with extension if applicable).
-     *
-     * @example If path is "foo/bar/baz.txt", returns "baz.txt"
-     * @example If path is "foo/bar/baz", returns "baz"
-     */
-    public function name(): string;
+    public function path(): Path;
 
     /**
      * Returns the "parent" directory.
