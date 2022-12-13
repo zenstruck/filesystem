@@ -23,6 +23,7 @@
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
         "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/mime": "^5.4|^6.0",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/var-dumper": "^5.4|^6.0"
     },
