@@ -16,10 +16,16 @@ class LazyFile implements File
 
     private ?Filesystem $filesystem = null;
     private File $inner;
-    private Path $pathObject;
 
-    public function __construct(private string $path)
+    /** @var Path|string|callable():string */
+    private $path;
+
+    /**
+     * @param string|callable():string $path
+     */
+    public function __construct(string|callable $path)
     {
+        $this->path = $path;
     }
 
     public function setFilesystem(Filesystem $filesystem): void
@@ -29,7 +35,15 @@ class LazyFile implements File
 
     public function path(): Path
     {
-        return $this->pathObject ??= new Path($this->path);
+        if ($this->path instanceof Path) {
+            return $this->path;
+        }
+
+        if (\is_callable($this->path)) {
+            return $this->path = new Path(($this->path)());
+        }
+
+        return $this->path = new Path($this->path);
     }
 
     public function guessExtension(): ?string

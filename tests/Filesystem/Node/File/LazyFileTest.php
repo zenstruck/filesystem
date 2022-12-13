@@ -39,7 +39,24 @@ class LazyFileTest extends TestCase
         $this->assertSame('path', $file->path()->basename());
     }
 
-    protected function createLazyFile(string $path): LazyFile
+    /**
+     * @test
+     */
+    public function can_use_callable_for_path(): void
+    {
+        $count = 0;
+        $file = $this->createLazyFile(function() use (&$count) {
+            ++$count;
+
+            return 'some/image.png';
+        });
+
+        $this->assertSame('some/image.png', $file->path()->toString());
+        $this->assertSame('some/image.png', $file->path()->toString());
+        $this->assertSame(1, $count);
+    }
+
+    protected function createLazyFile(string|callable $path): LazyFile
     {
         return new LazyFile($path);
     }
