@@ -14,10 +14,13 @@
     "require": {
         "php": ">=8.0",
         "league/flysystem": "^3.11",
+        "zenstruck/image": "^1.0",
         "zenstruck/stream": "^1.0",
         "zenstruck/temp-file": "^1.0"
     },
     "require-dev": {
+        "intervention/image": "^2.7",
+        "kornrunner/blurhash": "^1.2",
         "league/flysystem-memory": "^3.10",
         "league/flysystem-read-only": "^3.10",
         "phpstan/phpstan": "^1.4",
@@ -27,6 +30,12 @@
         "symfony/phpunit-bridge": "^6.1",
         "symfony/var-dumper": "^5.4|^6.0"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kbond/image"
+        }
+    ],
     "config": {
         "preferred-install": "dist",
         "sort-packages": true

@@ -13,9 +13,9 @@ use Zenstruck\Filesystem\Node\Path;
 class LazyFile implements File
 {
     use DecoratedFile, DecoratedNode;
+    protected File $inner;
 
     private ?Filesystem $filesystem = null;
-    private File $inner;
 
     /** @var Path|string|callable():string */
     private $path;

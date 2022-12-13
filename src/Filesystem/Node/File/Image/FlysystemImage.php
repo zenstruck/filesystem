@@ -10,4 +10,5 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class FlysystemImage extends FlysystemFile implements Image
 {
+    use DecoratedImage;
 }
