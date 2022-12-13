@@ -27,11 +27,6 @@ abstract class FlysystemNode implements Node
         return $this->path;
     }
 
-    public function name(): string
-    {
-        return \pathinfo($this->path(), \PATHINFO_BASENAME);
-    }
-
     public function directory(): ?Directory
     {
         $dirname = \pathinfo($this->path(), \PATHINFO_DIRNAME);

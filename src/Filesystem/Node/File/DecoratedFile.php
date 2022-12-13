@@ -12,20 +12,7 @@ use Zenstruck\Stream;
  */
 trait DecoratedFile
 {
-    public function extension(): ?string
-    {
-        return $this->inner()->extension();
-    }
-
-    public function guessExtension(): ?string
-    {
-        return $this->inner()->guessExtension();
-    }
-
-    public function nameWithoutExtension(): string
-    {
-        return $this->inner()->nameWithoutExtension();
-    }
+    use PathMethods;
 
     public function size(): int
     {

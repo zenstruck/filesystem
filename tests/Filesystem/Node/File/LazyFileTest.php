@@ -26,6 +26,19 @@ class LazyFileTest extends TestCase
         $file->contents();
     }
 
+    /**
+     * @test
+     */
+    public function path_related_methods_are_lazy(): void
+    {
+        $file = $this->createLazyFile('some/path.txt');
+
+        $this->assertSame('txt', $file->extension());
+        $this->assertSame('txt', $file->guessExtension());
+        $this->assertSame('path.txt', $file->name());
+        $this->assertSame('path', $file->nameWithoutExtension());
+    }
+
     protected function createLazyFile(string $path): LazyFile
     {
         return new LazyFile($path);

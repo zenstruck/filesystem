@@ -17,11 +17,6 @@ trait DecoratedNode
         return $this->inner()->path();
     }
 
-    public function name(): string
-    {
-        return $this->inner()->name();
-    }
-
     public function directory(): ?Directory
     {
         return $this->inner()->directory();
