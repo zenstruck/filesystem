@@ -12,6 +12,11 @@ use Zenstruck\Stream;
  */
 trait DecoratedFile
 {
+    public function guessExtension(): ?string
+    {
+        return $this->inner()->guessExtension();
+    }
+
     public function size(): int
     {
         return $this->inner()->size();

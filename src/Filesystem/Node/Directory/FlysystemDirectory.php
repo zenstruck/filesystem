@@ -47,7 +47,7 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         }
     }
 
-    public function recursive(): self
+    public function recursive(): static
     {
         $clone = clone $this;
         $clone->recursive = true;
@@ -55,7 +55,7 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         return $clone;
     }
 
-    public function filter(callable $predicate): self
+    public function filter(callable $predicate): static
     {
         $clone = clone $this;
         $clone->filters[] = $predicate;
@@ -63,12 +63,12 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         return $clone;
     }
 
-    public function files(): self // @phpstan-ignore-line
+    public function files(): static
     {
         return $this->filter(fn(Node $n) => $n instanceof File);
     }
 
-    public function directories(): self // @phpstan-ignore-line
+    public function directories(): static
     {
         return $this->filter(fn(Node $n) => $n instanceof Directory);
     }

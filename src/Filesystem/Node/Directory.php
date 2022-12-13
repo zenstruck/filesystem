@@ -14,27 +14,22 @@ use Zenstruck\Filesystem\Node;
  */
 interface Directory extends Node, \IteratorAggregate
 {
-    /**
-     * @return $this
-     */
-    public function recursive(): self;
+    public function recursive(): static;
 
     /**
      * Filter nodes (return true = include, return false = exclude).
      *
      * @param callable(Node):bool $predicate
-     *
-     * @return $this
      */
-    public function filter(callable $predicate): self;
+    public function filter(callable $predicate): static;
 
     /**
-     * @return self<File>|File[]
+     * @return $this<File>|File[]
      */
-    public function files(): self;
+    public function files(): static;
 
     /**
-     * @return self<Directory<Node>>|Directory<Node>[]
+     * @return $this<Directory<Node>>|Directory<Node>[]
      */
-    public function directories(): self;
+    public function directories(): static;
 }
