@@ -46,6 +46,8 @@ trait InteractsWithFilesystem
                     self::getContainer()->get($id)->delete('');
                 }
             }
+
+            self::ensureKernelShutdown();
         }
     }
 
