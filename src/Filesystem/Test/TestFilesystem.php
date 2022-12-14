@@ -133,6 +133,13 @@ final class TestFilesystem extends DecoratedFilesystem
         return new TestDirectory($this->inner()->directory($path));
     }
 
+    public function last(): TestFile|TestDirectory
+    {
+        $node = $this->inner()->last();
+
+        return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
+    }
+
     public function dump(): self
     {
         $this->directory()->recursive()->dump();
