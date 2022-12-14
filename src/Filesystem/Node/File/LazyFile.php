@@ -13,8 +13,8 @@ use Zenstruck\Filesystem\Node\Path;
 class LazyFile implements File
 {
     use DecoratedFile, DecoratedNode;
-    protected File $inner;
 
+    protected File $inner;
     private ?Filesystem $filesystem = null;
 
     /** @var Path|string|callable():string */
