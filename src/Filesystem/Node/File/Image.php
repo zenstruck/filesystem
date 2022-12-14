@@ -12,6 +12,8 @@ use Zenstruck\Image\LocalImage;
  */
 interface Image extends File, BaseImage
 {
+    public function transformUrl(array|string $filter): string;
+
     public function transform(callable|object $filter, array $options = []): PendingImage;
 
     public function tempFile(): LocalImage;

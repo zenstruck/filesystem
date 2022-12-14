@@ -14,6 +14,11 @@ trait DecoratedImage
 {
     private ?LocalImage $localImage = null;
 
+    public function transformUrl(array|string $filter): string
+    {
+        return $this->inner()->transformUrl($filter);
+    }
+
     public function transform(callable|object $filter, array $options = []): PendingImage
     {
         return new PendingImage($this->localImage()->transform($filter, $options));

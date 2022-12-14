@@ -25,6 +25,11 @@ final class PendingImage extends PendingFile implements Image
         return $this->refresh();
     }
 
+    public function transformUrl(array|string $filter): string
+    {
+        throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
+    }
+
     protected function localImage(): LocalImage
     {
         return $this->localImage ??= new LocalImage($this);

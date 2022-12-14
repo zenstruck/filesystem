@@ -70,5 +70,15 @@ trait ImageTests
         $this->assertInstanceOf(InterventionImage::class, $image->transformer(InterventionImage::class));
     }
 
+    /**
+     * @test
+     */
+    public function can_get_transform_url(): void
+    {
+        $image = $this->createFile(fixture('symfony.png'), 'path/symfony.png');
+
+        $this->assertSame('/generate/path/symfony.png?filter=some-filter', $image->transformUrl('some-filter'));
+    }
+
     abstract protected function createFile(\SplFileInfo $file, string $path): Image;
 }

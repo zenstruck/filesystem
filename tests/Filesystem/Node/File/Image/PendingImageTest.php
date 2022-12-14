@@ -16,6 +16,11 @@ final class PendingImageTest extends PendingFileTest
 {
     use ImageTests;
 
+    public function can_get_transform_url(): void
+    {
+        $this->markTestSkipped('Transformation url not supported.');
+    }
+
     /**
      * @test
      */

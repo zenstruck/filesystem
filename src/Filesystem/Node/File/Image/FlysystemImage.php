@@ -11,4 +11,9 @@ use Zenstruck\Filesystem\Node\File\Image;
 final class FlysystemImage extends FlysystemFile implements Image
 {
     use DecoratedImage;
+
+    public function transformUrl(array|string $filter): string
+    {
+        return $this->publicUrl(['filter' => $filter]);
+    }
 }

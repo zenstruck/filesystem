@@ -5,8 +5,12 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
+use League\Flysystem\UnableToGeneratePublicUrl;
+use League\Flysystem\UrlGeneration\PrefixPublicUrlGenerator;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Flysystem\ChainPublicUrlGenerator;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -34,7 +38,19 @@ function in_memory_filesystem(): Filesystem
 {
     return new FlysystemFilesystem(new Flysystem(
         new InMemoryFilesystemAdapter(),
-        ['public_url' => '/prefix'],
+        publicUrlGenerator: new ChainPublicUrlGenerator([
+            new class() implements PublicUrlGenerator {
+                public function publicUrl(string $path, Config $config): string
+                {
+                    if (!$filter = $config->get('filter')) {
+                        throw UnableToGeneratePublicUrl::noGeneratorConfigured($path);
+                    }
+
+                    return "/generate/{$path}?filter={$filter}";
+                }
+            },
+            new PrefixPublicUrlGenerator('/prefix'),
+        ]),
         temporaryUrlGenerator: new class() implements TemporaryUrlGenerator {
             public function temporaryUrl(string $path, DateTimeInterface $expiresAt, Config $config): string
             {
