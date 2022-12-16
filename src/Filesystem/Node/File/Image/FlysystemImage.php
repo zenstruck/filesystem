@@ -23,6 +23,6 @@ final class FlysystemImage extends FlysystemFile implements Image
 
     public function transformUrl(array|string $filter): string
     {
-        return $this->publicUrl(['filter' => $filter]);
+        return $this->operator->transformUrl($this->path(), $filter);
     }
 }

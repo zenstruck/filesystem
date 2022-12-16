@@ -16,19 +16,25 @@ use League\Flysystem\FilesystemOperator;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
+use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-final class Operator implements FilesystemOperator
+final class Operator implements FilesystemOperator, TransformUrlGenerator
 {
     public function __construct(
         private FilesystemOperator $inner,
         private string $name,
         private array|ContainerInterface $features,
     ) {
+    }
+
+    public function transformUrl(string $path, array|string $filter): string
+    {
+        return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter);
     }
 
     public function name(): string
