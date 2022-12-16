@@ -51,9 +51,9 @@ trait DecoratedFile
         return $this->inner()->publicUrl($config);
     }
 
-    public function temporaryUrl(\DateTimeInterface $expiresAt, array $config = []): string
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
     {
-        return $this->inner()->temporaryUrl($expiresAt, $config);
+        return $this->inner()->temporaryUrl($expires, $config);
     }
 
     public function tempFile(): \SplFileInfo

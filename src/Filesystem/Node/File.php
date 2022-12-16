@@ -35,7 +35,7 @@ interface File extends Node
 
     public function publicUrl(array $config = []): string;
 
-    public function temporaryUrl(\DateTimeInterface $expiresAt, array $config = []): string;
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string;
 
     /**
      * Create a temporary, "real, local file". This file is deleted at the

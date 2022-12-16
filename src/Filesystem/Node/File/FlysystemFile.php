@@ -66,9 +66,13 @@ class FlysystemFile extends FlysystemNode implements File
         return $this->operator->publicUrl($this->path(), $config);
     }
 
-    public function temporaryUrl(\DateTimeInterface $expiresAt, array $config = []): string
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
     {
-        return $this->operator->temporaryUrl($this->path(), $expiresAt, $config);
+        if (\is_string($expires)) {
+            $expires = new \DateTimeImmutable($expires);
+        }
+
+        return $this->operator->temporaryUrl($this->path(), $expires, $config);
     }
 
     public function tempFile(): \SplFileInfo
