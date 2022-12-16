@@ -15,8 +15,10 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PathPrefixer;
+use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
 use Zenstruck\Filesystem\Node\File;
@@ -29,26 +31,31 @@ use Zenstruck\Stream;
  */
 final class FlysystemFilesystem implements Filesystem
 {
+    private Operator $operator;
     private string|\LogicException $last;
 
-    public function __construct(private FilesystemOperator $flysystem, private string $name = 'default')
-    {
+    public function __construct(
+        FilesystemOperator $flysystem,
+        string $name = 'default',
+        array|ContainerInterface $features = []
+    ) {
+        $this->operator = new Operator($flysystem, $name, $features);
         $this->last = new \LogicException('No operations have been performed.');
     }
 
     public function name(): string
     {
-        return $this->name;
+        return $this->operator->name();
     }
 
     public function node(string $path): File|Directory
     {
-        if ($this->flysystem->fileExists($path)) {
-            return new FlysystemFile($path, $this->flysystem);
+        if ($this->operator->fileExists($path)) {
+            return new FlysystemFile($path, $this->operator);
         }
 
-        if ($this->flysystem->directoryExists($path)) {
-            return new FlysystemDirectory($path, $this->flysystem);
+        if ($this->operator->directoryExists($path)) {
+            return new FlysystemDirectory($path, $this->operator);
         }
 
         throw new NodeNotFound($path);
@@ -71,13 +78,13 @@ final class FlysystemFilesystem implements Filesystem
 
     public function has(string $path): bool
     {
-        return $this->flysystem->has($path);
+        return $this->operator->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
     {
         // todo: copy dir?
-        $this->flysystem->copy($source, $destination, $config);
+        $this->operator->copy($source, $destination, $config);
         $this->last = $destination;
 
         return $this;
@@ -86,7 +93,7 @@ final class FlysystemFilesystem implements Filesystem
     public function move(string $source, string $destination, array $config = []): static
     {
         // todo: move dir?
-        $this->flysystem->move($source, $destination, $config);
+        $this->operator->move($source, $destination, $config);
         $this->last = $destination;
 
         return $this;
@@ -104,14 +111,14 @@ final class FlysystemFilesystem implements Filesystem
             return $this;
         }
 
-        if ($this->flysystem->fileExists($path)) {
-            $this->flysystem->delete($path);
+        if ($this->operator->fileExists($path)) {
+            $this->operator->delete($path);
 
             return $this;
         }
 
-        if ($this->flysystem->directoryExists($path)) {
-            $this->flysystem->deleteDirectory($path);
+        if ($this->operator->directoryExists($path)) {
+            $this->operator->deleteDirectory($path);
         }
 
         return $this;
@@ -119,7 +126,7 @@ final class FlysystemFilesystem implements Filesystem
 
     public function mkdir(string $path, array $config = []): static
     {
-        $this->flysystem->createDirectory($path, $config);
+        $this->operator->createDirectory($path, $config);
         $this->last = $path;
 
         return $this;
@@ -127,7 +134,7 @@ final class FlysystemFilesystem implements Filesystem
 
     public function chmod(string $path, string $visibility): static
     {
-        $this->flysystem->setVisibility($path, $visibility);
+        $this->operator->setVisibility($path, $visibility);
         $this->last = $path;
 
         return $this;
@@ -178,7 +185,7 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         try {
-            $this->flysystem->writeStream($path, $value->get(), $config);
+            $this->operator->writeStream($path, $value->get(), $config);
         } finally {
             $closeStream && $value->close();
         }

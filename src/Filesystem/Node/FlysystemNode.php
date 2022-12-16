@@ -11,8 +11,8 @@
 
 namespace Zenstruck\Filesystem\Node;
 
-use League\Flysystem\FilesystemOperator;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
 
@@ -28,7 +28,7 @@ abstract class FlysystemNode implements Node
     /**
      * @internal
      */
-    public function __construct(string $path, protected FilesystemOperator $flysystem)
+    public function __construct(string $path, protected Operator $operator)
     {
         $this->path = new Path($path);
     }
@@ -42,19 +42,19 @@ abstract class FlysystemNode implements Node
     {
         $dirname = $this->path()->dirname();
 
-        return '.' === $dirname ? null : new FlysystemDirectory($dirname, $this->flysystem);
+        return '.' === $dirname ? null : new FlysystemDirectory($dirname, $this->operator);
     }
 
     public function lastModified(): \DateTimeImmutable
     {
-        return $this->lastModified ??= \DateTimeImmutable::createFromFormat('U', $this->flysystem->lastModified($this->path())) // @phpstan-ignore-line
+        return $this->lastModified ??= \DateTimeImmutable::createFromFormat('U', $this->operator->lastModified($this->path())) // @phpstan-ignore-line
             ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
         ;
     }
 
     public function visibility(): string
     {
-        return $this->visibility ??= $this->flysystem->visibility($this->path());
+        return $this->visibility ??= $this->operator->visibility($this->path());
     }
 
     public function refresh(): static

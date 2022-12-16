@@ -41,34 +41,34 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function size(): int
     {
-        return $this->size ??= $this->flysystem->fileSize($this->path());
+        return $this->size ??= $this->operator->fileSize($this->path());
     }
 
     public function contents(): string
     {
-        return $this->flysystem->read($this->path());
+        return $this->operator->read($this->path());
     }
 
     public function read(): Stream
     {
-        return Stream::wrap($this->flysystem->readStream($this->path()));
+        return Stream::wrap($this->operator->readStream($this->path()));
     }
 
     public function checksum(?string $algo = null): string
     {
         $config = $algo ? ['checksum_algo' => $algo] : [];
 
-        return $this->checksum[$algo] ??= $this->flysystem->checksum($this->path(), $config);
+        return $this->checksum[$algo] ??= $this->operator->checksum($this->path(), $config);
     }
 
     public function publicUrl(array $config = []): string
     {
-        return $this->flysystem->publicUrl($this->path(), $config);
+        return $this->operator->publicUrl($this->path(), $config);
     }
 
     public function temporaryUrl(\DateTimeInterface $expiresAt, array $config = []): string
     {
-        return $this->flysystem->temporaryUrl($this->path(), $expiresAt, $config);
+        return $this->operator->temporaryUrl($this->path(), $expiresAt, $config);
     }
 
     public function tempFile(): \SplFileInfo
@@ -84,12 +84,12 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function exists(): bool
     {
-        return $this->flysystem->fileExists($this->path());
+        return $this->operator->fileExists($this->path());
     }
 
     public function mimeType(): string
     {
-        return $this->mimeType ??= $this->flysystem->mimeType($this->path());
+        return $this->mimeType ??= $this->operator->mimeType($this->path());
     }
 
     public function refresh(): static
@@ -110,7 +110,7 @@ class FlysystemFile extends FlysystemNode implements File
             throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $this->mimeType()));
         }
 
-        $image = new FlysystemImage($this->path(), $this->flysystem);
+        $image = new FlysystemImage($this->path(), $this->operator);
         $image->checksum = $this->checksum;
         $image->mimeType = $this->mimeType;
         $image->size = $this->size;

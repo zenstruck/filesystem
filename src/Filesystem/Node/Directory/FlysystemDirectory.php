@@ -33,7 +33,7 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
 
     public function exists(): bool
     {
-        return $this->flysystem->directoryExists($this->path());
+        return $this->operator->directoryExists($this->path());
     }
 
     public function mimeType(): string
@@ -43,8 +43,8 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
 
     public function getIterator(): \Traversable
     {
-        foreach ($this->flysystem->listContents($this->path(), $this->recursive) as $attributes) {
-            $node = $attributes->isFile() ? new FlysystemFile($attributes->path(), $this->flysystem) : new self($attributes->path(), $this->flysystem);
+        foreach ($this->operator->listContents($this->path(), $this->recursive) as $attributes) {
+            $node = $attributes->isFile() ? new FlysystemFile($attributes->path(), $this->operator) : new self($attributes->path(), $this->operator);
 
             foreach ($this->filters as $filter) {
                 if (!$filter($node)) {
