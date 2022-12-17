@@ -21,8 +21,11 @@
     "require-dev": {
         "intervention/image": "^2.7",
         "kornrunner/blurhash": "^1.2",
+        "league/flysystem-async-aws-s3": "^3.10",
+        "league/flysystem-ftp": "^3.10",
         "league/flysystem-memory": "^3.10",
         "league/flysystem-read-only": "^3.10",
+        "league/flysystem-sftp-v3": "^3.10",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
         "symfony/framework-bundle": "^5.4|^6.0",
