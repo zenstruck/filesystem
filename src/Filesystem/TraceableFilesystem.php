@@ -19,8 +19,10 @@ use Zenstruck\Filesystem\Node\File\Image;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TraceableFilesystem extends DecoratedFilesystem
+final class TraceableFilesystem implements Filesystem
 {
+    use DecoratedFilesystem;
+
     /** @var array<Operation::*,list<array{0:string,1:string|null}>> */
     public array $operations = [];
 
@@ -62,77 +64,89 @@ final class TraceableFilesystem extends DecoratedFilesystem
     {
         $this->operations[Operation::READ][] = [$path, 'node'];
 
-        return parent::node($path);
+        return $this->inner()->node($path);
     }
 
     public function file(string $path): File
     {
         $this->operations[Operation::READ][] = [$path, 'file'];
 
-        return parent::file($path);
+        return $this->inner()->file($path);
     }
 
     public function directory(string $path = ''): Directory
     {
         $this->operations[Operation::READ][] = [$path, 'dir'];
 
-        return parent::directory($path);
+        return $this->inner()->directory($path);
     }
 
     public function image(string $path): Image
     {
         $this->operations[Operation::READ][] = [$path, 'image'];
 
-        return parent::image($path);
+        return $this->inner()->image($path);
     }
 
     public function has(string $path): bool
     {
         $this->operations[Operation::READ][] = [$path, null];
 
-        return parent::has($path);
+        return $this->inner()->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
     {
         $this->operations[Operation::COPY][] = [$source, $destination];
 
-        return parent::copy($source, $destination, $config);
+        $this->inner()->copy($source, $destination, $config);
+
+        return $this;
     }
 
     public function move(string $source, string $destination, array $config = []): static
     {
         $this->operations[Operation::MOVE][] = [$source, $destination];
 
-        return parent::move($source, $destination, $config);
+        $this->inner()->move($source, $destination, $config);
+
+        return $this;
     }
 
     public function delete(Directory|string $path, array $config = []): static
     {
         $this->operations[Operation::DELETE][] = [$path instanceof Directory ? $path->path() : $path, null];
 
-        return parent::delete($path, $config);
+        $this->inner()->delete($path, $config);
+
+        return $this;
     }
 
     public function mkdir(string $path, array $config = []): static
     {
         $this->operations[Operation::MKDIR][] = [$path, null];
 
-        return parent::mkdir($path, $config);
+        $this->inner()->mkdir($path, $config);
+
+        return $this;
     }
 
     public function chmod(string $path, string $visibility): static
     {
         $this->operations[Operation::CHMOD][] = [$path, $visibility];
 
-        return parent::chmod($path, $visibility);
+        $this->inner()->chmod($path, $visibility);
+
+        return $this;
     }
 
     public function write(string $path, mixed $value, array $config = []): static
     {
         $this->operations[Operation::WRITE][] = [$path, \get_debug_type($value)];
 
-        return parent::write($path, $value, $config);
+        $this->inner()->write($path, $value, $config);
+
+        return $this;
     }
 
     protected function inner(): Filesystem

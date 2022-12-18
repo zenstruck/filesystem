@@ -18,8 +18,10 @@ use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
-abstract class DecoratedFilesystem implements Filesystem
+trait DecoratedFilesystem
 {
     public function name(): string
     {

@@ -22,8 +22,10 @@ use Zenstruck\Filesystem\Test\Node\TestImage;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TestFilesystem extends DecoratedFilesystem
+final class TestFilesystem implements Filesystem
 {
+    use DecoratedFilesystem;
+
     public function __construct(private Filesystem $inner)
     {
         if (!\class_exists(Assert::class)) {

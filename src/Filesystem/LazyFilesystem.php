@@ -16,8 +16,10 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LazyFilesystem extends DecoratedFilesystem
+final class LazyFilesystem implements Filesystem
 {
+    use DecoratedFilesystem;
+
     /** @var callable():Filesystem|Filesystem */
     private $filesystem;
 

@@ -21,8 +21,10 @@ use Zenstruck\Filesystem\Node\File\Image;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LoggableFilesystem extends DecoratedFilesystem
+final class LoggableFilesystem implements Filesystem
 {
+    use DecoratedFilesystem;
+
     public const DEFAULT_CONFIG = [
         Operation::READ => LogLevel::DEBUG,
         Operation::WRITE => LogLevel::INFO,
@@ -48,7 +50,7 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::node($path);
+        return $this->inner()->node($path);
     }
 
     public function file(string $path): File
@@ -61,7 +63,7 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::file($path);
+        return $this->inner()->file($path);
     }
 
     public function directory(string $path = ''): Directory
@@ -74,7 +76,7 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::directory($path);
+        return $this->inner()->directory($path);
     }
 
     public function image(string $path): Image
@@ -87,7 +89,7 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::image($path);
+        return $this->inner()->image($path);
     }
 
     public function has(string $path): bool
@@ -100,7 +102,7 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::has($path);
+        return $this->inner()->has($path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
@@ -114,7 +116,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::copy($source, $destination, $config);
+        $this->inner()->copy($source, $destination, $config);
+
+        return $this;
     }
 
     public function move(string $source, string $destination, array $config = []): static
@@ -128,7 +132,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::move($source, $destination, $config);
+        $this->inner()->move($source, $destination, $config);
+
+        return $this;
     }
 
     public function delete(Directory|string $path, array $config = []): static
@@ -141,7 +147,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::delete($path, $config);
+        $this->inner()->delete($path, $config);
+
+        return $this;
     }
 
     public function mkdir(string $path, array $config = []): static
@@ -154,7 +162,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::mkdir($path, $config);
+        $this->inner()->mkdir($path, $config);
+
+        return $this;
     }
 
     public function chmod(string $path, string $visibility): static
@@ -168,7 +178,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::chmod($path, $visibility);
+        $this->inner()->chmod($path, $visibility);
+
+        return $this;
     }
 
     public function write(string $path, mixed $value, array $config = []): static
@@ -182,7 +194,9 @@ final class LoggableFilesystem extends DecoratedFilesystem
             ]
         );
 
-        return parent::write($path, $value, $config);
+        $this->inner()->write($path, $value, $config);
+
+        return $this;
     }
 
     protected function inner(): Filesystem
