@@ -12,12 +12,14 @@
 namespace Zenstruck\Filesystem;
 
 use League\Flysystem\Filesystem as Flysystem;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PathPrefixer;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
+use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
@@ -35,10 +37,18 @@ final class FlysystemFilesystem implements Filesystem
     private string|\LogicException $last;
 
     public function __construct(
-        FilesystemOperator $flysystem,
+        FilesystemOperator|string|FilesystemAdapter $flysystem,
         string $name = 'default',
         array|ContainerInterface $features = []
     ) {
+        if (\is_string($flysystem)) {
+            $flysystem = AdapterFactory::createAdapter($flysystem);
+        }
+
+        if ($flysystem instanceof FilesystemAdapter) {
+            $flysystem = new Flysystem($flysystem);
+        }
+
         $this->operator = new Operator($flysystem, $name, $features);
         $this->last = new \LogicException('No operations have been performed.');
     }

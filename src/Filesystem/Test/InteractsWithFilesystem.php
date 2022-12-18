@@ -15,10 +15,11 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 
@@ -69,12 +70,8 @@ trait InteractsWithFilesystem
         if ($this instanceof FilesystemProvider) {
             $filesystem = $this->createFilesystem();
 
-            if (\is_string($filesystem)) {
-                $filesystem = new LocalFilesystemAdapter($filesystem);
-            }
-
-            if ($filesystem instanceof FilesystemAdapter) {
-                $filesystem = new FlysystemFilesystem(new Flysystem($filesystem));
+            if (!$filesystem instanceof Filesystem) {
+                $filesystem = new FlysystemFilesystem($filesystem);
             }
         } elseif ($this instanceof KernelTestCase) {
             try {
@@ -94,11 +91,11 @@ trait InteractsWithFilesystem
             $fixtures = $this->createFixtureFilesystem();
 
             if (\is_string($fixtures)) {
-                $fixtures = new LocalFilesystemAdapter($fixtures);
+                $fixtures = AdapterFactory::createAdapter($fixtures);
+            }
 
-                if (\class_exists(ReadOnlyFilesystemAdapter::class)) {
-                    $fixtures = new ReadOnlyFilesystemAdapter($fixtures);
-                }
+            if ($fixtures instanceof FilesystemAdapter && \class_exists(ReadOnlyFilesystemAdapter::class)) {
+                $fixtures = new ReadOnlyFilesystemAdapter($fixtures);
             }
 
             if ($fixtures instanceof FilesystemAdapter) {
