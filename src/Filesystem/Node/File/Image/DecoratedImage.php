@@ -30,7 +30,7 @@ trait DecoratedImage
 
     public function transform(callable|object $filter, array $options = []): PendingImage
     {
-        return new PendingImage($this->localImage()->transform($filter, $options));
+        return $this->inner()->transform($filter, $options);
     }
 
     public function isPortrait(): bool
@@ -85,7 +85,7 @@ trait DecoratedImage
 
     public function transformer(string $class): object
     {
-        return $this->localImage()->transformer($class);
+        return $this->inner()->transformer($class);
     }
 
     public function tempFile(): LocalImage

@@ -21,6 +21,19 @@ final class FlysystemImage extends FlysystemFile implements Image
 {
     use DecoratedImage;
 
+    public function transform(callable|object $filter, array $options = []): PendingImage
+    {
+        return new PendingImage(
+            $this->operator->imageTransformer()->transform($this->localImage(), $filter, $options),
+            $this->operator->imageTransformer()
+        );
+    }
+
+    public function transformer(string $class): object
+    {
+        return $this->operator->imageTransformer()->get($class)->object($this->localImage());
+    }
+
     public function transformUrl(array|string $filter): string
     {
         return $this->operator->transformUrl($this->path(), $filter);
