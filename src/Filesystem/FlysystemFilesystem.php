@@ -37,7 +37,7 @@ final class FlysystemFilesystem implements Filesystem
     private string|\LogicException $last;
 
     public function __construct(
-        FilesystemOperator|string|FilesystemAdapter $flysystem,
+        FilesystemOperator|FilesystemAdapter|string $flysystem,
         string $name = 'default',
         array|ContainerInterface $features = []
     ) {
