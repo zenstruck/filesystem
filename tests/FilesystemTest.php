@@ -128,6 +128,25 @@ abstract class FilesystemTest extends TestCase
     /**
      * @test
      */
+    public function can_get_root_directory(): void
+    {
+        $fs = $this->createFilesystem()
+            ->write('file1.txt', 'content')
+            ->write('file2.txt', 'content')
+            ->write('nested/file3.txt', 'content')
+        ;
+
+        $this->assertCount(3, $fs->directory());
+        $this->assertCount(2, $fs->directory()->files());
+        $this->assertCount(1, $fs->directory()->directories());
+        $this->assertCount(4, $fs->directory()->recursive());
+        $this->assertCount(3, $fs->directory()->files()->recursive());
+        $this->assertCount(1, $fs->directory()->directories()->recursive());
+    }
+
+    /**
+     * @test
+     */
     public function invalid_directory(): void
     {
         $fs = $this->createFilesystem();

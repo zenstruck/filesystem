@@ -14,7 +14,6 @@ namespace Zenstruck\Filesystem;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemOperator;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PathPrefixer;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
@@ -153,7 +152,7 @@ final class FlysystemFilesystem implements Filesystem
     public function write(string $path, mixed $value, array $config = []): static
     {
         if ($value instanceof \SplFileInfo && $value->isDir()) {
-            $value = (new self(new Flysystem(new LocalFilesystemAdapter($value))))->directory()->recursive();
+            $value = (new self($value))->directory()->recursive();
         }
 
         if ($value instanceof Directory) {

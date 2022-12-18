@@ -26,6 +26,7 @@ const FIXTURE_DIR = __DIR__.'/Fixtures';
 const TEMP_DIR = __DIR__.'/../var/temp';
 
 (new Symfony\Component\Filesystem\Filesystem())->remove(TEMP_DIR);
+(new Symfony\Component\Filesystem\Filesystem())->mkdir(TEMP_DIR);
 
 function fixture(string $name): SplFileInfo
 {
@@ -39,6 +40,11 @@ function fixture_filesystem(): Filesystem
             new LocalFilesystemAdapter(FIXTURE_DIR)
         )
     ));
+}
+
+function temp_filesystem(): Filesystem
+{
+    return new FlysystemFilesystem(TEMP_DIR);
 }
 
 function in_memory_filesystem(): Filesystem
