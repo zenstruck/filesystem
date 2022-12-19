@@ -17,6 +17,7 @@ use League\Flysystem\UnableToReadFile;
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
@@ -40,6 +41,20 @@ class PendingFile extends \SplFileInfo implements File
         }
 
         parent::__construct($filename);
+    }
+
+    /**
+     * @param callable(self):string $path
+     */
+    public function saveTo(Filesystem $filesystem, string|callable|null $path = null): static
+    {
+        if (\is_callable($path)) {
+            $path = $path($this);
+        }
+
+        $filesystem->write($path ?? $this->path()->name(), $this);
+
+        return $this;
     }
 
     public function path(): Path

@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Node\File;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\TempFile;
@@ -23,6 +24,38 @@ use Zenstruck\Tests\Filesystem\Node\FileTests;
 class PendingFileTest extends TestCase
 {
     use FileTests;
+
+    /**
+     * @test
+     * @dataProvider pendingFileSaveToProvider
+     */
+    public function can_save_to_filesystem($file, $path, $expectedPath): void
+    {
+        $filesystem = in_memory_filesystem();
+        $class = $this->pendingFileClass();
+        $file = new $class($file);
+
+        $this->assertSame($file, $file->saveTo($filesystem, $path));
+        $this->assertSame(\file_get_contents($file), $filesystem->file($expectedPath)->contents());
+    }
+
+    public static function pendingFileSaveToProvider(): iterable
+    {
+        yield [fixture('symfony.png'), null, 'symfony.png'];
+        yield [fixture('symfony.png'), 'foo/bar.png', 'foo/bar.png'];
+        yield [fixture('symfony.png'), fn() => 'foo/bar.png', 'foo/bar.png'];
+        yield [fixture('symfony.png'), fn(PendingFile $f) => $f->getSize().'/bar.png', \filesize(fixture('symfony.png')).'/bar.png'];
+        yield [
+            new UploadedFile(fixture('symfony.png'), 'foo.png', test: true),
+            null,
+            'foo.png',
+        ];
+        yield [
+            new UploadedFile(fixture('symfony.png'), 'foo.png', test: true),
+            'some/image.png',
+            'some/image.png',
+        ];
+    }
 
     /**
      * @test
@@ -55,6 +88,11 @@ class PendingFileTest extends TestCase
     protected function createPendingFile(\SplFileInfo $file, string $filename): PendingFile
     {
         return new PendingFile($file);
+    }
+
+    protected function pendingFileClass(): string
+    {
+        return PendingFile::class;
     }
 
     protected function createFile(\SplFileInfo $file, string $path): File

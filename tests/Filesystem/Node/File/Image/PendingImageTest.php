@@ -45,6 +45,11 @@ final class PendingImageTest extends PendingFileTest
         $this->assertSame(100, $image->width());
     }
 
+    protected function pendingFileClass(): string
+    {
+        return PendingImage::class;
+    }
+
     protected function createPendingFile(\SplFileInfo $file, string $filename): PendingImage
     {
         return new PendingImage($file);
