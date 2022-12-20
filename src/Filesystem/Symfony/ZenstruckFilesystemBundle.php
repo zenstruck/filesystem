@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Test\InteractsWithFilesystem;
+namespace Zenstruck\Filesystem\Symfony;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class WithProviderKernelTest extends KernelTest
+final class ZenstruckFilesystemBundle extends Bundle
 {
 }

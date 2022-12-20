@@ -25,7 +25,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 const FIXTURE_DIR = __DIR__.'/Fixtures';
 const TEMP_DIR = __DIR__.'/../var/temp';
 
-(new Symfony\Component\Filesystem\Filesystem())->remove(TEMP_DIR);
+(new Symfony\Component\Filesystem\Filesystem())->remove(\dirname(TEMP_DIR));
 (new Symfony\Component\Filesystem\Filesystem())->mkdir(TEMP_DIR);
 
 function fixture(string $name): SplFileInfo
