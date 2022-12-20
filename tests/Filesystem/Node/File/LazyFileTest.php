@@ -65,6 +65,25 @@ class LazyFileTest extends TestCase
         $this->assertSame(1, $count);
     }
 
+    /**
+     * @test
+     */
+    public function can_use_callable_for_filesystem(): void
+    {
+        $filesystem = in_memory_filesystem()->write('some/image.png', 'content');
+        $count = 0;
+        $file = $this->createLazyFile('some/image.png');
+        $file->setFilesystem(function() use (&$count, $filesystem) {
+            ++$count;
+
+            return $filesystem;
+        });
+
+        $this->assertSame('content', $file->contents());
+        $this->assertSame('content', $file->contents());
+        $this->assertSame(1, $count);
+    }
+
     protected function createLazyFile(string|callable $path): LazyFile
     {
         return new LazyFile($path);

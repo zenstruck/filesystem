@@ -24,7 +24,9 @@ class LazyFile implements File
     use DecoratedFile, DecoratedNode;
 
     protected File $inner;
-    private ?Filesystem $filesystem = null;
+
+    /** @var null|Filesystem|callable():Filesystem */
+    private $filesystem;
 
     /** @var Path|string|callable():string */
     private $path;
@@ -37,7 +39,10 @@ class LazyFile implements File
         $this->path = $path;
     }
 
-    public function setFilesystem(Filesystem $filesystem): void
+    /**
+     * @param Filesystem|callable():Filesystem $filesystem
+     */
+    public function setFilesystem(Filesystem|callable $filesystem): void
     {
         $this->filesystem = $filesystem;
     }
@@ -67,6 +72,14 @@ class LazyFile implements File
 
     protected function filesystem(): Filesystem
     {
-        return $this->filesystem ?? throw new \RuntimeException('Filesystem not set.');
+        if ($this->filesystem instanceof Filesystem) {
+            return $this->filesystem;
+        }
+
+        if (\is_callable($this->filesystem)) {
+            return $this->filesystem = ($this->filesystem)();
+        }
+
+        throw new \RuntimeException('Filesystem not set.');
     }
 }
