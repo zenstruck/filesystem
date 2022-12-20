@@ -11,54 +11,15 @@
 
 namespace Zenstruck\Filesystem\Node\File;
 
-use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Node\DecoratedNode;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\Path;
+use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class LazyFile implements File
+class LazyFile extends LazyNode implements File
 {
-    use DecoratedFile, DecoratedNode;
-
-    protected File $inner;
-
-    /** @var null|Filesystem|callable():Filesystem */
-    private $filesystem;
-
-    /** @var Path|string|callable():string */
-    private $path;
-
-    /**
-     * @param string|callable():string $path
-     */
-    public function __construct(string|callable $path)
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @param Filesystem|callable():Filesystem $filesystem
-     */
-    public function setFilesystem(Filesystem|callable $filesystem): void
-    {
-        $this->filesystem = $filesystem;
-    }
-
-    public function path(): Path
-    {
-        if ($this->path instanceof Path) {
-            return $this->path;
-        }
-
-        if (\is_callable($this->path)) {
-            return $this->path = new Path(($this->path)());
-        }
-
-        return $this->path = new Path($this->path);
-    }
+    use DecoratedFile;
 
     public function guessExtension(): ?string
     {
@@ -67,19 +28,6 @@ class LazyFile implements File
 
     protected function inner(): File
     {
-        return $this->inner ??= $this->filesystem()->file($this->path());
-    }
-
-    protected function filesystem(): Filesystem
-    {
-        if ($this->filesystem instanceof Filesystem) {
-            return $this->filesystem;
-        }
-
-        if (\is_callable($this->filesystem)) {
-            return $this->filesystem = ($this->filesystem)();
-        }
-
-        throw new \RuntimeException('Filesystem not set.');
+        return $this->inner ??= $this->filesystem()->file($this->path()); // @phpstan-ignore-line
     }
 }

@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Test\Node;
 use Zenstruck\Assert;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Directory\DecoratedDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -22,6 +23,8 @@ use Zenstruck\Filesystem\Node\Directory;
  */
 final class TestDirectory extends TestNode implements Directory
 {
+    use DecoratedDirectory;
+
     /**
      * @param Directory<Node> $inner
      */
@@ -52,43 +55,6 @@ final class TestDirectory extends TestNode implements Directory
     {
         $this->dump();
         exit(1);
-    }
-
-    public function recursive(): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->recursive();
-
-        return $clone;
-    }
-
-    public function filter(callable $predicate): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->filter($predicate);
-
-        return $clone;
-    }
-
-    public function files(): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->files();
-
-        return $clone;
-    }
-
-    public function directories(): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->directories();
-
-        return $clone;
-    }
-
-    public function getIterator(): \Traversable
-    {
-        yield from $this->inner()->getIterator();
     }
 
     /**
