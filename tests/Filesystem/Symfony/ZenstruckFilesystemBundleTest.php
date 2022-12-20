@@ -47,14 +47,14 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
     /**
      * @test
      */
-    public function files_are_created_in_proper_spots_in_test_env(): void
+    public function files_are_created_in_proper_spots(): void
     {
         /** @var Service $service */
         $service = self::getContainer()->get(Service::class);
         $varDir = \dirname(TEMP_DIR);
 
-        $this->assertFileDoesNotExist($publicFile = $varDir.'/testfiles/public/file1.txt');
-        $this->assertFileDoesNotExist($privateFile = $varDir.'/testfiles/private/file2.txt');
+        $this->assertFileDoesNotExist($publicFile = $varDir.'/public/file1.txt');
+        $this->assertFileDoesNotExist($privateFile = $varDir.'/private/file2.txt');
         $this->assertFileDoesNotExist($noResetFile = $varDir.'/no_reset/file3.txt');
 
         $service->publicFilesystem->write('file1.txt', 'content');

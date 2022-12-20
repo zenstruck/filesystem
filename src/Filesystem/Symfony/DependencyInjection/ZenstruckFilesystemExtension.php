@@ -93,16 +93,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
     private function registerFilesystem(string $name, array $config, ContainerBuilder $container, string $defaultName): void
     {
-        if (false !== $config['test'] && 'test' === $container->getParameter('kernel.environment')) {
-            $config['dsn'] = $config['test'] ?? '%kernel.project_dir%/var/testfiles%env(default::TEST_TOKEN)%/'.$name;
-
-            if (!$container->hasParameter('zenstruck_filesystem.test_filesystems')) {
-                $container->setParameter('zenstruck_filesystem.test_filesystems', []);
+        if ($config['reset_before_tests']) {
+            if (!$container->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
+                $container->setParameter('zenstruck_filesystem.reset_before_tests_filesystems', []);
             }
 
             $container->setParameter(
-                'zenstruck_filesystem.test_filesystems',
-                \array_merge($container->getParameter('zenstruck_filesystem.test_filesystems'), [$name]) // @phpstan-ignore-line
+                'zenstruck_filesystem.reset_before_tests_filesystems',
+                \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]) // @phpstan-ignore-line
             );
         }
 

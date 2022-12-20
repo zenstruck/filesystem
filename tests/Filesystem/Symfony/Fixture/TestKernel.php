@@ -45,13 +45,14 @@ final class TestKernel extends Kernel
                 'public' => [
                     'dsn' => '%kernel.project_dir%/var/public',
                     'url_prefix' => '/files',
+                    'reset_before_tests' => true,
                 ],
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',
+                    'reset_before_tests' => true,
                 ],
                 'no_reset' => [
                     'dsn' => '%kernel.project_dir%/var/no_reset',
-                    'test' => false,
                 ],
             ],
         ]);

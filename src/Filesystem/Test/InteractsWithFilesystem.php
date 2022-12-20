@@ -51,11 +51,11 @@ trait InteractsWithFilesystem
             // delete test filesystems
             // todo add option to disable this
             // todo on first test, detect if all test filesystems are (static) in-memory and disable
-            if (self::getContainer()->hasParameter('zenstruck_filesystem.test_filesystems')) {
+            if (self::getContainer()->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
                 $registry = self::getContainer()->get(FilesystemRegistry::class);
 
                 // delete all test filesystems
-                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $name) {
+                foreach (self::getContainer()->getParameter('zenstruck_filesystem.reset_before_tests_filesystems') as $name) {
                     $registry->get($name)->delete('');
                 }
             }

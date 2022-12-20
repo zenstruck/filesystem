@@ -58,17 +58,12 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultTrue()
                                 ->info('Whether or not to log filesystem operations')
                             ->end()
-                            ->scalarNode('test')
-                                ->validate()
-                                    ->ifTrue(fn($v) => !\is_string($v) && false !== $v)
-                                    ->thenInvalid('%s is invalid, must be either string or false')
-                                ->end()
-                                ->defaultNull()
+                            ->booleanNode('reset_before_tests')
+                                ->defaultFalse()
                                 ->info(<<<EOF
-                                    If false, disable
-                                    If string, use as filesystem DSN and swap real adapter with this
-                                    Defaults to false in env's other than "test"
-                                    If not explicitly configured, in "test" env, defaults to "var/testfiles"
+                                    If true, and using the InteractsWithFilesystem trait
+                                    in your KernelTestCase's, delete this filesystem
+                                    before each test.
                                     EOF)
                             ->end()
                         ->end()
