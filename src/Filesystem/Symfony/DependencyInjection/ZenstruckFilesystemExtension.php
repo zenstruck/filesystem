@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -26,6 +27,7 @@ use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
+use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -53,6 +55,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         // form types
         $container->register('.zenstruck_filesystem.form.pending_file_type', PendingFileType::class)
             ->addTag('form.type')
+        ;
+
+        // normalizer
+        $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
+            ->addArgument(new ServiceLocatorArgument([
+                FilesystemRegistry::class => new Reference('.zenstruck_filesystem.filesystem_registry'),
+            ]))
+            ->addTag('serializer.normalizer')
         ;
     }
 
