@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Test;
 
-use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
@@ -19,7 +18,6 @@ use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
@@ -35,33 +33,13 @@ trait InteractsWithFilesystem
      * @before
      * @internal
      */
-    public function _resetFilesystems(): void
+    public function _unsetFilesystem(): void
     {
         if (\class_exists(StaticInMemoryAdapterRegistry::class)) {
             StaticInMemoryAdapterRegistry::deleteAllFilesystems();
         }
 
-        if (isset($this->_testFilesystem)) {
-            $this->_testFilesystem->delete('');
-
-            unset($this->_testFilesystem);
-        }
-
-        if ($this instanceof KernelTestCase && !$this instanceof FilesystemProvider) {
-            // delete test filesystems
-            // todo add option to disable this
-            // todo on first test, detect if all test filesystems are (static) in-memory and disable
-            if (self::getContainer()->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
-                $registry = self::getContainer()->get(FilesystemRegistry::class);
-
-                // delete all test filesystems
-                foreach (self::getContainer()->getParameter('zenstruck_filesystem.reset_before_tests_filesystems') as $name) {
-                    $registry->get($name)->delete('');
-                }
-            }
-
-            self::ensureKernelShutdown();
-        }
+        unset($this->_testFilesystem);
     }
 
     protected function filesystem(): TestFilesystem
@@ -87,7 +65,7 @@ trait InteractsWithFilesystem
                 throw new \LogicException(\sprintf('league/flysystem-memory is required to use "%s". Install with "composer require --dev league/flysystem-memory".', __TRAIT__));
             }
 
-            $filesystem = new FlysystemFilesystem(new Flysystem(new InMemoryFilesystemAdapter()));
+            $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
         }
 
         if ($this instanceof FixtureFilesystemProvider) {
@@ -102,7 +80,7 @@ trait InteractsWithFilesystem
             }
 
             if ($fixtures instanceof FilesystemAdapter) {
-                $fixtures = new FlysystemFilesystem(new Flysystem($fixtures));
+                $fixtures = new FlysystemFilesystem($fixtures);
             }
 
             $filesystem = new MultiFilesystem(['_default_' => $filesystem, 'fixture' => $fixtures], '_default_');

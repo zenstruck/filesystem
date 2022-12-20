@@ -61,7 +61,7 @@ final class Configuration implements ConfigurationInterface
                             ->booleanNode('reset_before_tests')
                                 ->defaultFalse()
                                 ->info(<<<EOF
-                                    If true, and using the InteractsWithFilesystem trait
+                                    If true, and using the ResetFilesystem trait
                                     in your KernelTestCase's, delete this filesystem
                                     before each test.
                                     EOF)

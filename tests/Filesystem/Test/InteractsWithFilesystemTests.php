@@ -12,13 +12,14 @@
 namespace Zenstruck\Tests\Filesystem\Test;
 
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\ResetFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait InteractsWithFilesystemTests
 {
-    use InteractsWithFilesystem;
+    use InteractsWithFilesystem, ResetFilesystem;
 
     /**
      * @test

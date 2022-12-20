@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\ResetFilesystem;
 use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;
 
 /**
@@ -20,7 +21,7 @@ use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;
  */
 final class ZenstruckFilesystemBundleTest extends KernelTestCase
 {
-    use InteractsWithFilesystem;
+    use InteractsWithFilesystem, ResetFilesystem;
 
     /**
      * @test
