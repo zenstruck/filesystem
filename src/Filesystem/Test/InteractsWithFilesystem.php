@@ -19,6 +19,7 @@ use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
@@ -51,9 +52,11 @@ trait InteractsWithFilesystem
             // todo add option to disable this
             // todo on first test, detect if all test filesystems are (static) in-memory and disable
             if (self::getContainer()->hasParameter('zenstruck_filesystem.test_filesystems')) {
+                $registry = self::getContainer()->get(FilesystemRegistry::class);
+
                 // delete all test filesystems
-                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $id) {
-                    self::getContainer()->get($id)->delete('');
+                foreach (self::getContainer()->getParameter('zenstruck_filesystem.test_filesystems') as $name) {
+                    $registry->get($name)->delete('');
                 }
             }
 

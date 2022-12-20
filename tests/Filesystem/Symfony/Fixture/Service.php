@@ -23,6 +23,7 @@ final class Service
         public Filesystem $filesystem,
         public Filesystem $publicFilesystem,
         public Filesystem $privateFilesystem,
+        public Filesystem $noResetFilesystem,
         public MultiFilesystem $multiFilesystem
     ) {
     }

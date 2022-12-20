@@ -41,10 +41,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('container.service_locator')
         ;
 
-        $container->register('.zenstruck_filesystem.filesystem_registry', FilesystemRegistry::class)
+        $registry = $container->register(FilesystemRegistry::class)
             ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $registry->setPublic(true);
+        }
 
         $container->register(MultiFilesystem::class)
             ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
@@ -60,7 +64,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         // normalizer
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
             ->addArgument(new ServiceLocatorArgument([
-                FilesystemRegistry::class => new Reference('.zenstruck_filesystem.filesystem_registry'),
+                FilesystemRegistry::class => new Reference(FilesystemRegistry::class),
             ]))
             ->addTag('serializer.normalizer')
         ;
@@ -89,6 +93,19 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
     private function registerFilesystem(string $name, array $config, ContainerBuilder $container, string $defaultName): void
     {
+        if (false !== $config['test'] && 'test' === $container->getParameter('kernel.environment')) {
+            $config['dsn'] = $config['test'] ?? '%kernel.project_dir%/var/testfiles%env(default::TEST_TOKEN)%/'.$name;
+
+            if (!$container->hasParameter('zenstruck_filesystem.test_filesystems')) {
+                $container->setParameter('zenstruck_filesystem.test_filesystems', []);
+            }
+
+            $container->setParameter(
+                'zenstruck_filesystem.test_filesystems',
+                \array_merge($container->getParameter('zenstruck_filesystem.test_filesystems'), [$name]) // @phpstan-ignore-line
+            );
+        }
+
         if (\str_starts_with($config['dsn'], '@')) {
             $config['dsn'] = new Reference(\mb_substr($config['dsn'], 1));
         } else {

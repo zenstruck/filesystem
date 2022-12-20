@@ -48,6 +48,10 @@ final class TestKernel extends Kernel
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',
                 ],
+                'no_reset' => [
+                    'dsn' => '%kernel.project_dir%/var/no_reset',
+                    'test' => false,
+                ],
             ],
         ]);
 
