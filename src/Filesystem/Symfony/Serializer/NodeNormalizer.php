@@ -52,7 +52,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return isset($context[self::FILESYSTEM_KEY]) ? $object->path() : $object->dsn();
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Node && !$data instanceof PendingFile;
     }
@@ -87,7 +87,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $node;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return isset(self::TYPE_MAP[$type]);
     }

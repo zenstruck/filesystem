@@ -34,6 +34,7 @@ final class TestKernel extends Kernel
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
