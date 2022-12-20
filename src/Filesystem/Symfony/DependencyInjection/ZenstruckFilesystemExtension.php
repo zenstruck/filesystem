@@ -46,13 +46,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
 
-        if ('test' === $container->getParameter('kernel.environment')) {
-            $registry->setPublic(true);
-        }
-
-        $container->register(MultiFilesystem::class)
+        $multi = $container->register(MultiFilesystem::class)
             ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
         ;
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $registry->setPublic(true);
+            $multi->setPublic(true);
+        }
 
         $this->registerFilesystems($mergedConfig, $container);
 
