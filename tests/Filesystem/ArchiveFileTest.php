@@ -29,14 +29,6 @@ final class ArchiveFileTest extends FilesystemTest
     /**
      * @test
      */
-    public function can_get_root_directory(): void
-    {
-        $this->markTestIncomplete('Should be fixed with: https://github.com/thephpleague/flysystem/pull/1612');
-    }
-
-    /**
-     * @test
-     */
     public function can_create_archive_file_in_non_existent_directory(): void
     {
         $filesystem = new ArchiveFile(self::FILE);
