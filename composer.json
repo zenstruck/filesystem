@@ -29,6 +29,7 @@
         "league/flysystem-ziparchive": "^3.12",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
+        "symfony/browser-kit": "^5.4|^6.0",
         "symfony/form": "^5.4|^6.0",
         "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",

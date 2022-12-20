@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PendingFileTypeTest extends TypeTestCase
+final class PendingFileTypeUnitTest extends TypeTestCase
 {
     /**
      * @test

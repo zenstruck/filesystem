@@ -15,7 +15,13 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
 
 /**
@@ -24,6 +30,40 @@ use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
 final class TestKernel extends Kernel
 {
     use MicroKernelTrait;
+
+    public function submitForm(Request $request, FormFactoryInterface $factory): Response
+    {
+        $form = $factory->createBuilder()
+            ->add('file', PendingFileType::class, [
+                'image' => $request->query->has('image'),
+                'multiple' => $request->query->has('multiple'),
+            ])
+            ->getForm()
+            ->submit($request->files->all())
+        ;
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return new Response('Not submitted and valid.');
+        }
+
+        $file = $form->getData()['file'];
+
+        if (\is_array($file)) {
+            foreach ($file as $f) {
+                if (!\file_exists($f)) {
+                    return new Response('File does not exist.');
+                }
+            }
+
+            return new JsonResponse(\array_map(fn($f) => \get_debug_type($f), $file));
+        }
+
+        if (!\file_exists($file)) {
+            return new Response('File does not exist.');
+        }
+
+        return new Response(\get_debug_type($file));
+    }
 
     public function registerBundles(): iterable
     {
@@ -60,6 +100,13 @@ final class TestKernel extends Kernel
         $c->register(Service::class)
             ->setPublic(true)
             ->setAutowired(true)
+        ;
+    }
+
+    protected function configureRoutes(RoutingConfigurator $routes): void
+    {
+        $routes->add('submit_form', '/submit-form')
+            ->controller([$this, 'submitForm'])
         ;
     }
 }
