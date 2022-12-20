@@ -70,6 +70,11 @@ class PendingFile extends \SplFileInfo implements File
         return $this->path = new Path($this);
     }
 
+    public function dsn(): string
+    {
+        return $this->path();
+    }
+
     public function lastModified(): \DateTimeImmutable
     {
         return \DateTimeImmutable::createFromFormat('U', (string) $this->getMTime()) // @phpstan-ignore-line

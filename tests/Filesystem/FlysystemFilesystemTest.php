@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Tests\Filesystem;
 
-use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -27,13 +26,24 @@ final class FlysystemFilesystemTest extends FilesystemTest
      */
     public function can_set_a_name(): void
     {
-        $filesystem = new FlysystemFilesystem(new Flysystem(new InMemoryFilesystemAdapter()));
+        $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
 
         $this->assertSame('default', $filesystem->name());
 
-        $filesystem = new FlysystemFilesystem(new Flysystem(new InMemoryFilesystemAdapter()), 'public');
+        $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter(), 'public');
 
         $this->assertSame('public', $filesystem->name());
+    }
+
+    /**
+     * @test
+     */
+    public function node_has_dsn(): void
+    {
+        $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter(), 'public');
+        $node = $filesystem->write('file.txt', 'content')->last();
+
+        $this->assertSame('public://file.txt', $node->dsn());
     }
 
     protected function createFilesystem(): Filesystem

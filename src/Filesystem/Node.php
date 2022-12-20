@@ -25,6 +25,13 @@ interface Node
     public function path(): Path;
 
     /**
+     * Returns standardized node identification, containing library name and node path.
+     *
+     * @example If node comes from "public" filesystem with "foo/bar.txt" path, returns "public://foo/bar.txt"
+     */
+    public function dsn(): string;
+
+    /**
      * Returns the "parent" directory.
      *
      * @return ?Directory<Node>

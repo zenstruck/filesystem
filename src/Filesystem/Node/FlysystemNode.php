@@ -38,6 +38,11 @@ abstract class FlysystemNode implements Node
         return $this->path;
     }
 
+    public function dsn(): string
+    {
+        return "{$this->operator->name()}://{$this->path()}";
+    }
+
     public function directory(): ?Directory
     {
         $dirname = $this->path()->dirname();
