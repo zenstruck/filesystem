@@ -14,14 +14,12 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
@@ -36,22 +34,17 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
-        $container->register('.zenstruck_filesystem.filesystem_locator', ServiceLocator::class)
+        $locator = $container->register('zenstruck_filesystem.filesystem_locator', ServiceLocator::class)
             ->addArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key'))
             ->addTag('container.service_locator')
         ;
 
-        $registry = $container->register(FilesystemRegistry::class)
-            ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
-            ->addTag('kernel.reset', ['method' => 'reset'])
-        ;
-
         $multi = $container->register(MultiFilesystem::class)
-            ->addArgument(new Reference('.zenstruck_filesystem.filesystem_locator'))
+            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
         ;
 
         if ('test' === $container->getParameter('kernel.environment')) {
-            $registry->setPublic(true);
+            $locator->setPublic(true);
             $multi->setPublic(true);
         }
 
@@ -64,9 +57,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         // normalizer
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
-            ->addArgument(new ServiceLocatorArgument([
-                FilesystemRegistry::class => new Reference(FilesystemRegistry::class),
-            ]))
+            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
             ->addTag('serializer.normalizer')
         ;
     }

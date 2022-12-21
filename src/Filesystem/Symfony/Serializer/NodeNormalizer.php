@@ -16,7 +16,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
@@ -81,7 +80,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         $node = new (self::TYPE_MAP[$type])($path);
 
         if ($filesystem) {
-            $node->setFilesystem(fn() => $this->container->get(FilesystemRegistry::class)->get($filesystem));
+            $node->setFilesystem(fn() => $this->container->get($filesystem));
         }
 
         return $node;

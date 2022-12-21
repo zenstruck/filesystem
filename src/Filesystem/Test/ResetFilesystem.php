@@ -12,7 +12,6 @@
 namespace Zenstruck\Filesystem\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Filesystem\FilesystemRegistry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -31,7 +30,7 @@ trait ResetFilesystem
 
         if ($this instanceof KernelTestCase && !$this instanceof FilesystemProvider) {
             if (self::getContainer()->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
-                $registry = self::getContainer()->get(FilesystemRegistry::class);
+                $registry = self::getContainer()->get('zenstruck_filesystem.filesystem_locator');
 
                 // delete all test filesystems
                 foreach (self::getContainer()->getParameter('zenstruck_filesystem.reset_before_tests_filesystems') as $name) {
