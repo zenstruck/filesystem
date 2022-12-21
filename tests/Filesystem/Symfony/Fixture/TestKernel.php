@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -68,6 +69,7 @@ final class TestKernel extends Kernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+        yield new TwigBundle();
         yield new ZenstruckFilesystemBundle();
     }
 
@@ -78,6 +80,10 @@ final class TestKernel extends Kernel
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
+        ]);
+
+        $c->loadFromExtension('twig', [
+            'default_path' => __DIR__.'/templates',
         ]);
 
         $c->loadFromExtension('zenstruck_filesystem', [
