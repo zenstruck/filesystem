@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Path\Expression;
-use Zenstruck\Filesystem\Node\File\Path\Generator;
 use Zenstruck\Filesystem\Node\File\Path\Namer;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
+use Zenstruck\Tests\Filesystem\Symfony\Fixture\CustomPathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -56,19 +56,5 @@ final class PathGeneratorTest extends TestCase
     {
         yield [new PathGenerator(['custom' => new CustomPathGenerator()])];
         yield [new PathGenerator(new ServiceLocator(['custom' => fn() => new CustomPathGenerator()]))];
-    }
-}
-
-class CustomPathGenerator implements Generator
-{
-    public function generatePath(File $file, array $context = []): string
-    {
-        $value = "from/custom.{$file->path()->extension()}";
-
-        foreach ($context as $k => $v) {
-            $value .= "{$k}:{$v}";
-        }
-
-        return $value;
     }
 }

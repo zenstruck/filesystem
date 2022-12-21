@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Filesystem\Node\File\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
 use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;
@@ -65,5 +66,18 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertFileExists($publicFile);
         $this->assertFileExists($privateFile);
         $this->assertFileExists($noResetFile);
+    }
+
+    /**
+     * @test
+     */
+    public function can_autowire_path_generator(): void
+    {
+        /** @var Service $service */
+        $service = self::getContainer()->get(Service::class);
+
+        $file = in_memory_filesystem()->write('some/file.txt', 'content')->last()->ensureFile();
+
+        $this->assertSame('9a0364b.txt', $service->pathGenerator->generate(Expression::checksum(7), $file));
     }
 }

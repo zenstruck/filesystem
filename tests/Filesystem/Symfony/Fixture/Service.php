@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
+use Zenstruck\Filesystem\Node\File\PathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,7 +25,8 @@ final class Service
         public Filesystem $publicFilesystem,
         public Filesystem $privateFilesystem,
         public Filesystem $noResetFilesystem,
-        public MultiFilesystem $multiFilesystem
+        public MultiFilesystem $multiFilesystem,
+        public PathGenerator $pathGenerator,
     ) {
     }
 }

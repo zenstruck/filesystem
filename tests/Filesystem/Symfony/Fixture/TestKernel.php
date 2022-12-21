@@ -106,6 +106,11 @@ final class TestKernel extends Kernel
         $c->register(Service::class)
             ->setPublic(true)
             ->setAutowired(true)
+            ->setAutoconfigured(true)
+        ;
+        $c->register(CustomPathGenerator::class)
+            ->setAutowired(true)
+            ->setAutoconfigured(true)
         ;
     }
 
