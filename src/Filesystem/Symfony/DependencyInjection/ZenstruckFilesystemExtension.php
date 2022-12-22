@@ -32,6 +32,7 @@ use Zenstruck\Filesystem\Node\File\Path\ExpressionPathGenerator;
 use Zenstruck\Filesystem\Node\File\Path\Generator;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
+use Zenstruck\Filesystem\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
@@ -57,8 +58,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $multi->setPublic(true);
         }
 
-        $this->registerFilesystems($mergedConfig, $container);
-        $this->registerPathGenerators($container);
+        if ($container->getParameter('kernel.debug')) {
+            $container->register('.zenstruck_filesystem.data_collector', FilesystemDataCollector::class)
+                ->addTag('data_collector', [
+                    'template' => '@ZenstruckFilesystem/Collector/filesystem.html.twig',
+                    'id' => 'filesystem',
+                ])
+            ;
+        }
 
         // form types
         $container->register('.zenstruck_filesystem.form.pending_file_type', PendingFileType::class)
@@ -70,6 +77,9 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
             ->addTag('serializer.normalizer')
         ;
+
+        $this->registerFilesystems($mergedConfig, $container);
+        $this->registerPathGenerators($container);
     }
 
     private function registerPathGenerators(ContainerBuilder $container): void
@@ -169,6 +179,11 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $container->register('.zenstruck_filesystem.filesystem.traceable_'.$name, TraceableFilesystem::class)
                 ->setDecoratedService($filesystemId)
                 ->setArguments([new Reference('.inner'), new Reference('debug.stopwatch', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
+                ->addTag('kernel.reset', ['method' => 'reset'])
+            ;
+
+            $container->getDefinition('.zenstruck_filesystem.data_collector')
+                ->addMethodCall('addFilesystem', [new Reference('.zenstruck_filesystem.filesystem.traceable_'.$name)])
             ;
         }
 

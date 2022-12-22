@@ -24,7 +24,7 @@ final class TraceableFilesystem implements Filesystem
 {
     use DecoratedFilesystem;
 
-    /** @var array<Operation::*,list<array{0:string,1:string|null}>> */
+    /** @var array<Operation::*,list<array{0:string,1:string|null,2:float}>> */
     public array $operations = [];
 
     public function __construct(private Filesystem $inner, private ?Stopwatch $stopwatch = null)
@@ -32,11 +32,27 @@ final class TraceableFilesystem implements Filesystem
     }
 
     /**
-     * @return array<Operation::*,list<array{0:string,1:string|null}>>
+     * @return array<Operation::*,list<array{0:string,1:string|null,2:float}>>
      */
     public function operations(): array
     {
         return $this->operations;
+    }
+
+    /**
+     * @return float in milliseconds
+     */
+    public function totalDuration(): float
+    {
+        $total = 0;
+
+        foreach ($this->operations as $set) {
+            foreach ($set as $data) {
+                $total += $data[2];
+            }
+        }
+
+        return $total;
     }
 
     public function totalOperations(): int
@@ -63,89 +79,75 @@ final class TraceableFilesystem implements Filesystem
 
     public function node(string $path): File|Directory
     {
-        $this->operations[Operation::READ][] = [$path, 'node'];
-
-        return $this->track(fn() => $this->inner()->node($path));
+        return $this->track(fn() => $this->inner()->node($path), Operation::READ, $path, 'node');
     }
 
     public function file(string $path): File
     {
-        $this->operations[Operation::READ][] = [$path, 'file'];
-
-        return $this->track(fn() => $this->inner()->file($path));
+        return $this->track(fn() => $this->inner()->file($path), Operation::READ, $path, 'file');
     }
 
     public function directory(string $path = ''): Directory
     {
-        $this->operations[Operation::READ][] = [$path, 'dir'];
-
-        return $this->track(fn() => $this->inner()->directory($path));
+        return $this->track(fn() => $this->inner()->directory($path), Operation::READ, $path, 'dir');
     }
 
     public function image(string $path): Image
     {
-        $this->operations[Operation::READ][] = [$path, 'image'];
-
-        return $this->track(fn() => $this->inner()->image($path));
+        return $this->track(fn() => $this->inner()->image($path), Operation::READ, $path, 'image');
     }
 
     public function has(string $path): bool
     {
-        $this->operations[Operation::READ][] = [$path, null];
-
-        return $this->track(fn() => $this->inner()->has($path));
+        return $this->track(fn() => $this->inner()->has($path), Operation::READ, $path);
     }
 
     public function copy(string $source, string $destination, array $config = []): static
     {
-        $this->operations[Operation::COPY][] = [$source, $destination];
-
-        $this->track(fn() => $this->inner()->copy($source, $destination, $config));
+        $this->track(fn() => $this->inner()->copy($source, $destination, $config), Operation::COPY, $source, $destination);
 
         return $this;
     }
 
     public function move(string $source, string $destination, array $config = []): static
     {
-        $this->operations[Operation::MOVE][] = [$source, $destination];
-
-        $this->track(fn() => $this->inner()->move($source, $destination, $config));
+        $this->track(fn() => $this->inner()->move($source, $destination, $config), Operation::MOVE, $source, $destination);
 
         return $this;
     }
 
     public function delete(Directory|string $path, array $config = []): static
     {
-        $this->operations[Operation::DELETE][] = [$path instanceof Directory ? $path->path() : $path, null];
-
-        $this->track(fn() => $this->inner()->delete($path, $config));
+        $this->track(
+            fn() => $this->inner()->delete($path, $config),
+            Operation::DELETE,
+            $path instanceof Directory ? $path->path() : $path
+        );
 
         return $this;
     }
 
     public function mkdir(string $path, array $config = []): static
     {
-        $this->operations[Operation::MKDIR][] = [$path, null];
-
-        $this->track(fn() => $this->inner()->mkdir($path, $config));
+        $this->track(fn() => $this->inner()->mkdir($path, $config), Operation::MKDIR, $path);
 
         return $this;
     }
 
     public function chmod(string $path, string $visibility): static
     {
-        $this->operations[Operation::CHMOD][] = [$path, $visibility];
-
-        $this->track(fn() => $this->inner()->chmod($path, $visibility));
+        $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
 
         return $this;
     }
 
     public function write(string $path, mixed $value, array $config = []): static
     {
-        $this->operations[Operation::WRITE][] = [$path, \get_debug_type($value)];
-
-        $this->track(fn() => $this->inner()->write($path, $value, $config));
+        $this->track(
+            fn() => $this->inner()->write($path, $value, $config),
+            Operation::WRITE, $path,
+            \get_debug_type($value)
+        );
 
         return $this;
     }
@@ -158,20 +160,19 @@ final class TraceableFilesystem implements Filesystem
     /**
      * @template T
      *
-     * @param callable():T $operation
+     * @param callable():T $callback
+     * @param Operation::* $operation
      */
-    private function track(callable $operation): mixed
+    private function track(callable $callback, string $operation, string $path, ?string $context = null): mixed
     {
-        if (!$this->stopwatch) {
-            return $operation();
-        }
-
-        $this->stopwatch->start('filesystem');
+        $start = \microtime(true);
+        $event = $this->stopwatch?->start('filesystem.'.$this->name(), 'filesystem');
 
         try {
-            return $operation();
+            return $callback();
         } finally {
-            $this->stopwatch->stop('filesystem');
+            $event?->stop();
+            $this->operations[$operation][] = [$path, $context, (\microtime(true) - $start) * 1000];
         }
     }
 }

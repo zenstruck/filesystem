@@ -45,6 +45,15 @@ final class TraceableFilesystemTest extends FilesystemTest
         $this->assertSame(5, $filesystem->totalReads());
         $this->assertSame(6, $filesystem->totalWrites());
 
+        $operations = $filesystem->operations();
+
+        // remove durations
+        foreach ($operations as $i => $set) {
+            foreach ($set as $j => $data) {
+                unset($operations[$i][$j][2]);
+            }
+        }
+
         $this->assertSame(
             [
                 Operation::WRITE => [['foo', 'string']],
@@ -61,7 +70,7 @@ final class TraceableFilesystemTest extends FilesystemTest
                     ['file2.png', null],
                 ],
             ],
-            $filesystem->operations()
+            $operations
         );
 
         $filesystem->reset();
@@ -75,13 +84,37 @@ final class TraceableFilesystemTest extends FilesystemTest
     /**
      * @test
      */
-    public function can_track_timing(): void
+    public function can_use_stopwatch(): void
     {
         $filesystem = new TraceableFilesystem(in_memory_filesystem(), $stopwatch = new Stopwatch());
 
         $filesystem->write('foo.txt', 'content')->delete('foo.txt');
 
         $this->assertCount(2, $stopwatch->getEvent('filesystem')->getPeriods());
+    }
+
+    /**
+     * @test
+     */
+    public function can_track_duration(): void
+    {
+        $filesystem = $this->createFilesystem();
+
+        $filesystem->write('file.txt', 'content');
+        $filesystem->has('file.txt');
+        $filesystem->delete('file.txt');
+
+        $totalDuration = 0;
+
+        $this->assertCount(3, $filesystem->operations());
+
+        foreach ($filesystem->operations() as $operation) {
+            foreach ($operation as [$path, $context, $duration]) {
+                $totalDuration += $duration;
+            }
+        }
+
+        $this->assertSame($totalDuration, $filesystem->totalDuration());
     }
 
     protected function createFilesystem(): TraceableFilesystem

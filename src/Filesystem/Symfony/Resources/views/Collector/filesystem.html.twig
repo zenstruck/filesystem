@@ -1,0 +1,41 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set time = collector.data.total_operations ? '%0.0f'|format(collector.data.total_duration) : null %}
+
+    {% if collector.data.total_operations %}
+        {% set icon %}
+            {{ source('@ZenstruckFilesystem/Collector/filesystem.svg') }}
+            <span class="sf-toolbar-value">{{ collector.data.total_operations }}</span>
+            {% if time %}
+                <span class="sf-toolbar-label">({{ time }} ms)</span>
+            {% endif %}
+        {% endset %}
+
+        {% set text %}
+            {% if time %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Total Duration</b>
+                    <span>{{ time }} ms</span>
+                </div>
+            {% endif %}
+
+            <div class="sf-toolbar-info-piece">
+                <b>Total Operations</b>
+                <span class="sf-toolbar-status">{{ collector.data.total_operations }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Total Reads</b>
+                <span class="sf-toolbar-status">{{ collector.data.total_reads }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Total Writes</b>
+                <span class="sf-toolbar-status">{{ collector.data.total_writes }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+    {% endif %}
+{% endblock %}
