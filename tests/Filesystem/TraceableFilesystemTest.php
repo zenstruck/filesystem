@@ -90,7 +90,7 @@ final class TraceableFilesystemTest extends FilesystemTest
 
         $filesystem->write('foo.txt', 'content')->delete('foo.txt');
 
-        $this->assertCount(2, $stopwatch->getEvent('filesystem')->getPeriods());
+        $this->assertCount(2, $stopwatch->getEvent('filesystem.default')->getPeriods());
     }
 
     /**
