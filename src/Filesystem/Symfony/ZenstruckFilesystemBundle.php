@@ -11,11 +11,19 @@
 
 namespace Zenstruck\Filesystem\Symfony;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Zenstruck\Filesystem\Symfony\DependencyInjection\Compiler\RegisterDoctrineTypePass;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class ZenstruckFilesystemBundle extends Bundle
 {
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new RegisterDoctrineTypePass());
+    }
 }

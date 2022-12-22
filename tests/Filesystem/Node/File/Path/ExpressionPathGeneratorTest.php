@@ -151,7 +151,7 @@ final class ExpressionPathGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function can_access_raw_document_values(): void
+    public function can_access_raw_file_values(): void
     {
         $file = $this->file('some/pATh.tXt', 'content');
 

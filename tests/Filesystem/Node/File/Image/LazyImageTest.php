@@ -23,7 +23,7 @@ final class LazyImageTest extends LazyFileTest
 {
     use ImageTests;
 
-    protected function createLazyFile(string|callable $path): LazyImage
+    protected function createLazyFile(string|callable|null $path = null): LazyImage
     {
         return new LazyImage($path);
     }

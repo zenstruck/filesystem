@@ -26,13 +26,13 @@ abstract class LazyNode implements Node
     /** @var null|Filesystem|callable():Filesystem */
     private $filesystem;
 
-    /** @var Path|string|callable():string */
+    /** @var null|Path|string|callable():string */
     private $path;
 
     /**
-     * @param string|callable():string $path
+     * @param null|string|callable():string $path
      */
-    public function __construct(string|callable $path)
+    public function __construct(string|callable|null $path = null)
     {
         $this->path = $path;
     }
@@ -45,10 +45,22 @@ abstract class LazyNode implements Node
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * @param string|callable():string $path
+     */
+    public function setPath(string|callable $path): void
+    {
+        $this->path = \is_string($path) ? new Path($path) : $path;
+    }
+
     public function path(): Path
     {
         if ($this->path instanceof Path) {
             return $this->path;
+        }
+
+        if (null === $this->path) {
+            throw new \RuntimeException('Path not set.');
         }
 
         if (\is_callable($this->path)) {
@@ -56,6 +68,11 @@ abstract class LazyNode implements Node
         }
 
         return $this->path = new Path($this->path);
+    }
+
+    public function exists(): bool
+    {
+        return $this->filesystem()->has($this->path());
     }
 
     protected function filesystem(): Filesystem

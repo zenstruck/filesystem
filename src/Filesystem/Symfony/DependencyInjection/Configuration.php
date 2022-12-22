@@ -11,8 +11,10 @@
 
 namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -72,6 +74,24 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('default_filesystem')
                     ->defaultNull()
                     ->info('Default filesystem name, if not configured, uses first one defined above')
+                ->end()
+                ->arrayNode('doctrine')
+                    ->{ContainerBuilder::willBeAvailable('doctrine/orm', EntityManagerInterface::class, ['doctrine/doctrine-bundle']) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->arrayNode('lifecycle')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('autoload')
+                                    ->info('Whether to auto load file type columns during object load')
+                                    ->defaultTrue()
+                                ->end()
+                                ->booleanNode('delete_on_remove')
+                                    ->info('Whether to delete files on object removal')
+                                    ->defaultTrue()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

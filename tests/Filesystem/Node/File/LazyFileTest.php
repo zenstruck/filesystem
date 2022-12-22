@@ -31,8 +31,22 @@ class LazyFileTest extends TestCase
         $file = $this->createLazyFile('some/path.txt');
 
         $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Filesystem not set.');
 
         $file->contents();
+    }
+
+    /**
+     * @test
+     */
+    public function path_must_be_set_before_accessing(): void
+    {
+        $file = $this->createLazyFile();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Path not set.');
+
+        $file->path();
     }
 
     /**
@@ -46,6 +60,20 @@ class LazyFileTest extends TestCase
         $this->assertSame('txt', $file->guessExtension());
         $this->assertSame('path.txt', $file->path()->name());
         $this->assertSame('path', $file->path()->basename());
+    }
+
+    /**
+     * @test
+     */
+    public function can_set_path_and_filesystem(): void
+    {
+        $filesystem = in_memory_filesystem()->write('some/image.png', 'content');
+        $file = $this->createLazyFile();
+
+        $file->setFilesystem($filesystem);
+        $file->setPath(fn() => 'some/image.png');
+
+        $this->assertSame('content', $file->contents());
     }
 
     /**
@@ -84,7 +112,22 @@ class LazyFileTest extends TestCase
         $this->assertSame(1, $count);
     }
 
-    protected function createLazyFile(string|callable $path): LazyFile
+    /**
+     * @test
+     */
+    public function can_check_for_existence_without_loading_file(): void
+    {
+        $file = $this->createLazyFile('some/file.png');
+        $file->setFilesystem($filesystem = in_memory_filesystem());
+
+        $this->assertFalse($file->exists());
+
+        $filesystem->write('some/file.png', 'content');
+
+        $this->assertTrue($file->exists());
+    }
+
+    protected function createLazyFile(string|callable|null $path = null): LazyFile
     {
         return new LazyFile($path);
     }

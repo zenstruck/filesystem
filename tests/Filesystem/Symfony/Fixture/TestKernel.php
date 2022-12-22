@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
+use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -69,7 +71,9 @@ final class TestKernel extends Kernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+        yield new DoctrineBundle();
         yield new TwigBundle();
+        yield new ZenstruckFoundryBundle();
         yield new ZenstruckFilesystemBundle();
     }
 
@@ -84,6 +88,27 @@ final class TestKernel extends Kernel
 
         $c->loadFromExtension('twig', [
             'default_path' => __DIR__.'/templates',
+        ]);
+
+        $c->loadFromExtension('zenstruck_foundry', [
+            'auto_refresh_proxies' => false,
+        ]);
+
+        $c->loadFromExtension('doctrine', [
+            'dbal' => ['url' => 'sqlite:///%kernel.project_dir%/var/data.db'],
+            'orm' => [
+                'auto_generate_proxy_classes' => true,
+                'auto_mapping' => true,
+                'mappings' => [
+                    'Test' => [
+                        'is_bundle' => false,
+                        'type' => 'attribute',
+                        'dir' => '%kernel.project_dir%/tests/Filesystem/Symfony/Fixture/Entity',
+                        'prefix' => 'Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity',
+                        'alias' => 'Test',
+                    ],
+                ],
+            ],
         ]);
 
         $c->loadFromExtension('zenstruck_filesystem', [

@@ -19,6 +19,8 @@
         "zenstruck/temp-file": "^1.1"
     },
     "require-dev": {
+        "doctrine/doctrine-bundle": "^2.8",
+        "doctrine/orm": "^2.14",
         "intervention/image": "^2.7",
         "kornrunner/blurhash": "^1.2",
         "league/flysystem-async-aws-s3": "^3.10",
@@ -39,7 +41,8 @@
         "symfony/twig-bundle": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
-        "zenstruck/assert": "^1.2"
+        "zenstruck/assert": "^1.2",
+        "zenstruck/foundry": "^1.26"
     },
     "repositories": [
         {

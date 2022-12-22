@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Doctrine\ObjectFileLoader;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 
@@ -27,6 +28,7 @@ final class Service
         public Filesystem $noResetFilesystem,
         public MultiFilesystem $multiFilesystem,
         public PathGenerator $pathGenerator,
+        public ObjectFileLoader $objectFileLoader,
     ) {
     }
 }

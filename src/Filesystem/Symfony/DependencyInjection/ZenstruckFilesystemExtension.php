@@ -24,6 +24,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
+use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
+use Zenstruck\Filesystem\Doctrine\ObjectFileLoader;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
@@ -80,6 +83,42 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         $this->registerFilesystems($mergedConfig, $container);
         $this->registerPathGenerators($container);
+
+        if ($mergedConfig['doctrine']['enabled']) {
+            $this->registerDoctrine($container, $mergedConfig['doctrine']);
+        }
+    }
+
+    private function registerDoctrine(ContainerBuilder $container, array $config): void
+    {
+        $container->register('.zenstruck_filesystem.doctrine.mapping_listener', NodeMappingListener::class)
+            ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
+        ;
+
+        $container->register(ObjectFileLoader::class)
+            ->setArguments([
+                new Reference('doctrine'),
+                new Reference('.zenstruck_filesystem.doctrine.lifecycle_listener'),
+            ])
+        ;
+
+        $listener = $container->register('.zenstruck_filesystem.doctrine.lifecycle_listener', NodeLifecycleListener::class)
+            ->addArgument(new ServiceLocatorArgument([
+                PathGenerator::class => new Reference(PathGenerator::class),
+                'filesystem_locator' => new Reference('zenstruck_filesystem.filesystem_locator'),
+            ]))
+            ->addTag('doctrine.event_listener', ['event' => 'preUpdate'])
+            ->addTag('doctrine.event_listener', ['event' => 'postFlush'])
+            ->addTag('doctrine.event_listener', ['event' => 'prePersist'])
+        ;
+
+        if ($config['lifecycle']['autoload']) {
+            $listener->addTag('doctrine.event_listener', ['event' => 'postLoad']);
+        }
+
+        if ($config['lifecycle']['delete_on_remove']) {
+            $listener->addTag('doctrine.event_listener', ['event' => 'postRemove']);
+        }
     }
 
     private function registerPathGenerators(ContainerBuilder $container): void
