@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem;
 
+use Symfony\Component\Stopwatch\Stopwatch;
 use Zenstruck\Filesystem\Operation;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Tests\FilesystemTest;
@@ -69,6 +70,18 @@ final class TraceableFilesystemTest extends FilesystemTest
         $this->assertSame(0, $filesystem->totalWrites());
         $this->assertSame(0, $filesystem->totalOperations());
         $this->assertEmpty($filesystem->operations());
+    }
+
+    /**
+     * @test
+     */
+    public function can_track_timing(): void
+    {
+        $filesystem = new TraceableFilesystem(in_memory_filesystem(), $stopwatch = new Stopwatch());
+
+        $filesystem->write('foo.txt', 'content')->delete('foo.txt');
+
+        $this->assertCount(2, $stopwatch->getEvent('filesystem')->getPeriods());
     }
 
     protected function createFilesystem(): TraceableFilesystem

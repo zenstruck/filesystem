@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
@@ -32,6 +33,7 @@ use Zenstruck\Filesystem\Node\File\Path\Generator;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
+use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
 
 /**
@@ -160,6 +162,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 ->setDecoratedService($filesystemId)
                 ->setArguments([new Reference('.inner'), new Reference('logger')])
                 ->addTag('monolog.logger', ['channel' => 'filesystem'])
+            ;
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->register('.zenstruck_filesystem.filesystem.traceable_'.$name, TraceableFilesystem::class)
+                ->setDecoratedService($filesystemId)
+                ->setArguments([new Reference('.inner'), new Reference('debug.stopwatch', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
             ;
         }
 

@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem;
 
+use Symfony\Component\Stopwatch\Stopwatch;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
@@ -26,7 +27,7 @@ final class TraceableFilesystem implements Filesystem
     /** @var array<Operation::*,list<array{0:string,1:string|null}>> */
     public array $operations = [];
 
-    public function __construct(private Filesystem $inner)
+    public function __construct(private Filesystem $inner, private ?Stopwatch $stopwatch = null)
     {
     }
 
@@ -64,42 +65,42 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::READ][] = [$path, 'node'];
 
-        return $this->inner()->node($path);
+        return $this->track(fn() => $this->inner()->node($path));
     }
 
     public function file(string $path): File
     {
         $this->operations[Operation::READ][] = [$path, 'file'];
 
-        return $this->inner()->file($path);
+        return $this->track(fn() => $this->inner()->file($path));
     }
 
     public function directory(string $path = ''): Directory
     {
         $this->operations[Operation::READ][] = [$path, 'dir'];
 
-        return $this->inner()->directory($path);
+        return $this->track(fn() => $this->inner()->directory($path));
     }
 
     public function image(string $path): Image
     {
         $this->operations[Operation::READ][] = [$path, 'image'];
 
-        return $this->inner()->image($path);
+        return $this->track(fn() => $this->inner()->image($path));
     }
 
     public function has(string $path): bool
     {
         $this->operations[Operation::READ][] = [$path, null];
 
-        return $this->inner()->has($path);
+        return $this->track(fn() => $this->inner()->has($path));
     }
 
     public function copy(string $source, string $destination, array $config = []): static
     {
         $this->operations[Operation::COPY][] = [$source, $destination];
 
-        $this->inner()->copy($source, $destination, $config);
+        $this->track(fn() => $this->inner()->copy($source, $destination, $config));
 
         return $this;
     }
@@ -108,7 +109,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::MOVE][] = [$source, $destination];
 
-        $this->inner()->move($source, $destination, $config);
+        $this->track(fn() => $this->inner()->move($source, $destination, $config));
 
         return $this;
     }
@@ -117,7 +118,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::DELETE][] = [$path instanceof Directory ? $path->path() : $path, null];
 
-        $this->inner()->delete($path, $config);
+        $this->track(fn() => $this->inner()->delete($path, $config));
 
         return $this;
     }
@@ -126,7 +127,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::MKDIR][] = [$path, null];
 
-        $this->inner()->mkdir($path, $config);
+        $this->track(fn() => $this->inner()->mkdir($path, $config));
 
         return $this;
     }
@@ -135,7 +136,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::CHMOD][] = [$path, $visibility];
 
-        $this->inner()->chmod($path, $visibility);
+        $this->track(fn() => $this->inner()->chmod($path, $visibility));
 
         return $this;
     }
@@ -144,7 +145,7 @@ final class TraceableFilesystem implements Filesystem
     {
         $this->operations[Operation::WRITE][] = [$path, \get_debug_type($value)];
 
-        $this->inner()->write($path, $value, $config);
+        $this->track(fn() => $this->inner()->write($path, $value, $config));
 
         return $this;
     }
@@ -152,5 +153,25 @@ final class TraceableFilesystem implements Filesystem
     protected function inner(): Filesystem
     {
         return $this->inner;
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable():T $operation
+     */
+    private function track(callable $operation): mixed
+    {
+        if (!$this->stopwatch) {
+            return $operation();
+        }
+
+        $this->stopwatch->start('filesystem');
+
+        try {
+            return $operation();
+        } finally {
+            $this->stopwatch->stop('filesystem');
+        }
     }
 }
