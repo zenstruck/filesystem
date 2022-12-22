@@ -31,6 +31,8 @@ final class ExpressionPathGenerator implements Generator
 
     public function generatePath(File $file, array $context = []): string
     {
+        $context['file'] = $file;
+
         return (string) \preg_replace_callback(
             '#{([\w.:\-\[\]]+)(\|(slug|slugify|lower))?}#',
             function($matches) use ($file, $context) {
@@ -99,7 +101,7 @@ final class ExpressionPathGenerator implements Generator
             };
         }
 
-        $value = self::parseVariableValue($file, $variable, $context);
+        $value = self::parseVariableValue($variable, $context);
 
         if (null === $value || \is_scalar($value) || $value instanceof \Stringable) {
             return (string) $value;
@@ -108,12 +110,8 @@ final class ExpressionPathGenerator implements Generator
         throw new \LogicException(\sprintf('Unable to parse expression variable {%s}.', $variable));
     }
 
-    private static function parseVariableValue(File $file, string $variable, array $context): mixed
+    private static function parseVariableValue(string $variable, array $context): mixed
     {
-        if (\str_starts_with($variable, 'file.')) {
-            return self::dotAccess($file, \mb_substr($variable, 5));
-        }
-
         if (\array_key_exists($variable, $context)) {
             return $context[$variable];
         }
