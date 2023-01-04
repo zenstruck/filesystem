@@ -53,5 +53,53 @@ trait DirectoryTests
         $this->assertCount(2, $dir->recursive()->directories());
     }
 
+    /**
+     * @test
+     */
+    public function older_than_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function newer_than_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function larger_than_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function smaller_than_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function matching_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function not_matching_filter(): void
+    {
+        $this->markTestIncomplete();
+    }
+
     abstract protected function createDirectory(\SplFileInfo $directory, string $path): Directory;
 }

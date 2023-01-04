@@ -82,8 +82,55 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         return $this->filter(fn(Node $n) => $n instanceof Directory);
     }
 
+    public function largerThan(int $bytes): static
+    {
+        return $this->files()->filter(fn(File $file) => $file->size() > $bytes); // @phpstan-ignore-line
+    }
+
+    public function smallerThan(int $bytes): static
+    {
+        return $this->files()->filter(fn(File $file) => $file->size() < $bytes); // @phpstan-ignore-line
+    }
+
+    public function olderThan(\DateTimeInterface|int|string $timestamp): static
+    {
+        $timestamp = self::normalizeTimestamp($timestamp);
+
+        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() < $timestamp); // @phpstan-ignore-line
+    }
+
+    public function newerThan(\DateTimeInterface|int|string $timestamp): static
+    {
+        $timestamp = self::normalizeTimestamp($timestamp);
+
+        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() > $timestamp); // @phpstan-ignore-line
+    }
+
+    public function matching(string $pattern): static
+    {
+        return $this->filter(fn(Node $node) => \fnmatch($pattern, $node->path()->toString()));
+    }
+
+    public function notMatching(string $pattern): static
+    {
+        return $this->filter(fn(Node $node) => !\fnmatch($pattern, $node->path()->toString()));
+    }
+
     public function ensureImage(): Image
     {
         throw new NodeTypeMismatch(\sprintf('Expected node at path "%s" to be an image but is a directory.', $this->path()));
+    }
+
+    private static function normalizeTimestamp(\DateTimeInterface|int|string $timestamp): int
+    {
+        if (\is_numeric($timestamp)) {
+            return (int) $timestamp;
+        }
+
+        if (!$timestamp instanceof \DateTimeInterface) {
+            $timestamp = new \DateTimeImmutable($timestamp);
+        }
+
+        return $timestamp->getTimestamp();
     }
 }

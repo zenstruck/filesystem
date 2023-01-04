@@ -28,7 +28,7 @@ interface Directory extends Node, \IteratorAggregate
     /**
      * Filter nodes (return true = include, return false = exclude).
      *
-     * @param callable(Node):bool $predicate
+     * @param callable(T):bool $predicate
      */
     public function filter(callable $predicate): static;
 
@@ -41,4 +41,28 @@ interface Directory extends Node, \IteratorAggregate
      * @return $this<Directory<Node>>|Directory<Node>[]
      */
     public function directories(): static;
+
+    /**
+     * @return $this<File>|File[]
+     */
+    public function largerThan(int $bytes): static;
+
+    /**
+     * @return $this<File>|File[]
+     */
+    public function smallerThan(int $bytes): static;
+
+    /**
+     * @return $this<File>|File[]
+     */
+    public function olderThan(int|string|\DateTimeInterface $timestamp): static;
+
+    /**
+     * @return $this<File>|File[]
+     */
+    public function newerThan(int|string|\DateTimeInterface $timestamp): static;
+
+    public function matching(string $pattern): static;
+
+    public function notMatching(string $pattern): static;
 }

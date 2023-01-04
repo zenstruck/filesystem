@@ -50,6 +50,54 @@ trait DecoratedDirectory
         return $clone;
     }
 
+    public function largerThan(int $bytes): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->largerThan($bytes);
+
+        return $clone;
+    }
+
+    public function smallerThan(int $bytes): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->smallerThan($bytes);
+
+        return $clone;
+    }
+
+    public function olderThan(\DateTimeInterface|int|string $timestamp): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->olderThan($timestamp);
+
+        return $clone;
+    }
+
+    public function newerThan(\DateTimeInterface|int|string $timestamp): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->newerThan($timestamp);
+
+        return $clone;
+    }
+
+    public function matching(string $pattern): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->matching($pattern);
+
+        return $clone;
+    }
+
+    public function notMatching(string $pattern): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->notMatching($pattern);
+
+        return $clone;
+    }
+
     public function getIterator(): \Traversable
     {
         yield from $this->inner()->getIterator();
