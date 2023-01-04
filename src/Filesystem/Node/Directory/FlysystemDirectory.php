@@ -21,14 +21,10 @@ use Zenstruck\Filesystem\Node\FlysystemNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @implements Directory<Node>
  */
 final class FlysystemDirectory extends FlysystemNode implements Directory
 {
     private bool $recursive = false;
-
-    /** @var array<callable(Node):bool> */
     private array $filters = [];
 
     public function exists(): bool
@@ -84,26 +80,26 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
 
     public function largerThan(int $bytes): static
     {
-        return $this->files()->filter(fn(File $file) => $file->size() > $bytes); // @phpstan-ignore-line
+        return $this->files()->filter(fn(File $file) => $file->size() > $bytes);
     }
 
     public function smallerThan(int $bytes): static
     {
-        return $this->files()->filter(fn(File $file) => $file->size() < $bytes); // @phpstan-ignore-line
+        return $this->files()->filter(fn(File $file) => $file->size() < $bytes);
     }
 
     public function olderThan(\DateTimeInterface|int|string $timestamp): static
     {
         $timestamp = self::normalizeTimestamp($timestamp);
 
-        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() < $timestamp); // @phpstan-ignore-line
+        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() < $timestamp);
     }
 
     public function newerThan(\DateTimeInterface|int|string $timestamp): static
     {
         $timestamp = self::normalizeTimestamp($timestamp);
 
-        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() > $timestamp); // @phpstan-ignore-line
+        return $this->files()->filter(fn(File $file) => $file->lastModified()->getTimestamp() > $timestamp);
     }
 
     public function matching(string $pattern): static

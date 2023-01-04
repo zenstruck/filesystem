@@ -12,22 +12,16 @@
 namespace Zenstruck\Filesystem\Test\Node;
 
 use Zenstruck\Assert;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\DecoratedDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @implements Directory<Node>
  */
 final class TestDirectory extends TestNode implements Directory
 {
     use DecoratedDirectory;
 
-    /**
-     * @param Directory<Node> $inner
-     */
     public function __construct(private Directory $inner)
     {
     }
@@ -57,9 +51,6 @@ final class TestDirectory extends TestNode implements Directory
         exit(1);
     }
 
-    /**
-     * @return Directory<Node>
-     */
     protected function inner(): Directory
     {
         return $this->inner;

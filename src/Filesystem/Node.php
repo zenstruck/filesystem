@@ -33,8 +33,6 @@ interface Node
 
     /**
      * Returns the "parent" directory.
-     *
-     * @return ?Directory<Node>
      */
     public function directory(): ?Directory;
 
@@ -63,8 +61,6 @@ interface Node
     public function ensureFile(): File;
 
     /**
-     * @return Directory<Node>
-     *
      * @throws NodeTypeMismatch if this node is not a directory
      */
     public function ensureDirectory(): Directory;

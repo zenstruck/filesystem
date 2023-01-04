@@ -11,22 +11,16 @@
 
 namespace Zenstruck\Filesystem\Node\Directory;
 
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @implements Directory<Node>
  */
 final class LazyDirectory extends LazyNode implements Directory
 {
     use DecoratedDirectory;
 
-    /**
-     * @return Directory<Node>
-     */
     protected function inner(): Directory
     {
         return $this->inner ??= $this->filesystem()->directory($this->path()); // @phpstan-ignore-line

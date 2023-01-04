@@ -26,8 +26,6 @@ interface Filesystem
     public function name(): string;
 
     /**
-     * @return File|Directory<Node>
-     *
      * @throws NodeNotFound if the path does not exist
      */
     public function node(string $path): File|Directory;
@@ -39,8 +37,6 @@ interface Filesystem
     public function file(string $path): File;
 
     /**
-     * @return Directory<Node>
-     *
      * @throws NodeNotFound     if the path does not exist
      * @throws NodeTypeMismatch if the node at path is not a directory
      */
@@ -58,9 +54,6 @@ interface Filesystem
 
     public function move(string $source, string $destination, array $config = []): static;
 
-    /**
-     * @param string|Directory<Node> $path
-     */
     public function delete(string|Directory $path, array $config = []): static;
 
     public function mkdir(string $path, array $config = []): static;
@@ -73,8 +66,6 @@ interface Filesystem
     public function write(string $path, mixed $value, array $config = []): static;
 
     /**
-     * @return File|Directory<Node>
-     *
      * @throws \LogicException if no last node available
      */
     public function last(): File|Directory;

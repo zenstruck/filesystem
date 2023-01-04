@@ -16,10 +16,9 @@ use Zenstruck\Filesystem\Node;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @template T of Node
- * @extends \IteratorAggregate<T>
+ * @extends \IteratorAggregate<Node|File|Directory>
  *
- * @method Node[] getIterator()
+ * @method Node[]|File[]|Directory[] getIterator()
  */
 interface Directory extends Node, \IteratorAggregate
 {
@@ -28,7 +27,7 @@ interface Directory extends Node, \IteratorAggregate
     /**
      * Filter nodes (return true = include, return false = exclude).
      *
-     * @param callable(T):bool $predicate
+     * @param callable(Node):bool|callable(File):bool|callable(Directory):bool $predicate
      */
     public function filter(callable $predicate): static;
 
@@ -38,7 +37,7 @@ interface Directory extends Node, \IteratorAggregate
     public function files(): static;
 
     /**
-     * @return $this<Directory<Node>>|Directory<Node>[]
+     * @return $this<Directory>|Directory[]
      */
     public function directories(): static;
 
