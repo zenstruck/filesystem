@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -193,11 +194,11 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $config['dsn'] = new Reference($adapterId);
         }
 
-        if ($config['url_prefix']) {
-            $config['config']['url_prefix'] = $config['url_prefix'];
+        if (isset($config['public_url']['prefix'])) {
+            $config['config']['url_prefix'] = $config['public_url']['prefix'];
         }
 
-        $container->register($flysystemId = '.zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
+        $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
             ->setArguments([$config['dsn'], $config['config']])
         ;
 
