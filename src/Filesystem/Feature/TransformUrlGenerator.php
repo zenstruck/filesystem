@@ -11,10 +11,12 @@
 
 namespace Zenstruck\Filesystem\Feature;
 
+use League\Flysystem\Config;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 interface TransformUrlGenerator
 {
-    public function transformUrl(string $path, array|string $filter): string;
+    public function transformUrl(string $path, array|string $filter, Config $config): string;
 }

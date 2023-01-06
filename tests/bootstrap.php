@@ -10,11 +10,11 @@
  */
 
 use League\Flysystem\Config;
-use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UrlGeneration\PrefixPublicUrlGenerator;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
@@ -40,11 +40,7 @@ function tempfile(string $name): SplFileInfo
 
 function fixture_filesystem(): Filesystem
 {
-    return new FlysystemFilesystem(new Flysystem(
-        new ReadOnlyFilesystemAdapter(
-            new LocalFilesystemAdapter(FIXTURE_DIR)
-        )
-    ));
+    return new FlysystemFilesystem(new ReadOnlyFilesystemAdapter(new LocalFilesystemAdapter(FIXTURE_DIR)));
 }
 
 function temp_filesystem(): Filesystem
@@ -55,19 +51,17 @@ function temp_filesystem(): Filesystem
 function in_memory_filesystem(): Filesystem
 {
     return new FlysystemFilesystem(
-        new Flysystem(
-            new InMemoryFilesystemAdapter(),
-            publicUrlGenerator: new PrefixPublicUrlGenerator('/prefix'),
-            temporaryUrlGenerator: new class() implements TemporaryUrlGenerator {
+        new InMemoryFilesystemAdapter(),
+        features: [
+            PublicUrlGenerator::class => new PrefixPublicUrlGenerator('/prefix'),
+            TemporaryUrlGenerator::class => new class() implements TemporaryUrlGenerator {
                 public function temporaryUrl(string $path, DateTimeInterface $expiresAt, Config $config): string
                 {
                     return "/temp/{$path}?expires={$expiresAt->getTimestamp()}";
                 }
-            }
-        ),
-        features: [
+            },
             TransformUrlGenerator::class => new class() implements TransformUrlGenerator {
-                public function transformUrl(string $path, array|string $filter): string
+                public function transformUrl(string $path, array|string $filter, Config $config): string
                 {
                     return "/generate/{$path}?filter={$filter}";
                 }

@@ -11,8 +11,11 @@
 
 namespace Zenstruck\Filesystem\Flysystem;
 
+use League\Flysystem\Config;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
+use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
@@ -24,7 +27,7 @@ use Zenstruck\Image\TransformerRegistry as ImageTransformerRegistry;
  *
  * @internal
  */
-final class Operator implements FilesystemOperator, TransformUrlGenerator
+final class Operator implements FilesystemOperator
 {
     private ImageTransformerRegistry $imageTransformerRegistry;
 
@@ -35,9 +38,9 @@ final class Operator implements FilesystemOperator, TransformUrlGenerator
     ) {
     }
 
-    public function transformUrl(string $path, array|string $filter): string
+    public function transformUrl(string $path, array|string $filter, array $config = []): string
     {
-        return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter);
+        return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter, new Config($config));
     }
 
     public function imageTransformer(): ImageTransformerRegistry
@@ -60,12 +63,20 @@ final class Operator implements FilesystemOperator, TransformUrlGenerator
 
     public function publicUrl(string $path, array $config = []): string
     {
-        return $this->inner->publicUrl($path, $config);
+        try {
+            return $this->feature(PublicUrlGenerator::class)->publicUrl($path, new Config($config));
+        } catch (UnsupportedFeature) {
+            return $this->inner->publicUrl($path, $config);
+        }
     }
 
     public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, array $config = []): string
     {
-        return $this->inner->temporaryUrl($path, $expiresAt, $config);
+        try {
+            return $this->feature(TemporaryUrlGenerator::class)->temporaryUrl($path, $expiresAt, new Config($config));
+        } catch (UnsupportedFeature) {
+            return $this->inner->temporaryUrl($path, $expiresAt, $config);
+        }
     }
 
     public function checksum(string $path, array $config = []): string

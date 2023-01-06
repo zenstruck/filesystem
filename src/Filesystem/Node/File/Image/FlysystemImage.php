@@ -34,8 +34,8 @@ final class FlysystemImage extends FlysystemFile implements Image
         return $this->operator->imageTransformer()->get($class)->object($this->localImage());
     }
 
-    public function transformUrl(array|string $filter): string
+    public function transformUrl(array|string $filter, array $config = []): string
     {
-        return $this->operator->transformUrl($this->path(), $filter);
+        return $this->operator->transformUrl($this->path(), $filter, $config);
     }
 }
