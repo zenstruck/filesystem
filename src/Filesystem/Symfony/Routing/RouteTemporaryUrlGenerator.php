@@ -17,19 +17,24 @@ use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
-final class RouteTemporaryUrlGenerator extends RouteUrlGenerator implements TemporaryUrlGenerator
+final class RouteTemporaryUrlGenerator implements TemporaryUrlGenerator
 {
     public function __construct(
         private SignedUrlGenerator $router,
         private string $route,
         private array $routeParameters = [],
     ) {
-        parent::__construct($this->router, $this->route, $this->routeParameters);
     }
 
     public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, Config $config): string
     {
-        return $this->generate($config->get('parameters', []), sign: true, expires: $expiresAt);
+        return $this->router->temporary(
+            $expiresAt,
+            $this->route,
+            \array_merge($this->routeParameters, $config->get('parameters', []), ['path' => $path])
+        );
     }
 }

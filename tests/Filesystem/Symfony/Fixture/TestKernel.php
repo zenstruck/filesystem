@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use League\Glide\Urls\UrlBuilder;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -23,9 +24,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Zenstruck\Filesystem\Glide\GlideTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
+use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -73,6 +76,7 @@ final class TestKernel extends Kernel
         yield new FrameworkBundle();
         yield new DoctrineBundle();
         yield new TwigBundle();
+        yield new ZenstruckUriBundle();
         yield new ZenstruckFoundryBundle();
         yield new ZenstruckFilesystemBundle();
     }
@@ -115,13 +119,20 @@ final class TestKernel extends Kernel
             'filesystems' => [
                 'public' => [
                     'dsn' => '%kernel.project_dir%/var/public',
-                    'public_url' => [
-                        'prefix' => '/files',
-                    ],
+                    'public_url' => '/prefix',
+                    'temporary_url' => 'route:public_temp',
+                    'image_url' => 'route:public_transform',
                     'reset_before_tests' => true,
                 ],
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',
+                    'public_url' => [
+                        'route' => [
+                            'name' => 'private_public',
+                            'sign' => true,
+                        ],
+                    ],
+                    'image_url' => '@'.GlideTransformUrlGenerator::class,
                     'reset_before_tests' => true,
                 ],
                 'no_reset' => [
@@ -130,6 +141,12 @@ final class TestKernel extends Kernel
             ],
         ]);
 
+        $c->register(UrlBuilder::class)
+            ->addArgument('/glide')
+        ;
+        $c->register(GlideTransformUrlGenerator::class)
+            ->setAutowired(true)
+        ;
         $c->register(Service::class)
             ->setPublic(true)
             ->setAutowired(true)
@@ -145,6 +162,15 @@ final class TestKernel extends Kernel
     {
         $routes->add('submit_form', '/submit-form')
             ->controller([$this, 'submitForm'])
+        ;
+        $routes->add('public_temp', '/temp/{path}')
+            ->requirements(['path' => '.+'])
+        ;
+        $routes->add('public_transform', '/transform/{path}')
+            ->requirements(['path' => '.+'])
+        ;
+        $routes->add('private_public', '/private/{path}')
+            ->requirements(['path' => '.+'])
         ;
     }
 }

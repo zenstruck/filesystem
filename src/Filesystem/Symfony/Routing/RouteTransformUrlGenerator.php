@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class RouteTransformUrlGenerator extends RouteUrlGenerator implements TransformUrlGenerator
 {
@@ -26,6 +28,7 @@ final class RouteTransformUrlGenerator extends RouteUrlGenerator implements Tran
         }
 
         return $this->generate(
+            $path,
             \array_merge($config->get('parameters', []), $filter),
             $config->get('sign'),
             $config->get('expires')

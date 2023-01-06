@@ -13,21 +13,25 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
-use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
+use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
 use Zenstruck\Filesystem\Doctrine\ObjectFileLoader;
+use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\LoggableFilesystem;
@@ -37,9 +41,14 @@ use Zenstruck\Filesystem\Node\File\Path\Generator;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\HttpKernel\FilesystemDataCollector;
+use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
+use Zenstruck\Filesystem\Symfony\Routing\RouteTemporaryUrlGenerator;
+use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
+use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
+use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -194,8 +203,102 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $config['dsn'] = new Reference($adapterId);
         }
 
-        if (isset($config['public_url']['prefix'])) {
-            $config['config']['url_prefix'] = $config['public_url']['prefix'];
+        $features = [];
+        $canSignUrls = \in_array(ZenstruckUriBundle::class, (array) $container->getParameter('kernel.bundles'), true);
+        $routers = [UrlGeneratorInterface::class => new Reference('router')];
+
+        if ($canSignUrls) {
+            $routers[SignedUrlGenerator::class] = new Reference(SignedUrlGenerator::class);
+        }
+
+        $routers = new ServiceLocatorArgument($routers);
+
+        // public url config
+        switch (true) {
+            case isset($config['public_url']['prefix']):
+                $config['config']['public_url'] = $config['public_url']['prefix'];
+
+                break;
+
+            case isset($config['public_url']['service']):
+                $features[PublicUrlGenerator::class] = new Reference($config['public_url']['service']);
+
+                break;
+
+            case isset($config['public_url']['route']):
+                $container->register($id = '.zenstruck_filesystem.filesystem_public_url.'.$name, RoutePublicUrlGenerator::class)
+                    ->setArguments([
+                        $routers,
+                        $config['public_url']['route']['name'],
+                        $config['public_url']['route']['parameters'],
+                        $config['public_url']['route']['sign'],
+                        $config['public_url']['route']['expires'],
+                    ])
+                ;
+
+                $features[PublicUrlGenerator::class] = new Reference($id);
+
+                if ($canSignUrls) {
+                    $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
+                        ->setArguments([
+                            new Reference(SignedUrlGenerator::class),
+                            $config['public_url']['route']['name'],
+                            $config['public_url']['route']['parameters'],
+                        ])
+                    ;
+
+                    $features[TemporaryUrlGenerator::class] = new Reference($id);
+                }
+
+                break;
+        }
+
+        // temporary url config
+        switch (true) {
+            case isset($config['temporary_url']['service']):
+                $features[TemporaryUrlGenerator::class] = new Reference($config['temporary_url']['service']);
+
+                break;
+
+            case isset($config['temporary_url']['route']):
+                if (!$canSignUrls) {
+                    throw new LogicException('zenstruck/url is required to sign urls. Install with "composer require zenstruck/uri" and be sure the bundle is enabled.');
+                }
+
+                $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
+                    ->setArguments([
+                        new Reference(SignedUrlGenerator::class),
+                        $config['temporary_url']['route']['name'],
+                        $config['temporary_url']['route']['parameters'],
+                    ])
+                ;
+
+                $features[TemporaryUrlGenerator::class] = new Reference($id);
+
+                break;
+        }
+
+        // image transform url config
+        switch (true) {
+            case isset($config['image_url']['service']):
+                $features[TransformUrlGenerator::class] = new Reference($config['image_url']['service']);
+
+                break;
+
+            case isset($config['image_url']['route']):
+                $container->register($id = '.zenstruck_filesystem.filesystem_image_url.'.$name, RouteTransformUrlGenerator::class)
+                    ->setArguments([
+                        $routers,
+                        $config['image_url']['route']['name'],
+                        $config['image_url']['route']['parameters'],
+                        $config['image_url']['route']['sign'],
+                        $config['image_url']['route']['expires'],
+                    ])
+                ;
+
+                $features[TransformUrlGenerator::class] = new Reference($id);
+
+                break;
         }
 
         $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
@@ -203,7 +306,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         ;
 
         $container->register($filesystemId = '.zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
-            ->setArguments([new Reference($flysystemId), $name])
+            ->setArguments([new Reference($flysystemId), $name, new ServiceLocatorArgument($features)])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
 

@@ -114,6 +114,7 @@ final class Configuration implements ConfigurationInterface
                                     ->then(function(string $v) {
                                         return match (true) {
                                             \str_starts_with($v, 'route:') => ['route' => ['name' => \mb_substr($v, 6)]],
+                                            \str_starts_with($v, '@') => ['service' => \mb_substr($v, 1)],
                                             default => ['service' => $v],
                                         };
                                     })
@@ -153,6 +154,7 @@ final class Configuration implements ConfigurationInterface
                                     ->then(function(string $v) {
                                         return match (true) {
                                             \str_starts_with($v, 'route:') => ['route' => ['name' => \mb_substr($v, 6)]],
+                                            \str_starts_with($v, '@') => ['service' => \mb_substr($v, 1)],
                                             default => ['service' => $v],
                                         };
                                     })

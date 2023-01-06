@@ -11,16 +11,19 @@
 
 namespace Zenstruck\Filesystem\Symfony\Routing;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 abstract class RouteUrlGenerator
 {
     public function __construct(
-        private UrlGeneratorInterface $router,
+        private ContainerInterface $container,
         private string $route,
         private array $routeParameters = [],
         private bool $signByDefault = false,
@@ -28,9 +31,9 @@ abstract class RouteUrlGenerator
     ) {
     }
 
-    final protected function generate(array $routeParameters, ?bool $sign, string|\DateTimeInterface|null $expires): string
+    final protected function generate(string $path, array $routeParameters, ?bool $sign, string|\DateTimeInterface|null $expires): string
     {
-        $routeParameters = \array_merge($this->routeParameters, $routeParameters);
+        $routeParameters = \array_merge($this->routeParameters, $routeParameters, ['path' => $path]);
         $sign ??= $this->signByDefault;
         $expires ??= $this->defaultExpires;
 
@@ -39,14 +42,16 @@ abstract class RouteUrlGenerator
         }
 
         if (!$sign) {
-            return $this->router->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->container->get(UrlGeneratorInterface::class)
+                ->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL)
+            ;
         }
 
-        if (!$this->router instanceof SignedUrlGenerator) {
+        if (!$this->container->has(SignedUrlGenerator::class)) {
             throw new \LogicException('zenstruck/url is required to sign urls. Install with "composer require zenstruck/uri" and be sure the bundle is enabled.');
         }
 
-        $builder = $this->router->build($this->route, $routeParameters);
+        $builder = $this->container->get(SignedUrlGenerator::class)->build($this->route, $routeParameters);
 
         return $expires ? $builder->expires($expires) : $builder;
     }

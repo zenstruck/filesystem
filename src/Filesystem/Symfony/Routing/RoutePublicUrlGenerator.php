@@ -16,13 +16,16 @@ use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class RoutePublicUrlGenerator extends RouteUrlGenerator implements PublicUrlGenerator
 {
     public function publicUrl(string $path, Config $config): string
     {
         return $this->generate(
-            \array_merge($config->get('parameters', []), ['path' => $path]),
+            $path,
+            $config->get('parameters', []),
             $config->get('sign'),
             $config->get('expires')
         );
