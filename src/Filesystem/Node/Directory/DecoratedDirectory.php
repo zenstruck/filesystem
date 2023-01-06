@@ -50,18 +50,66 @@ trait DecoratedDirectory
         return $clone;
     }
 
-    public function largerThan(int $bytes): static
+    public function size(array|int|string $sizes): static
     {
         $clone = clone $this;
-        $clone->inner = $this->inner()->largerThan($bytes);
+        $clone->inner = $this->inner()->size($sizes);
 
         return $clone;
     }
 
-    public function smallerThan(int $bytes): static
+    public function date(array|string $dates): static
     {
         $clone = clone $this;
-        $clone->inner = $this->inner()->smallerThan($bytes);
+        $clone->inner = $this->inner()->date($dates);
+
+        return $clone;
+    }
+
+    public function matchingFilename(array|string $patterns): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->matchingFilename($patterns);
+
+        return $clone;
+    }
+
+    public function notMatchingFilename(array|string $patterns): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->notMatchingFilename($patterns);
+
+        return $clone;
+    }
+
+    public function matchingPath(array|string $patterns): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->matchingPath($patterns);
+
+        return $clone;
+    }
+
+    public function notMatchingPath(array|string $patterns): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->notMatchingPath($patterns);
+
+        return $clone;
+    }
+
+    public function largerThan(int|string $size): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->largerThan($size);
+
+        return $clone;
+    }
+
+    public function smallerThan(int|string $size): static
+    {
+        $clone = clone $this;
+        $clone->inner = $this->inner()->smallerThan($size);
 
         return $clone;
     }
@@ -78,22 +126,6 @@ trait DecoratedDirectory
     {
         $clone = clone $this;
         $clone->inner = $this->inner()->newerThan($timestamp);
-
-        return $clone;
-    }
-
-    public function matching(string $pattern): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->matching($pattern);
-
-        return $clone;
-    }
-
-    public function notMatching(string $pattern): static
-    {
-        $clone = clone $this;
-        $clone->inner = $this->inner()->notMatching($pattern);
 
         return $clone;
     }

@@ -42,26 +42,107 @@ interface Directory extends Node, \IteratorAggregate
     public function directories(): static;
 
     /**
-     * @return $this<File>|File[]
+     * Filter by file size.
+     *
+     *     $directory->size('> 10K');
+     *     $directory->size('<= 1Ki');
+     *     $directory->size(4);
+     *     $directory->size(['> 10K', '< 20K'])
+     *
+     * @param string|int|string[]|int[] $sizes A size range string or an integer or an array of size ranges
      */
-    public function largerThan(int $bytes): static;
+    public function size(string|int|array $sizes): static;
 
     /**
-     * @return $this<File>|File[]
+     * Common shortcut for {@see size}.
      */
-    public function smallerThan(int $bytes): static;
+    public function largerThan(string|int $size): static;
 
     /**
-     * @return $this<File>|File[]
+     * Common shortcut for {@see size}.
      */
-    public function olderThan(int|string|\DateTimeInterface $timestamp): static;
+    public function smallerThan(string|int $size): static;
 
     /**
-     * @return $this<File>|File[]
+     * Filter by last modified.
+     *
+     * The date must be something that strtotime() is able to parse:
+     *
+     *     $directory->date('since yesterday');
+     *     $directory->date('until 2 days ago');
+     *     $directory->date('> now - 2 hours');
+     *     $directory->date('>= 2005-10-15');
+     *     $directory->date(['>= 2005-10-15', '<= 2006-05-27']);
+     *
+     * @param string|string[] $dates A date range string or an array of date ranges
      */
-    public function newerThan(int|string|\DateTimeInterface $timestamp): static;
+    public function date(string|array $dates): static;
 
-    public function matching(string $pattern): static;
+    /**
+     * Common shortcut for {@see date}.
+     */
+    public function olderThan(string|int|\DateTimeInterface $timestamp): static;
 
-    public function notMatching(string $pattern): static;
+    /**
+     * Common shortcut for {@see date}.
+     */
+    public function newerThan(string|int|\DateTimeInterface $timestamp): static;
+
+    /**
+     * Adds rules that filenames must match.
+     *
+     * You can use patterns (delimited with / sign), globs or simple strings.
+     *
+     *     $directory->matchingFilename('*.php')
+     *     $directory->matchingFilename('/\.php$/') // same as above
+     *     $directory->matchingFilename('test.php')
+     *     $directory->matchingFilename(['test.py', 'test.php'])
+     *
+     * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     */
+    public function matchingFilename(string|array $patterns): static;
+
+    /**
+     * Adds rules that filenames must NOT match.
+     *
+     * You can use patterns (delimited with / sign), globs or simple strings.
+     *
+     *     $directory->notMatchingFilename('*.php')
+     *     $directory->notMatchingFilename('/\.php$/') // same as above
+     *     $directory->notMatchingFilename('test.php')
+     *     $directory->notMatchingFilename(['test.py', 'test.php'])
+     *
+     * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     */
+    public function notMatchingFilename(string|array $patterns): static;
+
+    /**
+     * Adds rules that paths must match.
+     *
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     *     $directory->matchingPath('some/special/dir')
+     *     $directory->matchingPath('/some\/special\/dir/') // same as above
+     *     $directory->matchingPath(['some dir', 'another/dir'])
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string|string[] $patterns A pattern (a regexp or a string) or an array of patterns
+     */
+    public function matchingPath(string|array $patterns): static;
+
+    /**
+     * Adds rules that paths must NOT match.
+     *
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     *     $directory->notMatchingPath('some/special/dir')
+     *     $directory->notMatchingPath('/some\/special\/dir/') // same as above
+     *     $directory->notMatchingPath(['some dir', 'another/dir'])
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string|string[] $patterns A pattern (a regexp or a string) or an array of patterns
+     */
+    public function notMatchingPath(string|array $patterns): static;
 }

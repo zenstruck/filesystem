@@ -12,6 +12,8 @@
 namespace Zenstruck\Tests\Filesystem\Node;
 
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Test\Node\TestDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -50,56 +52,104 @@ trait DirectoryTests
         $this->assertCount(1, $dir->directories());
         $this->assertCount(5, $dir->recursive());
         $this->assertCount(3, $dir->recursive()->files());
-        $this->assertCount(2, $dir->recursive()->directories());
+        $this->assertCount(2, $dir = $dir->recursive()->directories());
+        $this->assertCount(2, $dir);
     }
 
     /**
      * @test
      */
-    public function older_than_filter(): void
+    public function date_range_filter(): void
     {
-        $this->markTestIncomplete();
+        $this->fixtureDir()
+            ->recursive()
+            ->files()
+            ->date('> 30 years ago')
+            ->assertCount(14)
+            ->date('> tomorrow')
+            ->assertCount(0)
+        ;
+
+        $this->fixtureDir()
+            ->recursive()
+            ->files()
+            ->newerThan('30 years ago')
+            ->assertCount(14)
+            ->newerThan('tomorrow')
+            ->assertCount(0)
+        ;
     }
 
     /**
      * @test
      */
-    public function newer_than_filter(): void
+    public function size_range_filter(): void
     {
-        $this->markTestIncomplete();
+        $this->fixtureDir()
+            ->recursive()
+            ->files()
+            ->size('< 1K')
+            ->assertCount(7)
+            ->size('> 0')
+            ->assertCount(4)
+        ;
+
+        $this->fixtureDir()
+            ->recursive()
+            ->files()
+            ->smallerThan('1K')
+            ->assertCount(7)
+            ->largerThan(0)
+            ->assertCount(4)
+        ;
     }
 
     /**
      * @test
      */
-    public function larger_than_filter(): void
+    public function matching_filename_filter(): void
     {
-        $this->markTestIncomplete();
+        $this->fixtureDir()
+            ->recursive()
+            ->matchingFilename(['symfony.*', 'file*'])
+            ->assertCount(9)
+            ->notMatchingFilename('*.png')
+            ->assertCount(8)
+        ;
     }
 
     /**
      * @test
      */
-    public function smaller_than_filter(): void
+    public function matching_path_filter(): void
     {
-        $this->markTestIncomplete();
+        $this->fixtureDir()
+            ->recursive()
+            ->matchingPath('sub*/*')
+            ->assertCount(4)
+            ->notMatchingPath('sub1/*')
+            ->assertCount(2)
+        ;
     }
 
     /**
      * @test
      */
-    public function matching_filter(): void
+    public function custom_filter(): void
     {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     */
-    public function not_matching_filter(): void
-    {
-        $this->markTestIncomplete();
+        $this->fixtureDir()
+            ->files()
+            ->filter(fn(File $file) => $file->contents() === \file_get_contents(fixture('symfony.jpg')))
+            ->assertCount(1)
+            ->recursive()
+            ->assertCount(2)
+        ;
     }
 
     abstract protected function createDirectory(\SplFileInfo $directory, string $path): Directory;
+
+    private function fixtureDir(): TestDirectory
+    {
+        return new TestDirectory($this->createDirectory(fixture(''), ''));
+    }
 }

@@ -33,6 +33,11 @@ function fixture(string $name): SplFileInfo
     return new \SplFileInfo(FIXTURE_DIR.'/'.$name);
 }
 
+function tempfile(string $name): SplFileInfo
+{
+    return new \SplFileInfo(TEMP_DIR.'/'.$name);
+}
+
 function fixture_filesystem(): Filesystem
 {
     return new FlysystemFilesystem(new Flysystem(
