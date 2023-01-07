@@ -310,10 +310,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
 
-        if ($config['log']) {
+        if ($config['log']['enabled']) {
             $container->register('.zenstruck_filesystem.filesystem.log_'.$name, LoggableFilesystem::class)
                 ->setDecoratedService($filesystemId)
-                ->setArguments([new Reference('.inner'), new Reference('logger')])
+                ->setArguments([new Reference('.inner'), new Reference('logger'), $config['log']])
                 ->addTag('monolog.logger', ['channel' => 'filesystem'])
             ;
         }

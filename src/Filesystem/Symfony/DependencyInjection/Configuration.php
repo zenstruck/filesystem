@@ -14,9 +14,11 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Zenstruck\Filesystem\Operation;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -196,9 +198,34 @@ final class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
-                            ->booleanNode('log') // todo log levels
-                                ->defaultTrue()
-                                ->info('Whether or not to log filesystem operations')
+                            ->arrayNode('log')
+                                ->info('Log filesystem operations')
+                                ->canBeDisabled()
+                                ->children()
+                                    ->enumNode(Operation::READ)
+                                        ->values($levels = [false, LogLevel::EMERGENCY, LogLevel::ALERT, LogLevel::CRITICAL, LogLevel::ERROR, LogLevel::WARNING, LogLevel::NOTICE, LogLevel::INFO, LogLevel::DEBUG])
+                                        ->defaultValue(LogLevel::DEBUG)
+                                    ->end()
+                                    ->enumNode(Operation::WRITE)
+                                        ->values($levels)
+                                        ->defaultValue(LogLevel::INFO)
+                                    ->end()
+                                    ->enumNode(Operation::MOVE)
+                                        ->values($levels)
+                                    ->end()
+                                    ->enumNode(Operation::COPY)
+                                        ->values($levels)
+                                    ->end()
+                                    ->enumNode(Operation::DELETE)
+                                        ->values($levels)
+                                    ->end()
+                                    ->enumNode(Operation::CHMOD)
+                                        ->values($levels)
+                                    ->end()
+                                    ->enumNode(Operation::MKDIR)
+                                        ->values($levels)
+                                    ->end()
+                                ->end()
                             ->end()
                             ->booleanNode('reset_before_tests')
                                 ->defaultFalse()
