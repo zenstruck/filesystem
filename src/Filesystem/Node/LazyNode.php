@@ -23,6 +23,8 @@ abstract class LazyNode implements Node
 
     protected Node $inner;
 
+    protected array $attributes = [];
+
     /** @var null|Filesystem|callable():Filesystem */
     private $filesystem;
 
@@ -30,11 +32,17 @@ abstract class LazyNode implements Node
     private $path;
 
     /**
-     * @param null|string|callable():string $path
+     * @param null|string|array|callable():string $attributes
      */
-    public function __construct(string|callable|null $path = null)
+    public function __construct(string|callable|array|null $attributes = null)
     {
-        $this->path = $path;
+        if (\is_callable($attributes) || \is_string($attributes)) {
+            $this->path = $attributes;
+        }
+
+        if (\is_array($attributes)) {
+            $this->attributes = $attributes;
+        }
     }
 
     /**
@@ -55,24 +63,67 @@ abstract class LazyNode implements Node
 
     public function path(): Path
     {
+        $this->path ??= $this->attributes[__FUNCTION__] ?? null;
+
         if ($this->path instanceof Path) {
             return $this->path;
-        }
-
-        if (null === $this->path) {
-            throw new \RuntimeException('Path not set.');
         }
 
         if (\is_callable($this->path)) {
             return $this->path = new Path(($this->path)());
         }
 
+        if (null === $this->path) {
+            throw new \RuntimeException('Path not set.');
+        }
+
         return $this->path = new Path($this->path);
+    }
+
+    public function dsn(): string
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->dsn();
+    }
+
+    public function lastModified(): \DateTimeImmutable
+    {
+        if (!isset($this->attributes[__FUNCTION__])) {
+            return $this->inner()->lastModified();
+        }
+
+        $lastModified = $this->attributes[__FUNCTION__];
+
+        if ($lastModified instanceof \DateTimeImmutable) {
+            return $this->attributes[__FUNCTION__];
+        }
+
+        $lastModified = \is_numeric($lastModified) ? \DateTimeImmutable::createFromFormat('U', (string) $lastModified) : new \DateTimeImmutable($lastModified);
+
+        return $lastModified->setTimezone(new \DateTimeZone(\date_default_timezone_get())); // @phpstan-ignore-line
+    }
+
+    public function visibility(): string
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->visibility();
+    }
+
+    public function mimeType(): string
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->mimeType();
     }
 
     public function exists(): bool
     {
         return $this->filesystem()->has($this->path());
+    }
+
+    public function refresh(): static
+    {
+        $this->inner()->refresh();
+
+        $this->attributes = [];
+
+        return $this;
     }
 
     protected function filesystem(): Filesystem

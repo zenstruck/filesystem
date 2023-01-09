@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Image\BlurHash;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -20,6 +21,41 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 final class LazyImage extends LazyFile implements Image
 {
     use DecoratedImage;
+
+    public function transformUrl(array|string $filter): string
+    {
+        if (\is_string($filter) && isset($this->attributes[__FUNCTION__][$filter])) {
+            return $this->attributes[__FUNCTION__][$filter];
+        }
+
+        return $this->inner()->transformUrl($filter);
+    }
+
+    public function iptc(): array
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->iptc();
+    }
+
+    public function blurHash(): BlurHash
+    {
+        // TODO
+        return $this->inner()->blurHash();
+    }
+
+    public function height(): int
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->height();
+    }
+
+    public function exif(): array
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->exif();
+    }
+
+    public function width(): int
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->width();
+    }
 
     protected function inner(): Image
     {

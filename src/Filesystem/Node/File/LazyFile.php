@@ -21,6 +21,33 @@ class LazyFile extends LazyNode implements File
 {
     use DecoratedFile;
 
+    public function size(): int
+    {
+        return $this->attributes[__FUNCTION__] ?? $this->inner()->size();
+    }
+
+    public function checksum(?string $algo = null): string
+    {
+        if (null === $algo && \is_string($this->attributes[__FUNCTION__] ?? null)) {
+            return $this->attributes[__FUNCTION__];
+        }
+
+        if ($algo && isset($this->attributes[__FUNCTION__][$algo])) {
+            return $this->attributes[__FUNCTION__][$algo];
+        }
+
+        return $this->inner()->checksum($algo);
+    }
+
+    public function publicUrl(array $config = []): string
+    {
+        if (!$config && isset($this->attributes[__FUNCTION__])) {
+            return $this->attributes[__FUNCTION__];
+        }
+
+        return $this->inner()->publicUrl($config);
+    }
+
     public function guessExtension(): ?string
     {
         return $this->path()->extension() ?? $this->inner()->guessExtension();

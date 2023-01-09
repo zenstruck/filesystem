@@ -127,9 +127,75 @@ class LazyFileTest extends TestCase
         $this->assertTrue($file->exists());
     }
 
-    protected function createLazyFile(string|callable|null $path = null): LazyFile
+    /**
+     * @test
+     */
+    public function can_create_with_path_as_attribute(): void
     {
-        return new LazyFile($path);
+        $this->assertSame('foo', $this->createLazyFile(['path' => 'foo'])->path()->toString());
+        $this->assertSame('foo', $this->createLazyFile(['path' => fn() => 'foo'])->path()->toString());
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_with_attributes(): void
+    {
+        $file = $this->createLazyFile([
+            'path' => 'some/file.png',
+            'dsn' => 'some:path',
+            'lastModified' => '2023-01-01',
+            'visibility' => 'private',
+            'mimeType' => 'image/png',
+            'size' => 72,
+            'checksum' => 'foo',
+            'publicUrl' => 'http://example.com',
+        ]);
+        $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
+
+        $this->assertSame('some:path', $file->dsn());
+        $this->assertEquals(new \DateTimeImmutable('2023-01-01'), $file->lastModified());
+        $this->assertSame('private', $file->visibility());
+        $this->assertSame('image/png', $file->mimeType());
+        $this->assertSame(72, $file->size());
+        $this->assertSame('foo', $file->checksum());
+        $this->assertSame('http://example.com', $file->publicUrl());
+
+        $this->assertSame('040f06fd774092478d450774f5ba30c5da78acc8', $file->checksum('sha1'));
+
+        $file->refresh();
+
+        $this->assertSame('default://some/file.png', $file->dsn());
+        $this->assertNotEquals(new \DateTimeImmutable('2023-01-01'), $file->lastModified());
+        $this->assertSame('public', $file->visibility());
+        $this->assertSame('image/png', $file->mimeType());
+        $this->assertSame(7, $file->size());
+        $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $file->checksum());
+        $this->assertSame('/prefix/some/file.png', $file->publicUrl());
+    }
+
+    /**
+     * @test
+     */
+    public function multiple_checksums(): void
+    {
+        $file = $this->createLazyFile([
+            'path' => 'some/file.png',
+            'checksum' => [
+                'md5' => 'foo',
+                'sha1' => 'bar',
+            ],
+        ]);
+        $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
+
+        $this->assertSame('foo', $file->checksum('md5'));
+        $this->assertSame('bar', $file->checksum('sha1'));
+        $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $file->checksum());
+    }
+
+    protected function createLazyFile(string|callable|array|null $attributes = null): LazyFile
+    {
+        return new LazyFile($attributes);
     }
 
     protected function createFile(\SplFileInfo $file, string $path): File
