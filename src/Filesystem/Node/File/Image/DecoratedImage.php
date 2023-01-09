@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Image\BlurHash;
+use Zenstruck\Image\CalculatedProperties;
 use Zenstruck\Image\LocalImage;
 
 /**
@@ -21,6 +22,8 @@ use Zenstruck\Image\LocalImage;
  */
 trait DecoratedImage
 {
+    use CalculatedProperties;
+
     private ?LocalImage $localImage = null;
 
     public function transformUrl(array|string $filter): string
@@ -31,16 +34,6 @@ trait DecoratedImage
     public function transform(callable|object $filter, array $options = []): PendingImage
     {
         return $this->inner()->transform($filter, $options);
-    }
-
-    public function isPortrait(): bool
-    {
-        return $this->localImage()->isPortrait();
-    }
-
-    public function isLandscape(): bool
-    {
-        return $this->localImage()->isLandscape();
     }
 
     public function iptc(): array
@@ -58,11 +51,6 @@ trait DecoratedImage
         return $this->localImage()->height();
     }
 
-    public function aspectRatio(): float
-    {
-        return $this->localImage()->aspectRatio();
-    }
-
     public function exif(): array
     {
         return $this->localImage()->exif();
@@ -71,16 +59,6 @@ trait DecoratedImage
     public function width(): int
     {
         return $this->localImage()->width();
-    }
-
-    public function pixels(): int
-    {
-        return $this->localImage()->pixels();
-    }
-
-    public function isSquare(): bool
-    {
-        return $this->localImage()->isSquare();
     }
 
     public function transformer(string $class): object
