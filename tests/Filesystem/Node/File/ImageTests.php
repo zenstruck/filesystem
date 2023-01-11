@@ -49,16 +49,6 @@ trait ImageTests
     /**
      * @test
      */
-    public function can_get_blurhash(): void
-    {
-        $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
-
-        $this->assertSame('LaLg^Zay~qWB9FWB-;j[%MWBRjxu', $image->blurHash()->encode());
-    }
-
-    /**
-     * @test
-     */
     public function can_transform_image(): void
     {
         $image = $this->createFile(fixture('symfony.png'), 'symfony.png');

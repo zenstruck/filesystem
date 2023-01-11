@@ -24,7 +24,7 @@ final class FlysystemImage extends FlysystemFile implements Image
     public function transform(callable|object $filter, array $options = []): PendingImage
     {
         return new PendingImage(
-            $this->operator->imageTransformer()->transform($this->localImage(), $filter, $options),
+            $this->operator->imageTransformer()->transform($this->localImage(), $filter, $options), // @phpstan-ignore-line
             $this->operator->imageTransformer()
         );
     }

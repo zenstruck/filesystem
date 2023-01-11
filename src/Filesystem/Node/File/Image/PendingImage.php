@@ -43,7 +43,7 @@ final class PendingImage extends PendingFile implements Image
     public function transform(callable|object $filter, array $options = []): self
     {
         return new self(
-            $this->transformerRegistry()->transform($this, $filter, $options),
+            $this->transformerRegistry()->transform($this, $filter, $options), // @phpstan-ignore-line
             $this->transformerRegistry()
         );
     }

@@ -13,7 +13,6 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Image\BlurHash;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,12 +33,6 @@ final class LazyImage extends LazyFile implements Image
     public function iptc(): array
     {
         return $this->attributes[__FUNCTION__] ?? $this->inner()->iptc();
-    }
-
-    public function blurHash(): BlurHash
-    {
-        // TODO
-        return $this->inner()->blurHash();
     }
 
     public function height(): int

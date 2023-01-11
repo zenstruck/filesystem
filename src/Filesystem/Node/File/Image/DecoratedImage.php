@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
-use Zenstruck\Image\BlurHash;
 use Zenstruck\Image\CalculatedProperties;
 use Zenstruck\Image\LocalImage;
 
@@ -39,11 +38,6 @@ trait DecoratedImage
     public function iptc(): array
     {
         return $this->localImage()->iptc();
-    }
-
-    public function blurHash(): BlurHash
-    {
-        return $this->localImage()->blurHash();
     }
 
     public function height(): int
