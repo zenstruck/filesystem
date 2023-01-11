@@ -62,16 +62,6 @@ trait ImageTests
     /**
      * @test
      */
-    public function can_get_transformer(): void
-    {
-        $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
-
-        $this->assertInstanceOf(InterventionImage::class, $image->transformer(InterventionImage::class));
-    }
-
-    /**
-     * @test
-     */
     public function can_get_transform_url(): void
     {
         $image = $this->createFile(fixture('symfony.png'), 'path/symfony.png');

@@ -11,8 +11,8 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
+use Zenstruck\Image as LocalImage;
 use Zenstruck\Image\CalculatedProperties;
-use Zenstruck\Image\LocalImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -53,11 +53,6 @@ trait DecoratedImage
     public function width(): int
     {
         return $this->localImage()->width();
-    }
-
-    public function transformer(string $class): object
-    {
-        return $this->inner()->transformer($class);
     }
 
     public function tempFile(): LocalImage

@@ -13,7 +13,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Image\LocalImage;
+use Zenstruck\Image as LocalImage;
 use Zenstruck\Image\TransformerRegistry;
 
 /**
@@ -43,14 +43,9 @@ final class PendingImage extends PendingFile implements Image
     public function transform(callable|object $filter, array $options = []): self
     {
         return new self(
-            $this->transformerRegistry()->transform($this, $filter, $options), // @phpstan-ignore-line
+            $this->transformerRegistry()->transform($this, $filter, $options),
             $this->transformerRegistry()
         );
-    }
-
-    public function transformer(string $class): object
-    {
-        return $this->transformerRegistry()->get($class)->object($this);
     }
 
     public function transformUrl(array|string $filter): string

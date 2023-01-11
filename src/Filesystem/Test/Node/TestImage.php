@@ -15,7 +15,7 @@ use Zenstruck\Assert;
 use Zenstruck\Filesystem\Node\File\DecoratedFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\DecoratedImage;
-use Zenstruck\Image\LocalImage;
+use Zenstruck\Image as LocalImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
