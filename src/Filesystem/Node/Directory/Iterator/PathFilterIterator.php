@@ -32,7 +32,10 @@ final class PathFilterIterator extends MultiplePcreFilterIterator
         return $this->isAccepted($this->current()->path()->toString());
     }
 
-    protected function toRegex(string $str): string
+    /**
+     * @param string $str
+     */
+    protected function toRegex($str): string
     {
         return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }
