@@ -14,7 +14,7 @@
     "require": {
         "php": ">=8.0",
         "league/flysystem": "^3.11",
-        "zenstruck/image": "^1.0",
+        "zenstruck/image": "^0.1",
         "zenstruck/stream": "^1.0",
         "zenstruck/temp-file": "^1.1"
     },
@@ -46,12 +46,6 @@
         "zenstruck/foundry": "^1.26",
         "zenstruck/uri": "^2.2"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kbond/image"
-        }
-    ],
     "config": {
         "preferred-install": "dist",
         "sort-packages": true
