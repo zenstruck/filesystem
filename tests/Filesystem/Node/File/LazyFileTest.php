@@ -79,14 +79,6 @@ class LazyFileTest extends TestCase
     /**
      * @test
      */
-    public function path_can_be_determined_from_dsn(): void
-    {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     */
     public function can_use_callable_for_path(): void
     {
         $count = 0;
@@ -151,7 +143,7 @@ class LazyFileTest extends TestCase
     {
         $file = $this->createLazyFile([
             'path' => 'some/file.png',
-            'dsn' => 'some:path',
+            'dsn' => 'some://path',
             'last_modified' => '2023-01-01',
             'visibility' => 'private',
             'mime_type' => 'image/png',
@@ -161,7 +153,7 @@ class LazyFileTest extends TestCase
         ]);
         $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
 
-        $this->assertSame('some:path', $file->dsn());
+        $this->assertSame('some://path', $file->dsn()->toString());
         $this->assertEquals(new \DateTimeImmutable('2023-01-01'), $file->lastModified());
         $this->assertSame('private', $file->visibility());
         $this->assertSame('image/png', $file->mimeType());
@@ -173,7 +165,7 @@ class LazyFileTest extends TestCase
 
         $file->refresh();
 
-        $this->assertSame('default://some/file.png', $file->dsn());
+        $this->assertSame('default://some/file.png', $file->dsn()->toString());
         $this->assertNotEquals(new \DateTimeImmutable('2023-01-01'), $file->lastModified());
         $this->assertSame('public', $file->visibility());
         $this->assertSame('image/png', $file->mimeType());
@@ -199,6 +191,18 @@ class LazyFileTest extends TestCase
         $this->assertSame('foo', $file->checksum('md5'));
         $this->assertSame('bar', $file->checksum('sha1'));
         $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $file->checksum());
+    }
+
+    /**
+     * @test
+     */
+    public function path_can_be_determined_from_dsn(): void
+    {
+        $file = $this->createLazyFile([
+            'dsn' => 'public://some/file.png',
+        ]);
+
+        $this->assertSame('some/file.png', $file->path()->toString());
     }
 
     protected function createLazyFile(string|callable|array|null $attributes = null): LazyFile

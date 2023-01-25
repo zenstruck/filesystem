@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\Path;
@@ -70,9 +71,9 @@ class PendingFile extends \SplFileInfo implements File
         return $this->path = new Path($this);
     }
 
-    public function dsn(): string
+    public function dsn(): Dsn
     {
-        return $this->path();
+        throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }
 
     public function lastModified(): \DateTimeImmutable

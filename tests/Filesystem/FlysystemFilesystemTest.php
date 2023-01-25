@@ -43,7 +43,9 @@ final class FlysystemFilesystemTest extends FilesystemTest
         $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter(), 'public');
         $node = $filesystem->write('file.txt', 'content')->last();
 
-        $this->assertSame('public://file.txt', $node->dsn());
+        $this->assertSame('public://file.txt', (string) $node->dsn());
+        $this->assertSame('public', $node->dsn()->filesystem());
+        $this->assertSame('file.txt', $node->dsn()->path()->toString());
     }
 
     protected function createFilesystem(): Filesystem

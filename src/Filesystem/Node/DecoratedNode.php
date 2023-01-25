@@ -26,7 +26,7 @@ trait DecoratedNode
         return $this->inner()->path();
     }
 
-    public function dsn(): string
+    public function dsn(): Dsn
     {
         return $this->inner()->dsn();
     }

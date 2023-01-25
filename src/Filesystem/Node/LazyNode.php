@@ -69,20 +69,25 @@ abstract class LazyNode implements Node
             return $this->path;
         }
 
-        if (\is_callable($this->path)) {
-            return $this->path = new Path(($this->path)());
-        }
-
-        if (null === $this->path) {
-            throw new \RuntimeException('Path not set.');
-        }
-
-        return $this->path = new Path($this->path);
+        return $this->path = match (true) {
+            \is_callable($this->path) => new Path(($this->path)()),
+            \is_string($this->path) => new Path($this->path),
+            isset($this->attributes[Metadata::DSN]) => $this->dsn()->path(),
+            default => throw new \RuntimeException('Path not set.'),
+        };
     }
 
-    public function dsn(): string
+    public function dsn(): Dsn
     {
-        return $this->attributes[Metadata::DSN] ?? $this->inner()->dsn();
+        if (!isset($this->attributes[Metadata::DSN])) {
+            return $this->inner()->dsn();
+        }
+
+        if (!$this->attributes[Metadata::DSN] instanceof Dsn) {
+            $this->attributes[Metadata::DSN] = Dsn::wrap($this->attributes[Metadata::DSN]);
+        }
+
+        return $this->attributes[Metadata::DSN];
     }
 
     public function lastModified(): \DateTimeImmutable

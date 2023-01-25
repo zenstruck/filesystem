@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem;
 
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\Path;
@@ -29,7 +30,7 @@ interface Node
      *
      * @example If node comes from "public" filesystem with "foo/bar.txt" path, returns "public://foo/bar.txt"
      */
-    public function dsn(): string;
+    public function dsn(): Dsn;
 
     /**
      * Returns the "parent" directory.

@@ -24,6 +24,7 @@ abstract class FlysystemNode implements Node
     protected ?\DateTimeImmutable $lastModified = null;
     protected ?string $visibility = null;
     private Path $path;
+    private Dsn $dsn;
 
     /**
      * @internal
@@ -38,9 +39,9 @@ abstract class FlysystemNode implements Node
         return $this->path;
     }
 
-    public function dsn(): string
+    public function dsn(): Dsn
     {
-        return "{$this->operator->name()}://{$this->path()}";
+        return $this->dsn ??= Dsn::create($this->operator->name(), $this->path);
     }
 
     public function directory(): ?Directory
