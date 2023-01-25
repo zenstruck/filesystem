@@ -18,6 +18,7 @@ use Zenstruck\Image\TransformerRegistry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
 final class PendingImage extends PendingFile implements Image
 {

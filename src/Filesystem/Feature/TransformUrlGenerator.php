@@ -15,6 +15,7 @@ use League\Flysystem\Config;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
 interface TransformUrlGenerator
 {
