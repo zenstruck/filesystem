@@ -12,10 +12,10 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zenstruck\Filesystem\Doctrine\Attribute\HasFiles;
+use Zenstruck\Filesystem\Doctrine\Mapping as Filesystem;
 
 #[ORM\Entity]
-#[HasFiles(autoload: false)]
+#[Filesystem\HasFiles(autoload: false)]
 class Entity2 extends Entity1
 {
 }

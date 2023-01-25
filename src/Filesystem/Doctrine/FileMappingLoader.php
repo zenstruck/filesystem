@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ObjectFileLoader
+final class FileMappingLoader
 {
     /**
      * @internal

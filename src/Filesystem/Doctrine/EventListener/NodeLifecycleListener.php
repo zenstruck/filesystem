@@ -15,12 +15,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs as ORMPreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\ManagerEventArgs;
 use Doctrine\Persistence\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Doctrine\Attribute\HasFiles;
-use Zenstruck\Filesystem\Doctrine\Attribute\Mapping;
+use Zenstruck\Filesystem\Doctrine\Mapping;
+use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
+use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
@@ -56,7 +58,7 @@ final class NodeLifecycleListener
         }
 
         // "real" column properties
-        foreach ($collection->mappings as $field => $mapping) {
+        foreach ($collection->statefulMappings as $field => $mapping) {
             $file = $metadata->getFieldValue($object, $field);
 
             if (!$file instanceof LazyNode) {
@@ -67,7 +69,7 @@ final class NodeLifecycleListener
         }
 
         // "virtual" column properties
-        foreach ($collection->virtualMappings as $field => [$class, $mapping]) {
+        foreach ($collection->statelessMappings as $field => [$class, $mapping]) {
             $property = self::property($metadata->getReflectionClass(), $field);
             $property->setAccessible(true);
 
@@ -102,7 +104,7 @@ final class NodeLifecycleListener
             return;
         }
 
-        foreach ($collection->mappings as $field => $mapping) {
+        foreach ($collection->statefulMappings as $field => $mapping) {
             if (!$mapping->deleteOnRemove) {
                 continue;
             }
@@ -128,7 +130,7 @@ final class NodeLifecycleListener
             return;
         }
 
-        foreach ($collection->mappings as $field => $mapping) {
+        foreach ($collection->statefulMappings as $field => $mapping) {
             $file = $metadata->getFieldValue($object, $field);
 
             if (!$file instanceof PendingFile) {
@@ -150,7 +152,7 @@ final class NodeLifecycleListener
             return;
         }
 
-        foreach ($collection->mappings as $field => $mapping) {
+        foreach ($collection->statefulMappings as $field => $mapping) {
             if (!$event->hasChangedField($field)) {
                 continue;
             }
@@ -165,6 +167,10 @@ final class NodeLifecycleListener
 
                 // just setting the new value does not update the property so refresh the object on flush
                 $this->postFlushOperations[] = static fn() => $event->getObjectManager()->refresh($object);
+
+                // because the above refresh clears the values, reload them
+                // todo is there a better method to do this?
+                $this->postFlushOperations[] = fn(EntityManagerInterface $em) => $this->load($object, $em, force: true);
             }
 
             if (self::shouldOldFileBeRemoved($mapping, $old, $new)) {
@@ -173,10 +179,13 @@ final class NodeLifecycleListener
         }
     }
 
-    public function postFlush(): void
+    /**
+     * @param ManagerEventArgs<EntityManagerInterface> $event
+     */
+    public function postFlush(ManagerEventArgs $event): void
     {
         foreach ($this->postFlushOperations as $operation) {
-            $operation();
+            $operation($event->getObjectManager());
         }
 
         $this->postFlushOperations = [];
@@ -197,7 +206,7 @@ final class NodeLifecycleListener
     private function generatePath(Mapping $mapping, File $file, object $object, string $field): string
     {
         return $this->container->get(PathGenerator::class)->generate(
-            $mapping->namer ?? throw new \LogicException(\sprintf('To save pending files/images, a "namer" must be configured in the filesystem mapping for "%s::$%s".', $object::class, $field)),
+            $mapping->namer() ?? throw new \LogicException(\sprintf('To save pending files/images, a "namer" must be configured in the filesystem mapping for "%s::$%s".', $object::class, $field)),
             $file,
             ['this' => $object]
         );
@@ -218,7 +227,7 @@ final class NodeLifecycleListener
         return [$object, $metadata, $collection];
     }
 
-    private static function shouldOldFileBeRemoved(Mapping $mapping, mixed $old, mixed $new): bool
+    private static function shouldOldFileBeRemoved(Stateful $mapping, mixed $old, mixed $new): bool
     {
         if (!$mapping->deleteOnUpdate) {
             return false;
@@ -239,7 +248,8 @@ final class NodeLifecycleListener
 
     private function filesystem(Mapping $mapping): Filesystem
     {
-        return $this->container->get('filesystem_locator')->get($mapping->filesystem);
+        // todo filesystem might be null
+        return $this->container->get('filesystem_locator')->get($mapping->filesystem());
     }
 
     /**

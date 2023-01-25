@@ -13,13 +13,16 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
+use Zenstruck\Filesystem\Doctrine\Types\FileType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageType;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RegisterDoctrineTypePass implements CompilerPassInterface
 {
+    public const TYPES = [FileType::class, ImageType::class];
+
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('doctrine.dbal.connection_factory.types')) {
@@ -29,7 +32,7 @@ final class RegisterDoctrineTypePass implements CompilerPassInterface
         /** @var array $typeDefinition */
         $typeDefinition = $container->getParameter('doctrine.dbal.connection_factory.types');
 
-        foreach (NodeMappingListener::TYPES as $type) {
+        foreach (self::TYPES as $type) {
             if (!isset($typeDefinition[$type::NAME])) {
                 $typeDefinition[$type::NAME] = ['class' => $type];
             }

@@ -12,13 +12,17 @@
 namespace Zenstruck\Filesystem\Doctrine\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
-use Zenstruck\Filesystem\Doctrine\Attribute\HasFiles;
-use Zenstruck\Filesystem\Doctrine\Attribute\Mapping;
+use Zenstruck\Filesystem\Doctrine\Mapping;
+use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
+use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
+use Zenstruck\Filesystem\Doctrine\Mapping\Stateless;
 use Zenstruck\Filesystem\Doctrine\Types\FileType;
 use Zenstruck\Filesystem\Doctrine\Types\ImageType;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
@@ -31,8 +35,6 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 final class NodeMappingListener
 {
     public const OPTION_KEY = '_zsfs';
-    public const TYPES = [FileType::class, ImageType::class];
-    private const TYPE_NAMES = [FileType::NAME, ImageType::NAME];
 
     /**
      * @param LoadClassMetadataEventArgs<ClassMetadata<object>,ObjectManager> $event
@@ -50,43 +52,44 @@ final class NodeMappingListener
             $collection = new HasFiles();
         }
 
-        foreach ($metadata->fieldMappings as $field => $config) {
-            if (!\in_array($config['type'], self::TYPE_NAMES, true)) {
+        foreach (self::mappedPropertiesFor($class) as [$property, $mapping]) {
+            $type = $property->getType();
+
+            if (!$type instanceof \ReflectionNamedType || !\in_array($nodeClass = $type->getName(), [File::class, Image::class])) {
+                throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s" or "%s" typehint (and not be a union/intersection).', $property->class, $property->name, File::class, Image::class));
+            }
+
+            if ($mapping instanceof Stateless) {
+                $collection->statelessMappings[$property->name] = [
+                    File::class === $nodeClass ? LazyFile::class : LazyImage::class,
+                    $mapping,
+                ];
+
                 continue;
             }
 
-            $class = isset($config['declared']) ? new \ReflectionClass($config['declared']) : $metadata->getReflectionClass();
-            $property = $class->getProperty($field);
+            \assert($mapping instanceof Stateful);
 
-            if (!$mapping = ($property->getAttributes(Mapping::class)[0] ?? null)?->newInstance()) {
-                try {
-                    $mapping = Mapping::fromArray($config['options'] ?? []);
-                } catch (\LogicException $e) {
-                    throw new \LogicException(\sprintf('Invalid mapping for %s::$%s (%s).', $metadata->name, $field, $e->getMessage()), previous: $e);
-                }
+            try {
+                $fieldMapping = $metadata->getFieldMapping($property->name);
+            } catch (MappingException) {
+                // no mapping set
+                $fieldMapping = [];
             }
 
-            $collection->mappings[$field] = $mapping;
+            if (!isset($fieldMapping['declared'])) {
+                // using inheritance mapping - field already mapped on parent
+                $metadata->mapField(\array_merge($fieldMapping, [
+                    'fieldName' => $property->name,
+                    'type' => File::class === $nodeClass ? FileType::NAME : ImageType::NAME,
+                    'nullable' => $type->allowsNull(),
+                ]));
+            }
+
+            $collection->statefulMappings[$property->name] = $mapping;
         }
 
-        // "virtual" columns
-        foreach (self::propertiesFor($metadata->getReflectionClass()) as $property) {
-            if (isset($metadata->fieldMappings[$property->name])) {
-                continue;
-            }
-
-            if (!$mapping = ($property->getAttributes(Mapping::class)[0] ?? null)?->newInstance()) {
-                continue;
-            }
-
-            if (!$mapping->namer) {
-                throw new \LogicException(\sprintf('Invalid virtual mapping for %s::$%s (A namer is required).', $metadata->name, $property->name));
-            }
-
-            $collection->virtualMappings[$property->name] = [self::determineVirtualClass($property), $mapping];
-        }
-
-        if (!$collection->mappings && !$collection->virtualMappings) {
+        if (!$collection->statelessMappings && !$collection->statefulMappings) {
             return;
         }
 
@@ -94,29 +97,17 @@ final class NodeMappingListener
     }
 
     /**
-     * @return class-string<LazyFile>
-     */
-    private static function determineVirtualClass(\ReflectionProperty $property): string
-    {
-        $type = $property->getType();
-
-        if ($type instanceof \ReflectionNamedType && Image::class === $type->getName()) {
-            return LazyImage::class;
-        }
-
-        return LazyFile::class;
-    }
-
-    /**
      * @param \ReflectionClass<object> $class
      *
-     * @return \ReflectionProperty[]
+     * @return iterable<array{0:\ReflectionProperty,1:Mapping}>
      */
-    private static function propertiesFor(\ReflectionClass $class): iterable
+    private static function mappedPropertiesFor(\ReflectionClass $class): iterable
     {
         do {
             foreach ($class->getProperties() as $property) {
-                yield $property;
+                if ($mapping = $property->getAttributes(Mapping::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
+                    yield [$property, $mapping->newInstance()];
+                }
             }
         } while ($class = $class->getParentClass());
     }

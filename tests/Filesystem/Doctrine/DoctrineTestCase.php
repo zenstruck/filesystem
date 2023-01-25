@@ -20,6 +20,7 @@ use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -36,5 +37,10 @@ abstract class DoctrineTestCase extends KernelTestCase implements FixtureFilesys
     protected function em(): EntityManagerInterface
     {
         return self::getContainer()->get(EntityManagerInterface::class);
+    }
+
+    protected function loadMappingFor(object $object): object
+    {
+        return (self::getContainer()->get(Service::class)->objectFileLoader)($object);
     }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Doctrine\Attribute;
+namespace Zenstruck\Filesystem\Doctrine;
 
 use Zenstruck\Filesystem\Node\File\Path\Expression;
 use Zenstruck\Filesystem\Node\File\Path\Namer;
@@ -17,46 +17,27 @@ use Zenstruck\Filesystem\Twig\Template;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @readonly
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Mapping
+abstract class Mapping
 {
-    public ?Namer $namer;
+    private ?Namer $namer;
 
     public function __construct(
-        public string $filesystem,
-
+        private ?string $filesystem = null,
         string|Namer|null $namer = null,
-
         array $namerContext = [],
-
-        /**
-         * Delete the file when object is removed?
-         */
-        public bool $deleteOnRemove = true,
-
-        /**
-         * Delete the old file when updated to a new one?
-         */
-        public bool $deleteOnUpdate = true,
     ) {
         $this->namer = self::parseNamer($namer, $namerContext);
     }
 
-    /**
-     * @internal
-     */
-    public static function fromArray(array $options): self
+    public function filesystem(): ?string
     {
-        return new self(
-            $options['filesystem'] ?? throw new \LogicException('The filesystem key must be set.'),
-            $options['namer'] ?? null,
-            $options['namerContext'] ?? [],
-            $options['deleteOnRemove'] ?? true,
-            $options['deleteOnUpdate'] ?? true,
-        );
+        return $this->filesystem;
+    }
+
+    public function namer(): ?Namer
+    {
+        return $this->namer;
     }
 
     private static function parseNamer(string|Namer|null $namer, array $context): ?Namer

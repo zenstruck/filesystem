@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Doctrine;
 
-use Zenstruck\Filesystem\Doctrine\ObjectFileLoader;
+use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity\Entity2;
@@ -21,7 +21,7 @@ use function Zenstruck\Foundry\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ObjectFileLoaderTest extends DoctrineTestCase
+final class FileMappingLoaderTest extends DoctrineTestCase
 {
     /**
      * @test
@@ -40,8 +40,8 @@ final class ObjectFileLoaderTest extends DoctrineTestCase
         $this->em()->clear();
 
         $fromDb = repository(Entity2::class)->first()->object();
-        $fromDb = self::getContainer()->get(ObjectFileLoader::class)($fromDb);
-        $fromDb = self::getContainer()->get(ObjectFileLoader::class)($fromDb); // ensure multiple calls work
+        $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb);
+        $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb); // ensure multiple calls work
 
         $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
         $this->assertSame('content1', $fromDb->getFile1()->contents());

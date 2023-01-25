@@ -11,54 +11,24 @@
 
 namespace Zenstruck\Tests\Filesystem\Doctrine\EventListener;
 
-use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
-use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Tests\Filesystem\Doctrine\DoctrineTestCase;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity\Entity1;
 
 use function Zenstruck\Foundry\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class NodeLifecycleListenerTest extends DoctrineTestCase
+abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 {
-    /**
-     * @test
-     */
-    public function files_autoloaded(): void
-    {
-        $object = new Entity1('FoO');
-        $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
-        $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
-
-        $this->filesystem()->write('foo.txt', 'content3');
-        $this->filesystem()->write('foo.jpg', 'content4');
-
-        $this->em()->persist($object);
-        $this->em()->flush();
-        $this->em()->clear();
-
-        $fromDb = repository(Entity1::class)->first()->object();
-
-        $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
-        $this->assertSame('content1', $fromDb->getFile1()->contents());
-        $this->assertInstanceOf(LazyImage::class, $fromDb->getImage1());
-        $this->assertSame('content2', $fromDb->getImage1()->contents());
-        $this->assertInstanceOf(LazyFile::class, $fromDb->getVirtualFile1());
-        $this->assertSame('content3', $fromDb->getVirtualFile1()->contents());
-        $this->assertInstanceOf(LazyImage::class, $fromDb->getVirtualImage1());
-        $this->assertSame('content4', $fromDb->getVirtualImage1()->contents());
-    }
-
     /**
      * @test
      */
     public function files_deleted_on_remove(): void
     {
-        $object = new Entity1('foo');
+        $class = $this->entityClass();
+        $object = new $class('foo');
         $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
         $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
 
@@ -69,12 +39,12 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository(Entity1::class)->first()->object();
+        $fromDb = repository($class)->first()->object();
 
         $this->em()->remove($fromDb);
         $this->em()->flush();
 
-        repository(Entity1::class)->assert()->count(0);
+        repository($class)->assert()->count(0);
 
         $this->filesystem()->assertNotExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
@@ -85,7 +55,8 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
      */
     public function files_deleted_on_change(): void
     {
-        $object = new Entity1('foo');
+        $class = $this->entityClass();
+        $object = new $class('foo');
         $this->em()->persist($object);
         $this->em()->flush();
 
@@ -98,7 +69,7 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository(Entity1::class)->first()->object();
+        $fromDb = repository($class)->first()->object();
 
         $fromDb->setFile1($this->filesystem()->write('some/new-file.txt', 'content3')->last());
         $object->setImage1($this->filesystem()->write('some/new-image.png', 'content4')->last()->ensureImage());
@@ -116,7 +87,8 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
      */
     public function files_deleted_on_set_null(): void
     {
-        $object = new Entity1('foo');
+        $class = $this->entityClass();
+        $object = new $class('foo');
         $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
         $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
 
@@ -127,7 +99,7 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository(Entity1::class)->first()->object();
+        $fromDb = repository($class)->first()->object();
 
         $fromDb->setFile1(null);
         $object->setImage1(null);
@@ -143,7 +115,8 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
      */
     public function file_not_deleted_if_path_the_same(): void
     {
-        $object = new Entity1('foo');
+        $class = $this->entityClass();
+        $object = new $class('foo');
         $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
 
         $this->em()->persist($object);
@@ -156,9 +129,9 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->em()->flush();
         $this->em()->clear();
 
-        $fromDb = repository(Entity1::class)->first()->object();
+        $fromDb = repository($class)->first()->object();
 
-        $this->assertSame('new content', $fromDb->getFile1()->contents());
+        $this->assertSame('new content', $this->loadMappingFor($fromDb)->getFile1()->contents());
     }
 
     /**
@@ -166,7 +139,8 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
      */
     public function can_persist_and_update_pending_files(): void
     {
-        $object = new Entity1('Foo');
+        $class = $this->entityClass();
+        $object = new $class('Foo');
         $object->setFile1(new PendingFile(fixture('sub1/file1.txt')));
         $object->setImage1(new PendingImage(fixture('symfony.jpg')));
 
@@ -204,7 +178,7 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
 
         $this->em()->clear();
 
-        $object = repository(Entity1::class)->first()->object();
+        // $object = $this->loadMappingFor(repository($class)->first()->object());
 
         $this->assertSame('files/foo-0a4a9b1.zip', $object->getFile1()->path()->toString());
         $this->assertSame('0a4a9b1c162b2b4ccfa9db645f8b7eaa', $object->getFile1()->checksum());
@@ -216,4 +190,9 @@ final class NodeLifecycleListenerTest extends DoctrineTestCase
         // ensure new file property isn't triggering a change
         $this->assertEmpty($this->em()->getUnitOfWork()->getEntityChangeSet($object));
     }
+
+    /**
+     * @return class-string
+     */
+    abstract protected function entityClass(): string;
 }

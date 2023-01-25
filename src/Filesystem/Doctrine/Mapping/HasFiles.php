@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Doctrine\Attribute;
+namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
 use Zenstruck\Filesystem\Node\File\LazyFile;
 
@@ -22,16 +22,16 @@ final class HasFiles
     /**
      * @internal
      *
-     * @var array<string,Mapping>
+     * @var array<string,Stateful>
      */
-    public array $mappings = [];
+    public array $statefulMappings = [];
 
     /**
      * @internal
      *
-     * @var array<string,array{0:class-string<LazyFile>,1:Mapping}>
+     * @var array<string,array{0:class-string<LazyFile>,1:Stateless}>
      */
-    public array $virtualMappings = [];
+    public array $statelessMappings = [];
 
     public function __construct(
         /**

@@ -30,7 +30,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
-use Zenstruck\Filesystem\Doctrine\ObjectFileLoader;
+use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -105,7 +105,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
         ;
 
-        $container->register(ObjectFileLoader::class)
+        $container->register(FileMappingLoader::class)
             ->setArguments([
                 new Reference('doctrine'),
                 new Reference('.zenstruck_filesystem.doctrine.lifecycle_listener'),

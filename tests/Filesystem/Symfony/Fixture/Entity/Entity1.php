@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zenstruck\Filesystem\Doctrine\Attribute\Mapping;
+use Zenstruck\Filesystem\Doctrine\Mapping as Filesystem;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
@@ -32,22 +32,21 @@ class Entity1
     #[ORM\Column(length: 255)]
     private string $title;
 
-    #[Mapping('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
-    #[ORM\Column(type: 'zs_file', nullable: true)]
+    #[Filesystem\StoreAsPath('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
     private ?File $file1 = null;
 
-    #[ORM\Column(type: 'zs_image', nullable: true, options: [
-        'filesystem' => 'public',
-        'namer' => 'expression:images/{this.title|slug}-{checksum:7}{ext}',
-        'deleteOnRemove' => false,
-        'deleteOnUpdate' => false,
-    ])]
+    #[Filesystem\StoreAsPath(
+        filesystem: 'public',
+        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        deleteOnRemove: false,
+        deleteOnUpdate: false,
+    )]
     private ?Image $image1 = null;
 
-    #[Mapping('public', namer: 'expression:{this.title|slug}.txt')]
+    #[Filesystem\Stateless('public', namer: 'expression:{this.title|slug}.txt')]
     private File $virtualFile1;
 
-    #[Mapping('public', namer: 'expression:{this.title|slug}.jpg')]
+    #[Filesystem\Stateless('public', namer: 'expression:{this.title|slug}.jpg')]
     private Image $virtualImage1;
 
     public function __construct(string $title)
