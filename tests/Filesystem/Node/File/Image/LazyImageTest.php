@@ -29,7 +29,7 @@ final class LazyImageTest extends LazyFileTest
     public function can_create_with_image_attributes(): void
     {
         $file = $this->createLazyFile([
-            'transformUrl' => [
+            'transform_url' => [
                 'filter1' => '/filter1',
                 'filter2' => '/filter2',
             ],

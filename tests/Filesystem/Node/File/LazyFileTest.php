@@ -79,6 +79,14 @@ class LazyFileTest extends TestCase
     /**
      * @test
      */
+    public function path_can_be_determined_from_dsn(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
     public function can_use_callable_for_path(): void
     {
         $count = 0;
@@ -144,12 +152,12 @@ class LazyFileTest extends TestCase
         $file = $this->createLazyFile([
             'path' => 'some/file.png',
             'dsn' => 'some:path',
-            'lastModified' => '2023-01-01',
+            'last_modified' => '2023-01-01',
             'visibility' => 'private',
-            'mimeType' => 'image/png',
+            'mime_type' => 'image/png',
             'size' => 72,
             'checksum' => 'foo',
-            'publicUrl' => 'http://example.com',
+            'public_url' => 'http://example.com',
         ]);
         $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
 

@@ -26,6 +26,10 @@ final class Operation
     public const CHMOD = 'chmod';
     public const MKDIR = 'mkdir';
 
+    private function __construct()
+    {
+    }
+
     /**
      * @return array<self::*>
      */

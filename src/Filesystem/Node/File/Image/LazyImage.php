@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,8 +24,8 @@ final class LazyImage extends LazyFile implements Image
 
     public function transformUrl(array|string $filter): string
     {
-        if (\is_string($filter) && isset($this->attributes[__FUNCTION__][$filter])) {
-            return $this->attributes[__FUNCTION__][$filter];
+        if (\is_string($filter) && isset($this->attributes[Metadata::TRANSFORM_URL][$filter])) {
+            return $this->attributes[Metadata::TRANSFORM_URL][$filter];
         }
 
         return $this->inner()->transformUrl($filter);
@@ -32,22 +33,22 @@ final class LazyImage extends LazyFile implements Image
 
     public function iptc(): array
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->iptc();
+        return $this->attributes[Metadata::IPTC] ?? $this->inner()->iptc();
     }
 
     public function height(): int
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->height();
+        return $this->attributes[Metadata::HEIGHT] ?? $this->inner()->height();
     }
 
     public function exif(): array
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->exif();
+        return $this->attributes[Metadata::EXIF] ?? $this->inner()->exif();
     }
 
     public function width(): int
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->width();
+        return $this->attributes[Metadata::WIDTH] ?? $this->inner()->width();
     }
 
     protected function inner(): Image

@@ -63,7 +63,7 @@ abstract class LazyNode implements Node
 
     public function path(): Path
     {
-        $this->path ??= $this->attributes[__FUNCTION__] ?? null;
+        $this->path ??= $this->attributes[Metadata::PATH] ?? null;
 
         if ($this->path instanceof Path) {
             return $this->path;
@@ -82,19 +82,19 @@ abstract class LazyNode implements Node
 
     public function dsn(): string
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->dsn();
+        return $this->attributes[Metadata::DSN] ?? $this->inner()->dsn();
     }
 
     public function lastModified(): \DateTimeImmutable
     {
-        if (!isset($this->attributes[__FUNCTION__])) {
+        if (!isset($this->attributes[Metadata::LAST_MODIFIED])) {
             return $this->inner()->lastModified();
         }
 
-        $lastModified = $this->attributes[__FUNCTION__];
+        $lastModified = $this->attributes[Metadata::LAST_MODIFIED];
 
         if ($lastModified instanceof \DateTimeImmutable) {
-            return $this->attributes[__FUNCTION__];
+            return $this->attributes[Metadata::LAST_MODIFIED];
         }
 
         $lastModified = \is_numeric($lastModified) ? \DateTimeImmutable::createFromFormat('U', (string) $lastModified) : new \DateTimeImmutable($lastModified);
@@ -104,12 +104,12 @@ abstract class LazyNode implements Node
 
     public function visibility(): string
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->visibility();
+        return $this->attributes[Metadata::VISIBILITY] ?? $this->inner()->visibility();
     }
 
     public function mimeType(): string
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->mimeType();
+        return $this->attributes[Metadata::MIME_TYPE] ?? $this->inner()->mimeType();
     }
 
     public function exists(): bool

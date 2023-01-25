@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\LazyNode;
+use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,17 +24,17 @@ class LazyFile extends LazyNode implements File
 
     public function size(): int
     {
-        return $this->attributes[__FUNCTION__] ?? $this->inner()->size();
+        return $this->attributes[Metadata::SIZE] ?? $this->inner()->size();
     }
 
     public function checksum(?string $algo = null): string
     {
-        if (null === $algo && \is_string($this->attributes[__FUNCTION__] ?? null)) {
-            return $this->attributes[__FUNCTION__];
+        if (null === $algo && \is_string($this->attributes[Metadata::CHECKSUM] ?? null)) {
+            return $this->attributes[Metadata::CHECKSUM];
         }
 
-        if ($algo && isset($this->attributes[__FUNCTION__][$algo])) {
-            return $this->attributes[__FUNCTION__][$algo];
+        if ($algo && isset($this->attributes[Metadata::CHECKSUM][$algo])) {
+            return $this->attributes[Metadata::CHECKSUM][$algo];
         }
 
         return $this->inner()->checksum($algo);
@@ -41,8 +42,8 @@ class LazyFile extends LazyNode implements File
 
     public function publicUrl(array $config = []): string
     {
-        if (!$config && isset($this->attributes[__FUNCTION__])) {
-            return $this->attributes[__FUNCTION__];
+        if (!$config && isset($this->attributes[Metadata::PUBLIC_URL])) {
+            return $this->attributes[Metadata::PUBLIC_URL];
         }
 
         return $this->inner()->publicUrl($config);
