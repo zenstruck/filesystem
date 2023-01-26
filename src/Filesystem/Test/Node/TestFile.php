@@ -99,8 +99,8 @@ class TestFile extends TestNode implements File
         }
 
         if ($this instanceof Image) {
-            $what['image']['height'] = $this->height();
-            $what['image']['width'] = $this->width();
+            $what['image']['height'] = $this->dimensions()->height();
+            $what['image']['width'] = $this->dimensions()->width();
         }
 
         \function_exists('dump') ? dump($what) : \var_dump($what);

@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Image\Dimensions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -31,24 +32,32 @@ final class LazyImage extends LazyFile implements Image
         return $this->inner()->transformUrl($filter);
     }
 
+    public function dimensions(): Dimensions
+    {
+        if (!isset($this->attributes[Metadata::DIMENSIONS])) {
+            return $this->inner()->dimensions();
+        }
+
+        $dimensions = $this->attributes[Metadata::DIMENSIONS];
+
+        if ($dimensions instanceof Dimensions) {
+            return $dimensions;
+        }
+
+        $dimensions[0] = $dimensions['width'] ?? $dimensions[0];
+        $dimensions[1] = $dimensions['height'] ?? $dimensions[1];
+
+        return $this->attributes[Metadata::DIMENSIONS] = new Dimensions($dimensions);
+    }
+
     public function iptc(): array
     {
         return $this->attributes[Metadata::IPTC] ?? $this->inner()->iptc();
     }
 
-    public function height(): int
-    {
-        return $this->attributes[Metadata::HEIGHT] ?? $this->inner()->height();
-    }
-
     public function exif(): array
     {
         return $this->attributes[Metadata::EXIF] ?? $this->inner()->exif();
-    }
-
-    public function width(): int
-    {
-        return $this->attributes[Metadata::WIDTH] ?? $this->inner()->width();
     }
 
     protected function inner(): Image

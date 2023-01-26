@@ -26,13 +26,13 @@ trait ImageTests
     {
         $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
 
-        $this->assertSame(678, $image->height());
-        $this->assertSame(563, $image->width());
-        $this->assertSame($image->width() * $image->height(), $image->pixels());
-        $this->assertSame($image->width() / $image->height(), $image->aspectRatio());
-        $this->assertSame($image->height() === $image->width(), $image->isSquare());
-        $this->assertSame($image->height() < $image->width(), $image->isLandscape());
-        $this->assertSame($image->height() > $image->width(), $image->isPortrait());
+        $this->assertSame(678, $image->dimensions()->height());
+        $this->assertSame(563, $image->dimensions()->width());
+        $this->assertSame($image->dimensions()->width() * $image->dimensions()->height(), $image->dimensions()->pixels());
+        $this->assertSame($image->dimensions()->width() / $image->dimensions()->height(), $image->dimensions()->aspectRatio());
+        $this->assertSame($image->dimensions()->height() === $image->dimensions()->width(), $image->dimensions()->isSquare());
+        $this->assertSame($image->dimensions()->height() < $image->dimensions()->width(), $image->dimensions()->isLandscape());
+        $this->assertSame($image->dimensions()->height() > $image->dimensions()->width(), $image->dimensions()->isPortrait());
     }
 
     /**
@@ -55,8 +55,8 @@ trait ImageTests
 
         $transformed = $image->transform(fn(InterventionImage $image) => $image->widen(100));
 
-        $this->assertSame(100, $transformed->width());
-        $this->assertSame(563, $image->refresh()->width());
+        $this->assertSame(100, $transformed->dimensions()->width());
+        $this->assertSame(563, $image->refresh()->dimensions()->width());
     }
 
     /**

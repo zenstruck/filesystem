@@ -33,8 +33,7 @@ final class LazyImageTest extends LazyFileTest
                 'filter1' => '/filter1',
                 'filter2' => '/filter2',
             ],
-            'height' => 22,
-            'width' => 48,
+            'dimensions' => [48, 22],
             'exif' => [
                 'foo' => 'bar',
             ],
@@ -45,15 +44,47 @@ final class LazyImageTest extends LazyFileTest
 
         $this->assertSame('/filter1', $file->transformUrl('filter1'));
         $this->assertSame('/filter2', $file->transformUrl('filter2'));
-        $this->assertSame(22, $file->height());
-        $this->assertSame(48, $file->width());
-        $this->assertFalse($file->isPortrait());
-        $this->assertFalse($file->isSquare());
-        $this->assertTrue($file->isLandscape());
-        $this->assertSame(1056, $file->pixels());
-        $this->assertSame(2.18, \round($file->aspectRatio(), 2));
+        $this->assertSame(22, $file->dimensions()->height());
+        $this->assertSame(48, $file->dimensions()->width());
+        $this->assertFalse($file->dimensions()->isPortrait());
+        $this->assertFalse($file->dimensions()->isSquare());
+        $this->assertTrue($file->dimensions()->isLandscape());
+        $this->assertSame(1056, $file->dimensions()->pixels());
+        $this->assertSame(2.18, \round($file->dimensions()->aspectRatio(), 2));
         $this->assertSame(['foo' => 'bar'], $file->exif());
         $this->assertSame(['baz' => 'foo'], $file->iptc());
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_with_image_dimensions_as_assoc_array(): void
+    {
+        $file = $this->createLazyFile([
+            'dimensions' => [
+                'width' => 48,
+                'height' => 22,
+            ],
+        ]);
+
+        $this->assertSame(22, $file->dimensions()->height());
+        $this->assertSame(48, $file->dimensions()->width());
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_with_image_dimensions_as_assoc_array_reversed(): void
+    {
+        $file = $this->createLazyFile([
+            'dimensions' => [
+                'height' => 22,
+                'width' => 48,
+            ],
+        ]);
+
+        $this->assertSame(22, $file->dimensions()->height());
+        $this->assertSame(48, $file->dimensions()->width());
     }
 
     protected function createLazyFile(string|callable|array|null $attributes = null): LazyImage

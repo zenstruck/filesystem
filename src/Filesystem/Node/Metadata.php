@@ -27,8 +27,7 @@ final class Metadata
     public const CHECKSUM = 'checksum';
     public const PUBLIC_URL = 'public_url';
     public const TRANSFORM_URL = 'transform_url';
-    public const HEIGHT = 'height';
-    public const WIDTH = 'width';
+    public const DIMENSIONS = 'dimensions';
     public const EXIF = 'exif';
     public const IPTC = 'iptc';
 

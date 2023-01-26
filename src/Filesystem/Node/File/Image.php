@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Image as LocalImage;
+use Zenstruck\Image\Dimensions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -29,19 +30,7 @@ interface Image extends File
      */
     public function transform(callable|object $filter, array $options = []): PendingImage;
 
-    public function height(): int;
-
-    public function width(): int;
-
-    public function aspectRatio(): float;
-
-    public function pixels(): int;
-
-    public function isSquare(): bool;
-
-    public function isPortrait(): bool;
-
-    public function isLandscape(): bool;
+    public function dimensions(): Dimensions;
 
     public function exif(): array;
 

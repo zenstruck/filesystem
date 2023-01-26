@@ -12,7 +12,7 @@
 namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Image as LocalImage;
-use Zenstruck\Image\CalculatedProperties;
+use Zenstruck\Image\Dimensions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -21,8 +21,6 @@ use Zenstruck\Image\CalculatedProperties;
  */
 trait DecoratedImage
 {
-    use CalculatedProperties;
-
     private ?LocalImage $localImage = null;
 
     public function transformUrl(array|string $filter): string
@@ -35,24 +33,19 @@ trait DecoratedImage
         return $this->inner()->transform($filter, $options);
     }
 
+    public function dimensions(): Dimensions
+    {
+        return $this->localImage()->dimensions();
+    }
+
     public function iptc(): array
     {
         return $this->localImage()->iptc();
     }
 
-    public function height(): int
-    {
-        return $this->localImage()->height();
-    }
-
     public function exif(): array
     {
         return $this->localImage()->exif();
-    }
-
-    public function width(): int
-    {
-        return $this->localImage()->width();
     }
 
     public function tempFile(): LocalImage

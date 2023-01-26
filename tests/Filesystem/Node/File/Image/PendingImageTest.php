@@ -37,12 +37,12 @@ final class PendingImageTest extends PendingFileTest
     {
         $image = $this->createPendingFile(TempFile::for(fixture('symfony.png')), 'noop');
 
-        $this->assertSame(563, $image->width());
+        $this->assertSame(563, $image->dimensions()->width());
 
         $transformed = $image->transformInPlace(fn(InterventionImage $image) => $image->widen(100));
 
         $this->assertSame($transformed, $image);
-        $this->assertSame(100, $image->width());
+        $this->assertSame(100, $image->dimensions()->width());
     }
 
     protected function pendingFileClass(): string

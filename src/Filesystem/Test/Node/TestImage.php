@@ -30,14 +30,14 @@ final class TestImage extends TestNode implements Image
 
     public function assertHeight(int $expected): self
     {
-        Assert::that($this->height())->is($expected, 'Expected height to be {expected} but is actually {actual}.');
+        Assert::that($this->dimensions()->height())->is($expected, 'Expected height to be {expected} but is actually {actual}.');
 
         return $this;
     }
 
     public function assertWidth(int $expected): self
     {
-        Assert::that($this->width())->is($expected, 'Expected width to be {expected} but is actually {actual}.');
+        Assert::that($this->dimensions()->width())->is($expected, 'Expected width to be {expected} but is actually {actual}.');
 
         return $this;
     }
