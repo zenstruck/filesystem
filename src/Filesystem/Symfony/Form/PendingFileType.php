@@ -19,16 +19,15 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PendingFileType extends AbstractType
+class PendingFileType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    final public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(
             eventName: FormEvents::PRE_SUBMIT,
@@ -39,7 +38,7 @@ final class PendingFileType extends AbstractType
 
                 if (!$options['multiple']) {
                     if ($formData instanceof File) {
-                        $event->setData(self::pendingFileFactory($options, $formData));
+                        $event->setData(static::pendingFileFactory($formData));
                     }
 
                     return;
@@ -49,7 +48,7 @@ final class PendingFileType extends AbstractType
 
                 foreach ($formData as $file) {
                     if ($file instanceof File) {
-                        $data[] = self::pendingFileFactory($options, $file);
+                        $data[] = static::pendingFileFactory($file);
                     }
                 }
 
@@ -59,30 +58,30 @@ final class PendingFileType extends AbstractType
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    final public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'data_class' => function(Options $options) {
-                    if ($options['multiple']) {
-                        return null;
-                    }
-
-                    return $options['image'] ? PendingImage::class : PendingFile::class;
-                },
-                'image' => false,
+                'data_class' => fn(Options $options) => $options['multiple'] ? null : static::pendingFileType(),
             ])
-            ->setAllowedTypes('image', 'bool')
         ;
     }
 
-    public function getParent(): string
+    final public function getParent(): string
     {
         return FileType::class;
     }
 
-    private static function pendingFileFactory(array $options, \SplFileInfo $file): PendingFile
+    /**
+     * @return class-string<PendingFile>
+     */
+    protected static function pendingFileType(): string
     {
-        return $options['image'] ? new PendingImage($file) : new PendingFile($file);
+        return PendingFile::class;
+    }
+
+    protected static function pendingFileFactory(\SplFileInfo $file): PendingFile
+    {
+        return new PendingFile($file);
     }
 }

@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Filesystem\Glide\GlideTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
+use Zenstruck\Filesystem\Symfony\Form\PendingImageType;
 use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
@@ -40,8 +41,7 @@ final class TestKernel extends Kernel
     public function submitForm(Request $request, FormFactoryInterface $factory): Response
     {
         $form = $factory->createBuilder()
-            ->add('file', PendingFileType::class, [
-                'image' => $request->query->has('image'),
+            ->add('file', $request->query->has('image') ? PendingImageType::class : PendingFileType::class, [
                 'multiple' => $request->query->has('multiple'),
             ])
             ->getForm()

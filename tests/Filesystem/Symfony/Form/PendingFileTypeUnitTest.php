@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
+use Zenstruck\Filesystem\Symfony\Form\PendingImageType;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,7 +43,7 @@ final class PendingFileTypeUnitTest extends TypeTestCase
      */
     public function set_data_image(): void
     {
-        $form = $this->factory->create(PendingFileType::class, options: ['image' => true]);
+        $form = $this->factory->create(PendingImageType::class);
 
         $data = new PendingImage(fixture('symfony.png'));
 
@@ -73,7 +74,7 @@ final class PendingFileTypeUnitTest extends TypeTestCase
      */
     public function set_data_multiple_image(): void
     {
-        $form = $this->factory->create(PendingFileType::class, options: ['multiple' => true, 'image' => true]);
+        $form = $this->factory->create(PendingImageType::class, options: ['multiple' => true]);
 
         $data = [
             new PendingImage(fixture('symfony.png')),
@@ -107,7 +108,7 @@ final class PendingFileTypeUnitTest extends TypeTestCase
      */
     public function submit_image(): void
     {
-        $form = $this->factory->createBuilder(PendingFileType::class, options: ['image' => true])
+        $form = $this->factory->createBuilder(PendingImageType::class)
             ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm()
         ;
@@ -148,7 +149,7 @@ final class PendingFileTypeUnitTest extends TypeTestCase
      */
     public function submit_multiple_image(): void
     {
-        $form = $this->factory->createBuilder(PendingFileType::class, options: ['multiple' => true, 'image' => true])
+        $form = $this->factory->createBuilder(PendingImageType::class, options: ['multiple' => true])
             ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm()
         ;
