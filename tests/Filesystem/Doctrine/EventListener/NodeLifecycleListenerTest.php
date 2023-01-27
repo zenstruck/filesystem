@@ -33,7 +33,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
 
         $this->em()->persist($object);
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
         $this->filesystem()->assertExists('some/file.txt');
@@ -58,12 +58,12 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $class = $this->entityClass();
         $object = new $class('foo');
         $this->em()->persist($object);
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
 
         $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
         $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
 
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
         $this->filesystem()->assertExists('some/file.txt');
@@ -74,7 +74,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $fromDb->setFile1($this->filesystem()->write('some/new-file.txt', 'content3')->last());
         $object->setImage1($this->filesystem()->write('some/new-image.png', 'content4')->last()->ensureImage());
 
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
 
         $this->filesystem()->assertExists('some/new-file.txt');
         $this->filesystem()->assertExists('some/new-image.png');
@@ -93,7 +93,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
 
         $this->em()->persist($object);
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
         $this->filesystem()->assertExists('some/file.txt');
@@ -104,7 +104,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $fromDb->setFile1(null);
         $object->setImage1(null);
 
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
 
         $this->filesystem()->assertNotExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
@@ -120,13 +120,13 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last());
 
         $this->em()->persist($object);
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
 
         $this->assertSame('content1', $object->getFile1()->contents());
 
         $object->setFile1($this->filesystem()->write('some/file.txt', 'new content')->last());
 
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
         $fromDb = repository($class)->first()->object();
@@ -145,11 +145,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $object->setImage1(new PendingImage(fixture('symfony.jpg')));
 
         $this->em()->persist($object);
-        $this->em()->flush();
-        $this->em()->getUnitOfWork()->computeChangeSets();
-
-        // ensure new file property isn't triggering a change
-        $this->assertEmpty($this->em()->getUnitOfWork()->getEntityChangeSet($object));
+        $this->flushAndAssertNoChangesFor($object);
 
         $this->filesystem()->assertSame('files/foo-d41d8cd.txt', 'fixture://sub1/file1.txt');
         $this->filesystem()->assertSame('images/foo-42890a2.jpg', 'fixture://symfony.jpg');
@@ -161,11 +157,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $object->setFile1(new PendingFile(fixture('archive.zip')));
         $object->setImage1(new PendingImage(fixture('symfony.png')));
 
-        $this->em()->flush();
-        $this->em()->getUnitOfWork()->computeChangeSets();
-
-        // ensure new file property isn't triggering a change
-        $this->assertEmpty($this->em()->getUnitOfWork()->getEntityChangeSet($object));
+        $this->flushAndAssertNoChangesFor($object);
 
         $this->filesystem()->assertNotExists('files/foo-d41d8cd.txt');
         $this->filesystem()->assertExists('images/foo-42890a2.jpg');
@@ -178,17 +170,10 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
         $this->em()->clear();
 
-        // $object = $this->loadMappingFor(repository($class)->first()->object());
-
         $this->assertSame('files/foo-0a4a9b1.zip', $object->getFile1()->path()->toString());
         $this->assertSame('0a4a9b1c162b2b4ccfa9db645f8b7eaa', $object->getFile1()->checksum());
         $this->assertSame('images/foo-ac6884f.png', $object->getImage1()->path()->toString());
         $this->assertSame('ac6884fc84724d792649552e7211843a', $object->getImage1()->checksum());
-
-        $this->em()->getUnitOfWork()->computeChangeSets();
-
-        // ensure new file property isn't triggering a change
-        $this->assertEmpty($this->em()->getUnitOfWork()->getEntityChangeSet($object));
     }
 
     /**

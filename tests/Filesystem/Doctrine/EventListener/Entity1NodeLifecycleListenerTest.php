@@ -36,7 +36,7 @@ final class Entity1NodeLifecycleListenerTest extends NodeLifecycleListenerTest
         $this->filesystem()->write('foo.jpg', 'content4');
 
         $this->em()->persist($object);
-        $this->em()->flush();
+        $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
         $fromDb = repository($class)->first()->object();

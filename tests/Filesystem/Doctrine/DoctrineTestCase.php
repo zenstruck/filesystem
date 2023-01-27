@@ -34,6 +34,18 @@ abstract class DoctrineTestCase extends KernelTestCase implements FixtureFilesys
         return FIXTURE_DIR;
     }
 
+    protected function flushAndAssertNoChangesFor(object $object): void
+    {
+        $this->em()->flush();
+        $this->assertNoChangesFor($object);
+    }
+
+    protected function assertNoChangesFor(object $object): void
+    {
+        $this->em()->getUnitOfWork()->computeChangeSets();
+        $this->assertEmpty($this->em()->getUnitOfWork()->getEntityChangeSet($object));
+    }
+
     protected function em(): EntityManagerInterface
     {
         return self::getContainer()->get(EntityManagerInterface::class);
