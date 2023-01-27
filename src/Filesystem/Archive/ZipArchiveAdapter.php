@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Flysystem\Adapter\ZipArchive;
+namespace Zenstruck\Filesystem\Archive;
 
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;

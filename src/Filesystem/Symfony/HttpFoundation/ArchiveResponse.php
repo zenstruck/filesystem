@@ -13,7 +13,7 @@ namespace Zenstruck\Filesystem\Symfony\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
-use Zenstruck\Filesystem\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ArchiveFile;
 use Zenstruck\Filesystem\Node;
 
 /**

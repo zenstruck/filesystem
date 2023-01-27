@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem;
+namespace Zenstruck\Filesystem\Archive;
 
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as BaseZipArchiveAdapter;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Flysystem\Adapter\ZipArchive\TransactionalZipArchiveProvider;
-use Zenstruck\Filesystem\Flysystem\Adapter\ZipArchive\ZipArchiveAdapter;
+use Zenstruck\Filesystem\DecoratedFilesystem;
+use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\TempFile;

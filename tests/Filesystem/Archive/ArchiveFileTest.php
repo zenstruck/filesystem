@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem;
+namespace Zenstruck\Tests\Filesystem\Archive;
 
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ArchiveFile;
 use Zenstruck\Tests\FilesystemTest;
 use Zenstruck\Tests\InteractsWithTempDirectory;
 
