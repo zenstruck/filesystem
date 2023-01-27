@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
@@ -65,12 +66,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw new UnexpectedValueException('Data must be a string.');
         }
 
-        $filesystem = null;
-        $path = $data;
-
-        if (2 === \count($parts = \explode('://', $data, 2))) {
-            [$filesystem, $path] = $parts;
-        }
+        [$filesystem, $path] = Dsn::normalize($data);
 
         if (isset($context[self::FILESYSTEM_KEY])) {
             $filesystem = $context[self::FILESYSTEM_KEY]; // context always takes priority

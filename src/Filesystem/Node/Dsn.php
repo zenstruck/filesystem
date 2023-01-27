@@ -16,7 +16,7 @@ namespace Zenstruck\Filesystem\Node;
  */
 final class Dsn implements \Stringable
 {
-    /** @var array{0:string,1:string} */
+    /** @var array{0:string|null,1:string} */
     private array $parts;
 
     private function __construct(private string $value)
@@ -38,6 +38,18 @@ final class Dsn implements \Stringable
         return new self("{$filesystem}://{$path}");
     }
 
+    /**
+     * @return array{0:string|null,1:string}
+     */
+    public static function normalize(string $value): array
+    {
+        if (2 === \count($parts = \explode('://', $value, 2))) {
+            return $parts; // @phpstan-ignore-line
+        }
+
+        return [null, $value];
+    }
+
     public function toString(): string
     {
         return $this->value;
@@ -45,7 +57,7 @@ final class Dsn implements \Stringable
 
     public function filesystem(): string
     {
-        return $this->parts()[0];
+        return $this->parts()[0] ?? throw new \InvalidArgumentException(\sprintf('"%s" is an invalid DSN value.', $this->value));
     }
 
     public function path(): Path
@@ -54,18 +66,10 @@ final class Dsn implements \Stringable
     }
 
     /**
-     * @return array{0:string,1:string}
+     * @return array{0:string|null,1:string}
      */
     private function parts(): array
     {
-        if (isset($this->parts)) {
-            return $this->parts;
-        }
-
-        if (2 !== \count($this->parts = \explode('://', $this->value, 2))) { // @phpstan-ignore-line
-            throw new \InvalidArgumentException(\sprintf('"%s" is an invalid DSN value.', $this->value));
-        }
-
-        return $this->parts; // @phpstan-ignore-line
+        return $this->parts ??= self::normalize($this->value);
     }
 }

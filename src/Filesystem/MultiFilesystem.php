@@ -17,6 +17,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
 use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 
@@ -211,11 +212,7 @@ final class MultiFilesystem implements Filesystem
      */
     private function parsePath(string $path): array
     {
-        $parts = \explode('://', $path, 2);
-
-        if (2 !== \count($parts)) {
-            return [$this->last = $this->get(), $path];
-        }
+        $parts = Dsn::normalize($path);
 
         return [$this->last = $this->get($parts[0]), $parts[1]];
     }
