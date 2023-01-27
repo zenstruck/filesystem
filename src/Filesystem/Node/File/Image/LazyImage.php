@@ -44,9 +44,6 @@ final class LazyImage extends LazyFile implements Image
             return $dimensions;
         }
 
-        $dimensions[0] = $dimensions['width'] ?? $dimensions[0];
-        $dimensions[1] = $dimensions['height'] ?? $dimensions[1];
-
         return $this->attributes[Metadata::DIMENSIONS] = new Dimensions($dimensions);
     }
 
