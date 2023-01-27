@@ -22,12 +22,13 @@ use Zenstruck\Filesystem\Node\File\Path\Namer;
 abstract class Stateful extends Mapping
 {
     public function __construct(
+        string|array $metadata,
         ?string $filesystem = null,
         string|Namer|null $namer = null,
         array $namerContext = [],
         public bool $deleteOnRemove = true,
         public bool $deleteOnUpdate = true,
     ) {
-        parent::__construct($filesystem, $namer, $namerContext);
+        parent::__construct($metadata, $filesystem, $namer, $namerContext);
     }
 }

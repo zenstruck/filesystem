@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class FileType extends StringType
+class FileStringType extends StringType
 {
     public const NAME = 'zs_file';
 
@@ -43,9 +43,9 @@ class FileType extends StringType
         return \is_string($value) ? $this->createFile($value) : null;
     }
 
-    public function getName(): string
+    final public function getName(): string
     {
-        return self::NAME;
+        return static::NAME;
     }
 
     final public function requiresSQLCommentHint(AbstractPlatform $platform): bool

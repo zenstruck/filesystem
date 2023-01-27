@@ -37,11 +37,74 @@ final class Metadata
     public const EXIF = 'exif';
     public const IPTC = 'iptc';
 
+    private const STRING_METADATA = [self::PATH, self::DSN];
+    private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::MIME_TYPE];
+    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL];
+    private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
+
     private function __construct()
     {
     }
 
     /**
+     * @internal
+     *
+     * @param class-string<Node> $class
+     *
+     * @return Format
+     */
+    public static function validate(string $class, array|string $metadata): array|string
+    {
+        if (\is_string($metadata)) {
+            if (\in_array($metadata, self::STRING_METADATA, true)) {
+                return $metadata;
+            }
+
+            throw new \LogicException(\sprintf('Metadata "%s" cannot be used as a string.', $metadata));
+        }
+
+        if (!$metadata) {
+            throw new \LogicException('Metadata cannot be empty.');
+        }
+
+        foreach ($metadata as $key => $value) {
+            if (\in_array($value, self::NODE_METADATA, true)) {
+                continue;
+            }
+
+            if (\in_array($value, self::FILE_METADATA, true)) {
+                if (!\is_a($class, File::class, true)) {
+                    throw new \LogicException(\sprintf('Metadata "%s" can only be used with files.', $value));
+                }
+
+                continue;
+            }
+
+            if (\in_array($value, self::IMAGE_METADATA, true)) {
+                if (!\is_a($class, Image::class, true)) {
+                    throw new \LogicException(\sprintf('Metadata "%s" can only be used with images.', $value));
+                }
+
+                continue;
+            }
+
+            if (self::CHECKSUM === $key) {
+                continue;
+            }
+
+            if (self::TRANSFORM_URL === $key && (\is_array($value) || \is_string($value))) {
+                continue;
+            }
+
+            throw new \LogicException(\sprintf('Metadata "%s:%s" is invalid.', $key, $value));
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * @internal
+     *
      * @param Format $metadata
      *
      * @return Serialized

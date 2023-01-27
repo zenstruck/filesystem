@@ -17,14 +17,9 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ImageType extends FileType
+final class ImageStringType extends FileStringType
 {
     public const NAME = 'zs_image';
-
-    public function getName(): string
-    {
-        return self::NAME;
-    }
 
     protected function createFile(string $path): LazyFile
     {

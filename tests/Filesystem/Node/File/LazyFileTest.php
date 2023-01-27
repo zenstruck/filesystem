@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Node\File;
 
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Filesystem\Node\FileTests;
@@ -195,14 +196,23 @@ class LazyFileTest extends TestCase
 
     /**
      * @test
+     * @dataProvider dsnProvider
      */
-    public function path_can_be_determined_from_dsn(): void
+    public function can_create_from_dsn(array|string|Dsn|callable $dsn): void
     {
-        $file = $this->createLazyFile([
-            'dsn' => 'public://some/file.png',
-        ]);
+        $file = $this->createLazyFile($dsn);
 
         $this->assertSame('some/file.png', $file->path()->toString());
+        $this->assertSame('public://some/file.png', $file->dsn()->toString());
+    }
+
+    public static function dsnProvider(): iterable
+    {
+        yield ['public://some/file.png'];
+        yield [Dsn::wrap('public://some/file.png')];
+        yield [fn() => 'public://some/file.png'];
+        yield [fn() => Dsn::wrap('public://some/file.png')];
+        yield [['dsn' => 'public://some/file.png']];
     }
 
     protected function createLazyFile(string|callable|array|null $attributes = null): LazyFile

@@ -20,12 +20,14 @@ use Zenstruck\Filesystem\Doctrine\Mapping;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateless;
-use Zenstruck\Filesystem\Doctrine\Types\FileType;
-use Zenstruck\Filesystem\Doctrine\Types\ImageType;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsPath;
+use Zenstruck\Filesystem\Doctrine\Types\FileStringType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageStringType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -70,6 +72,8 @@ final class NodeMappingListener
 
             \assert($mapping instanceof Stateful);
 
+            Metadata::validate($nodeClass, $mapping->metadata); // @phpstan-ignore-line
+
             try {
                 $fieldMapping = $metadata->getFieldMapping($property->name);
             } catch (MappingException) {
@@ -81,7 +85,7 @@ final class NodeMappingListener
                 // using inheritance mapping - field already mapped on parent
                 $metadata->mapField(\array_merge($fieldMapping, [
                     'fieldName' => $property->name,
-                    'type' => File::class === $nodeClass ? FileType::NAME : ImageType::NAME,
+                    'type' => self::doctrineTypeFor($mapping, $nodeClass), // @phpstan-ignore-line
                     'nullable' => $type->allowsNull(),
                 ]));
             }
@@ -94,6 +98,18 @@ final class NodeMappingListener
         }
 
         $metadata->table['options'][self::OPTION_KEY] = $collection;
+    }
+
+    /**
+     * @param class-string<File>|class-string<Image> $nodeClass
+     */
+    private static function doctrineTypeFor(Stateful $mapping, string $nodeClass): string
+    {
+        if ($mapping instanceof StoreAsPath) {
+            return File::class === $nodeClass ? FileStringType::NAME : ImageStringType::NAME;
+        }
+
+        throw new \LogicException('Invalid mapping');
     }
 
     /**

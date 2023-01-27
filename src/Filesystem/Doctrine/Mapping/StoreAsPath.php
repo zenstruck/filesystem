@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
 use Zenstruck\Filesystem\Node\File\Path\Namer;
+use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,9 +25,9 @@ final class StoreAsPath extends Stateful
         string|Namer|null $namer = null,
         array $namerContext = [],
         bool $deleteOnRemove = true,
-        bool $deleteOnUpdate = true
+        bool $deleteOnUpdate = true,
     ) {
-        parent::__construct($filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
+        parent::__construct(Metadata::PATH, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
     }
 
     public function filesystem(): string
