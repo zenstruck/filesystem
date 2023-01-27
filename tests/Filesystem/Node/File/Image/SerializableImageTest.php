@@ -11,8 +11,8 @@
 
 namespace Zenstruck\Tests\Filesystem\Node\File\Image;
 
-use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
+use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Tests\Filesystem\Node\File\ImageTests;
 use Zenstruck\Tests\Filesystem\Node\File\SerializableFileTest;
 
@@ -23,8 +23,62 @@ final class SerializableImageTest extends SerializableFileTest
 {
     use ImageTests;
 
-    protected function createFile(\SplFileInfo $file, string $path): Image
+    /**
+     * @test
+     */
+    public function serialize_metadata(): void
     {
-        return new SerializableImage($this->filesystem->write($path, $file)->last()->ensureImage(), []);
+        $serialized = $this->createFile(fixture('metadata.jpg'), 'some/image.jpg', [
+            Metadata::EXIF,
+            Metadata::IPTC,
+        ])->serialize();
+
+        $this->assertSame(16, $serialized['exif']['computed.Height']);
+        $this->assertSame('Lorem Ipsum', $serialized['iptc']['DocumentTitle']);
+    }
+
+    protected function serializedProvider(): iterable
+    {
+        yield from parent::serializedProvider();
+
+        yield [
+            $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
+                Metadata::DIMENSIONS,
+            ]),
+            [
+                'dimensions' => [
+                    'width' => 563,
+                    'height' => 678,
+                ],
+            ],
+        ];
+
+        yield [
+            $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
+                Metadata::TRANSFORM_URL => 'grayscale',
+            ]),
+            [
+                'transform_url' => [
+                    'grayscale' => '/generate/some/image.jpg?filter=grayscale',
+                ],
+            ],
+        ];
+
+        yield [
+            $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
+                Metadata::TRANSFORM_URL => ['grayscale', 'thumbnail'],
+            ]),
+            [
+                'transform_url' => [
+                    'grayscale' => '/generate/some/image.jpg?filter=grayscale',
+                    'thumbnail' => '/generate/some/image.jpg?filter=thumbnail',
+                ],
+            ],
+        ];
+    }
+
+    protected function createFile(\SplFileInfo $file, string $path, string|array $metadata = []): SerializableImage
+    {
+        return new SerializableImage($this->filesystem->write($path, $file)->last()->ensureImage(), $metadata);
     }
 }

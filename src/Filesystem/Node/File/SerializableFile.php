@@ -13,45 +13,39 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\DecoratedNode;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type Format from Metadata
+ * @phpstan-import-type Serialized from Metadata
  */
-class SerializableFile implements File
+class SerializableFile implements File, \JsonSerializable
 {
     use DecoratedFile, DecoratedNode;
 
     /**
-     * @param array<int,string>|array<string,list<string>> $metadata
+     * @param Format $metadata
      */
-    public function __construct(private File $file, private array $metadata)
+    public function __construct(private File $file, private string|array $metadata)
     {
     }
 
     /**
-     * @return array<string,scalar|array<string,scalar>>
+     * @return Serialized
      */
-    public function serialize(): array
+    public function jsonSerialize(): string|array
     {
-        $ret = [];
+        return $this->serialize();
+    }
 
-        foreach ($this->metadata as $key => $value) {
-            if (\is_int($key) && \is_string($value)) {
-                $ret[$value] = $this->{$value}();
-
-                continue;
-            }
-
-            if (!\is_string($key) || !\is_array($value)) {
-                throw new \LogicException('Invalid metadata format.');
-            }
-
-            foreach ($value as $argument) {
-                $ret[$key][$argument] = $this->{$key}($argument);
-            }
-        }
-
-        return $ret;
+    /**
+     * @return Serialized
+     */
+    public function serialize(): string|array
+    {
+        return Metadata::serialize($this, $this->metadata);
     }
 
     protected function inner(): File
