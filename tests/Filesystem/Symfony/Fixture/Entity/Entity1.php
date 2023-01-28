@@ -17,6 +17,7 @@ use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
+use Zenstruck\Filesystem\Node\Metadata;
 
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -48,6 +49,61 @@ class Entity1
 
     #[Filesystem\Stateless('public', namer: 'expression:{this.title|slug}.jpg')]
     private Image $virtualImage1;
+
+    #[Filesystem\StoreAsDsn('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
+    private ?File $file2 = null;
+
+    #[Filesystem\StoreAsDsn(
+        filesystem: 'public',
+        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        deleteOnRemove: false,
+        deleteOnUpdate: false,
+    )]
+    private ?Image $image2 = null;
+
+    #[Filesystem\StoreAsDsn(namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
+    private ?File $file3 = null;
+
+    #[Filesystem\StoreAsDsn(
+        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        deleteOnRemove: false,
+        deleteOnUpdate: false,
+    )]
+    private ?Image $image3 = null;
+
+    #[Filesystem\StoreWithMetadata(
+        metadata: [
+            Metadata::PATH,
+            Metadata::LAST_MODIFIED,
+            Metadata::VISIBILITY,
+            Metadata::MIME_TYPE,
+            Metadata::SIZE,
+            Metadata::PUBLIC_URL,
+        ],
+        filesystem: 'public',
+        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
+    )]
+    private ?File $file4 = null;
+
+    #[Filesystem\StoreWithMetadata(
+        metadata: [
+            Metadata::DSN,
+            Metadata::LAST_MODIFIED,
+            Metadata::VISIBILITY,
+            Metadata::MIME_TYPE,
+            Metadata::SIZE,
+            Metadata::PUBLIC_URL,
+            Metadata::TRANSFORM_URL => 'grayscale',
+            Metadata::DIMENSIONS,
+            Metadata::EXIF,
+            Metadata::IPTC,
+        ],
+        filesystem: 'public',
+        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        deleteOnRemove: false,
+        deleteOnUpdate: false,
+    )]
+    private ?Image $image4 = null;
 
     public function __construct(string $title)
     {
@@ -99,5 +155,65 @@ class Entity1
     public function getVirtualImage1(): ?File
     {
         return $this->virtualImage1->exists() ? $this->virtualImage1 : null;
+    }
+
+    public function getFile2(): ?File
+    {
+        return $this->file2;
+    }
+
+    public function setFile2(?File $file2): void
+    {
+        $this->file2 = $file2;
+    }
+
+    public function getImage2(): ?Image
+    {
+        return $this->image2;
+    }
+
+    public function setImage2(?Image $image2): void
+    {
+        $this->image2 = $image2;
+    }
+
+    public function getFile3(): ?File
+    {
+        return $this->file3;
+    }
+
+    public function setFile3(?File $file3): void
+    {
+        $this->file3 = $file3;
+    }
+
+    public function getImage3(): ?Image
+    {
+        return $this->image3;
+    }
+
+    public function setImage3(?Image $image3): void
+    {
+        $this->image3 = $image3;
+    }
+
+    public function getFile4(): ?File
+    {
+        return $this->file4;
+    }
+
+    public function setFile4(?File $file4): void
+    {
+        $this->file4 = $file4;
+    }
+
+    public function getImage4(): ?Image
+    {
+        return $this->image4;
+    }
+
+    public function setImage4(?Image $image4): void
+    {
+        $this->image4 = $image4;
     }
 }

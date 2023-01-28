@@ -23,12 +23,19 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\Mapping;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
+use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
+use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Filesystem\Node\File\SerializableFile;
 use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
@@ -65,7 +72,7 @@ final class NodeLifecycleListener
                 continue;
             }
 
-            $file->setFilesystem(fn() => $this->filesystem($mapping));
+            $file->setFilesystem(fn() => $this->filesystemFor($mapping, $file));
         }
 
         // "virtual" column properties
@@ -115,7 +122,7 @@ final class NodeLifecycleListener
                 continue;
             }
 
-            $this->filesystem($mapping)->delete($file->path());
+            $this->filesystemFor($mapping, $file)->delete($file->path());
         }
     }
 
@@ -131,13 +138,20 @@ final class NodeLifecycleListener
         }
 
         foreach ($collection->statefulMappings as $field => $mapping) {
-            $file = $metadata->getFieldValue($object, $field);
+            $original = $metadata->getFieldValue($object, $field);
+            $new = null;
 
-            if (!$file instanceof PendingFile) {
-                continue;
+            if ($original instanceof PendingFile) {
+                $new = $this->convertPendingFile($mapping, $original, $object, $field);
             }
 
-            $metadata->setFieldValue($object, $field, $this->convertPendingFile($mapping, $file, $object, $field));
+            if ($original && $mapping instanceof StoreWithMetadata && !$original instanceof SerializableFile) {
+                $new = self::createSerialized($mapping, $new ?? $original);
+            }
+
+            if ($new) {
+                $metadata->setFieldValue($object, $field, $new);
+            }
         }
     }
 
@@ -163,8 +177,6 @@ final class NodeLifecycleListener
             if ($new instanceof PendingFile) {
                 $new = $this->convertPendingFile($mapping, $new, $object, $field);
 
-                $event->setNewValue($field, $new);
-
                 // just setting the new value does not update the property so refresh the object on flush
                 $this->postFlushOperations[] = static fn() => $event->getObjectManager()->refresh($object);
 
@@ -173,8 +185,16 @@ final class NodeLifecycleListener
                 $this->postFlushOperations[] = fn(EntityManagerInterface $em) => $this->load($object, $em, force: true);
             }
 
+            if ($new && $mapping instanceof StoreWithMetadata && !$new instanceof SerializableFile) {
+                $new = self::createSerialized($mapping, $new);
+            }
+
+            if ($new) {
+                $event->setNewValue($field, $new);
+            }
+
             if (self::shouldOldFileBeRemoved($mapping, $old, $new)) {
-                $this->postFlushOperations[] = fn() => $this->filesystem($mapping)->delete($old->path());
+                $this->postFlushOperations[] = fn() => $this->filesystemFor($mapping, $old)->delete($old->path());
             }
         }
     }
@@ -191,11 +211,28 @@ final class NodeLifecycleListener
         $this->postFlushOperations = [];
     }
 
+    private static function createSerialized(StoreWithMetadata $mapping, File $file): SerializableFile
+    {
+        if ($file instanceof Image) {
+            return new SerializableImage($file, $mapping->metadata);
+        }
+
+        return new SerializableFile($file, $mapping->metadata);
+    }
+
     private function convertPendingFile(Mapping $mapping, PendingFile $file, object $object, string $field): LazyFile
     {
+        if (!$mapping->filesystem()) {
+            throw new \LogicException(\sprintf('In order to save pending files, the %s::$%s mapping must have a filesystem configured.', $object::class, $field));
+        }
+
         $path = $this->generatePath($mapping, $file, $object, $field);
 
         $this->postFlushOperations[] = fn() => $this->filesystem($mapping)->write($path, $file);
+
+        if ($mapping instanceof StoreAsDsn) {
+            $path = Dsn::create($mapping->filesystem(), $path);
+        }
 
         $lazyFile = $file instanceof PendingImage ? new LazyImage($path) : new LazyFile($path);
         $lazyFile->setFilesystem($this->filesystem($mapping));
@@ -244,6 +281,17 @@ final class NodeLifecycleListener
         }
 
         return $new->path()->toString() !== $old->path()->toString();
+    }
+
+    private function filesystemFor(Mapping $mapping, Node $file): Filesystem
+    {
+        $name = match ($mapping::class) {
+            StoreAsDsn::class => $file->dsn()->filesystem(),
+            default => $mapping->filesystem(),
+        };
+
+        // todo name might be null
+        return $this->container->get('filesystem_locator')->get($name);
     }
 
     private function filesystem(Mapping $mapping): Filesystem

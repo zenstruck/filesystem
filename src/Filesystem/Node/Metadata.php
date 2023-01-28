@@ -19,7 +19,7 @@ use Zenstruck\Filesystem\Node\File\Image;
  *
  * @TODO make enum in PHP 8.1
  *
- * @phpstan-type Format = self::PATH|self::DSN|array<int|self::*,self::*|list<string>>
+ * @phpstan-type Format = self::PATH|self::DSN|array<int|self::*,self::*|string|list<string>>
  * @phpstan-type Serialized = string|array<string,scalar|array<string,scalar>>
  */
 final class Metadata

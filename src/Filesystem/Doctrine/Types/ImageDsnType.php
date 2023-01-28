@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Types;
 
-use Doctrine\DBAL\Types\StringType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
@@ -23,16 +22,19 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
  */
 final class ImageDsnType extends StringType
 {
-    use Type;
-
     public const NAME = 'image_dsn';
 
-    protected function fileToData(File $file): array|string
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
+    protected function fileToData(File $file): string
     {
         return $file->dsn();
     }
 
-    protected function dataToFile(array|string $data): LazyFile
+    protected function dataToFile(string $data): LazyFile
     {
         return new LazyImage($data);
     }

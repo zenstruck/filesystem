@@ -11,10 +11,22 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
+use Zenstruck\Filesystem\Node\File\Path\Namer;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class StoreWithMetadata extends Stateful
 {
+    public function __construct(
+        array $metadata,
+        ?string $filesystem = null,
+        string|Namer|null $namer = null,
+        array $namerContext = [],
+        bool $deleteOnRemove = true,
+        bool $deleteOnUpdate = true
+    ) {
+        parent::__construct($metadata, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
+    }
 }

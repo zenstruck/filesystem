@@ -34,10 +34,13 @@ final class Dsn implements \Stringable
         return $value instanceof self ? $value : new self($value);
     }
 
-    public static function create(string $filesystem, Path $path): self
+    public static function create(string $filesystem, Path|string $path): self
     {
         $dsn = new self("{$filesystem}://{$path}");
-        $dsn->path = $path;
+
+        if ($path instanceof Path) {
+            $dsn->path = $path;
+        }
 
         return $dsn;
     }

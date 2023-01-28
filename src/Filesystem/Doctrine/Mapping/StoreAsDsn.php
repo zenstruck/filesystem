@@ -17,6 +17,7 @@ use Zenstruck\Filesystem\Node\Metadata;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class StoreAsDsn extends Stateful
 {
     public function __construct(

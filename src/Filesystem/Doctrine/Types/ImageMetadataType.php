@@ -11,33 +11,24 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Types;
 
-use Doctrine\DBAL\Types\StringType;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\File\SerializableFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-final class ImageMetadataType extends StringType
+final class ImageMetadataType extends JsonType
 {
-    use Type;
-
     public const NAME = 'image_metadata';
 
-    protected function fileToData(File $file): array|string
+    public function getName(): string
     {
-        if (!$file instanceof SerializableFile) {
-            throw new \LogicException('Invalid mapping.');
-        }
-
-        return $file->serialize();
+        return self::NAME;
     }
 
-    protected function dataToFile(array|string $data): LazyFile
+    protected function dataToFile(array $data): LazyFile
     {
         return new LazyImage($data);
     }

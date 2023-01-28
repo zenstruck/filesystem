@@ -11,10 +11,7 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Types;
 
-use Doctrine\DBAL\Types\JsonType;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\File\SerializableFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,20 +20,14 @@ use Zenstruck\Filesystem\Node\File\SerializableFile;
  */
 final class FileMetadataType extends JsonType
 {
-    use Type;
-
     public const NAME = 'file_metadata';
 
-    protected function fileToData(File $file): array|string
+    public function getName(): string
     {
-        if (!$file instanceof SerializableFile) {
-            throw new \LogicException('Invalid mapping.');
-        }
-
-        return $file->serialize();
+        return self::NAME;
     }
 
-    protected function dataToFile(array|string $data): LazyFile
+    protected function dataToFile(array $data): LazyFile
     {
         return new LazyFile($data);
     }
