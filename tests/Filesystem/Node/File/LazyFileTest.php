@@ -210,8 +210,6 @@ class LazyFileTest extends TestCase
     {
         yield ['public://some/file.png'];
         yield [Dsn::wrap('public://some/file.png')];
-        yield [fn() => 'public://some/file.png'];
-        yield [fn() => Dsn::wrap('public://some/file.png')];
         yield [['dsn' => 'public://some/file.png']];
     }
 

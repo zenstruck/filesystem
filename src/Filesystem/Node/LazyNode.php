@@ -36,13 +36,12 @@ abstract class LazyNode implements Node
      */
     public function __construct(string|callable|array|null $attributes = null)
     {
-        if (\is_callable($attributes) || \is_string($attributes)) {
-            $this->path = $attributes;
-        }
-
-        if (\is_array($attributes)) {
-            $this->attributes = $attributes;
-        }
+        match (true) {
+            \is_string($attributes) && \str_contains($attributes, '://') => $this->attributes = [Metadata::DSN => $attributes],
+            \is_string($attributes) || \is_callable($attributes) => $this->path = $attributes,
+            \is_array($attributes) => $this->attributes = $attributes,
+            default => null,
+        };
     }
 
     /**

@@ -18,6 +18,7 @@ final class Dsn implements \Stringable
 {
     /** @var array{0:string|null,1:string} */
     private array $parts;
+    private Path $path;
 
     private function __construct(private string $value)
     {
@@ -35,7 +36,10 @@ final class Dsn implements \Stringable
 
     public static function create(string $filesystem, Path $path): self
     {
-        return new self("{$filesystem}://{$path}");
+        $dsn = new self("{$filesystem}://{$path}");
+        $dsn->path = $path;
+
+        return $dsn;
     }
 
     /**
@@ -62,7 +66,7 @@ final class Dsn implements \Stringable
 
     public function path(): Path
     {
-        return new Path($this->parts()[1]);
+        return $this->path ??= new Path($this->parts()[1]);
     }
 
     /**
