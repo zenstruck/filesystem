@@ -11,18 +11,28 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Types;
 
-use Zenstruck\Filesystem\Node\File\Image\LazyImage;
+use Doctrine\DBAL\Types\StringType;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
-final class ImageStringType extends FileStringType
+final class FilePathType extends StringType
 {
-    public const NAME = 'zs_image';
+    use Type;
 
-    protected function createFile(string $path): LazyFile
+    public const NAME = 'file_path';
+
+    protected function fileToData(File $file): array|string
     {
-        return new LazyImage($path);
+        return $file->path();
+    }
+
+    protected function dataToFile(array|string $data): LazyFile
+    {
+        return new LazyFile($data);
     }
 }

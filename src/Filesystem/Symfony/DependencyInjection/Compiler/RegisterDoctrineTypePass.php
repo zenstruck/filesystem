@@ -13,15 +13,26 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Zenstruck\Filesystem\Doctrine\Types\FileStringType;
-use Zenstruck\Filesystem\Doctrine\Types\ImageStringType;
+use Zenstruck\Filesystem\Doctrine\Types\FileDsnType;
+use Zenstruck\Filesystem\Doctrine\Types\FileMetadataType;
+use Zenstruck\Filesystem\Doctrine\Types\FilePathType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageDsnType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageMetadataType;
+use Zenstruck\Filesystem\Doctrine\Types\ImagePathType;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RegisterDoctrineTypePass implements CompilerPassInterface
 {
-    public const TYPES = [FileStringType::class, ImageStringType::class];
+    public const TYPES = [
+        FilePathType::class,
+        ImagePathType::class,
+        FileDsnType::class,
+        ImageDsnType::class,
+        FileMetadataType::class,
+        ImageMetadataType::class,
+    ];
 
     public function process(ContainerBuilder $container): void
     {

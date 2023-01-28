@@ -20,9 +20,15 @@ use Zenstruck\Filesystem\Doctrine\Mapping;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateless;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsPath;
-use Zenstruck\Filesystem\Doctrine\Types\FileStringType;
-use Zenstruck\Filesystem\Doctrine\Types\ImageStringType;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
+use Zenstruck\Filesystem\Doctrine\Types\FileDsnType;
+use Zenstruck\Filesystem\Doctrine\Types\FileMetadataType;
+use Zenstruck\Filesystem\Doctrine\Types\FilePathType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageDsnType;
+use Zenstruck\Filesystem\Doctrine\Types\ImageMetadataType;
+use Zenstruck\Filesystem\Doctrine\Types\ImagePathType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
@@ -86,7 +92,7 @@ final class NodeMappingListener
                 $metadata->mapField(\array_merge($fieldMapping, [
                     'fieldName' => $property->name,
                     'type' => self::doctrineTypeFor($mapping, $nodeClass), // @phpstan-ignore-line
-                    'nullable' => $type->allowsNull(),
+                    'nullable' => $fieldMapping['nullable'] ?? $type->allowsNull(),
                 ]));
             }
 
@@ -105,11 +111,12 @@ final class NodeMappingListener
      */
     private static function doctrineTypeFor(Stateful $mapping, string $nodeClass): string
     {
-        if ($mapping instanceof StoreAsPath) {
-            return File::class === $nodeClass ? FileStringType::NAME : ImageStringType::NAME;
-        }
-
-        throw new \LogicException('Invalid mapping');
+        return match ($mapping::class) {
+            StoreAsPath::class => File::class === $nodeClass ? FilePathType::NAME : ImagePathType::NAME,
+            StoreAsDsn::class => File::class === $nodeClass ? FileDsnType::NAME : ImageDsnType::NAME,
+            StoreWithMetadata::class => File::class === $nodeClass ? FileMetadataType::NAME : ImageMetadataType::NAME,
+            default => throw new \LogicException('Invalid mapping'),
+        };
     }
 
     /**

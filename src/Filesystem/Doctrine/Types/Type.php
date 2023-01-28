@@ -12,7 +12,6 @@
 namespace Zenstruck\Filesystem\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
@@ -20,12 +19,12 @@ use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
-class FileStringType extends StringType
+trait Type
 {
-    public const NAME = 'zs_file';
-
-    final public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): string|array|null
     {
         if ($value instanceof PendingFile) {
             throw new \LogicException('A pending file cannot be added directly to the database - use the event listener.');
@@ -35,26 +34,25 @@ class FileStringType extends StringType
             throw new \LogicException('A placeholder file cannot be added to the database.');
         }
 
-        return $value instanceof File ? $value->path() : null;
+        return $value instanceof File ? $this->fileToData($value) : null;
     }
 
-    final public function convertToPHPValue($value, AbstractPlatform $platform): ?File
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?LazyFile
     {
-        return \is_string($value) ? $this->createFile($value) : null;
+        return \is_string($value) ? $this->dataToFile($value) : null;
     }
 
-    final public function getName(): string
+    public function getName(): string
     {
         return static::NAME;
     }
 
-    final public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
     }
 
-    protected function createFile(string $path): LazyFile
-    {
-        return new LazyFile($path);
-    }
+    abstract protected function fileToData(File $file): array|string;
+
+    abstract protected function dataToFile(string|array $data): LazyFile;
 }
