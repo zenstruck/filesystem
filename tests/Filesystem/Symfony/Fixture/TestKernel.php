@@ -156,6 +156,10 @@ final class TestKernel extends Kernel
             ->setAutowired(true)
             ->setAutoconfigured(true)
         ;
+        $c->register(CustomObjectPathGenerator::class)
+            ->setAutowired(true)
+            ->setAutoconfigured(true)
+        ;
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void

@@ -18,6 +18,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Tests\Filesystem\Symfony\Fixture\CustomObjectPathGenerator;
 
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -38,7 +39,7 @@ class Entity1
 
     #[Filesystem\StoreAsPath(
         filesystem: 'public',
-        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        namer: CustomObjectPathGenerator::class,
         deleteOnRemove: false,
         deleteOnUpdate: false,
     )]
@@ -55,7 +56,7 @@ class Entity1
 
     #[Filesystem\StoreAsDsn(
         filesystem: 'public',
-        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        namer: CustomObjectPathGenerator::class,
         deleteOnRemove: false,
         deleteOnUpdate: false,
     )]
@@ -65,7 +66,7 @@ class Entity1
     private ?File $file3 = null;
 
     #[Filesystem\StoreAsDsn(
-        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        namer: CustomObjectPathGenerator::class,
         deleteOnRemove: false,
         deleteOnUpdate: false,
     )]
