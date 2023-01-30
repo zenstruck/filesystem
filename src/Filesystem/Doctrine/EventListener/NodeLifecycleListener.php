@@ -48,6 +48,9 @@ final class NodeLifecycleListener
     /** @var callable[] */
     private array $postFlushOperations = [];
 
+    /** @var callable[] */
+    private array $onFailureOperations = [];
+
     public function __construct(private ContainerInterface $container)
     {
     }
@@ -208,7 +211,16 @@ final class NodeLifecycleListener
             $operation($event->getObjectManager());
         }
 
-        $this->postFlushOperations = [];
+        $this->postFlushOperations = $this->onFailureOperations = [];
+    }
+
+    public function onClear(): void
+    {
+        foreach ($this->onFailureOperations as $operation) {
+            $operation();
+        }
+
+        $this->postFlushOperations = $this->onFailureOperations = [];
     }
 
     private static function createSerialized(StoreWithMetadata $mapping, File $file): SerializableFile
@@ -228,7 +240,12 @@ final class NodeLifecycleListener
 
         $path = $this->generatePath($mapping, $file, $object, $field);
 
-        $this->postFlushOperations[] = fn() => $this->filesystem($mapping)->write($path, $file);
+        if ($mapping instanceof StoreWithMetadata) {
+            $this->filesystem($mapping)->write($path, $file);
+            $this->onFailureOperations[] = fn() => $this->filesystem($mapping)->delete($path);
+        } else {
+            $this->postFlushOperations[] = fn() => $this->filesystem($mapping)->write($path, $file);
+        }
 
         if ($mapping instanceof StoreAsDsn) {
             $path = Dsn::create($mapping->filesystem(), $path);
@@ -236,6 +253,9 @@ final class NodeLifecycleListener
 
         $lazyFile = $file instanceof PendingImage ? new LazyImage($path) : new LazyFile($path);
         $lazyFile->setFilesystem($this->filesystem($mapping));
+
+        if (!$mapping instanceof StoreWithMetadata) {
+        }
 
         return $lazyFile;
     }
