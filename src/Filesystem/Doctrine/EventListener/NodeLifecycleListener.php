@@ -83,10 +83,6 @@ final class NodeLifecycleListener
             $property = self::property($metadata->getReflectionClass(), $field);
             $property->setAccessible(true);
 
-            if ($property->isInitialized($object)) {
-                continue;
-            }
-
             $file = new $class();
             $file->setFilesystem(fn() => $this->filesystem($mapping));
             $file->setPath(fn() => $this->generatePath($mapping, $file, $object, $field));

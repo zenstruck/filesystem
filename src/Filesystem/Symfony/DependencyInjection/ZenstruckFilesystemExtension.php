@@ -31,6 +31,7 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
+use Zenstruck\Filesystem\Doctrine\Twig\FileMappingLoaderExtension;
 use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -110,6 +111,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 new Reference('doctrine'),
                 new Reference('.zenstruck_filesystem.doctrine.lifecycle_listener'),
             ])
+            ->addTag('twig.runtime')
         ;
 
         $listener = $container->register('.zenstruck_filesystem.doctrine.lifecycle_listener', NodeLifecycleListener::class)
@@ -129,6 +131,12 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if ($config['lifecycle']['delete_on_remove']) {
             $listener->addTag('doctrine.event_listener', ['event' => 'postRemove']);
+        }
+
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
+            $container->register('.zenstruck_filesystem.doctrine.twig_extension', FileMappingLoaderExtension::class)
+                ->addTag('twig.extension')
+            ;
         }
     }
 
