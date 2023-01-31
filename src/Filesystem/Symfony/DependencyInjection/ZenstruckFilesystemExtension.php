@@ -120,6 +120,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('doctrine.event_listener', ['event' => 'preUpdate'])
             ->addTag('doctrine.event_listener', ['event' => 'postFlush'])
             ->addTag('doctrine.event_listener', ['event' => 'prePersist'])
+            ->addTag('doctrine.event_listener', ['event' => 'onClear'])
         ;
 
         if ($config['lifecycle']['autoload']) {

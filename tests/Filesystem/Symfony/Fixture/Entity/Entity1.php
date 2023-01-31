@@ -34,6 +34,9 @@ class Entity1
     #[ORM\Column(length: 255)]
     private string $title;
 
+    #[ORM\Column('_unique', unique: true, nullable: true)]
+    private ?string $unique;
+
     #[Filesystem\StoreAsPath('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
     private ?File $file1 = null;
 
@@ -79,6 +82,7 @@ class Entity1
             Metadata::VISIBILITY,
             Metadata::MIME_TYPE,
             Metadata::SIZE,
+            Metadata::CHECKSUM,
             Metadata::PUBLIC_URL,
         ],
         filesystem: 'public',
@@ -93,6 +97,7 @@ class Entity1
             Metadata::VISIBILITY,
             Metadata::MIME_TYPE,
             Metadata::SIZE,
+            Metadata::CHECKSUM,
             Metadata::PUBLIC_URL,
             Metadata::TRANSFORM_URL => 'grayscale',
             Metadata::DIMENSIONS,
@@ -106,9 +111,10 @@ class Entity1
     )]
     private ?Image $image4 = null;
 
-    public function __construct(string $title)
+    public function __construct(string $title, ?string $unique = null)
     {
         $this->title = $title;
+        $this->unique = $unique;
         $this->virtualFile1 = new PlaceholderFile();
         $this->virtualImage1 = new PlaceholderImage();
     }
@@ -126,6 +132,11 @@ class Entity1
     public function setTitle(string $title): void
     {
         $this->title = $title;
+    }
+
+    public function setUnique(string $unique): void
+    {
+        $this->unique = $unique;
     }
 
     public function getFile1(): ?File
