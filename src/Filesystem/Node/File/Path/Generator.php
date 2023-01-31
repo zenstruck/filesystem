@@ -11,12 +11,12 @@
 
 namespace Zenstruck\Filesystem\Node\File\Path;
 
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 interface Generator
 {
-    public function generatePath(File $file, array $context = []): string;
+    public function generatePath(Node $node, array $context = []): string;
 }

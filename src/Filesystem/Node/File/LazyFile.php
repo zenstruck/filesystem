@@ -54,6 +54,11 @@ class LazyFile extends LazyNode implements File
         return $this->path()->extension() ?? $this->inner()->guessExtension();
     }
 
+    public function ensureFile(): static
+    {
+        return $this;
+    }
+
     protected function inner(): File
     {
         return $this->inner ??= $this->filesystem()->file($this->path()); // @phpstan-ignore-line

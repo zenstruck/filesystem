@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Path\Generator;
 
 /**
@@ -20,12 +20,12 @@ use Zenstruck\Filesystem\Node\File\Path\Generator;
  */
 final class CustomObjectPathGenerator implements Generator
 {
-    public function generatePath(File $file, array $context = []): string
+    public function generatePath(Node $node, array $context = []): string
     {
         return \sprintf('images/%s-%s.%s',
             \mb_strtolower((new AsciiSlugger())->slug($context['this']->getTitle())),
-            \mb_substr($file->checksum(), 0, 7),
-            $file->path()->extension(),
+            \mb_substr($node->ensureFile()->checksum(), 0, 7),
+            $node->path()->extension(),
         );
     }
 }

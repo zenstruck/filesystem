@@ -11,26 +11,26 @@
 
 namespace Zenstruck\Filesystem\Node\File\Path;
 
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class CallbackPathGenerator implements Generator
 {
-    /** @var callable(File,array):string */
+    /** @var callable(Node,array):string */
     private $callback;
 
     /**
-     * @param callable(File,array):string $callback
+     * @param callable(Node,array):string $callback
      */
     public function __construct(callable $callback)
     {
         $this->callback = $callback;
     }
 
-    public function generatePath(File $file, array $context = []): string
+    public function generatePath(Node $node, array $context = []): string
     {
-        return ($this->callback)($file, $context);
+        return ($this->callback)($node, $context);
     }
 }

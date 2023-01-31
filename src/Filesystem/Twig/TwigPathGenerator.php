@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Twig;
 
 use Twig\Environment;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Path\Generator;
 
@@ -24,14 +25,18 @@ final class TwigPathGenerator implements Generator
     {
     }
 
-    public function generatePath(File $file, array $context = []): string
+    public function generatePath(Node $node, array $context = []): string
     {
         if (!isset($context['template'])) {
             throw new \LogicException(\sprintf('A "template" context must be set to use "%s".', self::class));
         }
 
         $template = (string) $context['template'];
-        $context['file'] = $file;
+        $context['node'] = $node;
+
+        if ($node instanceof File) {
+            $context['file'] = $node;
+        }
 
         if (\str_ends_with($template, '.twig')) {
             // template file

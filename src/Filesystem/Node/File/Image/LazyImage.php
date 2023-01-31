@@ -57,6 +57,11 @@ final class LazyImage extends LazyFile implements Image
         return $this->attributes[Metadata::EXIF] ?? $this->inner()->exif();
     }
 
+    public function ensureImage(): self
+    {
+        return $this;
+    }
+
     protected function inner(): Image
     {
         return $this->inner ??= $this->filesystem()->image($this->path()); // @phpstan-ignore-line

@@ -12,7 +12,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Psr\Container\ContainerInterface;
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Path\CallbackPathGenerator;
 use Zenstruck\Filesystem\Node\File\Path\ExpressionPathGenerator;
 use Zenstruck\Filesystem\Node\File\Path\Generator;
@@ -33,17 +33,17 @@ final class PathGenerator
     {
     }
 
-    public function generate(string|Namer|callable $namer, File $file, array $context = []): string
+    public function generate(string|Namer|callable $namer, Node $node, array $context = []): string
     {
         if (\is_string($namer)) {
             $namer = new Namer($namer);
         }
 
         if (!$namer instanceof Namer && \is_callable($namer)) {
-            return (new CallbackPathGenerator($namer))->generatePath($file, $context);
+            return (new CallbackPathGenerator($namer))->generatePath($node, $context);
         }
 
-        return $this->get($namer->id())->generatePath($file, $namer->with($context)->context());
+        return $this->get($namer->id())->generatePath($node, $namer->with($context)->context());
     }
 
     private function get(string $id): Generator

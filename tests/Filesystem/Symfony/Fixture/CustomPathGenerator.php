@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
-use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File\Path\Generator;
 
 /**
@@ -19,9 +19,9 @@ use Zenstruck\Filesystem\Node\File\Path\Generator;
  */
 final class CustomPathGenerator implements Generator
 {
-    public function generatePath(File $file, array $context = []): string
+    public function generatePath(Node $node, array $context = []): string
     {
-        $value = "from/custom.{$file->path()->extension()}";
+        $value = "from/custom.{$node->path()->extension()}";
 
         foreach ($context as $k => $v) {
             $value .= "{$k}:{$v}";

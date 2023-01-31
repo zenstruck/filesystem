@@ -21,6 +21,11 @@ final class LazyDirectory extends LazyNode implements Directory
 {
     use DecoratedDirectory;
 
+    public function ensureDirectory(): self
+    {
+        return $this;
+    }
+
     protected function inner(): Directory
     {
         return $this->inner ??= $this->filesystem()->directory($this->path()); // @phpstan-ignore-line

@@ -15,6 +15,7 @@ use Symfony\Component\String\ByteString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
 
 /**
@@ -29,19 +30,23 @@ final class ExpressionPathGenerator implements Generator
     {
     }
 
-    public function generatePath(File $file, array $context = []): string
+    public function generatePath(Node $node, array $context = []): string
     {
-        $context['file'] = $file;
+        $context['node'] = $node;
+
+        if ($node instanceof File) {
+            $context['file'] = $node;
+        }
 
         return (string) \preg_replace_callback(
             '#{([\w.:\-\[\]]+)(\|(slug|slugify|lower))?}#',
-            function($matches) use ($file, $context) {
+            function($matches) use ($node, $context) {
                 $value = match ($matches[1]) {
-                    'name' => $this->slugify($file->path()->basename()),
-                    'ext' => self::extensionWithDot($file),
-                    'checksum' => $file->checksum(),
+                    'name' => $this->slugify($node->path()->basename()),
+                    'ext' => self::extensionWithDot($node),
+                    'checksum' => $node->ensureFile()->checksum(),
                     'rand' => self::randomString(),
-                    default => self::parseVariable($matches[1], $file, $context),
+                    default => self::parseVariable($matches[1], $node, $context),
                 };
 
                 return match ($matches[3] ?? null) {
@@ -66,9 +71,9 @@ final class ExpressionPathGenerator implements Generator
         return ByteString::fromRandom($length, self::ALPHABET)->toString();
     }
 
-    private static function extensionWithDot(File $file): string
+    private static function extensionWithDot(Node $node): string
     {
-        if (!$ext = $file->path()->extension()) {
+        if (!$ext = $node->path()->extension()) {
             return '';
         }
 
@@ -91,11 +96,11 @@ final class ExpressionPathGenerator implements Generator
         return \mb_strtolower($this->slugger ? $this->slugger->slug($value) : \str_replace(' ', '-', $value));
     }
 
-    private static function parseVariable(string $variable, File $file, array $context): string
+    private static function parseVariable(string $variable, Node $node, array $context): string
     {
         if (\count($parts = \explode(':', $variable)) > 1) {
             return match (\mb_strtolower($parts[0])) {
-                'checksum' => self::parseChecksum($file, $parts),
+                'checksum' => self::parseChecksum($node->ensureFile(), $parts),
                 'rand' => self::randomString((int) $parts[1]),
                 default => throw new \LogicException(\sprintf('Unable to parse expression variable {%s}.', $variable)),
             };
