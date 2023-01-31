@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Node\File\Path;
+namespace Zenstruck\Tests\Filesystem\Node\Path\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Path\Expression;
-use Zenstruck\Filesystem\Node\File\Path\ExpressionPathGenerator;
+use Zenstruck\Filesystem\Node\Path\Expression;
+use Zenstruck\Filesystem\Node\Path\Generator\ExpressionPathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

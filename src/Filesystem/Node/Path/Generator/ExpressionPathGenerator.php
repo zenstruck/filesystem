@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Node\File\Path;
+namespace Zenstruck\Filesystem\Node\Path\Generator;
 
 use Symfony\Component\String\ByteString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -17,6 +17,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\Path\Generator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

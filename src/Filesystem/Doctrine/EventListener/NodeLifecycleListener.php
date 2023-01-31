@@ -32,9 +32,9 @@ use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
+use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

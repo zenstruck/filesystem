@@ -11,9 +11,9 @@
 
 namespace Zenstruck\Filesystem\Doctrine;
 
-use Zenstruck\Filesystem\Node\File\Path\Expression;
-use Zenstruck\Filesystem\Node\File\Path\Namer;
 use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Path\Expression;
+use Zenstruck\Filesystem\Node\Path\Namer;
 use Zenstruck\Filesystem\Twig\Template;
 
 /**

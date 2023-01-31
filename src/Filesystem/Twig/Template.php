@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Filesystem\Twig;
 
-use Zenstruck\Filesystem\Node\File\Path\Namer;
+use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

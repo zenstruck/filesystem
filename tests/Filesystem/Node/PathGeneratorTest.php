@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Node\File;
+namespace Zenstruck\Tests\Filesystem\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Path\Expression;
-use Zenstruck\Filesystem\Node\File\Path\Namer;
-use Zenstruck\Filesystem\Node\File\PathGenerator;
+use Zenstruck\Filesystem\Node\Path\Expression;
+use Zenstruck\Filesystem\Node\Path\Namer;
+use Zenstruck\Filesystem\Node\PathGenerator;
 use Zenstruck\Tests\Filesystem\Symfony\Fixture\CustomPathGenerator;
 
 /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Node\File\Path;
+namespace Zenstruck\Filesystem\Node\Path;
 
 use Zenstruck\Filesystem\Node;
 

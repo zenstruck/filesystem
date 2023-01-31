@@ -14,7 +14,7 @@ namespace Zenstruck\Filesystem\Twig;
 use Twig\Environment;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Path\Generator;
+use Zenstruck\Filesystem\Node\Path\Generator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

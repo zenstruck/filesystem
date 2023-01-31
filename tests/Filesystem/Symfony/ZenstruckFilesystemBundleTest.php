@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Filesystem\Node\File\Path\Expression;
+use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
 use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;

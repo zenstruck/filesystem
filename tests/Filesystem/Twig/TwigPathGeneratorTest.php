@@ -13,7 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Twig;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\PathGenerator;
+use Zenstruck\Filesystem\Node\PathGenerator;
 use Zenstruck\Filesystem\Twig\Template;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
 

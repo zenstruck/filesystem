@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Node\File;
+namespace Zenstruck\Filesystem\Node;
 
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File\Path\CallbackPathGenerator;
-use Zenstruck\Filesystem\Node\File\Path\ExpressionPathGenerator;
-use Zenstruck\Filesystem\Node\File\Path\Generator;
-use Zenstruck\Filesystem\Node\File\Path\Namer;
+use Zenstruck\Filesystem\Node\Path\Generator;
+use Zenstruck\Filesystem\Node\Path\Generator\CallbackPathGenerator;
+use Zenstruck\Filesystem\Node\Path\Generator\ExpressionPathGenerator;
+use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

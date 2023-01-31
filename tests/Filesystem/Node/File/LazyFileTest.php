@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\File\Path\Expression;
-use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Path\Expression;
+use Zenstruck\Filesystem\Node\PathGenerator;
 use Zenstruck\Tests\Filesystem\Node\FileTests;
 
 /**

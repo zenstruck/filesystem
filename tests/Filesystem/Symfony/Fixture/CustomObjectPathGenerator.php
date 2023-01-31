@@ -13,7 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\File\Path\Generator;
+use Zenstruck\Filesystem\Node\Path\Generator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

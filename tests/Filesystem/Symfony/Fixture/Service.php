@@ -14,7 +14,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\MultiFilesystem;
-use Zenstruck\Filesystem\Node\File\PathGenerator;
+use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

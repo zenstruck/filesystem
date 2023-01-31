@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Node\File\Path;
+namespace Zenstruck\Filesystem\Node\Path\Generator;
 
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\Path\Generator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
