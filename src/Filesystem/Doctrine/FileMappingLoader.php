@@ -19,11 +19,15 @@ use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
  */
 final class FileMappingLoader
 {
+    /** @var \WeakMap<object,true> */
+    private \WeakMap $loaded;
+
     /**
      * @internal
      */
     public function __construct(private ManagerRegistry $registry, private NodeLifecycleListener $listener)
     {
+        $this->loaded = new \WeakMap();
     }
 
     /**
@@ -35,11 +39,15 @@ final class FileMappingLoader
      */
     public function __invoke(object $object): object
     {
-        if (!$om = $this->registry->getManagerForClass($object::class)) {
+        if (isset($this->loaded[$object])) {
             return $object;
         }
 
-        $this->listener->load($object, $om, force: true);
+        if ($om = $this->registry->getManagerForClass($object::class)) {
+            $this->listener->load($object, $om, force: true);
+        }
+
+        $this->loaded[$object] = true;
 
         return $object;
     }
