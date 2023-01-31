@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Doctrine;
+namespace Zenstruck\Filesystem\Node;
 
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\Path\Namer;
 use Zenstruck\Filesystem\Twig\Template;
@@ -23,7 +22,7 @@ use Zenstruck\Filesystem\Twig\Template;
  *
  * @phpstan-import-type Format from Metadata
  */
-abstract class Mapping
+class Mapping
 {
     /** @var Format */
     public string|array $metadata;
@@ -52,11 +51,17 @@ abstract class Mapping
         }
     }
 
+    /**
+     * @internal
+     */
     public function filesystem(): ?string
     {
         return $this->filesystem;
     }
 
+    /**
+     * @internal
+     */
     public function namer(): ?Namer
     {
         return $this->namer;

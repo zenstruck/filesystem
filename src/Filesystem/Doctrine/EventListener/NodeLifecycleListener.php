@@ -20,7 +20,6 @@ use Doctrine\Persistence\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Doctrine\Mapping;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
@@ -34,6 +33,7 @@ use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**

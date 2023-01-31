@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zenstruck\Filesystem\Doctrine\Mapping as Filesystem;
+use Zenstruck\Filesystem\Node\Mapping as Filesystem;
 
 #[ORM\Entity]
 #[Filesystem\HasFiles(autoload: false)]

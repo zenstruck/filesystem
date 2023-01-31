@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
-use Zenstruck\Filesystem\Doctrine\Mapping;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**

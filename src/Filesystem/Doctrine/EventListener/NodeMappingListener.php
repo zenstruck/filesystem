@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
-use Zenstruck\Filesystem\Doctrine\Mapping;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateless;
@@ -33,6 +32,7 @@ use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\Metadata;
 
 /**
