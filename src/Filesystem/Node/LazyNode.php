@@ -21,6 +21,8 @@ abstract class LazyNode implements Node
 {
     use DecoratedNode;
 
+    private const PLACEHOLDER = '2519856631465865896663102660600396863735707774042205734238233842';
+
     protected Node $inner;
 
     protected array $attributes = [];
@@ -69,7 +71,7 @@ abstract class LazyNode implements Node
         }
 
         return $this->path = match (true) {
-            \is_callable($this->path) => new Path(($this->path)()),
+            \is_callable($this->path) => new Path($this->resolvePath($this->path)),
             \is_string($this->path) => new Path($this->path),
             isset($this->attributes[Metadata::DSN]) => $this->dsn()->path(),
             default => throw new \RuntimeException('Path not set.'),
@@ -141,5 +143,17 @@ abstract class LazyNode implements Node
         }
 
         throw new \RuntimeException('Filesystem not set.');
+    }
+
+    private function resolvePath(callable $generator): string
+    {
+        $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Metadata::EXTENSION]) ? '.' : '', $this->attributes[Metadata::EXTENSION] ?? ''));
+        $path = $generator();
+
+        if (\str_contains($path, self::PLACEHOLDER)) {
+            throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.');
+        }
+
+        return $path;
     }
 }

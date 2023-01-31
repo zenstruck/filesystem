@@ -111,6 +111,42 @@ class Entity1
     )]
     private ?Image $image4 = null;
 
+    #[Filesystem\StoreWithMetadata(
+        metadata: [
+            Metadata::EXTENSION,
+            Metadata::LAST_MODIFIED,
+            Metadata::VISIBILITY,
+            Metadata::MIME_TYPE,
+            Metadata::SIZE,
+            Metadata::CHECKSUM,
+            Metadata::PUBLIC_URL,
+        ],
+        filesystem: 'public',
+        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
+    )]
+    private ?File $file5 = null;
+
+    #[Filesystem\StoreWithMetadata(
+        metadata: [
+            Metadata::EXTENSION,
+            Metadata::LAST_MODIFIED,
+            Metadata::VISIBILITY,
+            Metadata::MIME_TYPE,
+            Metadata::SIZE,
+            Metadata::CHECKSUM,
+            Metadata::PUBLIC_URL,
+            Metadata::TRANSFORM_URL => 'grayscale',
+            Metadata::DIMENSIONS,
+            Metadata::EXIF,
+            Metadata::IPTC,
+        ],
+        filesystem: 'public',
+        namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
+        deleteOnRemove: false,
+        deleteOnUpdate: false,
+    )]
+    private ?Image $image5 = null;
+
     public function __construct(string $title, ?string $unique = null)
     {
         $this->title = $title;
@@ -227,5 +263,25 @@ class Entity1
     public function setImage4(?Image $image4): void
     {
         $this->image4 = $image4;
+    }
+
+    public function getFile5(): ?File
+    {
+        return $this->file5;
+    }
+
+    public function setFile5(?File $file5): void
+    {
+        $this->file5 = $file5;
+    }
+
+    public function getImage5(): ?Image
+    {
+        return $this->image5;
+    }
+
+    public function setImage5(?Image $image5): void
+    {
+        $this->image5 = $image5;
     }
 }

@@ -33,7 +33,9 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
     public static function fileMetadataMethodProvider(): iterable
     {
-        yield 'metadata_with_path' => [4];
+        yield from self::fileMethodProvider();
+
+        yield 'metadata_without_path' => [5];
     }
 
     /**
@@ -154,7 +156,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
     /**
      * @test
-     * @dataProvider fileMethodProvider
+     * @dataProvider fileMetadataMethodProvider
      */
     public function can_persist_and_update_pending_files_stored_as_path(int $num): void
     {
@@ -257,13 +259,12 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
     /**
      * @test
-     * @dataProvider fileMetadataMethodProvider
      */
-    public function metadata_is_pulled_from_attributes(int $num): void
+    public function metadata_is_pulled_from_attributes(): void
     {
         $class = $this->entityClass();
         $object = new $class('Foo');
-        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('symfony.png'))->last()->ensureImage());
+        $object->setImage4($this->filesystem()->write('some/image.png', fixture('symfony.png'))->last()->ensureImage());
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
@@ -274,7 +275,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $fromDb = repository($class)->first()->object();
 
         /** @var Image $image */
-        $image = $fromDb->{'getImage'.$num}();
+        $image = $fromDb->getImage4();
 
         $this->assertSame('public://some/image.png', $image->dsn()->toString());
         $this->assertSame('some/image.png', $image->path()->toString());

@@ -56,6 +56,7 @@ class SerializableFileTest extends TestCase
                 Metadata::CHECKSUM,
                 Metadata::SIZE,
                 Metadata::PUBLIC_URL,
+                Metadata::EXTENSION,
             ]),
             [
                 'path' => 'some/image.jpg',
@@ -65,6 +66,7 @@ class SerializableFileTest extends TestCase
                 'checksum' => '42890a25562a1803949caa09d235f242',
                 'size' => 25884,
                 'public_url' => '/prefix/some/image.jpg',
+                'extension' => 'jpg',
             ],
         ];
 

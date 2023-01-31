@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Filesystem\Node\File\Path\Expression;
+use Zenstruck\Filesystem\Node\File\PathGenerator;
+use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Tests\Filesystem\Node\FileTests;
 
 /**
@@ -211,6 +214,38 @@ class LazyFileTest extends TestCase
         yield ['public://some/file.png'];
         yield [Dsn::wrap('public://some/file.png')];
         yield [['dsn' => 'public://some/file.png']];
+    }
+
+    /**
+     * @test
+     */
+    public function can_generate_path(): void
+    {
+        $file = $this->createLazyFile([
+            Metadata::CHECKSUM => 'foobar',
+            Metadata::EXTENSION => 'jpg',
+        ]);
+
+        $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{checksum}{ext}'), $file));
+
+        $this->assertSame('files/foobar.jpg', $file->path()->toString());
+    }
+
+    /**
+     * @test
+     */
+    public function generated_path_cannot_contain_placeholder(): void
+    {
+        $file = $this->createLazyFile([
+            Metadata::CHECKSUM => 'foobar',
+            Metadata::EXTENSION => 'jpg',
+        ]);
+
+        $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{name}{ext}'), $file));
+
+        $this->expectException(\LogicException::class);
+
+        $file->path();
     }
 
     protected function createLazyFile(string|callable|array|null $attributes = null): LazyFile

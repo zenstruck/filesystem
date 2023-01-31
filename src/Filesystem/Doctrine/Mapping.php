@@ -45,11 +45,11 @@ abstract class Mapping
             throw new \LogicException('A filesystem is required if not storing the DSN.');
         }
 
-        if (!$this->namer && !\in_array($metadata, [Metadata::DSN, Metadata::PATH], true) && !isset($metadata[Metadata::DSN]) && !isset($metadata[Metadata::PATH])) {
-            throw new \LogicException('The path or DSN metadata must be included.');
-        }
-
         $this->metadata = $metadata;
+
+        if (!$this->namer && $this->requiresPathGenerator()) {
+            throw new \LogicException('A namer is required if not storing the DSN or path.');
+        }
     }
 
     public function filesystem(): ?string
@@ -60,6 +60,18 @@ abstract class Mapping
     public function namer(): ?Namer
     {
         return $this->namer;
+    }
+
+    /**
+     * @internal
+     */
+    final public function requiresPathGenerator(): bool
+    {
+        if (\is_string($this->metadata)) {
+            return false;
+        }
+
+        return !\in_array(Metadata::DSN, $this->metadata, true) && !\in_array(Metadata::PATH, $this->metadata, true);
     }
 
     private static function parseNamer(string|Namer|null $namer, array $context): ?Namer

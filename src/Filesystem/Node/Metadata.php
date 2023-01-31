@@ -32,6 +32,7 @@ final class Metadata
     public const SIZE = 'size';
     public const CHECKSUM = 'checksum';
     public const PUBLIC_URL = 'public_url';
+    public const EXTENSION = 'extension';
     public const TRANSFORM_URL = 'transform_url';
     public const DIMENSIONS = 'dimensions';
     public const EXIF = 'exif';
@@ -39,7 +40,7 @@ final class Metadata
 
     private const STRING_METADATA = [self::PATH, self::DSN];
     private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::MIME_TYPE];
-    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL];
+    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION];
     private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
 
     private function __construct()
@@ -133,6 +134,7 @@ final class Metadata
                 self::VISIBILITY => $node->visibility(),
                 self::MIME_TYPE => $node->mimeType(),
                 self::SIZE => $node->ensureFile()->size(),
+                self::EXTENSION => $node->path()->extension(),
                 self::CHECKSUM => self::serializeChecksum($node->ensureFile(), $value),
                 self::PUBLIC_URL => $node->ensureFile()->publicUrl(),
                 self::TRANSFORM_URL => self::serializeTransformUrl($node->ensureImage(), $value),

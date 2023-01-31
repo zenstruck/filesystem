@@ -25,7 +25,6 @@ use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -36,7 +35,6 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PathGenerator;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
-use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -71,11 +69,15 @@ final class NodeLifecycleListener
         foreach ($collection->statefulMappings as $field => $mapping) {
             $file = $metadata->getFieldValue($object, $field);
 
-            if (!$file instanceof LazyNode) {
+            if (!$file instanceof LazyFile) {
                 continue;
             }
 
             $file->setFilesystem(fn() => $this->filesystemFor($mapping, $file));
+
+            if ($mapping->requiresPathGenerator()) {
+                $file->setPath(fn() => $this->generatePath($mapping, $file, $object, $field));
+            }
         }
 
         // "virtual" column properties
@@ -250,9 +252,6 @@ final class NodeLifecycleListener
         $lazyFile = $file instanceof PendingImage ? new LazyImage($path) : new LazyFile($path);
         $lazyFile->setFilesystem($this->filesystem($mapping));
 
-        if (!$mapping instanceof StoreWithMetadata) {
-        }
-
         return $lazyFile;
     }
 
@@ -299,7 +298,7 @@ final class NodeLifecycleListener
         return $new->path()->toString() !== $old->path()->toString();
     }
 
-    private function filesystemFor(Mapping $mapping, Node $file): Filesystem
+    private function filesystemFor(Mapping $mapping, File $file): Filesystem
     {
         $name = match ($mapping::class) {
             StoreAsDsn::class => $file->dsn()->filesystem(),
