@@ -46,7 +46,7 @@ abstract class Mapping
         }
 
         if (!$this->namer && !\in_array($metadata, [Metadata::DSN, Metadata::PATH], true) && !isset($metadata[Metadata::DSN]) && !isset($metadata[Metadata::PATH])) {
-            throw new \LogicException('A namer is required if not storing the DSN or path.');
+            throw new \LogicException('The path or DSN metadata must be included.');
         }
 
         $this->metadata = $metadata;
