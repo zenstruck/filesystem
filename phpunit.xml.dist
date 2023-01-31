@@ -18,6 +18,10 @@
     <testsuites>
         <testsuite name="zenstruck/filesystem Test Suite">
             <directory>tests</directory>
+            <exclude>tests/Filesystem/Doctrine</exclude>
+        </testsuite>
+        <testsuite name="zenstruck/filesystem Doctrine Tests">
+            <directory>tests/Filesystem/Doctrine</directory>
         </testsuite>
     </testsuites>
 
