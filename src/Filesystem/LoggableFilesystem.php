@@ -36,7 +36,7 @@ final class LoggableFilesystem implements Filesystem
     public function __construct(
         private Filesystem $inner,
         private LoggerInterface $logger,
-        private array $config = []
+        private array $config = [],
     ) {
     }
 
