@@ -31,6 +31,129 @@ Additionally, the following features are provided:
 composer require zenstruck/filesystem
 ```
 
+## Symfony Integration
+
+### Full Default Bundle Config
+
+```yaml
+zenstruck_filesystem:
+
+    # Filesystem configurations
+    filesystems:
+
+        # Prototype
+        name:
+
+            # Flysystem adapter DSN or, if prefixed with "@" flysystem adapter service id
+            dsn:                  ~ # Required
+
+                # Examples:
+                # - '%kernel.project_dir%/public/files'
+                # - 'ftp://foo:bar@example.com/path'
+                # - 's3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1'
+                # - '@my_adapter_service'
+
+            # Extra global adapter filesystem config
+            config:               []
+
+            # Public URL generator for this filesystem
+            public_url:
+
+                # URL prefix or multiple prefixes to use for this filesystem (can be an array)
+                prefix:
+
+                    # Examples:
+                    # - /files
+                    # - 'https://cdn1.example.com'
+                    # - 'https://cdn2.example.com'
+
+                # Service id for a League\Flysystem\UrlGeneration\PublicUrlGenerator
+                service:              null
+
+                # Generate with a route
+                route:
+
+                    # Route name
+                    name:                 ~ # Required
+
+                    # Route parameters
+                    parameters:           []
+
+                    # Sign by default?
+                    sign:                 false
+
+                    # Default expiry
+                    expires:              null # Example: '+ 30 minutes'
+
+            # Temporary URL generator for this filesystem
+            temporary_url:
+
+                # Service id for a League\Flysystem\UrlGeneration\TemporaryUrlGenerator
+                service:              null
+
+                # Generate with a route
+                route:
+
+                    # Route name
+                    name:                 ~ # Required
+
+                    # Route parameters
+                    parameters:           []
+
+            # Image Transform URL generator for this filesystem
+            image_url:
+
+                # Service id for a League\Flysystem\UrlGeneration\PublicUrlGenerator
+                service:              null
+
+                # Generate with a route
+                route:
+
+                    # Route name
+                    name:                 ~ # Required
+
+                    # Route parameters
+                    parameters:           []
+
+                    # Sign by default?
+                    sign:                 false
+
+                    # Default expiry
+                    expires:              null # Example: '+ 30 minutes'
+
+            # Log filesystem operations
+            log:
+                enabled:              true
+                read:                 debug # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                write:                info # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                move:                 ~ # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                copy:                 ~ # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                delete:               ~ # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                chmod:                ~ # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+                mkdir:                ~ # One of false; "emergency"; "alert"; "critical"; "error"; "warning"; "notice"; "info"; "debug"
+
+            # If true, and using the ResetFilesystem trait
+            # in your KernelTestCase's, delete this filesystem
+            # before each test.
+            reset_before_tests:   false
+
+    # Default filesystem name, if not configured, uses first one defined above
+    default_filesystem:   null
+
+    # Doctrine configuration
+    doctrine:
+        enabled:              true
+
+        # Global lifecycle events (can be disabled on a property-by-property basis)
+        lifecycle:
+
+            # Whether to auto load file type columns during object load
+            autoload:             true
+
+            # Whether to delete files on object removal
+            delete_on_remove:     true
+```
+
 ## Backward Compatibility Promise
 
 This library follows [Symfony's BC Promise](https://symfony.com/doc/current/contributing/code/bc.html) with the
