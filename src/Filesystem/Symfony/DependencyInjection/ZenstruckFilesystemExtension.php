@@ -32,6 +32,7 @@ use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\Doctrine\Twig\FileMappingLoaderExtension;
+use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
 use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -327,6 +328,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 ->setDecoratedService($filesystemId)
                 ->setArguments([new Reference('.inner'), new Reference('logger'), $config['log']])
                 ->addTag('monolog.logger', ['channel' => 'filesystem'])
+            ;
+        }
+
+        if ($config['events']['enabled']) {
+            $container->register('.zenstruck_filesystem.filesystem.events_'.$name, EventDispatcherFilesystem::class)
+                ->setDecoratedService($filesystemId)
+                ->setArguments([new Reference('.inner'), new Reference('event_dispatcher'), $config['events']])
             ;
         }
 

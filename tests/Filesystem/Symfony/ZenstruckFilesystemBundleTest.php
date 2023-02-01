@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
+use Zenstruck\Tests\Fixtures\FilesystemEventSubscriber;
 use Zenstruck\Tests\Fixtures\Service;
 
 /**
@@ -108,5 +109,26 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertStringContainsString('_hash=', $privateFile->temporaryUrl('tomorrow'));
         $this->assertStringContainsString('_expires=', $privateFile->temporaryUrl('tomorrow'));
         $this->assertSame('/glide/bar/file.png?w=100&h=200', $privateFile->transformUrl(['w' => 100, 'h' => 200]));
+    }
+
+    /**
+     * @test
+     */
+    public function events_are_dispatched(): void
+    {
+        $subscriber = self::getContainer()->get(FilesystemEventSubscriber::class);
+
+        $this->assertEmpty($subscriber->events);
+
+        $this->filesystem()
+            ->write('foo', 'bar')
+            ->mkdir('bar')
+            ->chmod('foo', 'public')
+            ->copy('foo', 'file.png')
+            ->delete('foo')
+            ->move('file.png', 'file2.png')
+        ;
+
+        $this->assertCount(12, $subscriber->events);
     }
 }

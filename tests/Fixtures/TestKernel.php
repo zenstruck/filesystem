@@ -123,6 +123,7 @@ final class TestKernel extends Kernel
                     'temporary_url' => 'route:public_temp',
                     'image_url' => 'route:public_transform',
                     'reset_before_tests' => true,
+                    'events' => true,
                 ],
                 'private' => [
                     'dsn' => '%kernel.project_dir%/var/private',
@@ -157,6 +158,10 @@ final class TestKernel extends Kernel
             ->setAutoconfigured(true)
         ;
         $c->register(CustomObjectPathGenerator::class)
+            ->setAutowired(true)
+            ->setAutoconfigured(true)
+        ;
+        $c->register(FilesystemEventSubscriber::class)
             ->setAutowired(true)
             ->setAutoconfigured(true)
         ;

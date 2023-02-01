@@ -121,6 +121,16 @@ zenstruck_filesystem:
                     # Default expiry
                     expires:              null # Example: '+ 30 minutes'
 
+            # Dispatch filesystem operation events
+            events:
+                enabled:              false
+                write:                true
+                delete:               true
+                mkdir:                true
+                chmod:                true
+                copy:                 true
+                move:                 true
+
             # Log filesystem operations
             log:
                 enabled:              true

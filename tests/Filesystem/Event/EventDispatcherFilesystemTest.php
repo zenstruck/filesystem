@@ -30,6 +30,7 @@ use Zenstruck\Filesystem\Event\PreMoveEvent;
 use Zenstruck\Filesystem\Event\PreWriteEvent;
 use Zenstruck\Filesystem\Operation;
 use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\Fixtures\FilesystemEventSubscriber;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,7 +43,7 @@ final class EventDispatcherFilesystemTest extends FilesystemTest
     public function can_track_events(): void
     {
         $dispatcher = self::eventDispatcher();
-        $dispatcher->addSubscriber($subscriber = new DummySubscriber());
+        $dispatcher->addSubscriber($subscriber = new FilesystemEventSubscriber());
 
         $filesystem = $this->createFilesystem($dispatcher, [
             Operation::WRITE => true,
@@ -142,34 +143,5 @@ final class EventDispatcherFilesystemTest extends FilesystemTest
     private static function eventDispatcher(): EventDispatcher
     {
         return new EventDispatcher();
-    }
-}
-
-class DummySubscriber implements EventSubscriberInterface
-{
-    /** @var OperationEvent[] */
-    public array $events = [];
-
-    public function on(OperationEvent $event): void
-    {
-        $this->events[] = $event;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PreWriteEvent::class => 'on',
-            PostWriteEvent::class => 'on',
-            PreCopyEvent::class => 'on',
-            PostCopyEvent::class => 'on',
-            PreMoveEvent::class => 'on',
-            PostMoveEvent::class => 'on',
-            PreDeleteEvent::class => 'on',
-            PostDeleteEvent::class => 'on',
-            PreChmodEvent::class => 'on',
-            PostChmodEvent::class => 'on',
-            PreMkdirEvent::class => 'on',
-            PostMkdirEvent::class => 'on',
-        ];
     }
 }
