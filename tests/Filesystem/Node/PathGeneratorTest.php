@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\Path\Namer;
 use Zenstruck\Filesystem\Node\PathGenerator;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\CustomPathGenerator;
+use Zenstruck\Tests\Fixtures\CustomPathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

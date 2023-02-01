@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
+namespace Zenstruck\Tests\Fixtures;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use League\Glide\Urls\UrlBuilder;
@@ -107,8 +107,8 @@ final class TestKernel extends Kernel
                     'Test' => [
                         'is_bundle' => false,
                         'type' => 'attribute',
-                        'dir' => '%kernel.project_dir%/tests/Filesystem/Symfony/Fixture/Entity',
-                        'prefix' => 'Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity',
+                        'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
+                        'prefix' => 'Zenstruck\Tests\Fixtures\Entity',
                         'alias' => 'Test',
                     ],
                 ],

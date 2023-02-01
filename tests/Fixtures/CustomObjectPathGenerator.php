@@ -9,24 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
+namespace Zenstruck\Tests\Fixtures;
 
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Path\Generator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CustomPathGenerator implements Generator
+final class CustomObjectPathGenerator implements Generator
 {
     public function generatePath(Node $node, array $context = []): string
     {
-        $value = "from/custom.{$node->path()->extension()}";
-
-        foreach ($context as $k => $v) {
-            $value .= "{$k}:{$v}";
-        }
-
-        return $value;
+        return \sprintf('images/%s-%s.%s',
+            \mb_strtolower((new AsciiSlugger())->slug($context['this']->getTitle())),
+            \mb_substr($node->ensureFile()->checksum(), 0, 7),
+            $node->path()->extension(),
+        );
     }
 }

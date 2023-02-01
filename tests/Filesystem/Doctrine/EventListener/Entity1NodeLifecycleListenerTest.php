@@ -13,7 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Doctrine\EventListener;
 
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity\Entity1;
+use Zenstruck\Tests\Fixtures\Entity\Entity1;
 
 use function Zenstruck\Foundry\repository;
 

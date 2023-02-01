@@ -13,7 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Doctrine\Twig;
 
 use Twig\Environment;
 use Zenstruck\Tests\Filesystem\Doctrine\DoctrineTestCase;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity\Entity2;
+use Zenstruck\Tests\Fixtures\Entity\Entity2;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

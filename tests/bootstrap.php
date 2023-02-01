@@ -22,7 +22,7 @@ use Zenstruck\Filesystem\FlysystemFilesystem;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-const FIXTURE_DIR = __DIR__.'/Fixtures';
+const FIXTURE_DIR = __DIR__.'/Fixtures/files';
 const TEMP_DIR = __DIR__.'/../var/temp';
 
 (new Symfony\Component\Filesystem\Filesystem())->remove(\dirname(TEMP_DIR));

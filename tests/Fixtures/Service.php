@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Symfony\Fixture;
+namespace Zenstruck\Tests\Fixtures;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;

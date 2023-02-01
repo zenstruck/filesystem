@@ -10,7 +10,7 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="Zenstruck\Tests\Filesystem\Symfony\Fixture\TestKernel" />
+        <server name="KERNEL_CLASS" value="Zenstruck\Tests\Fixtures\TestKernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0"/>
     </php>

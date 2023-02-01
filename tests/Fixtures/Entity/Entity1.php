@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity;
+namespace Zenstruck\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Filesystem\Doctrine\Mapping as Filesystem;
@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 use Zenstruck\Filesystem\Node\Metadata;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\CustomObjectPathGenerator;
+use Zenstruck\Tests\Fixtures\CustomObjectPathGenerator;
 
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]

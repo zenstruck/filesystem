@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Doctrine\EventListener;
 
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity\Entity2;
+use Zenstruck\Tests\Fixtures\Entity\Entity2;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

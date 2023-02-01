@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Tests\Filesystem\Symfony\Fixture\Entity;
+namespace Zenstruck\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Filesystem\Node\Mapping as Filesystem;

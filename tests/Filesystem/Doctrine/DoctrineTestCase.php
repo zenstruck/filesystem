@@ -20,7 +20,7 @@ use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Tests\Filesystem\Symfony\Fixture\Service;
+use Zenstruck\Tests\Fixtures\Service;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
