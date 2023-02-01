@@ -13,9 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Event;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
-use Zenstruck\Filesystem\Event\OperationEvent;
 use Zenstruck\Filesystem\Event\PostChmodEvent;
 use Zenstruck\Filesystem\Event\PostCopyEvent;
 use Zenstruck\Filesystem\Event\PostDeleteEvent;
