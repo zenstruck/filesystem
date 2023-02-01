@@ -88,7 +88,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         // normalizer
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
-            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
+            ->addArgument(new ServiceLocatorArgument([
+                PathGenerator::class => new Reference(PathGenerator::class),
+                'filesystem_locator' => new Reference('zenstruck_filesystem.filesystem_locator'),
+            ]))
             ->addTag('serializer.normalizer')
         ;
 

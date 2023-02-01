@@ -24,6 +24,11 @@ use Zenstruck\Filesystem\Twig\Template;
  */
 class Mapping
 {
+    public const METADATA = 'metadata';
+    public const FILESYSTEM = 'filesystem';
+    public const NAMER = 'namer';
+    public const NAMER_CONTEXT = 'namer_context';
+
     /** @var Format */
     public string|array $metadata;
 
@@ -38,17 +43,35 @@ class Mapping
         string|Namer|null $namer = null,
         array $namerContext = [],
     ) {
+        $this->metadata = $metadata;
         $this->namer = self::parseNamer($namer, $namerContext);
 
-        if (!$this->filesystem && Metadata::DSN !== $metadata && !isset($metadata[Metadata::DSN])) {
-            throw new \LogicException('A filesystem is required if not storing the DSN.');
+        if (!$this->filesystem && $this->requiresFilesystem()) {
+            throw new \LogicException('A filesystem is required if not serializing the DSN.');
         }
-
-        $this->metadata = $metadata;
 
         if (!$this->namer && $this->requiresPathGenerator()) {
-            throw new \LogicException('A namer is required if not storing the DSN or path.');
+            throw new \LogicException('A namer is required if not serializing the DSN or path.');
         }
+    }
+
+    /**
+     * @internal
+     */
+    public static function fromArray(array $array): self
+    {
+        $filesystem = $array[self::FILESYSTEM] ?? null;
+
+        if ($filesystem instanceof self) {
+            return $filesystem;
+        }
+
+        return new self(
+            $array[self::METADATA] ?? (isset($array[self::FILESYSTEM]) ? Metadata::PATH : Metadata::DSN),
+            $filesystem,
+            $array[self::NAMER] ?? null,
+            $array[self::NAMER_CONTEXT] ?? [],
+        );
     }
 
     /**
@@ -77,6 +100,19 @@ class Mapping
         }
 
         return !\in_array(Metadata::DSN, $this->metadata, true) && !\in_array(Metadata::PATH, $this->metadata, true);
+    }
+
+    private function requiresFilesystem(): bool
+    {
+        if (Metadata::DSN === $this->metadata) {
+            return false;
+        }
+
+        if (\is_array($this->metadata) && \in_array(Metadata::DSN, $this->metadata, true)) {
+            return false;
+        }
+
+        return true;
     }
 
     private static function parseNamer(string|Namer|null $namer, array $context): ?Namer

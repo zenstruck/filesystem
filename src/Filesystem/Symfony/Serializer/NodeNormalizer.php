@@ -26,14 +26,15 @@ use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\LazyNode;
+use Zenstruck\Filesystem\Node\Mapping;
+use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
-    public const FILESYSTEM_KEY = 'filesystem';
-
     private const TYPE_MAP = [
         File::class => LazyFile::class,
         Directory::class => LazyDirectory::class,
@@ -47,9 +48,9 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param Node $object
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string
     {
-        return isset($context[self::FILESYSTEM_KEY]) ? $object->path() : $object->dsn();
+        return Metadata::serialize($object, Mapping::fromArray($context)->metadata);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -62,21 +63,32 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node
     {
-        if (!\is_string($data)) {
-            throw new UnexpectedValueException('Data must be a string.');
+        if (!\is_string($data) && !\is_array($data)) {
+            throw new UnexpectedValueException('Data must be a string or array.');
         }
 
-        [$filesystem, $path] = Dsn::normalize($data);
-
-        if (isset($context[self::FILESYSTEM_KEY])) {
-            $filesystem = $context[self::FILESYSTEM_KEY]; // context always takes priority
-        }
+        $mapping = Mapping::fromArray($context);
 
         /** @var LazyNode $node */
-        $node = new (self::TYPE_MAP[$type])($path);
+        $node = new (self::TYPE_MAP[$type])($data);
+        $filesystem = $mapping->filesystem();
+
+        if (!$filesystem) { // filesystem defined in context always takes priority
+            [$filesystem] = Dsn::normalize(\is_string($data) ? $data : $data[Metadata::DSN] ?? '');
+        }
 
         if ($filesystem) {
-            $node->setFilesystem(fn() => $this->container->get($filesystem));
+            $node->setFilesystem(fn() => $this->container->get('filesystem_locator')->get($filesystem));
+        }
+
+        if ($mapping->requiresPathGenerator()) {
+            $node->setPath(function() use ($mapping, $node, $context) {
+                return $this->container->get(PathGenerator::class)->generate(
+                    $mapping->namer(),
+                    $node,
+                    $context
+                );
+            });
         }
 
         return $node;
