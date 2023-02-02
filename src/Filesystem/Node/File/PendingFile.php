@@ -18,6 +18,7 @@ use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Dsn;
@@ -178,6 +179,15 @@ class PendingFile extends \SplFileInfo implements File
 
     public function ensureFile(): self
     {
+        return $this;
+    }
+
+    public function ensureExists(): static
+    {
+        if (!$this->exists()) {
+            throw new NodeNotFound($this->path());
+        }
+
         return $this;
     }
 

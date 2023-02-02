@@ -64,7 +64,7 @@ abstract class FilesystemTest extends TestCase
     {
         $fs = $this->createFilesystem()->write('some/file.txt', 'content');
 
-        $this->assertTrue($fs->file('some/file.txt')->exists());
+        $this->assertTrue($fs->file('some/file.txt')->ensureExists()->exists());
     }
 
     /**

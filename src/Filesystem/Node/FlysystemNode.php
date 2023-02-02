@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Node;
 
+use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
@@ -70,6 +71,15 @@ abstract class FlysystemNode implements Node
     public function refresh(): static
     {
         $this->lastModified = $this->visibility = null;
+
+        return $this;
+    }
+
+    public function ensureExists(): static
+    {
+        if (!$this->exists()) {
+            throw new NodeNotFound($this->path());
+        }
 
         return $this;
     }

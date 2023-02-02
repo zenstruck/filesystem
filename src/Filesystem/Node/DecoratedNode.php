@@ -63,6 +63,13 @@ trait DecoratedNode
         return $this;
     }
 
+    public function ensureExists(): static
+    {
+        $this->inner()->ensureExists();
+
+        return $this;
+    }
+
     public function ensureFile(): File
     {
         return $this->inner()->ensureFile();

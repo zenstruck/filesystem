@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem;
 
+use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Dsn;
@@ -55,6 +56,11 @@ interface Node
      * Clear any cached metadata.
      */
     public function refresh(): static;
+
+    /**
+     * @throws NodeNotFound
+     */
+    public function ensureExists(): static;
 
     /**
      * @throws NodeTypeMismatch if this node is not a file
