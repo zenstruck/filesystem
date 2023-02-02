@@ -28,7 +28,7 @@ trait DecoratedFilesystem
         return $this->inner()->name();
     }
 
-    public function node(string $path): File|Directory
+    public function node(string $path): Node
     {
         return $this->inner()->node($path);
     }
@@ -95,7 +95,7 @@ trait DecoratedFilesystem
         return $this;
     }
 
-    public function last(): File|Directory
+    public function last(): Node
     {
         return $this->inner()->last();
     }

@@ -37,7 +37,7 @@ final class MultiFilesystem implements Filesystem
         return $this->get($filesystem)->name();
     }
 
-    public function node(string $path): File|Directory
+    public function node(string $path): Node
     {
         [$filesystem, $path] = $this->parsePath($path);
 
@@ -143,7 +143,7 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function last(?string $name = null): File|Directory
+    public function last(?string $name = null): Node
     {
         if ($name) {
             return $this->get($name)->last();

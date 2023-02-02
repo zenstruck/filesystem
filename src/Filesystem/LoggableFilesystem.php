@@ -40,7 +40,7 @@ final class LoggableFilesystem implements Filesystem
     ) {
     }
 
-    public function node(string $path): File|Directory
+    public function node(string $path): Node
     {
         $this->log(
             $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],

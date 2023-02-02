@@ -17,7 +17,6 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\PathPrefixer;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
@@ -25,6 +24,7 @@ use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\FlysystemFile;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\FlysystemNode;
 use Zenstruck\Stream;
 
 /**
@@ -57,32 +57,24 @@ final class FlysystemFilesystem implements Filesystem
         return $this->operator->name();
     }
 
-    public function node(string $path): File|Directory
+    public function node(string $path): Node
     {
-        if ($this->operator->fileExists($path)) {
-            return new FlysystemFile($path, $this->operator);
-        }
-
-        if ($this->operator->directoryExists($path)) {
-            return new FlysystemDirectory($path, $this->operator);
-        }
-
-        throw new NodeNotFound($path);
+        return (new FlysystemNode($path, $this->operator))->ensureExists();
     }
 
     public function file(string $path): File
     {
-        return $this->node($path)->ensureFile();
+        return (new FlysystemFile($path, $this->operator))->ensureExists();
     }
 
     public function directory(string $path = ''): Directory
     {
-        return $this->node($path)->ensureDirectory();
+        return (new FlysystemDirectory($path, $this->operator))->ensureExists();
     }
 
     public function image(string $path): Image
     {
-        return $this->node($path)->ensureImage();
+        return $this->file($path)->ensureImage();
     }
 
     public function has(string $path): bool
@@ -164,9 +156,8 @@ final class FlysystemFilesystem implements Filesystem
             $progress = $config['progress'] ?? static fn() => null;
 
             foreach ($value->files() as $file) {
-                /** @var File $file */
                 $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config);
-                $progress($this->last()->ensureFile());
+                $progress(new FlysystemFile($this->last, $this->operator));
             }
 
             $this->last = $path;
@@ -210,8 +201,8 @@ final class FlysystemFilesystem implements Filesystem
         return $this;
     }
 
-    public function last(): File|Directory
+    public function last(): Node
     {
-        return \is_string($this->last) ? $this->node($this->last) : throw $this->last;
+        return \is_string($this->last) ? new FlysystemNode($this->last, $this->operator) : throw $this->last;
     }
 }

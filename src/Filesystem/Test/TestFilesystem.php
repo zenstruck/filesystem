@@ -14,10 +14,10 @@ namespace Zenstruck\Filesystem\Test;
 use Zenstruck\Assert;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
 use Zenstruck\Filesystem\Test\Node\TestImage;
+use Zenstruck\Filesystem\Test\Node\TestNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,7 +34,7 @@ final class TestFilesystem implements Filesystem
     }
 
     /**
-     * @param null|callable(TestFile|TestDirectory):void $callback
+     * @param null|callable(TestNode):void $callback
      */
     public function assertExists(string $path, ?callable $callback = null): self
     {
@@ -122,11 +122,9 @@ final class TestFilesystem implements Filesystem
         return $this;
     }
 
-    public function node(string $path): TestFile|TestDirectory
+    public function node(string $path): TestNode
     {
-        $node = $this->inner()->node($path);
-
-        return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
+        return new TestNode($this->inner()->node($path));
     }
 
     public function file(string $path): TestFile
@@ -144,11 +142,9 @@ final class TestFilesystem implements Filesystem
         return new TestDirectory($this->inner()->directory($path));
     }
 
-    public function last(): TestFile|TestDirectory
+    public function last(): TestNode
     {
-        $node = $this->inner()->last();
-
-        return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
+        return new TestNode($this->inner()->last());
     }
 
     public function dump(): self

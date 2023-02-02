@@ -28,7 +28,7 @@ interface Filesystem
     /**
      * @throws NodeNotFound if the path does not exist
      */
-    public function node(string $path): File|Directory;
+    public function node(string $path): Node;
 
     /**
      * @throws NodeNotFound     if the path does not exist
@@ -76,5 +76,5 @@ interface Filesystem
     /**
      * @throws \LogicException if no last node available
      */
-    public function last(): File|Directory;
+    public function last(): Node;
 }

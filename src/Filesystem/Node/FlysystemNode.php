@@ -80,11 +80,15 @@ class FlysystemNode implements Node
 
     public function ensureExists(): static
     {
-        if (!$this->exists()) {
-            throw new NodeNotFound($this->path());
+        if ($this->exists()) {
+            return $this;
         }
 
-        return $this;
+        throw match (true) {
+            $this instanceof File && $this->operator->directoryExists($this->path()) => NodeTypeMismatch::expectedFileAt($this->path()),
+            $this instanceof Directory && $this->operator->fileExists($this->path()) => NodeTypeMismatch::expectedDirectoryAt($this->path()),
+            default => new NodeNotFound($this->path()),
+        };
     }
 
     public function ensureFile(): File

@@ -16,7 +16,6 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Stream;
 use Zenstruck\TempFile;
@@ -34,15 +33,11 @@ abstract class FilesystemTest extends TestCase
         $fs = $this->createFilesystem();
         $fs->write('some/file.txt', 'content');
 
-        $file = $fs->node('some/file.txt');
-        $dir = $fs->node('some');
+        $file = $fs->node('some/file.txt')->ensureExists();
+        $dir = $fs->node('some')->ensureExists();
 
-        $this->assertInstanceOf(File::class, $file);
-        $this->assertTrue($file->exists());
-        $this->assertSame('content', $file->contents());
-        $this->assertInstanceOf(Directory::class, $dir);
-        $this->assertTrue($dir->exists());
-        $this->assertCount(1, $dir);
+        $this->assertSame('content', $file->ensureFile()->contents());
+        $this->assertCount(1, $dir->ensureDirectory());
     }
 
     /**
@@ -347,7 +342,7 @@ abstract class FilesystemTest extends TestCase
         yield ['content'];
         yield [TempFile::for('content')];
         yield [Stream::inMemory()->write('content')->rewind()->get()];
-        yield [in_memory_filesystem()->write('file.txt', 'content')->last()];
+        yield [in_memory_filesystem()->write('file.txt', 'content')->last()->ensureFile()];
     }
 
     /**

@@ -18,9 +18,13 @@ use Zenstruck\Filesystem\Node\DecoratedNode;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class TestNode implements Node
+class TestNode implements Node
 {
     use DecoratedNode;
+
+    public function __construct(private Node $inner)
+    {
+    }
 
     public function ensureDirectory(): TestDirectory
     {
@@ -76,5 +80,10 @@ abstract class TestNode implements Node
         $expected($actual);
 
         return $this;
+    }
+
+    protected function inner(): Node
+    {
+        return $this->inner;
     }
 }

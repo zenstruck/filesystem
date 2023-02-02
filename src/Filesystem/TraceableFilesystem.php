@@ -77,7 +77,7 @@ final class TraceableFilesystem implements Filesystem
         $this->operations = [];
     }
 
-    public function node(string $path): File|Directory
+    public function node(string $path): Node
     {
         return $this->track(fn() => $this->inner()->node($path), Operation::READ, $path, 'node');
     }
