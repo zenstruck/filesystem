@@ -48,10 +48,11 @@ function temp_filesystem(): Filesystem
     return new FlysystemFilesystem(TEMP_DIR);
 }
 
-function in_memory_filesystem(): Filesystem
+function in_memory_filesystem(string $name = 'default'): Filesystem
 {
     return new FlysystemFilesystem(
         new InMemoryFilesystemAdapter(),
+        name: $name,
         features: [
             PublicUrlGenerator::class => new PrefixPublicUrlGenerator('/prefix'),
             TemporaryUrlGenerator::class => new class() implements TemporaryUrlGenerator {

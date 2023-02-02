@@ -295,6 +295,19 @@ abstract class FilesystemTest extends TestCase
     /**
      * @test
      */
+    public function cannot_delete_directory_object_from_another_filesystem(): void
+    {
+        $fs = $this->createFilesystem();
+        $dir = in_memory_filesystem('alternate')->mkdir('some/dir')->last()->ensureDirectory();
+
+        $this->expectException(\LogicException::class);
+
+        $fs->delete($dir);
+    }
+
+    /**
+     * @test
+     */
     public function can_make_directory(): void
     {
         $fs = $this->createFilesystem();
