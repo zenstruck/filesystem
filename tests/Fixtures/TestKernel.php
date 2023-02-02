@@ -140,6 +140,7 @@ final class TestKernel extends Kernel
                     'dsn' => '%kernel.project_dir%/var/no_reset',
                 ],
             ],
+            'default_filesystem' => 'public',
         ]);
 
         $c->register(UrlBuilder::class)

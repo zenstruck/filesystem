@@ -15,7 +15,6 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -178,22 +177,20 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             return; // no filesystems defined
         }
 
-        $defaultName = $mergedConfig['default_filesystem'] ?? \array_key_first($mergedConfig['filesystems']);
+        $defaultName = $mergedConfig['default_filesystem'];
 
-        if (!isset($mergedConfig['filesystems'][$defaultName])) {
-            throw new InvalidConfigurationException('Invalid default filesystem name');
+        if ($defaultName) {
+            $container->getDefinition(MultiFilesystem::class)
+                ->addArgument($defaultName)
+            ;
         }
-
-        $container->getDefinition(MultiFilesystem::class)
-            ->addArgument($defaultName)
-        ;
 
         foreach ($mergedConfig['filesystems'] as $name => $config) {
             $this->registerFilesystem($name, $config, $container, $defaultName);
         }
     }
 
-    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, string $defaultName): void
+    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName): void
     {
         if ($config['reset_before_tests']) {
             if (!$container->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
@@ -350,10 +347,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ;
         }
 
+        $container->registerAliasForArgument($filesystemId, Filesystem::class, $name.'Filesystem');
+
         if ($name === $defaultName) {
             $container->setAlias(Filesystem::class, $filesystemId);
-        } else {
-            $container->registerAliasForArgument($filesystemId, Filesystem::class, $name.'Filesystem');
         }
     }
 }

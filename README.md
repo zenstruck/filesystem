@@ -147,7 +147,7 @@ zenstruck_filesystem:
             # before each test.
             reset_before_tests:   false
 
-    # Default filesystem name, if not configured, uses first one defined above
+    # Default filesystem name used to autowire Zenstruck\Filesystem
     default_filesystem:   null
 
     # Doctrine configuration

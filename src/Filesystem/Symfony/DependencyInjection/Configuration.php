@@ -18,6 +18,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Operation;
 
 /**
@@ -30,6 +31,16 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('zenstruck_filesystem');
 
         $treeBuilder->getRootNode() // @phpstan-ignore-line
+            ->validate()
+                ->ifTrue(function(array $v) {
+                    if (null === $v['default_filesystem']) {
+                        return false;
+                    }
+
+                    return !\array_key_exists($v['default_filesystem'], $v['filesystems']);
+                })
+                ->thenInvalid('The default_filesystem is not configured')
+            ->end()
             ->children()
                 ->arrayNode('filesystems')
                     ->info('Filesystem configurations')
@@ -255,7 +266,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('default_filesystem')
                     ->defaultNull()
-                    ->info('Default filesystem name, if not configured, uses first one defined above')
+                    ->info('Default filesystem name used to autowire '.Filesystem::class)
                 ->end()
                 ->arrayNode('doctrine')
                     ->{ContainerBuilder::willBeAvailable('doctrine/orm', EntityManagerInterface::class, ['doctrine/doctrine-bundle']) ? 'canBeDisabled' : 'canBeEnabled'}()
