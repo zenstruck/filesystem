@@ -40,6 +40,7 @@ use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\Path\Generator;
 use Zenstruck\Filesystem\Node\Path\Generator\ExpressionPathGenerator;
 use Zenstruck\Filesystem\Node\PathGenerator;
+use Zenstruck\Filesystem\Symfony\Command\FilesystemPurgeCommand;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\HttpKernel\FilesystemDataCollector;
 use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
@@ -93,6 +94,12 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 'filesystem_locator' => new Reference('zenstruck_filesystem.filesystem_locator'),
             ]))
             ->addTag('serializer.normalizer')
+        ;
+
+        // commands
+        $container->register('.zenstruck_filesystem.purge_command', FilesystemPurgeCommand::class)
+            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
+            ->addTag('console.command')
         ;
 
         $this->registerFilesystems($mergedConfig, $container);

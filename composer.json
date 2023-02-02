@@ -42,6 +42,7 @@
         "symfony/validator": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
         "zenstruck/assert": "^1.2",
+        "zenstruck/console-test": "^1.4",
         "zenstruck/foundry": "^1.26",
         "zenstruck/uri": "^2.2"
     },
