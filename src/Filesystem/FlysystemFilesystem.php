@@ -37,9 +37,11 @@ final class FlysystemFilesystem implements Filesystem
 
     public function __construct(
         FilesystemOperator|FilesystemAdapter|string $flysystem,
-        string $name = 'default',
+        ?string $name = null,
         array|ContainerInterface $features = []
     ) {
+        $name ??= 'filesystem'.\spl_object_id($this);
+
         if (\is_string($flysystem)) {
             $flysystem = AdapterFactory::createAdapter($flysystem);
         }

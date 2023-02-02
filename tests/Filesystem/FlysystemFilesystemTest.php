@@ -26,13 +26,20 @@ final class FlysystemFilesystemTest extends FilesystemTest
      */
     public function can_set_a_name(): void
     {
-        $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
-
-        $this->assertSame('default', $filesystem->name());
-
         $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter(), 'public');
 
         $this->assertSame('public', $filesystem->name());
+    }
+
+    /**
+     * @test
+     */
+    public function names_are_unique_per_instance(): void
+    {
+        $filesystem1 = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
+        $filesystem2 = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
+
+        $this->assertNotSame($filesystem1->name(), $filesystem2->name());
     }
 
     /**
