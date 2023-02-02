@@ -12,7 +12,6 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
-use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
 use Zenstruck\Filesystem\Node\FlysystemNode;
@@ -24,8 +23,6 @@ use Zenstruck\TempFile;
  */
 class FlysystemFile extends FlysystemNode implements File
 {
-    private const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
-
     private ?int $size = null;
     private ?string $mimeType = null;
     private array $checksum = [];
@@ -106,20 +103,14 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function ensureImage(): Image
     {
-        if ($this instanceof Image) {
+        if ($this instanceof FlysystemImage) {
             return $this;
         }
 
-        if (!\in_array($this->guessExtension(), self::IMAGE_EXTENSIONS, true)) {
-            throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $this->mimeType()));
-        }
-
-        $image = new FlysystemImage($this->path(), $this->operator);
+        $image = parent::ensureImage();
         $image->checksum = $this->checksum;
         $image->mimeType = $this->mimeType;
         $image->size = $this->size;
-        $image->lastModified = $this->lastModified;
-        $image->visibility = $this->visibility;
 
         return $image;
     }

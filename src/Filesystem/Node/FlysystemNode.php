@@ -15,14 +15,18 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
+use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class FlysystemNode implements Node
 {
-    protected ?\DateTimeImmutable $lastModified = null;
-    protected ?string $visibility = null;
+    private const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
+
+    private ?\DateTimeImmutable $lastModified = null;
+    private ?string $visibility = null;
     private Path $path;
     private Dsn $dsn;
 
@@ -78,5 +82,25 @@ abstract class FlysystemNode implements Node
     public function ensureDirectory(): Directory
     {
         return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
+    }
+
+    /**
+     * @return FlysystemImage
+     */
+    public function ensureImage(): Image
+    {
+        if ($this instanceof FlysystemImage) {
+            return $this;
+        }
+
+        if (!\in_array($this->ensureFile()->guessExtension(), self::IMAGE_EXTENSIONS, true)) {
+            throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $this->mimeType()));
+        }
+
+        $image = new FlysystemImage($this->path(), $this->operator);
+        $image->lastModified = $this->lastModified;
+        $image->visibility = $this->visibility;
+
+        return $image;
     }
 }
