@@ -54,6 +54,11 @@ interface Filesystem
 
     public function move(string $source, string $destination, array $config = []): static;
 
+    /**
+     * @param array{
+     *     progress?: callable(Node=):void
+     * } $config
+     */
     public function delete(string|Directory $path, array $config = []): static;
 
     public function mkdir(string $path, array $config = []): static;
@@ -62,6 +67,9 @@ interface Filesystem
 
     /**
      * @param resource|string|\SplFileInfo|Node $value
+     * @param array{
+     *     progress?: callable(File=):void
+     * } $config
      */
     public function write(string $path, mixed $value, array $config = []): static;
 

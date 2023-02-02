@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Stream;
@@ -275,6 +276,30 @@ abstract class FilesystemTest extends TestCase
     /**
      * @test
      */
+    public function can_delete_directory_object_with_progress(): void
+    {
+        $fs = $this->createFilesystem();
+        $fs->write('file.txt', 'content');
+        $fs->write('some/file.txt', 'content');
+        $fs->write('some/sub/file.txt', 'content');
+        $nodes = [];
+
+        $this->assertTrue($fs->has('some/file.txt'));
+        $this->assertTrue($fs->has('some/sub/file.txt'));
+
+        $fs->delete($fs->directory('some')->files()->recursive(), ['progress' => function(Node $node) use (&$nodes) {
+            $nodes[] = $node->path()->toString();
+        }]);
+
+        $this->assertTrue($fs->has('file.txt'));
+        $this->assertFalse($fs->has('some/file.txt'));
+        $this->assertFalse($fs->has('some/sub/file.txt'));
+        $this->assertSame(['some/file.txt', 'some/sub/file.txt'], $nodes);
+    }
+
+    /**
+     * @test
+     */
     public function can_make_directory(): void
     {
         $fs = $this->createFilesystem();
@@ -340,6 +365,31 @@ abstract class FilesystemTest extends TestCase
         $this->assertTrue($fs->has('foo/sub2'));
         $this->assertTrue($fs->has('foo/sub2/file2.txt'));
         $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
+    }
+
+    /**
+     * @test
+     * @dataProvider writeDirectoryProvider
+     */
+    public function can_write_directory_with_progress(mixed $value): void
+    {
+        $fs = $this->createFilesystem();
+        $nodes = [];
+
+        $fs->write('foo', $value, ['progress' => function(File $file) use (&$nodes) {
+            $nodes[] = $file->path()->toString();
+        }]);
+
+        $this->assertTrue($fs->has('foo'));
+        $this->assertTrue($fs->has('foo/file1.txt'));
+        $this->assertTrue($fs->has('foo/sub2'));
+        $this->assertTrue($fs->has('foo/sub2/file2.txt'));
+        $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
+        $this->assertSame([
+            'foo/file1.txt',
+            'foo/sub2/sub3/file2.txt',
+            'foo/sub2/file2.txt',
+        ], $nodes);
     }
 
     public static function writeDirectoryProvider(): iterable

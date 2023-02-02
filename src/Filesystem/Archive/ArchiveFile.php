@@ -35,6 +35,11 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         parent::__construct($filename ?? TempFile::new()->delete());
     }
 
+    /**
+     * @param array{
+     *     commit_progress?: callable(float):void
+     * } $config
+     */
     public static function zip(Node|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
     {
         $filesystem = new self($filename);

@@ -113,8 +113,11 @@ final class FlysystemFilesystem implements Filesystem
         $this->last = new \LogicException('Last operation was a delete so no last node is available.');
 
         if ($path instanceof Directory) {
+            $progress = $config['progress'] ?? static fn() => null;
+
             foreach ($path as $node) {
                 $this->delete($node->path(), $config);
+                $progress($node);
             }
 
             return $this;
@@ -158,9 +161,12 @@ final class FlysystemFilesystem implements Filesystem
         if ($value instanceof Directory) {
             $prefixer = new PathPrefixer($path);
             $prefixLength = \mb_strlen($value->path());
+            $progress = $config['progress'] ?? static fn() => null;
 
             foreach ($value->files() as $file) {
+                /** @var File $file */
                 $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config);
+                $progress($this->last()->ensureFile());
             }
 
             $this->last = $path;
