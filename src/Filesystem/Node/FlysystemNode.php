@@ -16,13 +16,14 @@ use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
+use Zenstruck\Filesystem\Node\File\FlysystemFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class FlysystemNode implements Node
+class FlysystemNode implements Node
 {
     private const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
 
@@ -31,12 +32,9 @@ abstract class FlysystemNode implements Node
     private Path $path;
     private Dsn $dsn;
 
-    /**
-     * @internal
-     */
-    public function __construct(string $path, protected Operator $operator)
+    public function __construct(string|Path $path, protected Operator $operator)
     {
-        $this->path = new Path($path);
+        $this->path = \is_string($path) ? new Path($path) : $path;
     }
 
     public function path(): Path
@@ -75,6 +73,11 @@ abstract class FlysystemNode implements Node
         return $this;
     }
 
+    public function exists(): bool
+    {
+        return $this->operator->has($this->path());
+    }
+
     public function ensureExists(): static
     {
         if (!$this->exists()) {
@@ -86,12 +89,36 @@ abstract class FlysystemNode implements Node
 
     public function ensureFile(): File
     {
-        return $this instanceof File ? $this : throw NodeTypeMismatch::expectedFileAt($this->path());
+        if ($this instanceof FlysystemFile) {
+            return $this;
+        }
+
+        if ($this->operator->fileExists($this->path())) {
+            $file = new FlysystemFile($this->path(), $this->operator);
+            $file->lastModified = $this->lastModified;
+            $file->visibility = $this->visibility;
+
+            return $file;
+        }
+
+        throw NodeTypeMismatch::expectedFileAt($this->path());
     }
 
     public function ensureDirectory(): Directory
     {
-        return $this instanceof Directory ? $this : throw NodeTypeMismatch::expectedDirectoryAt($this->path());
+        if ($this instanceof FlysystemDirectory) {
+            return $this;
+        }
+
+        if ($this->operator->directoryExists($this->path())) {
+            $directory = new FlysystemDirectory($this->path(), $this->operator);
+            $directory->lastModified = $this->lastModified;
+            $directory->visibility = $this->visibility;
+
+            return $directory;
+        }
+
+        throw NodeTypeMismatch::expectedDirectoryAt($this->path());
     }
 
     /**
