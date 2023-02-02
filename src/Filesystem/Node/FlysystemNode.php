@@ -103,8 +103,10 @@ abstract class FlysystemNode implements Node
             return $this;
         }
 
-        if (!\in_array($this->ensureFile()->guessExtension(), self::IMAGE_EXTENSIONS, true)) {
-            throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $this->mimeType()));
+        $file = $this->ensureFile();
+
+        if (!\in_array($file->guessExtension(), self::IMAGE_EXTENSIONS, true)) {
+            throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $file->mimeType()));
         }
 
         $image = new FlysystemImage($this->path(), $this->operator);

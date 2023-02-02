@@ -51,11 +51,6 @@ trait DecoratedNode
         return $this->inner()->exists();
     }
 
-    public function mimeType(): string
-    {
-        return $this->inner()->mimeType();
-    }
-
     public function refresh(): static
     {
         $this->inner()->refresh();

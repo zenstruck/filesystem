@@ -33,7 +33,6 @@ trait DirectoryTests
         $this->assertSame('bar', $dir->path()->basename());
         $this->assertNull($dir->path()->extension());
         $this->assertSame('foo', $dir->directory()->path()->toString());
-        $this->assertSame('dir', $dir->mimeType());
 
         $dir = $this->createDirectory(fixture('sub1'), 'foo');
 

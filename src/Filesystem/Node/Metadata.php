@@ -39,8 +39,8 @@ final class Metadata
     public const IPTC = 'iptc';
 
     private const STRING_METADATA = [self::PATH, self::DSN];
-    private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::MIME_TYPE];
-    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION];
+    private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY];
+    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE];
     private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
 
     private function __construct()
@@ -132,7 +132,7 @@ final class Metadata
                 self::DSN => $node->dsn()->toString(),
                 self::LAST_MODIFIED => $node->lastModified()->format('c'),
                 self::VISIBILITY => $node->visibility(),
-                self::MIME_TYPE => $node->mimeType(),
+                self::MIME_TYPE => $node->ensureFile()->mimeType(),
                 self::SIZE => $node->ensureFile()->size(),
                 self::EXTENSION => $node->path()->extension(),
                 self::CHECKSUM => self::serializeChecksum($node->ensureFile(), $value),

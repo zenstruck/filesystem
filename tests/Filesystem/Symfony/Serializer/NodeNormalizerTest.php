@@ -48,7 +48,7 @@ final class NodeNormalizerTest extends KernelTestCase
         $this->assertInstanceOf($type, $deserialized);
         $this->assertTrue($deserialized->exists());
         $this->assertSame($node->path()->toString(), $deserialized->path()->toString());
-        $this->assertSame($node->mimeType(), $deserialized->mimeType());
+        $this->assertEquals($node->lastModified(), $deserialized->lastModified());
     }
 
     public static function normalizeProvider(): iterable

@@ -25,6 +25,8 @@ interface File extends Node
      */
     public function guessExtension(): ?string;
 
+    public function mimeType(): string;
+
     public function size(): int;
 
     public function contents(): string;

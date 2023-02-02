@@ -113,11 +113,6 @@ abstract class LazyNode implements Node
         return $this->attributes[Metadata::VISIBILITY] ?? $this->inner()->visibility();
     }
 
-    public function mimeType(): string
-    {
-        return $this->attributes[Metadata::MIME_TYPE] ?? $this->inner()->mimeType();
-    }
-
     public function exists(): bool
     {
         return $this->filesystem()->has($this->path());

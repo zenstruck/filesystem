@@ -26,6 +26,11 @@ trait DecoratedFile
         return $this->inner()->guessExtension();
     }
 
+    public function mimeType(): string
+    {
+        return $this->inner()->mimeType();
+    }
+
     public function size(): int
     {
         return $this->inner()->size();

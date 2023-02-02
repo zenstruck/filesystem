@@ -22,6 +22,11 @@ class LazyFile extends LazyNode implements File
 {
     use DecoratedFile;
 
+    public function mimeType(): string
+    {
+        return $this->attributes[Metadata::MIME_TYPE] ?? $this->inner()->mimeType();
+    }
+
     public function size(): int
     {
         return $this->attributes[Metadata::SIZE] ?? $this->inner()->size();

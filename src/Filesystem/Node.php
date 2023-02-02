@@ -50,8 +50,6 @@ interface Node
      */
     public function exists(): bool;
 
-    public function mimeType(): string;
-
     /**
      * Clear any cached metadata.
      */
