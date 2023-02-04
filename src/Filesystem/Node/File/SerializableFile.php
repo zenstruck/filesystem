@@ -18,6 +18,8 @@ use Zenstruck\Filesystem\Node\Metadata;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @internal
+ *
  * @phpstan-import-type Format from Metadata
  * @phpstan-import-type Serialized from Metadata
  */

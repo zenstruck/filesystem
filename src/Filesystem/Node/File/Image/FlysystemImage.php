@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class FlysystemImage extends FlysystemFile implements Image
 {

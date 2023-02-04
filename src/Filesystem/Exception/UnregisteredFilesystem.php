@@ -16,6 +16,9 @@ namespace Zenstruck\Filesystem\Exception;
  */
 final class UnregisteredFilesystem extends \RuntimeException
 {
+    /**
+     * @internal
+     */
     public function __construct(string $name, ?\Throwable $previous = null)
     {
         parent::__construct(\sprintf('Filesystem "%s" is not registered.', $name), previous: $previous);

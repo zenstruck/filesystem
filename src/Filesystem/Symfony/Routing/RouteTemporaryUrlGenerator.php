@@ -17,8 +17,6 @@ use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @internal
  */
 final class RouteTemporaryUrlGenerator implements TemporaryUrlGenerator
 {

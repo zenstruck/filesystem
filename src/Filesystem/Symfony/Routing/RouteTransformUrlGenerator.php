@@ -16,8 +16,6 @@ use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @internal
  */
 final class RouteTransformUrlGenerator extends RouteUrlGenerator implements TransformUrlGenerator
 {

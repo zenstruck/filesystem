@@ -22,6 +22,8 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class FlysystemNode implements Node
 {

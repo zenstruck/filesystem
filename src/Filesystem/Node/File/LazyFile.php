@@ -17,6 +17,8 @@ use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class LazyFile extends LazyNode implements File
 {

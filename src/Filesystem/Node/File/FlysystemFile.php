@@ -20,6 +20,8 @@ use Zenstruck\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class FlysystemFile extends FlysystemNode implements File
 {

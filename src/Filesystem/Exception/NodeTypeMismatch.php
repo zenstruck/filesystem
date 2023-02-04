@@ -18,11 +18,17 @@ use League\Flysystem\FilesystemException;
  */
 final class NodeTypeMismatch extends \RuntimeException implements FilesystemException
 {
+    /**
+     * @internal
+     */
     public static function expectedDirectoryAt(string $path): self
     {
         return new self(\sprintf('Expected node at path "%s" to be a directory but is a file.', $path));
     }
 
+    /**
+     * @internal
+     */
     public static function expectedFileAt(string $path): self
     {
         return new self(\sprintf('Expected node at path "%s" to be a file but is a directory.', $path));

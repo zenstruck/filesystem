@@ -22,6 +22,8 @@ use Zenstruck\Filesystem\Doctrine\Types\ImagePathType;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class RegisterDoctrineTypePass implements CompilerPassInterface
 {

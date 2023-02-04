@@ -16,8 +16,6 @@ use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @internal
  */
 final class RoutePublicUrlGenerator extends RouteUrlGenerator implements PublicUrlGenerator
 {

@@ -23,6 +23,8 @@ use Zenstruck\Filesystem\Operation;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class Configuration implements ConfigurationInterface
 {

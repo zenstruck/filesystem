@@ -16,8 +16,6 @@ use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @readonly
  */
 abstract class Stateful extends Mapping
 {

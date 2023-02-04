@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Node;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 abstract class LazyNode implements Node
 {

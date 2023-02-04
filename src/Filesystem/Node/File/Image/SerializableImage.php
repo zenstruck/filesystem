@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Node\File\SerializableFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class SerializableImage extends SerializableFile implements Image
 {

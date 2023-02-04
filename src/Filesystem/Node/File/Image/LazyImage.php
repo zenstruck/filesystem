@@ -18,6 +18,8 @@ use Zenstruck\Image\Dimensions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class LazyImage extends LazyFile implements Image
 {

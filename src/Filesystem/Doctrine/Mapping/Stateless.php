@@ -26,17 +26,11 @@ final class Stateless extends Mapping
         parent::__construct(Metadata::PATH, $filesystem, $namer, $namerContext);
     }
 
-    /**
-     * @internal
-     */
     public function filesystem(): string
     {
         return parent::filesystem(); // @phpstan-ignore-line
     }
 
-    /**
-     * @internal
-     */
     public function namer(): Namer
     {
         return parent::namer(); // @phpstan-ignore-line

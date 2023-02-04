@@ -30,9 +30,6 @@ final class StoreAsPath extends Stateful
         parent::__construct(Metadata::PATH, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
     }
 
-    /**
-     * @internal
-     */
     public function filesystem(): string
     {
         return parent::filesystem(); // @phpstan-ignore-line

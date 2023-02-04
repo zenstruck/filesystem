@@ -72,6 +72,9 @@ class PendingFile extends \SplFileInfo implements File
         return $this->path = new Path($this);
     }
 
+    /**
+     * @internal
+     */
     public function dsn(): Dsn
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
@@ -157,16 +160,25 @@ class PendingFile extends \SplFileInfo implements File
         return TempFile::for($this);
     }
 
+    /**
+     * @internal
+     */
     public function publicUrl(array $config = []): string
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }
 
+    /**
+     * @internal
+     */
     public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }
 
+    /**
+     * @internal
+     */
     public function directory(): ?Directory
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));

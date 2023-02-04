@@ -19,6 +19,8 @@ use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class PendingImageValidator extends ImageValidator
 {

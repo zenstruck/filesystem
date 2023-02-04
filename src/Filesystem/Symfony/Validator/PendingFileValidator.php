@@ -19,6 +19,8 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class PendingFileValidator extends FileValidator
 {

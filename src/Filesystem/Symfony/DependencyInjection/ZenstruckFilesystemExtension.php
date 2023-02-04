@@ -54,6 +54,8 @@ use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {

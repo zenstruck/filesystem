@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class LazyDirectory extends LazyNode implements Directory
 {

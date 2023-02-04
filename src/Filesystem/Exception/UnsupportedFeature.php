@@ -17,6 +17,8 @@ namespace Zenstruck\Filesystem\Exception;
 final class UnsupportedFeature extends \LogicException
 {
     /**
+     * @internal
+     *
      * @param class-string $feature
      */
     public function __construct(string $feature, string $filesystem, ?\Throwable $previous = null)

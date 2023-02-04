@@ -18,6 +18,9 @@ use League\Flysystem\FilesystemException;
  */
 final class NodeNotFound extends \RuntimeException implements FilesystemException
 {
+    /**
+     * @internal
+     */
     public function __construct(string $path, ?\Throwable $previous = null)
     {
         parent::__construct(\sprintf('Node at path "%s" not found.', $path), previous: $previous);

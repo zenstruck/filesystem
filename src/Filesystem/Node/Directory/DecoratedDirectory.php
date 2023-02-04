@@ -15,6 +15,8 @@ use Zenstruck\Filesystem\Node\Directory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 trait DecoratedDirectory
 {

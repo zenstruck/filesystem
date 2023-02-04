@@ -29,6 +29,8 @@ use Zenstruck\Filesystem\Node\FlysystemNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class FlysystemDirectory extends FlysystemNode implements Directory
 {
