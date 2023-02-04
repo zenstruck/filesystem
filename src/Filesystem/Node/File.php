@@ -31,7 +31,7 @@ interface File extends Node
 
     public function contents(): string;
 
-    public function read(): Stream;
+    public function stream(): Stream;
 
     public function checksum(?string $algo = null): string;
 

@@ -41,9 +41,9 @@ trait DecoratedFile
         return $this->inner()->contents();
     }
 
-    public function read(): Stream
+    public function stream(): Stream
     {
-        return $this->inner()->read();
+        return $this->inner()->stream();
     }
 
     public function checksum(?string $algo = null): string

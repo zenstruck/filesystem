@@ -48,7 +48,7 @@ class FlysystemFile extends FlysystemNode implements File
         return $this->operator->read($this->path());
     }
 
-    public function read(): Stream
+    public function stream(): Stream
     {
         return Stream::wrap($this->operator->readStream($this->path()));
     }
@@ -76,7 +76,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function tempFile(): \SplFileInfo
     {
-        $stream = $this->read();
+        $stream = $this->stream();
 
         try {
             return TempFile::for($stream->get());

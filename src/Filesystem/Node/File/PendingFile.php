@@ -143,7 +143,7 @@ class PendingFile extends \SplFileInfo implements File
         return @\file_get_contents($this) ?: throw UnableToReadFile::fromLocation($this);
     }
 
-    public function read(): Stream
+    public function stream(): Stream
     {
         return Stream::open($this, 'r');
     }
