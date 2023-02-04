@@ -102,24 +102,9 @@ final class FlysystemFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
         $this->last = new \LogicException('Last operation was a delete so no last node is available.');
-
-        if ($path instanceof Directory) {
-            if ($this->name() !== $path->dsn()->filesystem()) {
-                throw new \LogicException(\sprintf('Cannot delete directory on filesystem "%s" with directory from filesystem "%s".', $this->name(), $path->dsn()->filesystem()));
-            }
-
-            $progress = $config['progress'] ?? static fn() => null;
-
-            foreach ($path as $node) {
-                $this->delete($node->path(), $config);
-                $progress($node);
-            }
-
-            return $this;
-        }
 
         if ($this->operator->fileExists($path)) {
             $this->operator->delete($path);

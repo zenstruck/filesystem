@@ -16,7 +16,6 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\Node;
-use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\TempFile;
 
@@ -68,7 +67,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
         return $filesystem;
     }
 
-    public function delete(Directory|string $path = '', array $config = []): static
+    public function delete(string $path = '', array $config = []): static
     {
         if (!\in_array($path, ['/', ''], true)) {
             $this->inner()->delete($path, $config);

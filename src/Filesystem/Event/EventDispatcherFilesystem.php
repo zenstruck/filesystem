@@ -14,7 +14,6 @@ namespace Zenstruck\Filesystem\Event;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
-use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Operation;
 
 /**
@@ -52,7 +51,7 @@ final class EventDispatcherFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
         $this->dispatch($event = new PreDeleteEvent($this, $path, $config), Operation::DELETE);
         $this->inner->delete($event->path, $event->config);

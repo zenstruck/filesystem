@@ -116,13 +116,9 @@ final class TraceableFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
-        $this->track(
-            fn() => $this->inner()->delete($path, $config),
-            Operation::DELETE,
-            $path instanceof Directory ? $path->path() : $path
-        );
+        $this->track(fn() => $this->inner()->delete($path, $config), Operation::DELETE, $path);
 
         return $this;
     }

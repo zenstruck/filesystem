@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Stream;
 use Zenstruck\TempFile;
@@ -247,62 +246,6 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertTrue($fs->has('some/file.txt'));
         $this->assertFalse($fs->has('some/sub'));
-    }
-
-    /**
-     * @test
-     */
-    public function can_delete_directory_object(): void
-    {
-        $fs = $this->createFilesystem();
-        $fs->write('some/file.txt', 'content');
-        $fs->write('some/sub/file.txt', 'content');
-
-        $this->assertTrue($fs->has('some/file.txt'));
-        $this->assertTrue($fs->has('some/sub/file.txt'));
-
-        $fs->delete($fs->directory('some')->files());
-
-        $this->assertFalse($fs->has('some/file.txt'));
-        $this->assertTrue($fs->has('some/sub'));
-        $this->assertTrue($fs->has('some/sub/file.txt'));
-    }
-
-    /**
-     * @test
-     */
-    public function can_delete_directory_object_with_progress(): void
-    {
-        $fs = $this->createFilesystem();
-        $fs->write('file.txt', 'content');
-        $fs->write('some/file.txt', 'content');
-        $fs->write('some/sub/file.txt', 'content');
-        $nodes = [];
-
-        $this->assertTrue($fs->has('some/file.txt'));
-        $this->assertTrue($fs->has('some/sub/file.txt'));
-
-        $fs->delete($fs->directory('some')->files()->recursive(), ['progress' => function(Node $node) use (&$nodes) {
-            $nodes[] = $node->path()->toString();
-        }]);
-
-        $this->assertTrue($fs->has('file.txt'));
-        $this->assertFalse($fs->has('some/file.txt'));
-        $this->assertFalse($fs->has('some/sub/file.txt'));
-        $this->assertSame(['some/file.txt', 'some/sub/file.txt'], $nodes);
-    }
-
-    /**
-     * @test
-     */
-    public function cannot_delete_directory_object_from_another_filesystem(): void
-    {
-        $fs = $this->createFilesystem();
-        $dir = in_memory_filesystem('alternate')->mkdir('some/dir')->last()->ensureDirectory();
-
-        $this->expectException(\LogicException::class);
-
-        $fs->delete($dir);
     }
 
     /**

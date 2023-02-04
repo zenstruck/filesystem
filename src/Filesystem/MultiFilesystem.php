@@ -107,11 +107,11 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
-        [$filesystem, $pathString] = $this->parsePath($path instanceof Directory ? $path->path() : $path);
+        [$filesystem, $path] = $this->parsePath($path);
 
-        $filesystem->delete($path instanceof Directory ? $path : $pathString, $config);
+        $filesystem->delete($path, $config);
 
         return $this;
     }

@@ -54,12 +54,7 @@ interface Filesystem
 
     public function move(string $source, string $destination, array $config = []): static;
 
-    /**
-     * @param array{
-     *     progress?: callable(Node=):void
-     * } $config
-     */
-    public function delete(string|Directory $path, array $config = []): static;
+    public function delete(string $path, array $config = []): static;
 
     public function mkdir(string $path, array $config = []): static;
 

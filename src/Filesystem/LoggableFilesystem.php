@@ -137,13 +137,13 @@ final class LoggableFilesystem implements Filesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
         $this->log(
             $this->config[Operation::DELETE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Deleting "{path}" on filesystem "{filesystem}"',
             [
-                'path' => $path instanceof Directory ? $path->path() : $path,
+                'path' => $path,
             ]
         );
 

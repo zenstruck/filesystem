@@ -67,7 +67,7 @@ trait DecoratedFilesystem
         return $this;
     }
 
-    public function delete(Directory|string $path, array $config = []): static
+    public function delete(string $path, array $config = []): static
     {
         $this->inner()->delete($path, $config);
 
