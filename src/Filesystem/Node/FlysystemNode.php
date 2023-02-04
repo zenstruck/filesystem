@@ -89,7 +89,7 @@ class FlysystemNode implements Node
         throw match (true) {
             $this instanceof File && $this->operator->directoryExists($this->path()) => NodeTypeMismatch::expectedFileAt($this->path()),
             $this instanceof Directory && $this->operator->fileExists($this->path()) => NodeTypeMismatch::expectedDirectoryAt($this->path()),
-            default => new NodeNotFound($this->path()),
+            default => new NodeNotFound($this->path(), $this->operator->name()),
         };
     }
 

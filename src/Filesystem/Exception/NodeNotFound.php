@@ -21,8 +21,8 @@ final class NodeNotFound extends \RuntimeException implements FilesystemExceptio
     /**
      * @internal
      */
-    public function __construct(string $path, ?\Throwable $previous = null)
+    public function __construct(string $path, string $filesystem, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('Node at path "%s" not found.', $path), previous: $previous);
+        parent::__construct(\sprintf('Node at path "%s" not found for filesystem "%s".', $path, $filesystem), previous: $previous);
     }
 }

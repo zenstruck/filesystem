@@ -197,7 +197,7 @@ class PendingFile extends \SplFileInfo implements File
     public function ensureExists(): static
     {
         if (!$this->exists()) {
-            throw new NodeNotFound($this->path());
+            throw new NodeNotFound($this->path(), '(pending-file)');
         }
 
         return $this;
