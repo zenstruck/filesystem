@@ -16,13 +16,13 @@ Additionally, the following features are provided:
 
 1. Filesystem _wrappers_ to add additional functionality (ie [`MultiFilesystem`](#multifilesystem),
    and [`LoggableFilesystem`](#loggablefilesystem)).
-2. Powerful [testing helpers](#testfilesystem).
+2. Powerful [testing helpers](#testing).
 3. [`ArchiveFile`](#archivefile) representing a local zip file that acts as both a filesystem _and_ a real file.
 4. [Doctrine Integration](#doctrine-integration).
 5. [Symfony Integration](#symfony-integration)
     - [Custom Responses](#responses)
     - [Validators](#validators)
-    - [Bundle](#symfony-bundle) to help configure filesystem services, wire the Doctrine integration and additional
+    - [Bundle](#bundle) to help configure filesystem services, wire the Doctrine integration and additional
       testing helpers.
 
 ## Installation
@@ -31,9 +31,101 @@ Additionally, the following features are provided:
 composer require zenstruck/filesystem
 ```
 
+## API
+
+### `Filesystem`
+
+### `Node`
+
+### `Directory`
+
+### `File`
+
+#### `PendingFile`
+
+#### `Image`
+
+##### `PendingImage`
+
+## Filesystems
+
+### `FlysystemFilesystem`
+
+#### Features
+
+##### `TransformUrlGenerator`
+
+### `MultiFilesystem`
+
+### `LoggableFilesystem`
+
+### `EventDispatcherFilesystem`
+
+### `ArchiveFile`
+
+## Testing
+
+### `InteractsWithFilesystem`
+
+#### `FilesystemProvider`
+
+#### `FixtureFilesystemProvider`
+
+### `ResetFilesystem`
+
+## Glide Integration
+
+### `GlideTransformUrlGenerator`
+
 ## Symfony Integration
 
-### Full Default Bundle Config
+### Responses
+
+#### `FileResponse`
+
+#### `ArchiveResponse`
+
+### Validators
+
+#### `PendingFileConstraint`
+
+#### `PendingImageConstraint`
+
+### Bundle
+
+#### Configuration
+
+#### Services
+
+#### Serializer
+
+#### Form Types
+
+##### `PendingFileType`
+
+##### `PendingImageType`
+
+#### Commands
+
+##### `zenstruck:filesystem:purge`
+
+#### Routing
+
+##### Public Url Route
+
+##### Temporary Url Route
+
+##### Transform Url Route
+
+##### `RouteTransformUrlGenerator`
+
+#### Doctrine Integration
+
+#### Functional/Integration Testing
+
+##### Testing Performance
+
+### Full Default Bundle Configuration
 
 ```yaml
 zenstruck_filesystem:
