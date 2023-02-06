@@ -92,7 +92,7 @@ trait FileTests
         $expected = \file_get_contents($fixture);
 
         $this->assertSame($expected, $file->contents());
-        $this->assertSame($expected, Stream::wrap($file->stream())->contents());
+        $this->assertSame($expected, Stream::wrap($file->read())->contents());
         $this->assertSame($expected, \file_get_contents($file->tempFile()));
     }
 

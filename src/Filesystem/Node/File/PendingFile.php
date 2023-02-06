@@ -165,7 +165,7 @@ class PendingFile extends \SplFileInfo implements File
         return @\file_get_contents($this) ?: throw UnableToReadFile::fromLocation($this);
     }
 
-    public function stream()
+    public function read()
     {
         if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
             return $this->uploadedFile->getStream()->detach() ?? throw UnableToReadFile::fromLocation($this->path());
@@ -188,7 +188,7 @@ class PendingFile extends \SplFileInfo implements File
         }
 
         if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            $stream = Stream::wrap($this->stream());
+            $stream = Stream::wrap($this->read());
             $stream->putContents($this);
             $stream->close();
             \chmod($this, 0644);

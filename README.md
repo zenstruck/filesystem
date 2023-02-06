@@ -115,7 +115,7 @@ Interface: `Zenstruck\Filesystem\Node\File` (extends [`Node`](#node)).
 
 $file->contents(); // string - the file's contents
 
-$file->stream(); // resource
+$file->read(); // resource
 
 $file->size(); // int
 

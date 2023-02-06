@@ -164,7 +164,7 @@ final class FlysystemFilesystem implements Filesystem
         }
 
         if ($value instanceof File) {
-            $value = $value->stream();
+            $value = $value->read();
             $closeStream = true;
         }
 

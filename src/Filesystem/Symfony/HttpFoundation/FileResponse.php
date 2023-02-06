@@ -23,7 +23,7 @@ final class FileResponse extends StreamedResponse
 {
     public function __construct(File $file, int $status = 200, array $headers = [])
     {
-        parent::__construct(static fn() => Stream::inOutput()->write($file->stream()), $status, $headers);
+        parent::__construct(static fn() => Stream::inOutput()->write($file->read()), $status, $headers);
 
         if (!$this->headers->has('Last-Modified')) {
             $this->setLastModified($file->lastModified());
