@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Node;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Stream;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -91,7 +92,7 @@ trait FileTests
         $expected = \file_get_contents($fixture);
 
         $this->assertSame($expected, $file->contents());
-        $this->assertSame($expected, $file->stream()->contents());
+        $this->assertSame($expected, Stream::wrap($file->stream())->contents());
         $this->assertSame($expected, \file_get_contents($file->tempFile()));
     }
 

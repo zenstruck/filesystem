@@ -41,7 +41,7 @@ trait DecoratedFile
         return $this->inner()->contents();
     }
 
-    public function stream(): Stream
+    public function stream()
     {
         return $this->inner()->stream();
     }

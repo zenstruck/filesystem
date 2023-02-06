@@ -48,9 +48,9 @@ class FlysystemFile extends FlysystemNode implements File
         return $this->operator->read($this->path());
     }
 
-    public function stream(): Stream
+    public function stream()
     {
-        return Stream::wrap($this->operator->readStream($this->path()));
+        return $this->operator->readStream($this->path());
     }
 
     public function checksum(?string $algo = null): string
@@ -76,7 +76,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function tempFile(): \SplFileInfo
     {
-        $stream = $this->stream();
+        $stream = Stream::wrap($this->stream());
 
         try {
             return TempFile::for($stream->get());
