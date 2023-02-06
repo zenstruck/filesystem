@@ -35,17 +35,218 @@ composer require zenstruck/filesystem
 
 ### `Filesystem`
 
+```php
+/** @var \Zenstruck\Filesystem $filesystem */
+
+// read operations
+$filesystem->has('some/path'); // bool
+$filesystem->node('some/path'); // Zenstruck\Filesystem\Node or throws NodeNotFound
+$filesystem->file('some/path.txt'); // Zenstruck\Filesystem\Node\File or throws NodeNotFound or NodeTypeMismatch (if exists but not a file)
+$filesystem->image('some/path.png'); // Zenstruck\Filesystem\Node\File\Image or throws NodeNotFound or NodeTypeMismatch (if exists but not an image)
+$filesystem->directory('some/path'); // Zenstruck\Filesystem\Node\Directory or throws NodeNotFound or NodeTypeMismatch (if exists but not a directory)
+
+// write operations
+$filesystem->write('some/path.txt', 'string contents'); // write a string
+$filesystem->write('some/path.txt', $resource); // write a resource
+$filesystem->write('some/path.txt', new \SplFileInfo('path/to/local/file.txt')); // write a local file
+$filesystem->write('some/prefix', new \SplFileInfo('path/to/local/directory')); // write a local directory
+$filesystem->write('some/path.txt', $file); // write a Zenstruck\Filesystem\Node\File
+$filesystem->write('some/prefix', $directory); // write a Zenstruck\Filesystem\Node\Directory
+
+$filesystem->copy('from/file.txt', 'dest/file.txt');
+
+$filesystem->move('from/file.txt', 'dest/file.txt');
+
+$filesystem->delete('some/file.txt');
+$filesystem->delete('some/directory');
+
+$filesystem->mkdir('some/directory');
+
+$filesystem->chmod('some/file.txt', 'private');
+
+// utility methods
+$filesystem->name(); // string - human-readable name for the filesystem
+
+$filesystem->last(); // Zenstruck\Filesystem\Node the node of the last write operation
+```
+
 ### `Node`
 
-### `Directory`
+Interface: `Zenstruck\Filesystem\Node`.
+
+```php
+/** @var \Zenstruck\Filesystem\Node $node */
+
+$node->path(); // Zenstruck\Filesystem\Node\Path
+$node->path()->toString(); // string - the full path
+(string) $node->path(); // same as above
+$node->path()->name(); // string - filename with extension
+$node->path()->basename(); // string - filename without extension
+$node->path()->extension(); // string|null - file extension
+$node->path()->dirname(); // string - the parent directory
+
+$node->dsn(); // Zenstruck\Filesystem\Node\Dsn
+$node->dsn()->toString(); // string - <filesystem-name>://<full-path>
+(string) $node->dsn(); // same as above
+$node->dsn()->path(); // Zenstruck\Filesystem\Node\Path
+$node->dsn()->filesystem(); // string - name of the filesystem this node belongs to
+
+$node->directory(); // Zenstruck\Filesystem\Node\Directory|null - parent directory object
+
+$node->visibility(); // string - ie "public" or "private"
+$node->lastModified(); // \DateTimeImmutable (in currently configured timezone)
+
+$node->exists(); // bool
+$node->ensureExists(); // static or throws NodeNotFound
+
+$node->refresh(); // static and clears any cached metadata
+
+$node->ensureDirectory(); // Zenstruck\Filesystem\Node\Directory or throws NodeTypeMismatch (if not a directory)
+$node->ensureFile(); // Zenstruck\Filesystem\Node\File or throws NodeTypeMismatch (if not a file)
+$node->ensureImage(); // Zenstruck\Filesystem\Node\Image or throws NodeTypeMismatch (if not an image)
+```
 
 ### `File`
 
+Interface: `Zenstruck\Filesystem\Node\File` (extends [`Node`](#node)).
+
+```php
+/** @var \Zenstruck\Filesystem\Node\File $file */
+
+$file->contents(); // string - the file's contents
+
+$file->stream(); // Zenstruck\Stream
+$file->stream()->get(); // resource
+
+$file->size(); // int
+
+$file->guessExtension(); // string|null - returns extension if available or attempts to guess from mime-type
+
+$file->checksum(); // string - using FilesystemAdapter's default algorithm
+$file->checksum('md5'); // string - specify the algorithm
+
+$file->publicUrl(); // string (needs to be configured)
+$file->temporaryUrl(new \DateTimeImmutable('+30 minutes')); // string - expiring url (needs to be configured)
+$file->temporaryUrl('+30 minutes'); // equivalent to above
+
+$file->tempFile(); // \SplFileInfo - temporary local file that's deleted at the end of the script
+```
+
+> **Note**: See [`zenstruck/stream`](https://github.com/zenstruck/stream#zenstruckstream) for more
+> details about `File::stream()`.
+
+> **Note**: See [`zenstruck/temp-file`](https://github.com/zenstruck/temp-file#zenstrucktemp-file) for more
+> details about `File::stream()`.
+
 #### `PendingFile`
+
+Class: `Zenstruck\Filesystem\Node\File\PendingFile` (extends `\SplFileInfo` and implements [`File`](#file)).
+
+```php
+use Zenstruck\Filesystem\Node\File\PendingFile;
+
+$file = new PendingFile('/path/to/local/file.txt');
+$file->path()->toString(); // "/path/to/local/file.txt"
+
+/** @var \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile */
+
+$file = new PendingFile($uploadedFile);
+$file->path()->toString(); // $uploadedFile->getClientOriginalName()
+
+/** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
+
+$file = new PendingFile($uploadedFile);
+$file->path()->toString(); // $uploadedFile->getClientFilename()
+```
 
 #### `Image`
 
+Interface: `Zenstruck\Filesystem\Node\File\Image` (extends [`File`](#file)).
+
+```php
+/** @var \Zenstruck\Filesystem\Node\File\Image $image */
+
+$image->dimensions(); // Zenstruck\Image\Dimensions
+$image->dimensions()->height(); // int
+$image->dimensions()->width(); // int
+$image->dimensions()->pixels(); // int
+$image->dimensions()->aspectRatio(); // float
+$image->dimensions()->isSquare(); // bool
+$image->dimensions()->isPortrait(); // bool
+$image->dimensions()->isLandscape(); // bool
+
+$image->exif(); // array - image exif data if available
+$image->iptc(); // array - image iptc data if available
+
+$image->transformUrl('filter-name'); // string (needs to be configured)
+$image->transformUrl(['w' => 100, 'h' => 50]); // string (needs to be configured)
+
+$image->transform(
+    function(ManipulationObject $image) {
+        // make manipulations
+
+        return $image;
+    }
+); // PendingImage
+```
+
+> **Note**: See [`zenstruck/image`](https://github.com/zenstruck/image#zenstruckimage) for more
+> details about `Image::transform()`.
+
 ##### `PendingImage`
+
+Class: `Zenstruck\Filesystem\Node\File\Image\PendingImage` (extends [`PendingFile`](#pendingfile) and implements [`Image`](#image)).
+
+### `Directory`
+
+Interface: `Zenstruck\Filesystem\Node\Directory` (extends [`Node`](#node)).
+
+```php
+/** @var Zenstruck\Filesystem\Node\Directory $directory */
+
+// iterate over nodes (non-recursive)
+foreach ($directory as $node) {
+    /** @var Zenstruck\Filesystem\Node $node */
+}
+
+// iterate over only files (non-recursive)
+foreach ($directory->files() as $file) {
+    /** @var Zenstruck\Filesystem\Node\File $file */
+}
+
+// iterate over only directories (non-recursive)
+foreach ($directory->directories() as $dir) {
+    /** @var Zenstruck\Filesystem\Node\Directory $dir */
+}
+
+// recursively iterate
+foreach ($directory->recursive() as $node) {
+    /** @var Zenstruck\Filesystem\Node $node */
+}
+
+// advanced filter
+$directories = $directory
+    ->recursive()
+    ->files()
+    ->largerThan('10M')
+    ->smallerThan('1G')
+    ->olderThan('30 days ago')
+    ->newerThan('20 days ago')
+    ->matchingFilename('*.twig')
+    ->notMatchingFilename('*.txt.twig')
+    ->matchingPath('/files/')
+    ->notMatchingPath('/exclude/')
+    ->filter(function(File $file) { // custom filter
+        if ($someCondition) {
+            return false; // exclude
+        }
+
+        return true; // include
+    })
+;
+```
+
+> **Note**: Most of the _advanced filters_ require `symfony/finder` (`composer require symfony/finder`).
 
 ## Filesystems
 
