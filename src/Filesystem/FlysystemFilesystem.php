@@ -158,7 +158,7 @@ final class FlysystemFilesystem implements Filesystem
 
         $closeStream = false;
 
-        if ($value instanceof \SplFileInfo) {
+        if ($value instanceof \SplFileInfo && !$value instanceof File) {
             $value = Stream::open($value, 'r');
             $closeStream = true;
         }

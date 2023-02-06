@@ -15,6 +15,7 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
+use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Zenstruck\Filesystem;
@@ -33,13 +34,18 @@ use Zenstruck\TempFile;
  */
 class PendingFile extends \SplFileInfo implements File
 {
-    private SymfonyFile $symfonyFile;
+    private SymfonyFile|UploadedFileInterface|null $uploadedFile = null;
     private Path $path;
+    private \SplFileInfo $tempFile;
 
-    public function __construct(string|\SplFileInfo $filename)
+    public function __construct(string|\SplFileInfo|UploadedFileInterface $filename)
     {
-        if ($filename instanceof SymfonyFile) {
-            $this->symfonyFile = $filename;
+        if ($filename instanceof SymfonyFile || $filename instanceof UploadedFileInterface) {
+            $this->uploadedFile = $filename;
+        }
+
+        if ($filename instanceof UploadedFileInterface && !$filename instanceof \SplFileInfo) {
+            $filename = TempFile::new();
         }
 
         parent::__construct($filename);
@@ -65,8 +71,12 @@ class PendingFile extends \SplFileInfo implements File
             return $this->path;
         }
 
-        if (isset($this->symfonyFile) && $this->symfonyFile instanceof SymfonyUploadedFile) {
-            return $this->path = new Path($this->symfonyFile->getClientOriginalName());
+        if ($this->uploadedFile instanceof SymfonyUploadedFile) {
+            return $this->path = new Path($this->uploadedFile->getClientOriginalName());
+        }
+
+        if ($this->uploadedFile instanceof UploadedFileInterface && $clientFileName = $this->uploadedFile->getClientFilename()) {
+            return $this->path = new Path($clientFileName);
         }
 
         return $this->path = new Path($this);
@@ -94,11 +104,15 @@ class PendingFile extends \SplFileInfo implements File
 
     public function mimeType(): string
     {
-        if (isset($this->symfonyFile) && $this->symfonyFile instanceof SymfonyUploadedFile) {
-            return $this->symfonyFile->getMimeType() ?? $this->symfonyFile->getClientMimeType();
+        if ($this->uploadedFile instanceof SymfonyUploadedFile) {
+            return $this->uploadedFile->getMimeType() ?? $this->uploadedFile->getClientMimeType();
         }
 
-        if (isset($this->symfonyFile) && $mimeType = $this->symfonyFile->getMimeType()) {
+        if ($this->uploadedFile instanceof SymfonyFile && $mimeType = $this->uploadedFile->getMimeType()) {
+            return $mimeType;
+        }
+
+        if ($this->uploadedFile instanceof UploadedFileInterface && $mimeType = $this->uploadedFile->getClientMediaType()) {
             return $mimeType;
         }
 
@@ -118,12 +132,12 @@ class PendingFile extends \SplFileInfo implements File
             return $ext;
         }
 
-        if (isset($this->symfonyFile) && $this->symfonyFile instanceof SymfonyUploadedFile) {
-            return $this->symfonyFile->guessClientExtension();
+        if ($this->uploadedFile instanceof SymfonyUploadedFile) {
+            return $this->uploadedFile->guessClientExtension();
         }
 
-        if (isset($this->symfonyFile)) {
-            return $this->symfonyFile->guessExtension();
+        if ($this->uploadedFile instanceof SymfonyFile) {
+            return $this->uploadedFile->guessExtension();
         }
 
         if (\is_string($ext = \array_search($this->mimeType(), GeneratedExtensionToMimeTypeMap::MIME_TYPES_FOR_EXTENSIONS, true))) {
@@ -135,16 +149,28 @@ class PendingFile extends \SplFileInfo implements File
 
     public function size(): int
     {
+        if ($this->uploadedFile instanceof UploadedFileInterface && $size = $this->uploadedFile->getSize()) {
+            return $size;
+        }
+
         return $this->getSize();
     }
 
     public function contents(): string
     {
+        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
+            return (string) $this->uploadedFile->getStream();
+        }
+
         return @\file_get_contents($this) ?: throw UnableToReadFile::fromLocation($this);
     }
 
     public function stream(): Stream
     {
+        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
+            return Stream::wrap($this->uploadedFile->getStream()->detach() ?? UnableToReadFile::fromLocation($this->path()));
+        }
+
         return Stream::open($this, 'r');
     }
 
@@ -157,7 +183,19 @@ class PendingFile extends \SplFileInfo implements File
 
     public function tempFile(): \SplFileInfo
     {
-        return TempFile::for($this);
+        if (isset($this->tempFile)) {
+            return $this->tempFile;
+        }
+
+        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
+            $this->stream()->putContents($this);
+            \chmod($this, 0644);
+            $this->refresh();
+
+            return $this->tempFile = $this;
+        }
+
+        return $this->tempFile = TempFile::for($this);
     }
 
     /**
@@ -215,16 +253,19 @@ class PendingFile extends \SplFileInfo implements File
         }
 
         $image = new PendingImage($this);
-
-        if (isset($this->symfonyFile)) {
-            $image->symfonyFile = $this->symfonyFile;
-        }
+        $image->uploadedFile = $this->uploadedFile;
 
         return $image;
     }
 
     private function localFlysystem(): Flysystem
     {
-        return new Flysystem(new LocalFilesystemAdapter(\dirname($this)));
+        $file = $this;
+
+        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
+            $file = $this->tempFile();
+        }
+
+        return new Flysystem(new LocalFilesystemAdapter(\dirname($file)));
     }
 }
