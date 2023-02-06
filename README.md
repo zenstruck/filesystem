@@ -193,6 +193,22 @@ $image->transform(
 
 Class: `Zenstruck\Filesystem\Node\File\Image\PendingImage` (extends [`PendingFile`](#pendingfile) and implements [`Image`](#image)).
 
+```php
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
+
+$image = new PendingImage('/path/to/local/file.txt');
+$image = new PendingImage($symfonyUploadedFile);
+
+// transform and overwrite
+$image->transformInPlace(
+    function(ManipulationObject $image) {
+        // make manipulations
+
+        return $image;
+    }
+); // self
+```
+
 ### `Directory`
 
 Interface: `Zenstruck\Filesystem\Node\Directory` (extends [`Node`](#node)).
@@ -248,9 +264,26 @@ $directories = $directory
 
 ### `FlysystemFilesystem`
 
-#### Features
+```php
+use Zenstruck\Filesystem\FlysystemFilesystem;
 
-##### `TransformUrlGenerator`
+/** @var \League\Flysystem\FilesystemOperator $operator */
+/** @var \League\Flysystem\FilesystemAdapter $adapter */
+
+// create from an already configured Flysystem Filesystem Operator
+$filesystem = new FlysystemFilesystem($operator);
+
+// create from an already configured Flysystem Filesystem Adapter
+$filesystem = new FlysystemFilesystem($operator);
+
+// create for local directory
+$filesystem = new FlysystemFilesystem('/path/to/local/dir');
+
+// create for dsn (see available DSNs below)
+$filesystem = new FlysystemFilesystem('ftp://user:pass@host.com:21/root');
+```
+
+#### Filesystem DSN
 
 ### `MultiFilesystem`
 

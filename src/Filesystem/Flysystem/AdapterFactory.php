@@ -64,10 +64,18 @@ final class AdapterFactory
             'ftp', 'ftps' => self::createFtpAdapter($parsed),
             'sftp' => self::createSftpAdapter($parsed),
             's3' => self::createS3Adapter($parsed),
-            'in-memory' => new InMemoryFilesystemAdapter(),
-            'static-in-memory' => StaticInMemoryAdapterRegistry::get($parsed['path'] ?? 'default'),
+            'in-memory' => self::createInMemoryAdapter($parsed),
             default => new LocalFilesystemAdapter($parsed['path'] ?? throw new \InvalidArgumentException('missing path')),
         };
+    }
+
+    private static function createInMemoryAdapter(array $parsed): InMemoryFilesystemAdapter
+    {
+        if ($name = $parsed['path'] ?? null) {
+            return StaticInMemoryAdapterRegistry::get($name);
+        }
+
+        return new InMemoryFilesystemAdapter();
     }
 
     private static function createSftpAdapter(array $parsed): FilesystemAdapter

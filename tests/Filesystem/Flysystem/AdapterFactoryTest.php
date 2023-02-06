@@ -49,8 +49,7 @@ final class AdapterFactoryTest extends TestCase
         yield ['file:/tmp', LocalFilesystemAdapter::class];
         yield ['file:///tmp', LocalFilesystemAdapter::class];
         yield ['in-memory:', InMemoryFilesystemAdapter::class];
-        yield ['static-in-memory:', InMemoryFilesystemAdapter::class];
-        yield ['static-in-memory:foo', InMemoryFilesystemAdapter::class];
+        yield ['in-memory:foo', InMemoryFilesystemAdapter::class];
         yield ['ftp://foo:bar@example.com/path', FtpAdapter::class];
         yield ['ftps://foo:bar@example.com/path', FtpAdapter::class];
         yield ['sftp://foo:bar@example.com/path', SftpAdapter::class];
@@ -62,8 +61,8 @@ final class AdapterFactoryTest extends TestCase
      */
     public function static_in_memory_adapter_is_created_with_different_names(): void
     {
-        $first = AdapterFactory::createAdapter('static-in-memory:');
-        $second = AdapterFactory::createAdapter('static-in-memory:second');
+        $first = AdapterFactory::createAdapter('in-memory:first');
+        $second = AdapterFactory::createAdapter('in-memory:second');
 
         $first->write('foo', 'bar', new Config());
 
