@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
+use Psr\Http\Message\UploadedFileInterface;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Image as LocalImage;
@@ -24,9 +25,15 @@ final class PendingImage extends PendingFile implements Image
 {
     use DecoratedImage;
 
-    public function __construct(\SplFileInfo|string $filename, private ?TransformerRegistry $transformerRegistry = null)
+    private bool $isPsrFile = false;
+
+    public function __construct(\SplFileInfo|string|UploadedFileInterface $filename, private ?TransformerRegistry $transformerRegistry = null)
     {
         parent::__construct($filename);
+
+        if ($filename instanceof UploadedFileInterface && !$filename instanceof \SplFileInfo) {
+            $this->isPsrFile = true;
+        }
     }
 
     /**
@@ -43,8 +50,10 @@ final class PendingImage extends PendingFile implements Image
 
     public function transform(callable|object $filter, array $options = []): self
     {
+        $file = $this->isPsrFile ? $this->localImage() : $this;
+
         return new self(
-            $this->transformerRegistry()->transform($this, $filter, $options),
+            $this->transformerRegistry()->transform($file, $filter, $options),
             $this->transformerRegistry()
         );
     }
@@ -56,6 +65,10 @@ final class PendingImage extends PendingFile implements Image
 
     protected function localImage(): LocalImage
     {
+        if ($this->isPsrFile) {
+            return $this->localImage = $this->tempFile();
+        }
+
         return $this->localImage ??= new LocalImage($this);
     }
 

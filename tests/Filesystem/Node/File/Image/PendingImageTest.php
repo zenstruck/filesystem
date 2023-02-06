@@ -21,7 +21,7 @@ use Zenstruck\Tests\Filesystem\Node\File\PendingFileTest;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PendingImageTest extends PendingFileTest
+class PendingImageTest extends PendingFileTest
 {
     use ImageTests;
 
