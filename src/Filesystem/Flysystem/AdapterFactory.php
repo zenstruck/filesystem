@@ -35,6 +35,13 @@ final class AdapterFactory
 {
     public static function createAdapter(string $dsn): FilesystemAdapter
     {
+        $readonly = false;
+
+        if (\str_starts_with($dsn, 'readonly:')) {
+            $readonly = true;
+            $dsn = \mb_substr($dsn, 9);
+        }
+
         if (false === $parsed = \parse_url($dsn)) {
             throw new \InvalidArgumentException(\sprintf('Could not parse "%s".', $dsn));
         }
@@ -43,15 +50,9 @@ final class AdapterFactory
 
         \parse_str($parsed['query'] ??= '', $query);
 
-        $readonly = $query['readonly'] ?? false;
-
         if ($readonly && !\class_exists(ReadOnlyFilesystemAdapter::class)) {
             throw new \LogicException('league/flysystem-read-only is required.');
         }
-
-        unset($query['readonly']);
-
-        $parsed['query'] = $query;
 
         $adapter = self::createRealAdapter($parsed);
 

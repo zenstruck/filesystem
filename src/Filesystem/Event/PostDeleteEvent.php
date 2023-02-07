@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Filesystem\Event;
 
-use Zenstruck\Filesystem\Node\Directory;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -20,7 +18,7 @@ use Zenstruck\Filesystem\Node\Directory;
  */
 final class PostDeleteEvent extends PostOperationEvent
 {
-    public function path(): Directory|string
+    public function path(): string
     {
         return $this->event->path;
     }

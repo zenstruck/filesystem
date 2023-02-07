@@ -18,6 +18,7 @@ use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
+use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 
@@ -54,6 +55,7 @@ final class AdapterFactoryTest extends TestCase
         yield ['ftps://foo:bar@example.com/path', FtpAdapter::class];
         yield ['sftp://foo:bar@example.com/path', SftpAdapter::class];
         yield ['s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1', AsyncAwsS3Adapter::class];
+        yield ['readonly:ftp://foo:bar@example.com/path', ReadOnlyFilesystemAdapter::class];
     }
 
     /**

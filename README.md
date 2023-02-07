@@ -283,17 +283,195 @@ $filesystem = new FlysystemFilesystem('/path/to/local/dir');
 $filesystem = new FlysystemFilesystem('ftp://user:pass@host.com:21/root');
 ```
 
-#### Filesystem DSN
+#### Filesystem DSNs
+
+| DSN                                                        | Adapter                                                                                                                                                                                                                                        |
+|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                                                                                                                                                                                                                                 |
+| `in-memory:`                                               | `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                                 |
+| `in-memory:name`                                           | _Static_ `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                        |
+| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
+| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
+| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter` (requires [`league/flysystem-sftp-v3`](https://flysystem.thephpleague.com/docs/adapter/sftp-v3/))                                                                                                                                |
+| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` (requires [`league/flysystem-async-aws-s3`](https://flysystem.thephpleague.com/docs/adapter/async-aws-s3/) or [`league/flysystem-aws-s3-v3`](https://flysystem.thephpleague.com/docs/adapter/aws-s3-v3/)) |
+| `readonly:<any-above-dsn>`                                 | `ReadOnlyFilesystemAdapter` (requires [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/))                                                                                                              |
 
 ### `ScopedFilesystem`
 
+```php
+use Zenstruck\Filesystem\ScopedFilesystem;
+
+/** @var \Zenstruck\Filesystem $primaryFilesystem */
+
+$scopedFilesystem = new ScopedFilesystem($primaryFilesystem, 'some/prefix');
+
+// paths are prefixed
+$scopedFilesystem
+    ->write('file.txt', 'content')
+    ->file('file.txt')->path()->toString(); // "some/prefix/file.txt"
+;
+
+// prefix is stripped from path
+$scopedFilesystem
+    ->write('some/prefix/file.txt', 'content')
+    ->file('file.txt')->path()->toString(); // "some/prefix/file.txt"
+;
+```
+
 ### `MultiFilesystem`
+
+```php
+use Zenstruck\Filesystem\MultiFilesystem;
+
+/** @var \Zenstruck\Filesystem $filesystem1 */
+/** @var \Zenstruck\Filesystem $filesystem2 */
+
+$filesystem = new MultiFilesystem([
+    'filesystem1' => $filesystem1,
+    'filesystem2' => $filesystem2,
+]);
+
+// prefix paths with a "scheme" as the filesystem's name
+$filesystem->file('filesystem1://some/file.txt'); // File from "filesystem1"
+$filesystem->file('filesystem2://another/file.txt'); // File from "filesystem2"
+
+// can copy and move across filesystems
+$filesystem->copy('filesystem1://file.txt', 'filesystem2://file.txt');
+$filesystem->move('filesystem1://file.txt', 'filesystem2://file.txt');
+
+// set a default filesystem for when no scheme is set
+$filesystem = new MultiFilesystem(
+    [
+        'filesystem1' => $filesystem1,
+        'filesystem2' => $filesystem2,
+    ],
+    default: 'filesystem2'
+);
+
+$filesystem->file('another/file.txt'); // File from "filesystem2"
+```
 
 ### `LoggableFilesystem`
 
+> **Note**: A `psr/log-implementation` is required.
+
+```php
+use Zenstruck\Filesystem\LoggableFilesystem;
+use Zenstruck\Filesystem\Operation;
+use Psr\Log\LogLevel;
+
+/** @var \Zenstruck\Filesystem $inner */
+/** @var \Psr\Log\LoggerInterface $logger */
+
+$filesystem = new LoggableFilesystem($inner, $logger);
+
+// operations are logged
+$filesystem->write('file.txt', 'content'); // logged as '[info] Writing "string" to "file.txt" on filesystem "<filesystem-name>"'
+
+// customize the log levels for each operation
+$filesystem = new LoggableFilesystem($inner, $logger, [
+    Operation::READ => false, // disable logging read operations
+    Operation::WRITE => LogLevel::DEBUG,
+    Operation::MOVE => LogLevel::ALERT,
+    Operation::COPY => LogLevel::CRITICAL,
+    Operation::DELETE => LogLevel::EMERGENCY,
+    Operation::CHMOD => LogLevel::ERROR,
+    Operation::MKDIR => LogLevel::NOTICE,
+]);
+```
+
 ### `EventDispatcherFilesystem`
 
+> **Note**: A `psr/event-dispatcher-implementation` is required.
+
+```php
+use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
+use Zenstruck\Filesystem\Operation;
+
+/** @var \Zenstruck\Filesystem $inner */
+/** @var \Psr\EventDispatcher\EventDispatcherInterface $dispatcher */
+
+$filesystem = new EventDispatcherFilesystem($inner, $dispatcher, [
+    // set these to false or exclude to disable dispatching operation's event
+    Operation::WRITE => true,
+    Operation::COPY => true,
+    Operation::MOVE => true,
+    Operation::DELETE => true,
+    Operation::CHMOD => true,
+    Operation::MKDIR => true,
+]);
+
+$filesystem
+    ->write('foo', 'bar') // PreWriteEvent/PostWriteEvent dispatched
+    ->mkdir('bar') // PreMkdirEvent/PostMkdirEvent dispatched
+    ->chmod('foo', 'public') // PreChmodEvent/PostChmodEvent dispatched
+    ->copy('foo', 'file.png') // PreCopyEvent/PostCopyEvent dispatched
+    ->delete('foo') // PreDeleteEvent/PostDeleteEvent dispatched
+    ->move('file.png', 'file2.png') // PreMoveEvent/PostMoveEvent dispatched
+;
+```
+
+> **Note**: See event classes to see what is made available to them.
+
+> **Note**: The `Pre*Event` properties can be manipulated.
+
 ### `ArchiveFile`
+
+> **Note**: `league/flysystem-ziparchive` is required (`composer require league/flysystem-ziparchive`).
+
+This is a special filesystem wrapping a zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
+
+```php
+use Zenstruck\Filesystem\Archive\ArchiveFile;
+
+$archive = new ArchiveFile('/local/path/to/archive.zip');
+$archive->file('some/file.txt');
+$archive->write('another/file.txt', 'content');
+
+(string) $archive; // /local/path/to/archive.zip
+```
+
+When creating without a path, creates a temporary archive file (that's deleted at the end of the script):
+
+```php
+use Zenstruck\Filesystem\Archive\ArchiveFile;
+
+$archive = new ArchiveFile();
+
+$archive->write('some/file.txt', 'content');
+$archive->write('another/file.txt', 'content');
+
+(string) $archive; // /tmp/...
+```
+
+Write operations can be queued and committed via a _transaction_:
+
+```php
+use Zenstruck\Filesystem\Archive\ArchiveFile;
+
+$archive = new ArchiveFile();
+
+$archive->beginTransaction(); // start the transaction
+$archive->write('some/file.txt', 'content');
+$archive->write('another/file.txt', 'content');
+$archive->commit(); // actually writes the above files
+
+// optionally pass a progress callback to commit
+$archive->commit(function() use ($progress) { // callback is called at most, 100 times
+    $progress->advance();
+});
+```
+
+Static helper for quickly creating `zip` archives:
+
+```php
+use Zenstruck\Filesystem\Archive\ArchiveFile;
+
+$zipFile = ArchiveFile::zip('/some/local/file.txt');
+
+// can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
+$zipFile = ArchiveFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+```
 
 ## Testing
 
