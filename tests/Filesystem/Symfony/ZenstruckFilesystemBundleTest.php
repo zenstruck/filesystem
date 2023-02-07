@@ -45,6 +45,8 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertTrue($service->publicFilesystem->has('file1.txt'));
         $this->assertTrue($service->privateFilesystem->has('file2.txt'));
         $this->assertFalse($service->privateFilesystem->has('file1.txt'));
+
+        $this->assertSame('some/prefix/foo/bar.txt', $service->scopedFilesystem->write('foo/bar.txt', '')->last()->path()->toString());
     }
 
     /**

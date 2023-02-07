@@ -139,6 +139,7 @@ final class TestKernel extends Kernel
                 'no_reset' => [
                     'dsn' => '%kernel.project_dir%/var/no_reset',
                 ],
+                'scoped' => 'scoped:public?some/prefix',
             ],
             'default_filesystem' => 'public',
         ]);

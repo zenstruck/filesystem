@@ -15,6 +15,7 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -40,6 +41,7 @@ use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\Path\Generator;
 use Zenstruck\Filesystem\Node\Path\Generator\ExpressionPathGenerator;
 use Zenstruck\Filesystem\Node\PathGenerator;
+use Zenstruck\Filesystem\ScopedFilesystem;
 use Zenstruck\Filesystem\Symfony\Command\FilesystemPurgeCommand;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\HttpKernel\FilesystemDataCollector;
@@ -195,11 +197,11 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         foreach ($mergedConfig['filesystems'] as $name => $config) {
-            $this->registerFilesystem($name, $config, $container, $defaultName);
+            $this->registerFilesystem($name, $config, $container, $defaultName, \array_keys($mergedConfig['filesystems']));
         }
     }
 
-    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName): void
+    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void
     {
         if ($config['reset_before_tests']) {
             if (!$container->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
@@ -210,6 +212,30 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 'zenstruck_filesystem.reset_before_tests_filesystems',
                 \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]) // @phpstan-ignore-line
             );
+        }
+
+        if (\str_starts_with($config['dsn'], 'scoped:')) {
+            $parts = \parse_url($config['dsn']);
+
+            if (!\in_array($scopedName = ($parts['path'] ?? ''), $filesystemNames, true)) {
+                throw new InvalidConfigurationException(\sprintf('"%s" is not a registered filesystem.', $scopedName));
+            }
+
+            $container->register($filesystemId = '.zenstruck_filesystem.filesystem.'.$name, ScopedFilesystem::class)
+                ->setArguments([
+                    new Reference('.zenstruck_filesystem.filesystem.'.$scopedName),
+                    $parts['query'] ?? '',
+                    $name,
+                ])
+            ;
+
+            $container->registerAliasForArgument($filesystemId, Filesystem::class, $name.'Filesystem');
+
+            if ($name === $defaultName) {
+                $container->setAlias(Filesystem::class, $filesystemId);
+            }
+
+            return;
         }
 
         if (\str_starts_with($config['dsn'], '@')) {

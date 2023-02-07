@@ -285,6 +285,8 @@ $filesystem = new FlysystemFilesystem('ftp://user:pass@host.com:21/root');
 
 #### Filesystem DSN
 
+### `ScopedFilesystem`
+
 ### `MultiFilesystem`
 
 ### `LoggableFilesystem`
