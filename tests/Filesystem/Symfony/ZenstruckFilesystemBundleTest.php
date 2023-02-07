@@ -133,4 +133,21 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
 
         $this->assertCount(12, $subscriber->events);
     }
+
+    /**
+     * @test
+     */
+    public function static_in_memory_filesystem(): void
+    {
+        /** @var Service $service */
+        $service = self::getContainer()->get(Service::class);
+
+        $service->staticFilesystem->write('file.txt', 'content');
+
+        $this->filesystem()->assertExists('static://file.txt');
+
+        self::ensureKernelShutdown();
+
+        $this->filesystem()->assertExists('static://file.txt');
+    }
 }

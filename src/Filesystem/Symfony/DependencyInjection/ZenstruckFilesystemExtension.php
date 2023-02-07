@@ -203,6 +203,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
     private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void
     {
+        if ('static-in-memory' === $config['dsn']) {
+            $config['dsn'] = "in-memory:{$name}";
+        }
+
         if ($config['reset_before_tests']) {
             if (!$container->hasParameter('zenstruck_filesystem.reset_before_tests_filesystems')) {
                 $container->setParameter('zenstruck_filesystem.reset_before_tests_filesystems', []);

@@ -27,6 +27,7 @@ final class Service
         public Filesystem $privateFilesystem,
         public Filesystem $noResetFilesystem,
         public Filesystem $scopedFilesystem,
+        public Filesystem $staticFilesystem,
         public MultiFilesystem $multiFilesystem,
         public PathGenerator $pathGenerator,
         public FileMappingLoader $objectFileLoader,
