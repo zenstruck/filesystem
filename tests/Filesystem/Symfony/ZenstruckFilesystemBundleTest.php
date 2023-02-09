@@ -38,6 +38,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
 
         $service->multiFilesystem->write('public://file1.txt', 'public content');
         $service->multiFilesystem->write('private://file2.txt', 'private content');
+        $service->multiFilesystem->write('scoped://file3.txt', 'scoped content');
 
         $this->assertTrue($service->multiFilesystem->has('file1.txt'));
         $this->assertTrue($service->multiFilesystem->has('public://file1.txt'));
@@ -45,6 +46,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertTrue($service->publicFilesystem->has('file1.txt'));
         $this->assertTrue($service->privateFilesystem->has('file2.txt'));
         $this->assertFalse($service->privateFilesystem->has('file1.txt'));
+        $this->assertTrue($service->scopedFilesystem->has('file3.txt'));
 
         $this->assertSame('some/prefix/foo/bar.txt', $service->scopedFilesystem->write('foo/bar.txt', '')->last()->path()->toString());
     }

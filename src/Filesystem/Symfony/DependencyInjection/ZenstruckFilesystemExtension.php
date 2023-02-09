@@ -231,6 +231,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                     $scopedPath,
                     $name,
                 ])
+                ->addTag('zenstruck_filesystem', ['key' => $name])
             ;
 
             $container->registerAliasForArgument($filesystemId, Filesystem::class, $name.'Filesystem');
