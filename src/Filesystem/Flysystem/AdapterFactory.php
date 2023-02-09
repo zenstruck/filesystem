@@ -57,7 +57,14 @@ final class AdapterFactory
             throw new \InvalidArgumentException(\sprintf('Could not parse "%s".', $dsn));
         }
 
-        if (\in_array($scheme = $parsed['scheme'] ?? null, [null, 'file'], true)) {
+        $scheme = $parsed['scheme'] ?? null;
+
+        if ('file' === $scheme) {
+            $scheme = null;
+            $dsn = \mb_substr($dsn, \str_starts_with($dsn, 'file://') ? 7 : 5);
+        }
+
+        if (!$scheme) {
             return new LocalFilesystemAdapter($dsn);
         }
 
