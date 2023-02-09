@@ -67,6 +67,10 @@ class TestNode implements Node
     {
         $actual = $this->lastModified();
 
+        if (\is_string($expected) && !\is_callable($expected)) {
+            $expected = new \DateTimeImmutable($expected);
+        }
+
         if ($expected instanceof \DateTimeInterface) {
             $expected = $expected->getTimestamp();
         }

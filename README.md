@@ -16,7 +16,7 @@ Additionally, the following features are provided:
 
 1. Filesystem _wrappers_ to add additional functionality (ie [`MultiFilesystem`](#multifilesystem),
    and [`LoggableFilesystem`](#loggablefilesystem)).
-2. Powerful [testing helpers](#testing).
+2. Powerful [testing helpers](#testfilesystem).
 3. [`ArchiveFile`](#archivefile) representing a local zip file that acts as both a filesystem _and_ a real file.
 4. [Doctrine Integration](#doctrine-integration).
 5. [Symfony Integration](#symfony-integration)
@@ -473,33 +473,258 @@ $zipFile = ArchiveFile::zip('/some/local/file.txt');
 $zipFile = ArchiveFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
 ```
 
-## Testing
+## `TestFilesystem`
+
+This filesystem wraps another and provides assertions for your tests. When using PHPUnit, these assertions are
+converted to PHPUnit assertions.
+
+> **Note**: `zenstruck/assert` is required to use the assertions (`composer require --dev zenstruck/assert`).
+
+```php
+use Zenstruck\Filesystem\Test\TestFilesystem;
+use Zenstruck\Filesystem\Test\Node\TestDirectory;
+use Zenstruck\Filesystem\Test\Node\TestFile
+use Zenstruck\Filesystem\Test\Node\TestImage;
+
+/** @var \Zenstruck\Filesystem $filesystem */
+
+$filesystem = new TestFilesystem($filesystem);
+
+$filesystem
+    ->assertExists('foo')
+    ->assertNotExists('invalid')
+    ->assertFileExists('file1.txt')
+    ->assertDirectoryExists('foo')
+    ->assertImageExists('symfony.png')
+    ->assertSame('symfony.png', 'fixture://symfony.png')
+    ->assertNotSame('file1.txt', 'fixture://symfony.png')
+    ->assertDirectoryExists('foo', function(TestDirectory $dir) {
+        $dir
+            ->assertCount(4)
+            ->files()->assertCount(2)
+        ;
+
+        $dir
+            ->recursive()
+            ->assertCount(5)
+            ->files()->assertCount(3)
+        ;
+    })
+    ->assertFileExists('file1.txt', function(TestFile $file) {
+        $file
+            ->assertVisibilityIs('public')
+            ->assertChecksum($file->checksum()->toString())
+            ->assertContentIs('contents1')
+            ->assertContentIsNot('foo')
+            ->assertContentContains('1')
+            ->assertContentDoesNotContain('foo')
+            ->assertMimeTypeIs('text/plain')
+            ->assertMimeTypeIsNot('foo')
+            ->assertLastModified('2023-01-01 08:54')
+            ->assertLastModified(function(\DateTimeInterface $actual) {
+                // ...
+            })
+            ->assertSize(9)
+        ;
+    })
+    ->assertImageExists('symfony.png', function(TestImage $image) {
+        $image
+            ->assertHeight(678)
+            ->assertWidth(563)
+        ;
+    })
+;
+```
 
 ### `InteractsWithFilesystem`
 
+Use the `InteractsWithFilesystem` trait in your unit tests to quickly provide an in-memory filesystem.
+
+> **Note**: By default, `league/flysystem-memory` is required (`composer require --dev league/flysystem-memory`).
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+
+class MyTest extends TestCase
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $this->filesystem() // instance of TestFilesystem wrapping an in-memory filesystem
+            ->write('file.txt', 'content')
+            ->assertExists('file.txt')
+        ;
+    }
+}
+```
+
 #### `FilesystemProvider`
+
+To provide your own filesystem for your tests, have your tests (or base test-case) implement `FilesystemProvider`:
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\FilesystemProvider;
+
+class MyTest extends TestCase implements FilesystemProvider
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $this->filesystem() // instance of TestFilesystem wrapping the AdapterFilesystem defined below
+            ->write('file.txt', 'content')
+            ->assertExists('file.txt')
+        ;
+    }
+
+    public function createFilesystem(): Filesystem|FilesystemAdapter|string;
+    {
+        return '/some/temp/dir';
+    }
+}
+```
+
+> **Note**: By default, the provided filesystem isn't reset before each test. See the
+> [`ResetFilesystem`](#resetfilesystem) to enable this behaviour.
 
 #### `FixtureFilesystemProvider`
 
+A common requirement for filesystem tests, is to have a set of known fixture files that are used in your tests.
+Have your test's (or base test-case) implement `FixtureFilesystemProvider` to provide in your tests:
+
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\FixtureFilesystemProvider;
+
+class MyTest extends TestCase implements FixtureFilesystemProvider
+{
+    use InteractsWithFilesystem;
+
+    public function test_1(): void
+    {
+        $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping a MultiFilesystem
+
+        $filesystem
+            ->write('file.txt', 'content') // accesses your test filesystem
+            ->assertExists('file.txt')
+            ->copy('fixture://some/file.txt', 'file.txt') // copy a fixture to your test filesystem
+        ;
+    }
+
+    public function createFixtureFilesystem(): Filesystem|FilesystemAdapter|string;
+    {
+        return __DIR__.'/../fixtures';
+    }
+}
+```
+
+> **Note**: If the [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/)
+> adapter is available, it's used to wrap your fixture adapter to ensure you don't accidentally overwrite/delete
+> your fixture files (`composer require --dev league/flysystem-read-only`).
+
 ### `ResetFilesystem`
 
-## Glide Integration
+If using your own [`FilesystemProvider`](#filesystemprovider), you can use the `ResetFilesystem` trait to
+purge your filesystem before each test.
 
-### `GlideTransformUrlGenerator`
+```php
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Test\ResetFilesystem
+use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
+use Zenstruck\Filesystem\Test\FilesystemProvider;
+
+class MyTest extends TestCase implements FilesystemProvider
+{
+    use InteractsWithFilesystem, ResetFilesystem;
+
+    public function test_1(): void
+    {
+        $this->filesystem()
+            ->write('file.txt', 'content')
+            ->assertExists('file.txt')
+        ;
+    }
+
+    public function test_2(): void
+    {
+        $this->filesystem()
+            ->assertNotExists('file.txt') // file created in test_1 was deleted before this test
+        ;
+    }
+
+    public function createFilesystem(): Filesystem|FilesystemAdapter|string;
+    {
+        return '/some/temp/dir';
+    }
+}
+```
 
 ## Symfony Integration
 
 ### Responses
 
+Helpful custom Symfony responses are provided.
+
 #### `FileResponse`
+
+Take a filesystem [`File`](#file) and send as a response:
+
+```php
+use Zenstruck\Filesystem\Symfony\HttpFoundation\FileResponse;
+
+/** @var \Zenstruck\Filesystem\File $file */
+
+$response = new FileResponse($file); // auto-adds content-type/last-modified headers
+
+// create inline/attachment responses
+$response = FileResponse::attachment($file); // auto names by the filename (file.txt)
+$response = FileResponse::inline($file); // auto names by the filename (file.txt)
+
+// customize the filename used for the content-disposition header
+$response = FileResponse::attachment($file, 'different-name.txt');
+$response = FileResponse::inline($file, 'different-name.txt');
+```
 
 #### `ArchiveResponse`
 
+Zip file(s) and send as a response. Can be created with a local file, local directory, instance of
+[`File`](#file) or instance of [`Directory`](#directory).
+
+```php
+use Zenstruck\Filesystem\Symfony\HttpFoundation\ArchiveResponse;
+
+/** @var \SplFileInfo|\Zenstruck\Filesystem\Node\File|\Zenstruck\Filesystem\Node\Directory $what */
+
+$response = ArchiveResponse::zip($what);
+$response = ArchiveResponse::zip($what, 'data.zip'); // customize the content-disposition name (defaults to archive.zip)
+```
+
 ### Validators
 
-#### `PendingFileConstraint`
+Both a [`PendingFile`](#pendingfile) and [`PendingImage`](#pendingimage) validator is provided. The constraints have
+the same API as Symfony's native [`File`](https://symfony.com/doc/current/reference/constraints/File.html) and
+[`Image`](https://symfony.com/doc/current/reference/constraints/Image.html) constraints.
 
-#### `PendingImageConstraint`
+```php
+use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;
+use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
+
+/** @var \Symfony\Component\Validator\Validator\ValidatorInterface $validator */
+/** @var \Zenstruck\Filesystem\Node\File $file */
+/** @var \Zenstruck\Filesystem\Node\File\Image $image */
+
+$validator->validate($file, new PendingFileConstraint(maxSize: '1M')));
+
+$validator->validate($image, new PendingImageConstraint(maxWidth: 200, maxHeight: 200)));
+```
 
 ### Bundle
 
