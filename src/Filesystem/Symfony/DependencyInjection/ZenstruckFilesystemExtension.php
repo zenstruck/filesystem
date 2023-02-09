@@ -218,17 +218,17 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             );
         }
 
-        if (\str_starts_with($config['dsn'], 'scoped:')) {
-            $parts = \parse_url($config['dsn']);
+        if (\str_starts_with($config['dsn'], 'scoped:') && 2 === \count($parts = \explode(':', \mb_substr($config['dsn'], 7), 2))) {
+            [$scopedName, $scopedPath] = $parts;
 
-            if (!\in_array($scopedName = ($parts['path'] ?? ''), $filesystemNames, true)) {
+            if (!\in_array($scopedName, $filesystemNames, true)) {
                 throw new InvalidConfigurationException(\sprintf('"%s" is not a registered filesystem.', $scopedName));
             }
 
             $container->register($filesystemId = '.zenstruck_filesystem.filesystem.'.$name, ScopedFilesystem::class)
                 ->setArguments([
                     new Reference('.zenstruck_filesystem.filesystem.'.$scopedName),
-                    $parts['query'] ?? '',
+                    $scopedPath,
                     $name,
                 ])
             ;

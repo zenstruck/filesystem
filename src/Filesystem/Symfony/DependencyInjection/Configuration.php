@@ -62,7 +62,7 @@ final class Configuration implements ConfigurationInterface
                                     'ftp://foo:bar@example.com/path',
                                     's3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1',
                                     'static-in-memory',
-                                    'scoped:<name>?<prefix>',
+                                    'scoped:<name>:<prefix>',
                                     '@my_adapter_service',
                                 ])
                             ->end()
