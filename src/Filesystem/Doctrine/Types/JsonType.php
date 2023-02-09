@@ -27,6 +27,9 @@ use Zenstruck\Filesystem\Node\File\SerializableFile;
  */
 abstract class JsonType extends BaseJsonType
 {
+    /**
+     * @template T of ?string
+     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
