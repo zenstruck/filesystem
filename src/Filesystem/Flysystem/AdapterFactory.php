@@ -65,6 +65,8 @@ final class AdapterFactory
 
         \parse_str($parsed['query'] ??= '', $query);
 
+        $parsed['query'] = $query;
+
         return match ($scheme) {
             'flysystem+ftp', 'flysystem+ftps' => self::createFtpAdapter($parsed),
             'flysystem+sftp' => self::createSftpAdapter($parsed),
@@ -123,7 +125,7 @@ final class AdapterFactory
         if (\class_exists(AsyncAwsS3Adapter::class)) {
             return new AsyncAwsS3Adapter(
                 new AsyncS3Client([
-                    'region' => $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set as the fragment (ie #us-east-1).'),
+                    'region' => $parsed['query']['region'] ?? $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set in the query (ie ?region=us-east-1) or as the fragment (ie #us-east-1).'),
                     'accessKeyId' => $parsed['user'] ?? null,
                     'accessKeySecret' => $parsed['pass'] ?? null,
                 ]),
@@ -135,7 +137,7 @@ final class AdapterFactory
         if (\class_exists(AwsS3V3Adapter::class)) {
             return new AwsS3V3Adapter( // @phpstan-ignore-line
                 new S3Client([ // @phpstan-ignore-line
-                    'region' => $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set as the fragment (ie #us-east-1).'),
+                    'region' => $parsed['query']['region'] ?? $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set in the query (ie ?region=us-east-1) or as the fragment (ie #us-east-1).'),
                     'credentials' => [
                         'key' => $parsed['user'] ?? null,
                         'secret' => $parsed['pass'] ?? null,
