@@ -177,6 +177,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
             $container->register('.zenstruck_filesystem.path_generator.twig', TwigPathGenerator::class)
+                ->addArgument(new Reference('twig'))
                 ->addTag('zenstruck_filesystem.path_generator', ['key' => 'twig'])
             ;
         }
