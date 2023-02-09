@@ -228,7 +228,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
             $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, ScopedFilesystem::class)
                 ->setArguments([
-                    new Reference('.zenstruck_filesystem.filesystem.'.$scopedName),
+                    new Reference('zenstruck_filesystem.filesystem.'.$scopedName),
                     $scopedPath,
                     $name,
                 ])
