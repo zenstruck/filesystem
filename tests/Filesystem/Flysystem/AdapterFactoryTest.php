@@ -51,11 +51,11 @@ final class AdapterFactoryTest extends TestCase
         yield ['file:///tmp', LocalFilesystemAdapter::class];
         yield ['in-memory:', InMemoryFilesystemAdapter::class];
         yield ['in-memory:foo', InMemoryFilesystemAdapter::class];
-        yield ['ftp://foo:bar@example.com/path', FtpAdapter::class];
-        yield ['ftps://foo:bar@example.com/path', FtpAdapter::class];
-        yield ['sftp://foo:bar@example.com/path', SftpAdapter::class];
-        yield ['s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1', AsyncAwsS3Adapter::class];
-        yield ['readonly:ftp://foo:bar@example.com/path', ReadOnlyFilesystemAdapter::class];
+        yield ['flysystem+ftp://foo:bar@example.com/path', FtpAdapter::class];
+        yield ['flysystem+ftps://foo:bar@example.com/path', FtpAdapter::class];
+        yield ['flysystem+sftp://foo:bar@example.com/path', SftpAdapter::class];
+        yield ['flysystem+s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1', AsyncAwsS3Adapter::class];
+        yield ['readonly:flysystem+ftp://foo:bar@example.com/path', ReadOnlyFilesystemAdapter::class];
     }
 
     /**

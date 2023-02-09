@@ -280,21 +280,21 @@ $filesystem = new FlysystemFilesystem($operator);
 $filesystem = new FlysystemFilesystem('/path/to/local/dir');
 
 // create for dsn (see available DSNs below)
-$filesystem = new FlysystemFilesystem('ftp://user:pass@host.com:21/root');
+$filesystem = new FlysystemFilesystem('flysystem+ftp://user:pass@host.com:21/root');
 ```
 
 #### Filesystem DSNs
 
-| DSN                                                        | Adapter                                                                                                                                                                                                                                        |
-|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `%kernel.project_dir%/public/files`                        | `LocalAdapter`                                                                                                                                                                                                                                 |
-| `in-memory:`                                               | `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                                 |
-| `in-memory:name`                                           | _Static_ `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                        |
-| `ftp://user:pass@host.com:21/root`                         | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
-| `ftps://user:pass@host.com:21/root`                        | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
-| `sftp://user:pass@host.com:22/root`                        | `SftpAdapter` (requires [`league/flysystem-sftp-v3`](https://flysystem.thephpleague.com/docs/adapter/sftp-v3/))                                                                                                                                |
-| `s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` (requires [`league/flysystem-async-aws-s3`](https://flysystem.thephpleague.com/docs/adapter/async-aws-s3/) or [`league/flysystem-aws-s3-v3`](https://flysystem.thephpleague.com/docs/adapter/aws-s3-v3/)) |
-| `readonly:<any-above-dsn>`                                 | `ReadOnlyFilesystemAdapter` (requires [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/))                                                                                                              |
+| DSN                                                                  | Adapter                                                                                                                                                                                                                                        |
+|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `%kernel.project_dir%/public/files`                                  | `LocalAdapter`                                                                                                                                                                                                                                 |
+| `in-memory:`                                                         | `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                                 |
+| `in-memory:name`                                                     | _Static_ `InMemoryFilesystemAdapter` (requires [`league/flysystem-memory`](https://flysystem.thephpleague.com/docs/adapter/in-memory/))                                                                                                        |
+| `flysystem+ftp://user:pass@host.com/root`                            | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
+| `flysystem+ftps://user:pass@host.com/root`                           | `FtpAdapter` (requires [`league/flysystem-ftp`](https://flysystem.thephpleague.com/docs/adapter/ftp/))                                                                                                                                         |
+| `flysystem+sftp://user:pass@host.com:22/root`                        | `SftpAdapter` (requires [`league/flysystem-sftp-v3`](https://flysystem.thephpleague.com/docs/adapter/sftp-v3/))                                                                                                                                |
+| `flysystem+s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1` | `AsyncAwsS3Adapter`/`AwsS3V3Adapter` (requires [`league/flysystem-async-aws-s3`](https://flysystem.thephpleague.com/docs/adapter/async-aws-s3/) or [`league/flysystem-aws-s3-v3`](https://flysystem.thephpleague.com/docs/adapter/aws-s3-v3/)) |
+| `readonly:<any-above-dsn>`                                           | `ReadOnlyFilesystemAdapter` (requires [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/))                                                                                                              |
 
 ### `ScopedFilesystem`
 
@@ -776,8 +776,8 @@ zenstruck_filesystem:
 
                 # Examples:
                 # - '%kernel.project_dir%/public/files'
-                # - 'ftp://foo:bar@example.com/path'
-                # - 's3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1'
+                # - 'flysystem+ftp://foo:bar@example.com/path'
+                # - 'flysystem+s3://accessKeyId:accessKeySecret@bucket/prefix#us-east-1'
                 # - 'static-in-memory'
                 # - 'scoped:<name>:<prefix>'
                 # - '@my_adapter_service'

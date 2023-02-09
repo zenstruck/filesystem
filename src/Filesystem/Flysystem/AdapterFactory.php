@@ -42,31 +42,35 @@ final class AdapterFactory
             $dsn = \mb_substr($dsn, 9);
         }
 
+        if ($readonly && !\class_exists(ReadOnlyFilesystemAdapter::class)) {
+            throw new \LogicException('league/flysystem-read-only is required (composer require league/flysystem-read-only).');
+        }
+
+        $adapter = self::createRealAdapter($dsn);
+
+        return $readonly ? new ReadOnlyFilesystemAdapter($adapter) : $adapter;
+    }
+
+    private static function createRealAdapter(string $dsn): FilesystemAdapter
+    {
         if (false === $parsed = \parse_url($dsn)) {
             throw new \InvalidArgumentException(\sprintf('Could not parse "%s".', $dsn));
+        }
+
+        if (\in_array($scheme = $parsed['scheme'] ?? null, [null, 'file'], true)) {
+            return new LocalFilesystemAdapter($dsn);
         }
 
         $query = [];
 
         \parse_str($parsed['query'] ??= '', $query);
 
-        if ($readonly && !\class_exists(ReadOnlyFilesystemAdapter::class)) {
-            throw new \LogicException('league/flysystem-read-only is required.');
-        }
-
-        $adapter = self::createRealAdapter($parsed);
-
-        return $readonly ? new ReadOnlyFilesystemAdapter($adapter) : $adapter;
-    }
-
-    private static function createRealAdapter(array $parsed): FilesystemAdapter
-    {
-        return match ($parsed['scheme'] ?? null) {
-            'ftp', 'ftps' => self::createFtpAdapter($parsed),
-            'sftp' => self::createSftpAdapter($parsed),
-            's3' => self::createS3Adapter($parsed),
+        return match ($scheme) {
+            'flysystem+ftp', 'flysystem+ftps' => self::createFtpAdapter($parsed),
+            'flysystem+sftp' => self::createSftpAdapter($parsed),
+            'flysystem+s3' => self::createS3Adapter($parsed),
             'in-memory' => self::createInMemoryAdapter($parsed),
-            default => new LocalFilesystemAdapter($parsed['path'] ?? throw new \InvalidArgumentException('missing path')),
+            default => throw new \InvalidArgumentException(\sprintf('Could not parse DSN "%s".', $dsn)),
         };
     }
 
@@ -110,7 +114,7 @@ final class AdapterFactory
             'username' => $parsed['user'] ?? null,
             'password' => $parsed['pass'] ?? null,
             'port' => $parsed['port'] ?? 21,
-            'ssl' => $parsed['query']['ssl'] ?? 'ftps' === ($parsed['scheme'] ?? null),
+            'ssl' => $parsed['query']['ssl'] ?? 'flysystem+ftps' === ($parsed['scheme'] ?? null),
         ])));
     }
 
