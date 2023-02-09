@@ -226,7 +226,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 throw new InvalidConfigurationException(\sprintf('"%s" is not a registered filesystem.', $scopedName));
             }
 
-            $container->register($filesystemId = '.zenstruck_filesystem.filesystem.'.$name, ScopedFilesystem::class)
+            $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, ScopedFilesystem::class)
                 ->setArguments([
                     new Reference('.zenstruck_filesystem.filesystem.'.$scopedName),
                     $scopedPath,
@@ -356,7 +356,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->setArguments([$config['dsn'], $config['config']])
         ;
 
-        $container->register($filesystemId = '.zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
+        $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
             ->setArguments([new Reference($flysystemId), $name, new ServiceLocatorArgument($features)])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
