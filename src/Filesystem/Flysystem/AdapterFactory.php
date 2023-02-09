@@ -116,7 +116,7 @@ final class AdapterFactory
             'username' => $parsed['user'] ?? null,
             'password' => $parsed['pass'] ?? null,
             'port' => $parsed['port'] ?? 21,
-            'ssl' => $parsed['query']['ssl'] ?? 'flysystem+ftps' === ($parsed['scheme'] ?? null),
+            'ssl' => (bool) ($parsed['query']['ssl'] ?? 'flysystem+ftps' === ($parsed['scheme'] ?? null)),
         ])));
     }
 
