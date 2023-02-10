@@ -53,34 +53,43 @@ final class AdapterFactory
 
     private static function createRealAdapter(string $dsn): FilesystemAdapter
     {
-        if (false === $parsed = \parse_url($dsn)) {
-            throw new \InvalidArgumentException(\sprintf('Could not parse "%s".', $dsn));
-        }
+        $parsed = self::parse($dsn);
 
-        $scheme = $parsed['scheme'] ?? null;
-
-        if ('file' === $scheme) {
-            $scheme = null;
-            $dsn = \mb_substr($dsn, \str_starts_with($dsn, 'file://') ? 7 : 5);
-        }
-
-        if (!$scheme) {
-            return new LocalFilesystemAdapter($dsn);
-        }
-
-        $query = [];
-
-        \parse_str($parsed['query'] ??= '', $query);
-
-        $parsed['query'] = $query;
-
-        return match ($scheme) {
+        return match ($parsed['scheme'] ?? null) {
+            null, 'file' => new LocalFilesystemAdapter($dsn),
             'flysystem+ftp', 'flysystem+ftps' => self::createFtpAdapter($parsed),
             'flysystem+sftp' => self::createSftpAdapter($parsed),
             'flysystem+s3' => self::createS3Adapter($parsed),
             'in-memory' => self::createInMemoryAdapter($parsed),
-            default => throw new \InvalidArgumentException(\sprintf('Could not parse DSN "%s".', $dsn)),
+            default => throw new \InvalidArgumentException(\sprintf('Could not create FilesystemAdapter for DSN "%s".', $dsn)),
         };
+    }
+
+    private static function parse(string $dsn): array
+    {
+        if (false !== $parsed = \parse_url($dsn)) {
+            return $parsed;
+        }
+
+        // for some reason parse_url doesn't support stream wrapper schemes (like phar://) out of the box
+        if (\str_contains($dsn, '://') && false !== $parsed = \parse_url(\str_replace('://', ':', $dsn))) {
+            unset($parsed['scheme']);
+
+            return $parsed;
+        }
+
+        throw new \InvalidArgumentException(\sprintf('Could not parse DSN "%s".', $dsn));
+    }
+
+    private static function normalizeQuery(array $parts): array
+    {
+        $query = [];
+
+        \parse_str($parts['query'] ??= '', $query);
+
+        $parts['query'] = $query;
+
+        return $parts;
     }
 
     private static function createInMemoryAdapter(array $parsed): InMemoryFilesystemAdapter
@@ -97,6 +106,8 @@ final class AdapterFactory
         if (!\class_exists(SftpAdapter::class)) {
             throw new \LogicException('league/flysystem-sftp-v3 is required to use the SFTP adapter. Install with "composer require league/flysystem-sftp-v3".');
         }
+
+        $parsed = self::normalizeQuery($parsed);
 
         return new SftpAdapter(
             new SftpConnectionProvider(
@@ -117,6 +128,8 @@ final class AdapterFactory
             throw new \LogicException('league/flysystem-ftp is required to use the FTP adapter. Install with "composer require league/flysystem-ftp".');
         }
 
+        $parsed = self::normalizeQuery($parsed);
+
         return new FtpAdapter(FtpConnectionOptions::fromArray(\array_filter([
             'host' => $parsed['host'] ?? null,
             'root' => $parsed['path'] ?? null,
@@ -129,6 +142,8 @@ final class AdapterFactory
 
     private static function createS3Adapter(array $parsed): FilesystemAdapter
     {
+        $parsed = self::normalizeQuery($parsed);
+
         if (\class_exists(AsyncAwsS3Adapter::class)) {
             return new AsyncAwsS3Adapter(
                 new AsyncS3Client([

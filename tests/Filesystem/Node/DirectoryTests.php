@@ -64,7 +64,7 @@ trait DirectoryTests
             ->recursive()
             ->files()
             ->date('> 30 years ago')
-            ->assertCount(14)
+            ->assertCount(15)
             ->date('> tomorrow')
             ->assertCount(0)
         ;
@@ -73,7 +73,7 @@ trait DirectoryTests
             ->recursive()
             ->files()
             ->newerThan('30 years ago')
-            ->assertCount(14)
+            ->assertCount(15)
             ->newerThan('tomorrow')
             ->assertCount(0)
         ;

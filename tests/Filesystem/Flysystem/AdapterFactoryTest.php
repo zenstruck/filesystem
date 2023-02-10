@@ -47,8 +47,8 @@ final class AdapterFactoryTest extends TestCase
     public static function dsnProvider(): iterable
     {
         yield ['/tmp', LocalFilesystemAdapter::class];
-        yield ['file:/tmp', LocalFilesystemAdapter::class];
         yield ['file:///tmp', LocalFilesystemAdapter::class];
+        yield ['phar://'.fixture('archive.tar'), LocalFilesystemAdapter::class];
         yield ['in-memory:', InMemoryFilesystemAdapter::class];
         yield ['in-memory:foo', InMemoryFilesystemAdapter::class];
         yield ['flysystem+ftp://foo:bar@example.com/path', FtpAdapter::class];
