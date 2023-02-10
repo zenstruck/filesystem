@@ -113,7 +113,7 @@ final class FilesystemPurgeCommand extends Command
 
         foreach ($toDelete as $path) {
             $filesystem->delete($path);
-            $io->isVerbose() ? $io->comment('[Deleted] '.$directory->path()) : $io->progressAdvance();
+            $io->isVerbose() ? $io->comment('[Deleted] '.$path) : $io->progressAdvance();
         }
 
         if (!$io->isVerbose()) {
