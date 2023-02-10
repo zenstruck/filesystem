@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Archive;
 
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as BaseZipArchiveAdapter;
+use League\Flysystem\ZipArchive\ZipArchiveProvider;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -31,6 +32,10 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
 
     public function __construct(?string $filename = null)
     {
+        if (!\interface_exists(ZipArchiveProvider::class)) {
+            throw new \LogicException('league/flysystem-ziparchive is required (composer require league/flysystem-ziparchive).');
+        }
+
         parent::__construct($filename ?? TempFile::new()->delete());
     }
 
