@@ -352,9 +352,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 break;
         }
 
-        $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
+        $flysystemDef = $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
             ->setArguments([$config['dsn'], $config['config']])
         ;
+
+        if ($config['lazy']) {
+            $flysystemDef->setLazy(true);
+        }
 
         $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
             ->setArguments([new Reference($flysystemId), $name, new ServiceLocatorArgument($features)])

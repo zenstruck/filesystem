@@ -18,6 +18,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Operation;
 
@@ -69,6 +70,14 @@ final class Configuration implements ConfigurationInterface
                             ->variableNode('config')
                                 ->info('Extra global adapter filesystem config')
                                 ->defaultValue([])
+                            ->end()
+                            ->booleanNode('lazy')
+                                ->info('Lazily load the filesystem when the first call occurs (requires Symfony 6.2+)')
+                                ->validate()
+                                    ->ifTrue(fn($v) => $v && !\interface_exists(LazyObjectInterface::class))
+                                    ->thenInvalid('symfony/var-exporter 6.2+ is required')
+                                ->end()
+                                ->defaultValue(\interface_exists(LazyObjectInterface::class))
                             ->end()
                             ->arrayNode('public_url')
                                 ->info('Public URL generator for this filesystem')
