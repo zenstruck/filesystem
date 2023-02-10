@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Node\Directory;
 
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 
 /**
@@ -20,6 +21,11 @@ use Zenstruck\Filesystem\Node\Directory;
  */
 trait DecoratedDirectory
 {
+    public function first(): ?Node
+    {
+        return $this->inner()->first();
+    }
+
     public function recursive(): static
     {
         $clone = clone $this;

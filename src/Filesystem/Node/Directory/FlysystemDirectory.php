@@ -51,6 +51,15 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
     /** @var DateComparator[] */
     private array $dates = [];
 
+    public function first(): ?Node
+    {
+        foreach ($this as $node) {
+            return $node;
+        }
+
+        return null;
+    }
+
     public function exists(): bool
     {
         return $this->operator->directoryExists($this->path());

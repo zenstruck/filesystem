@@ -256,6 +256,9 @@ $directories = $directory
         return true; // include
     })
 ;
+
+// get first matching node
+$directories->first(); // null|\Zenstruck\Filesystem\Node
 ```
 
 > **Note**: Most of the _advanced filters_ require `symfony/finder` (`composer require symfony/finder`).

@@ -24,6 +24,8 @@ interface Directory extends Node, \IteratorAggregate
 {
     public function recursive(): static;
 
+    public function first(): ?Node;
+
     /**
      * Filter nodes (return true = include, return false = exclude).
      *

@@ -58,6 +58,17 @@ trait DirectoryTests
     /**
      * @test
      */
+    public function can_get_first(): void
+    {
+        $dir = $this->createDirectory(fixture(''), '');
+
+        $this->assertSame('symfony.svg', $dir->files()->matchingFilename('*.svg')->first()?->path()->toString());
+        $this->assertNull($dir->files()->matchingFilename('*.foo')->first());
+    }
+
+    /**
+     * @test
+     */
     public function date_range_filter(): void
     {
         $this->fixtureDir()
