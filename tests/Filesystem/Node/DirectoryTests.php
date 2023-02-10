@@ -75,7 +75,7 @@ trait DirectoryTests
             ->recursive()
             ->files()
             ->date('> 30 years ago')
-            ->assertCount(21)
+            ->assertCount(17)
             ->date('> tomorrow')
             ->assertCount(0)
         ;
@@ -84,7 +84,7 @@ trait DirectoryTests
             ->recursive()
             ->files()
             ->newerThan('30 years ago')
-            ->assertCount(21)
+            ->assertCount(17)
             ->newerThan('tomorrow')
             ->assertCount(0)
         ;
@@ -99,18 +99,18 @@ trait DirectoryTests
             ->recursive()
             ->files()
             ->size('< 1K')
-            ->assertCount(12)
-            ->size('> 0')
             ->assertCount(9)
+            ->size('> 0')
+            ->assertCount(6)
         ;
 
         $this->fixtureDir()
             ->recursive()
             ->files()
             ->smallerThan('1K')
-            ->assertCount(12)
-            ->largerThan(0)
             ->assertCount(9)
+            ->largerThan(0)
+            ->assertCount(6)
         ;
     }
 

@@ -191,6 +191,29 @@ final class ArchiveFileTest extends FilesystemTest
         $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
     }
 
+    /**
+     * @test
+     * @dataProvider archiveFileProvider
+     */
+    public function can_read_different_types_of_archive_files(\SplFileInfo $filename): void
+    {
+        $archive = new ArchiveFile($filename);
+
+        $this->assertCount(2, $archive->directory());
+        $this->assertCount(1, $archive->directory()->files());
+        $this->assertCount(1, $archive->directory()->directories());
+        $this->assertCount(3, $archive->directory()->recursive());
+        $this->assertSame('contents 1', $archive->directory()->files()->first()->ensureFile()->contents());
+    }
+
+    public static function archiveFileProvider(): iterable
+    {
+        yield [fixture('archive.zip')];
+        yield [fixture('archive.tar')];
+        yield [fixture('archive.tar.gz')];
+        yield [fixture('archive.tar.bz2')];
+    }
+
     protected function createFilesystem(): Filesystem
     {
         return new ArchiveFile();
