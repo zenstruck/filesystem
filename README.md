@@ -422,7 +422,7 @@ $filesystem
 
 > **Note**: `league/flysystem-ziparchive` is required (`composer require league/flysystem-ziparchive`).
 
-This is a special filesystem wrapping a zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
+This is a special filesystem wrapping a local zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
 
 ```php
 use Zenstruck\Filesystem\Archive\ArchiveFile;
@@ -474,6 +474,23 @@ $zipFile = ArchiveFile::zip('/some/local/file.txt');
 
 // can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
 $zipFile = ArchiveFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+```
+
+### `TarFile`
+
+> **Note**: `league/flysystem-read-only` is required (`composer require league/flysystem-read-only`).
+
+This is a special filesystem wrapping an existing local tar(.gz/bz2) archive. It acts as both a _readonly_
+`Filesystem` and `\SplFileInfo` object:
+
+```php
+use Zenstruck\Filesystem\Archive\TarFile;
+
+$archive = new ArchiveFile('/local/path/to/archive.tar');
+$archive = new ArchiveFile('/local/path/to/archive.tar.gz');
+$archive = new ArchiveFile('/local/path/to/archive.tar.bz2');
+
+$archive->file('some/file.txt'); // \Zenstruck\Filesystem\Node\File
 ```
 
 ## `TestFilesystem`
