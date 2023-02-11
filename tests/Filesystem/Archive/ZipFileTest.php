@@ -13,14 +13,14 @@ namespace Zenstruck\Tests\Filesystem\Archive;
 
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Archive\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ZipFile;
 use Zenstruck\Tests\FilesystemTest;
 use Zenstruck\Tests\InteractsWithTempDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ArchiveFileTest extends FilesystemTest
+final class ZipFileTest extends FilesystemTest
 {
     use InteractsWithTempDirectory;
 
@@ -31,7 +31,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_create_archive_file_in_non_existent_directory(): void
     {
-        $filesystem = new ArchiveFile(self::FILE);
+        $filesystem = new ZipFile(self::FILE);
         $filesystem->write('foo.txt', 'contents');
 
         $this->assertFileExists(self::FILE);
@@ -42,7 +42,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function deleting_root_deletes_archive(): void
     {
-        $filesystem = new ArchiveFile(self::FILE);
+        $filesystem = new ZipFile(self::FILE);
         $filesystem->write('foo.txt', 'contents');
 
         $this->assertFileExists(self::FILE);
@@ -57,7 +57,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function trying_to_read_from_non_existent_archive_does_not_create_the_file(): void
     {
-        $filesystem = new ArchiveFile(self::FILE);
+        $filesystem = new ZipFile(self::FILE);
 
         $this->assertFileDoesNotExist(self::FILE);
 
@@ -73,7 +73,7 @@ final class ArchiveFileTest extends FilesystemTest
     {
         \file_put_contents($file = TEMP_DIR.'/archive.zip', 'invalid content');
 
-        $filesystem = new ArchiveFile($file);
+        $filesystem = new ZipFile($file);
 
         $this->expectException(UnableToOpenZipArchive::class);
 
@@ -85,7 +85,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_read_existing_file(): void
     {
-        $filesystem = new ArchiveFile(fixture('archive.zip'));
+        $filesystem = new ZipFile(fixture('archive.zip'));
 
         $this->assertTrue($filesystem->has());
         $this->assertTrue($filesystem->has('file1.txt'));
@@ -99,7 +99,7 @@ final class ArchiveFileTest extends FilesystemTest
      */
     public function can_wrap_write_operations_in_a_transaction(): void
     {
-        $filesystem = new ArchiveFile();
+        $filesystem = new ZipFile();
         $filesystem->beginTransaction();
         $filesystem->write('file1.txt', 'contents1');
         $filesystem->write('sub/file2.txt', 'contents2');
@@ -137,7 +137,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->recursive()
         ;
 
-        $archive = ArchiveFile::zip($dir);
+        $archive = ZipFile::zip($dir);
 
         $this->assertFileExists($archive);
 
@@ -152,7 +152,7 @@ final class ArchiveFileTest extends FilesystemTest
     {
         $file = in_memory_filesystem()->write('nested/file.txt', 'contents')->last()->ensureFile();
 
-        $archive = ArchiveFile::zip($file);
+        $archive = ZipFile::zip($file);
 
         $this->assertFileExists($archive);
 
@@ -166,7 +166,7 @@ final class ArchiveFileTest extends FilesystemTest
     {
         \file_put_contents($file = TEMP_DIR.'/file.txt', 'contents');
 
-        $archive = ArchiveFile::zip($file);
+        $archive = ZipFile::zip($file);
 
         $this->assertFileExists($archive);
 
@@ -183,7 +183,7 @@ final class ArchiveFileTest extends FilesystemTest
             ->write('nested/file2.txt', 'contents 2')
         ;
 
-        $archive = ArchiveFile::zip(TEMP_DIR);
+        $archive = ZipFile::zip(TEMP_DIR);
 
         $this->assertFileExists($archive);
 
@@ -191,31 +191,8 @@ final class ArchiveFileTest extends FilesystemTest
         $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
     }
 
-    /**
-     * @test
-     * @dataProvider archiveFileProvider
-     */
-    public function can_read_different_types_of_archive_files(\SplFileInfo $filename): void
-    {
-        $archive = new ArchiveFile($filename);
-
-        $this->assertCount(2, $archive->directory());
-        $this->assertCount(1, $archive->directory()->files());
-        $this->assertCount(1, $archive->directory()->directories());
-        $this->assertCount(3, $archive->directory()->recursive());
-        $this->assertSame('contents 1', $archive->directory()->files()->first()->ensureFile()->contents());
-    }
-
-    public static function archiveFileProvider(): iterable
-    {
-        yield [fixture('archive.zip')];
-        yield [fixture('archive.tar')];
-        yield [fixture('archive.tar.gz')];
-        yield [fixture('archive.tar.bz2')];
-    }
-
     protected function createFilesystem(): Filesystem
     {
-        return new ArchiveFile();
+        return new ZipFile();
     }
 }

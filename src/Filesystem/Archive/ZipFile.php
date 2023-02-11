@@ -14,17 +14,18 @@ namespace Zenstruck\Filesystem\Archive;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as BaseZipArchiveAdapter;
 use League\Flysystem\ZipArchive\ZipArchiveProvider;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Archive\Zip\TransactionalZipArchiveProvider;
+use Zenstruck\Filesystem\Archive\Zip\ZipArchiveAdapter;
 use Zenstruck\Filesystem\DecoratedFilesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ArchiveFile extends \SplFileInfo implements Filesystem
+final class ZipFile extends \SplFileInfo implements Filesystem
 {
     use DecoratedFilesystem;
 
@@ -33,6 +34,10 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
 
     public function __construct(?string $filename = null)
     {
+        if (!\interface_exists(ZipArchiveProvider::class)) {
+            throw new \LogicException('league/flysystem-ziparchive is required (composer require league/flysystem-ziparchive).');
+        }
+
         parent::__construct($filename ?? TempFile::new()->delete());
     }
 
@@ -112,21 +117,7 @@ final class ArchiveFile extends \SplFileInfo implements Filesystem
 
     protected function inner(): Filesystem
     {
-        if (isset($this->inner)) {
-            return $this->inner;
-        }
-
-        $file = new PendingFile($this);
-
-        if ($file->exists() && \in_array($file->guessExtension(), ['tar', 'tar.gz', 'tar.bz2'])) {
-            return $this->inner = new FlysystemFilesystem('readonly:phar://'.$this);
-        }
-
-        if (!\interface_exists(ZipArchiveProvider::class)) {
-            throw new \LogicException('league/flysystem-ziparchive is required (composer require league/flysystem-ziparchive).');
-        }
-
-        return $this->inner = new FlysystemFilesystem(
+        return $this->inner ??= new FlysystemFilesystem(
             new ZipArchiveAdapter(
                 new BaseZipArchiveAdapter($this->provider(), '/'),
                 $this

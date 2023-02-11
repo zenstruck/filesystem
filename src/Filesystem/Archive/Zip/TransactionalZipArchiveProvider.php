@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Archive;
+namespace Zenstruck\Filesystem\Archive\Zip;
 
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;

@@ -17,7 +17,8 @@ Additionally, the following features are provided:
 1. Filesystem _wrappers_ to add additional functionality (ie [`MultiFilesystem`](#multifilesystem),
    and [`LoggableFilesystem`](#loggablefilesystem)).
 2. Powerful [testing helpers](#testfilesystem).
-3. [`ArchiveFile`](#archivefile) representing a local zip file that acts as both a filesystem _and_ a real file.
+3. [`ZipFile`](#zipfile)/[`TarFile`](#tarfile) representing a local zip/tar(.gz/bz2) file that acts as both a
+   filesystem _and_ a real file.
 4. [Doctrine Integration](#doctrine-integration).
 5. [Symfony Integration](#symfony-integration)
     - [Custom Responses](#responses)
@@ -418,16 +419,16 @@ $filesystem
 
 > **Note**: The `Pre*Event` properties can be manipulated.
 
-### `ArchiveFile`
+### `ZipFile`
 
 > **Note**: `league/flysystem-ziparchive` is required (`composer require league/flysystem-ziparchive`).
 
 This is a special filesystem wrapping a local zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
 
 ```php
-use Zenstruck\Filesystem\Archive\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ZipFile;
 
-$archive = new ArchiveFile('/local/path/to/archive.zip');
+$archive = new ZipFile('/local/path/to/archive.zip');
 $archive->file('some/file.txt');
 $archive->write('another/file.txt', 'content');
 
@@ -437,9 +438,9 @@ $archive->write('another/file.txt', 'content');
 When creating without a path, creates a temporary archive file (that's deleted at the end of the script):
 
 ```php
-use Zenstruck\Filesystem\Archive\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ZipFile;
 
-$archive = new ArchiveFile();
+$archive = new ZipFile();
 
 $archive->write('some/file.txt', 'content');
 $archive->write('another/file.txt', 'content');
@@ -450,9 +451,9 @@ $archive->write('another/file.txt', 'content');
 Write operations can be queued and committed via a _transaction_:
 
 ```php
-use Zenstruck\Filesystem\Archive\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ZipFile;
 
-$archive = new ArchiveFile();
+$archive = new ZipFile();
 
 $archive->beginTransaction(); // start the transaction
 $archive->write('some/file.txt', 'content');
@@ -468,12 +469,12 @@ $archive->commit(function() use ($progress) { // callback is called at most, 100
 Static helper for quickly creating `zip` archives:
 
 ```php
-use Zenstruck\Filesystem\Archive\ArchiveFile;
+use Zenstruck\Filesystem\Archive\ZipFile;
 
-$zipFile = ArchiveFile::zip('/some/local/file.txt');
+$zipFile = ZipFile::zip('/some/local/file.txt');
 
 // can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
-$zipFile = ArchiveFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+$zipFile = ZipFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
 ```
 
 ### `TarFile`
@@ -486,9 +487,9 @@ This is a special filesystem wrapping an existing local tar(.gz/bz2) archive. It
 ```php
 use Zenstruck\Filesystem\Archive\TarFile;
 
-$archive = new ArchiveFile('/local/path/to/archive.tar');
-$archive = new ArchiveFile('/local/path/to/archive.tar.gz');
-$archive = new ArchiveFile('/local/path/to/archive.tar.bz2');
+$archive = new TarFile('/local/path/to/archive.tar');
+$archive = new TarFile('/local/path/to/archive.tar.gz');
+$archive = new TarFile('/local/path/to/archive.tar.bz2');
 
 $archive->file('some/file.txt'); // \Zenstruck\Filesystem\Node\File
 ```
