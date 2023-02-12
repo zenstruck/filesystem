@@ -33,7 +33,9 @@ use Zenstruck\Stream;
 final class FlysystemFilesystem implements Filesystem
 {
     private Operator $operator;
-    private string|\LogicException $last;
+
+    /** @var \Closure():Node|\LogicException */
+    private \Closure|\LogicException $last;
 
     public function __construct(
         FilesystemOperator|FilesystemAdapter|string $flysystem,
@@ -88,7 +90,7 @@ final class FlysystemFilesystem implements Filesystem
     {
         // todo: copy dir?
         $this->operator->copy($source, $destination, $config);
-        $this->last = $destination;
+        $this->last = fn() => new FlysystemFile($destination, $this->operator);
 
         return $this;
     }
@@ -97,7 +99,7 @@ final class FlysystemFilesystem implements Filesystem
     {
         // todo: move dir?
         $this->operator->move($source, $destination, $config);
-        $this->last = $destination;
+        $this->last = fn() => new FlysystemFile($destination, $this->operator);
 
         return $this;
     }
@@ -122,7 +124,7 @@ final class FlysystemFilesystem implements Filesystem
     public function mkdir(string $path, array $config = []): static
     {
         $this->operator->createDirectory($path, $config);
-        $this->last = $path;
+        $this->last = fn() => new FlysystemDirectory($path, $this->operator);
 
         return $this;
     }
@@ -130,7 +132,7 @@ final class FlysystemFilesystem implements Filesystem
     public function chmod(string $path, string $visibility): static
     {
         $this->operator->setVisibility($path, $visibility);
-        $this->last = $path;
+        $this->last = fn() => new FlysystemNode($path, $this->operator);
 
         return $this;
     }
@@ -148,10 +150,10 @@ final class FlysystemFilesystem implements Filesystem
 
             foreach ($value->files() as $file) {
                 $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config);
-                $progress(new FlysystemFile($this->last, $this->operator));
+                $progress($this->last()->ensureFile());
             }
 
-            $this->last = $path;
+            $this->last = fn() => new FlysystemDirectory($path, $this->operator);
 
             return $this;
         }
@@ -187,13 +189,13 @@ final class FlysystemFilesystem implements Filesystem
             $closeStream && $value->close();
         }
 
-        $this->last = $path;
+        $this->last = fn() => new FlysystemFile($path, $this->operator);
 
         return $this;
     }
 
     public function last(): Node
     {
-        return \is_string($this->last) ? new FlysystemNode($this->last, $this->operator) : throw $this->last;
+        return \is_callable($this->last) ? ($this->last)() : throw $this->last;
     }
 }
