@@ -40,6 +40,6 @@ final class TarFile extends \SplFileInfo implements Filesystem
 
     protected function inner(): Filesystem
     {
-        return $this->inner ??= new FlysystemFilesystem('readonly:phar://'.$this);
+        return $this->inner ??= new FlysystemFilesystem('readonly:phar://'.$this, 'phar://'.$this);
     }
 }

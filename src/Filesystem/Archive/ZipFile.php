@@ -121,7 +121,8 @@ final class ZipFile extends \SplFileInfo implements Filesystem
             new ZipArchiveAdapter(
                 new BaseZipArchiveAdapter($this->provider(), '/'),
                 $this
-            )
+            ),
+            "zip://{$this}"
         );
     }
 

@@ -29,6 +29,16 @@ final class ZipFileTest extends FilesystemTest
     /**
      * @test
      */
+    public function name(): void
+    {
+        $filesystem = new ZipFile(self::FILE);
+
+        $this->assertSame('zip://'.self::FILE, $filesystem->name());
+    }
+
+    /**
+     * @test
+     */
     public function can_create_archive_file_in_non_existent_directory(): void
     {
         $filesystem = new ZipFile(self::FILE);

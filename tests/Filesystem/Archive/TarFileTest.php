@@ -27,6 +27,7 @@ final class TarFileTest extends TestCase
     {
         $archive = new TarFile($filename);
 
+        $this->assertSame('phar://'.$filename, $archive->name());
         $this->assertCount(2, $archive->directory());
         $this->assertCount(1, $archive->directory()->files());
         $this->assertCount(1, $archive->directory()->directories());
