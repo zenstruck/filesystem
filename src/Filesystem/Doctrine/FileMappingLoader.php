@@ -31,14 +31,24 @@ final class FileMappingLoader
     }
 
     /**
-     * @template T of object
+     * @template T of object|iterable
      *
      * @param T $object
      *
      * @return T
      */
-    public function __invoke(object $object): object
+    public function __invoke(object|iterable $object): object|iterable
     {
+        if (\is_iterable($object)) {
+            foreach ($object as $item) {
+                if (\is_object($item)) {
+                    $this($item);
+                }
+            }
+
+            return $object;
+        }
+
         if (isset($this->loaded[$object])) {
             return $object;
         }

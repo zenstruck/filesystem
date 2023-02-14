@@ -48,6 +48,7 @@ final class FileMappingLoaderTest extends DoctrineTestCase
         $fromDb = repository(Entity2::class)->first()->object();
         $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb);
         $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb); // ensure multiple calls work
+        self::getContainer()->get(FileMappingLoader::class)([$fromDb]);
 
         $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
         $this->assertSame('content1', $fromDb->getFile1()->contents());
