@@ -158,21 +158,16 @@ final class FlysystemFilesystem implements Filesystem
             return $this;
         }
 
-        $closeStream = false;
-
         if ($value instanceof \SplFileInfo && !$value instanceof File) {
             $value = Stream::open($value, 'r');
-            $closeStream = true;
         }
 
         if ($value instanceof File) {
-            $value = $value->read();
-            $closeStream = true;
+            $value = $value->stream();
         }
 
         if (\is_string($value)) {
             $value = Stream::wrap($value);
-            $closeStream = true;
         }
 
         if (\is_resource($value)) {
@@ -183,11 +178,7 @@ final class FlysystemFilesystem implements Filesystem
             throw new \InvalidArgumentException(\sprintf('Unable to write "%s".', \get_debug_type($value)));
         }
 
-        try {
-            $this->operator->writeStream($path, $value->get(), $config);
-        } finally {
-            $closeStream && $value->close();
-        }
+        $this->operator->writeStream($path, $value->autoClose()->get(), $config);
 
         $this->last = fn() => new FlysystemFile($path, $this->operator);
 
