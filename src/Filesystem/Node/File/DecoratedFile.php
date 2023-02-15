@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Stream;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -43,6 +44,11 @@ trait DecoratedFile
     public function read()
     {
         return $this->inner()->read();
+    }
+
+    public function stream(): Stream
+    {
+        return $this->inner()->stream();
     }
 
     public function checksum(?string $algo = null): string

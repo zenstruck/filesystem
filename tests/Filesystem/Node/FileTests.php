@@ -93,6 +93,7 @@ trait FileTests
 
         $this->assertSame($expected, $file->contents());
         $this->assertSame($expected, Stream::wrap($file->read())->contents());
+        $this->assertSame($expected, (string) $file->stream());
         $this->assertSame($expected, \file_get_contents($file->tempFile()));
     }
 

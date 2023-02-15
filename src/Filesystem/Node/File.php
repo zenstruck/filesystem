@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Node;
 
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Stream;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,6 +35,8 @@ interface File extends Node
      * @return resource
      */
     public function read();
+
+    public function stream(): Stream;
 
     public function checksum(?string $algo = null): string;
 

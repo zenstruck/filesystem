@@ -167,11 +167,18 @@ class PendingFile extends \SplFileInfo implements File
 
     public function read()
     {
+        return $this->stream()->get();
+    }
+
+    public function stream(): Stream
+    {
         if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            return $this->uploadedFile->getStream()->detach() ?? throw UnableToReadFile::fromLocation($this->path());
+            $resource = $this->uploadedFile->getStream()->detach() ?? throw UnableToReadFile::fromLocation($this->path());
+
+            return Stream::wrap($resource);
         }
 
-        return Stream::open($this, 'r')->get();
+        return Stream::open($this, 'r');
     }
 
     public function checksum(?string $algo = null): string

@@ -116,7 +116,9 @@ Interface: `Zenstruck\Filesystem\Node\File` (extends [`Node`](#node)).
 
 $file->contents(); // string - the file's contents
 
-$file->read(); // resource
+$file->stream(); // \Zenstruck\Stream - wrapper for a resource
+
+$file->read(); // "raw" resource
 
 $file->size(); // int
 
@@ -134,6 +136,9 @@ $file->tempFile(); // \SplFileInfo - temporary local file that's deleted at the 
 
 > **Note**: See [`zenstruck/temp-file`](https://github.com/zenstruck/temp-file#zenstrucktemp-file) for more
 > details about `File::tempFile()`.
+
+> **Note**: See [`zenstruck/stream`](https://github.com/zenstruck/stream#zenstruckstream) for more
+> details about `File::stream()`.
 
 #### `PendingFile`
 

@@ -53,6 +53,11 @@ class FlysystemFile extends FlysystemNode implements File
         return $this->operator->readStream($this->path());
     }
 
+    public function stream(): Stream
+    {
+        return Stream::wrap($this->read());
+    }
+
     public function checksum(?string $algo = null): string
     {
         $config = $algo ? ['checksum_algo' => $algo] : [];

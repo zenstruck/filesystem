@@ -15,7 +15,7 @@
         "php": ">=8.0",
         "league/flysystem": "^3.11",
         "zenstruck/image": "^0.4.1",
-        "zenstruck/stream": "^1.1",
+        "zenstruck/stream": "^1.2",
         "zenstruck/temp-file": "^1.1"
     },
     "require-dev": {
