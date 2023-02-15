@@ -67,18 +67,26 @@ final class AdapterFactory
 
     private static function parse(string $dsn): array
     {
-        if (false !== $parsed = \parse_url($dsn)) {
-            return $parsed;
-        }
+        $parsed = \parse_url($dsn);
 
         // for some reason parse_url doesn't support stream wrapper schemes (like phar://) out of the box
-        if (\str_contains($dsn, '://') && false !== $parsed = \parse_url(\str_replace('://', ':', $dsn))) {
+        if (false === $parsed && \str_contains($dsn, '://') && false !== $parsed = \parse_url(\str_replace('://', ':', $dsn))) {
             unset($parsed['scheme']);
-
-            return $parsed;
         }
 
-        throw new \InvalidArgumentException(\sprintf('Could not parse DSN "%s".', $dsn));
+        if (false === $parsed) {
+            throw new \InvalidArgumentException(\sprintf('Could not parse DSN "%s".', $dsn));
+        }
+
+        if (isset($parsed['user'])) {
+            $parsed['user'] = \rawurldecode($parsed['user']);
+        }
+
+        if (isset($parsed['pass'])) {
+            $parsed['pass'] = \rawurldecode($parsed['pass']);
+        }
+
+        return $parsed;
     }
 
     private static function normalizeQuery(array $parts): array
