@@ -69,7 +69,7 @@ final class ScopedFilesystem implements Filesystem
         return $this->inner->move($this->prefix($source), $this->prefix($destination), $config);
     }
 
-    public function delete(string $path, array $config = []): static
+    public function delete(string $path, array $config = []): self
     {
         $this->inner->delete($this->prefix($path), $config);
 

@@ -54,7 +54,7 @@ final class EventDispatcherFilesystem implements Filesystem
         return $file;
     }
 
-    public function delete(string $path, array $config = []): static
+    public function delete(string $path, array $config = []): self
     {
         $this->dispatch($event = new PreDeleteEvent($this, $path, $config), Operation::DELETE);
         $this->inner->delete($event->path, $event->config);

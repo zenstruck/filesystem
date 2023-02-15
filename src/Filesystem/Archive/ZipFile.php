@@ -105,7 +105,7 @@ final class ZipFile extends \SplFileInfo implements Filesystem
         return $filesystem->commit($config['commit_progress'] ?? null);
     }
 
-    public function delete(string $path = '', array $config = []): static
+    public function delete(string $path = '', array $config = []): self
     {
         if (!\in_array($path, ['/', ''], true)) {
             $this->inner()->delete($path, $config);

@@ -120,7 +120,7 @@ interface Filesystem
      * @throws UnableToDeleteDirectory
      * @throws FilesystemException
      */
-    public function delete(string $path, array $config = []): static;
+    public function delete(string $path, array $config = []): self;
 
     /**
      * Create a directory in the filesystem.

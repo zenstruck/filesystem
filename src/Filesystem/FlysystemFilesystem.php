@@ -98,7 +98,7 @@ final class FlysystemFilesystem implements Filesystem
         return new FlysystemFile($destination, $this->operator);
     }
 
-    public function delete(string $path, array $config = []): static
+    public function delete(string $path, array $config = []): self
     {
         if ($this->operator->fileExists($path)) {
             $this->operator->delete($path);
