@@ -79,6 +79,18 @@ final class TestFilesystemTest extends FilesystemTest
         ;
     }
 
+    /**
+     * @test
+     */
+    public function can_create_real_file(): void
+    {
+        $file = $this->createFilesystem()->write('file1.txt', 'contents')->realFile('file1.txt');
+
+        $this->assertFileExists($file);
+        $this->assertSame('/tmp/file1.txt', (string) $file);
+        $this->assertSame('contents', \file_get_contents($file));
+    }
+
     protected function createFilesystem(): TestFilesystem
     {
         return new TestFilesystem(in_memory_filesystem());

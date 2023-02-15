@@ -560,6 +560,8 @@ $filesystem
         ;
     })
 ;
+
+$file = $filesystem->realFile('symfony.png'); // \SplFileInfo('/tmp/symfony.png') - deleted at the end of the script
 ```
 
 ### `InteractsWithFilesystem`

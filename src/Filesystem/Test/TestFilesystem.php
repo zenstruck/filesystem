@@ -18,6 +18,7 @@ use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
 use Zenstruck\Filesystem\Test\Node\TestImage;
 use Zenstruck\Filesystem\Test\Node\TestNode;
+use Zenstruck\TempFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -145,6 +146,21 @@ final class TestFilesystem implements Filesystem
     public function last(): TestNode
     {
         return new TestNode($this->inner()->last());
+    }
+
+    /**
+     * Create a "real" local file for a "filesystem" file.
+     *
+     * This file is temporary and deleted at the end of the script.
+     */
+    public function realFile(string $path): \SplFileInfo
+    {
+        $file = $this->file($path);
+
+        $tempFile = new TempFile(\sprintf('%s/%s', \sys_get_temp_dir(), $file->path()->name()));
+        \file_put_contents($tempFile, $file->read());
+
+        return $tempFile->refresh();
     }
 
     public function dump(): self
