@@ -138,9 +138,9 @@ final class ExpressionPathGeneratorTest extends TestCase
         $file = $this->file('some/pATh.txt', 'content');
 
         $this->assertSame(
-            'prefix/baz/value/stRIng/1//prop1-valUe/6',
+            'prefix/baz/value/stRIng/1//prop1-valUe/6/2022-02-03/0-1-3',
             $this->name($file, [
-                'expression' => 'prefix/{foo.bar}/{array.key}/{object}/{object.prop1}/{object.prop2}/{object.prop3}/{object.prop4}{object.prop5}',
+                'expression' => 'prefix/{foo.bar}/{array.key}/{object}/{object.prop1}/{object.prop2}/{object.prop3}/{object.prop4}{object.prop5()}/{object.prop6.format(Y-m-d)}/{object.implode(0, 1, 3)}',
                 'foo.bar' => 'baz',
                 'array' => ['key' => 'value'],
                 'object' => new ContextObject(),
@@ -210,6 +210,12 @@ class ContextObject
     private $prop3 = 'prop1-valUe';
     private $prop4 = 6;
     private $prop5;
+    private $prop6;
+
+    public function __construct()
+    {
+        $this->prop6 = new \DateTimeImmutable('Feb 3, 2022');
+    }
 
     public function __toString(): string
     {
@@ -229,5 +235,15 @@ class ContextObject
     public function getProp5()
     {
         return $this->prop5;
+    }
+
+    public function getProp6()
+    {
+        return $this->prop6;
+    }
+
+    public function implode(string ...$values)
+    {
+        return \implode('-', $values);
     }
 }

@@ -40,17 +40,17 @@ final class ExpressionPathGenerator implements Generator
         }
 
         return (string) \preg_replace_callback(
-            '#{([\w.:\-\[\]]+)(\|(slug|slugify|lower))?}#',
+            '#{([\w.:\-\[\]]+)(\(([\w\s,\-]+)?\))?(\|(slug|slugify|lower))?}#',
             function($matches) use ($node, $context) {
                 $value = match ($matches[1]) {
                     'name' => $this->slugify($node->path()->basename()),
                     'ext' => self::extensionWithDot($node),
                     'checksum' => $node->ensureFile()->checksum(),
                     'rand' => self::randomString(),
-                    default => self::parseVariable($matches[1], $node, $context),
+                    default => self::parseVariable($matches[1], $matches[3] ?? null, $node, $context),
                 };
 
-                return match ($matches[3] ?? null) {
+                return match ($matches[5] ?? null) {
                     'slug', 'slugify' => $this->slugify($value),
                     'lower' => \mb_strtolower($value),
                     default => $value,
@@ -97,7 +97,7 @@ final class ExpressionPathGenerator implements Generator
         return \mb_strtolower($this->slugger ? $this->slugger->slug($value) : \str_replace(' ', '-', $value));
     }
 
-    private static function parseVariable(string $variable, Node $node, array $context): string
+    private static function parseVariable(string $variable, ?string $arguments, Node $node, array $context): string
     {
         if (\count($parts = \explode(':', $variable)) > 1) {
             return match (\mb_strtolower($parts[0])) {
@@ -107,7 +107,11 @@ final class ExpressionPathGenerator implements Generator
             };
         }
 
-        $value = self::parseVariableValue($variable, $context);
+        $value = self::parseVariableValue(
+            $variable,
+            null === $arguments ? [] : \array_map(static fn(string $v) => \trim($v), \explode(',', $arguments)),
+            $context
+        );
 
         if (null === $value || \is_scalar($value) || $value instanceof \Stringable) {
             return (string) $value;
@@ -116,13 +120,13 @@ final class ExpressionPathGenerator implements Generator
         throw new \LogicException(\sprintf('Unable to parse expression variable {%s}.', $variable));
     }
 
-    private static function parseVariableValue(string $variable, array $context): mixed
+    private static function parseVariableValue(string $variable, array $arguments, array $context): mixed
     {
         if (\array_key_exists($variable, $context)) {
             return $context[$variable];
         }
 
-        return self::dotAccess($context, $variable);
+        return self::dotAccess($context, $variable, $arguments);
     }
 
     private static function parseChecksum(File $file, array $parts): string
@@ -142,7 +146,7 @@ final class ExpressionPathGenerator implements Generator
     /**
      * Quick and dirty "dot" accessor that works for objects and arrays.
      */
-    private static function dotAccess(object|array &$what, string $path): mixed
+    private static function dotAccess(object|array &$what, string $path, array $arguments): mixed
     {
         $current = &$what;
 
@@ -158,14 +162,14 @@ final class ExpressionPathGenerator implements Generator
             }
 
             if (\method_exists($current, $segment)) {
-                $current = $current->{$segment}();
+                $current = $current->{$segment}(...$arguments);
 
                 continue;
             }
 
             foreach (['get', 'has', 'is'] as $prefix) {
                 if (\method_exists($current, $method = $prefix.\ucfirst($segment))) {
-                    $current = $current->{$method}();
+                    $current = $current->{$method}(...$arguments);
 
                     continue 2;
                 }
