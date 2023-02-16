@@ -26,6 +26,7 @@ abstract class Stateful extends Mapping
         array $namerContext = [],
         public bool $deleteOnRemove = true,
         public bool $deleteOnUpdate = true,
+        public array $column = [],
     ) {
         parent::__construct($metadata, $filesystem, $namer, $namerContext);
     }

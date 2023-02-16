@@ -37,7 +37,11 @@ class Entity1
     #[ORM\Column('_unique', unique: true, nullable: true)]
     private ?string $unique;
 
-    #[Filesystem\StoreAsPath('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
+    #[Filesystem\StoreAsPath(
+        filesystem: 'public',
+        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}',
+        column: ['name' => 'custom_name'],
+    )]
     private ?File $file1 = null;
 
     #[Filesystem\StoreAsPath(

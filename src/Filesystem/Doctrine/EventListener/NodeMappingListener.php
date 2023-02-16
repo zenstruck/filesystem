@@ -12,9 +12,9 @@
 namespace Zenstruck\Filesystem\Doctrine\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
-use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
@@ -76,25 +76,35 @@ final class NodeMappingListener
                 continue;
             }
 
-            \assert($mapping instanceof Stateful);
+            if (!$mapping instanceof Stateful) {
+                throw new MappingException(\sprintf('Unknown mapping type "%s" for %s::$%s.', $mapping::class, $class->name, $property->name));
+            }
 
             Metadata::validate($nodeClass, $mapping->metadata); // @phpstan-ignore-line
 
-            try {
-                $fieldMapping = $metadata->getFieldMapping($property->name);
-            } catch (MappingException) {
-                // no mapping set
-                $fieldMapping = [];
+            if ($metadata->hasField($property->name) && isset($metadata->getFieldMapping($property->name)['declared'])) {
+                // using inheritance mapping - field already mapped on parent
+                $collection->statefulMappings[$property->name] = $mapping;
+
+                continue;
             }
 
-            if (!isset($fieldMapping['declared'])) {
-                // using inheritance mapping - field already mapped on parent
-                $metadata->mapField(\array_merge($fieldMapping, [
-                    'fieldName' => $property->name,
-                    'type' => self::doctrineTypeFor($mapping, $nodeClass), // @phpstan-ignore-line
-                    'nullable' => $fieldMapping['nullable'] ?? $type->allowsNull(),
-                ]));
+            if ($metadata->hasField($property->name)) {
+                throw new MappingException(\sprintf('Cannot use zenstruck/filesystem mapping with doctrine/orm mapping for %s::$%s. Use %s::$column to customize the mapping.', $class->name, $property->name, $mapping::class));
             }
+
+            $fieldMapping = $mapping->column;
+
+            if (isset($fieldMapping['name'])) {
+                $fieldMapping['columnName'] = $fieldMapping['name'];
+                unset($fieldMapping['name']);
+            }
+
+            $metadata->mapField(\array_merge($fieldMapping, [
+                'fieldName' => $property->name,
+                'type' => self::doctrineTypeFor($mapping, $nodeClass), // @phpstan-ignore-line
+                'nullable' => $fieldMapping['nullable'] ?? $type->allowsNull(),
+            ]));
 
             $collection->statefulMappings[$property->name] = $mapping;
         }

@@ -25,8 +25,9 @@ final class StoreWithMetadata extends Stateful
         string|Namer|null $namer = null,
         array $namerContext = [],
         bool $deleteOnRemove = true,
-        bool $deleteOnUpdate = true
+        bool $deleteOnUpdate = true,
+        array $column = [],
     ) {
-        parent::__construct($metadata, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
+        parent::__construct($metadata, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate, $column);
     }
 }

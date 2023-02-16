@@ -26,7 +26,8 @@ final class StoreAsDsn extends Stateful
         array $namerContext = [],
         bool $deleteOnRemove = true,
         bool $deleteOnUpdate = true,
+        array $column = [],
     ) {
-        parent::__construct(Metadata::DSN, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate);
+        parent::__construct(Metadata::DSN, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate, $column);
     }
 }
