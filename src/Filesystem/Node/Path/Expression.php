@@ -18,7 +18,7 @@ final class Expression extends Namer implements \Stringable
 {
     public function __construct(private string $value, array $context = [])
     {
-        $context['expression'] = $this;
+        $context['expression'] = $this->value;
 
         parent::__construct('expression', $context);
     }
