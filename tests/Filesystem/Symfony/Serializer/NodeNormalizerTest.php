@@ -124,6 +124,20 @@ final class NodeNormalizerTest extends KernelTestCase
                 'extension' => 'txt',
             ],
         ];
+        yield [
+            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content')->last(),
+            [
+                'filesystem' => 'public',
+                'metadata' => [Metadata::CHECKSUM, Metadata::SIZE, Metadata::FILENAME],
+                'namer' => new Expression('some/prefix/{name}{ext}'),
+            ],
+            File::class,
+            [
+                'checksum' => '9a0364b9e99bb480dd25e1f0284c8555',
+                'size' => 7,
+                'filename' => 'some-file.txt',
+            ],
+        ];
     }
 
     private function serializer(): SerializerInterface

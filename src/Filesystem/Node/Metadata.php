@@ -26,6 +26,7 @@ final class Metadata
 {
     public const PATH = 'path';
     public const DSN = 'dsn';
+    public const FILENAME = 'filename';
     public const LAST_MODIFIED = 'last_modified';
     public const VISIBILITY = 'visibility';
     public const MIME_TYPE = 'mime_type';
@@ -39,7 +40,7 @@ final class Metadata
     public const IPTC = 'iptc';
 
     private const STRING_METADATA = [self::PATH, self::DSN];
-    private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY];
+    private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::FILENAME];
     private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE];
     private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
 
@@ -130,6 +131,7 @@ final class Metadata
             $ret[$key] = match ($key) {
                 self::PATH => $node->path()->toString(),
                 self::DSN => $node->dsn()->toString(),
+                self::FILENAME => $node->path()->name(),
                 self::LAST_MODIFIED => $node->lastModified()->format('c'),
                 self::VISIBILITY => $node->visibility(),
                 self::MIME_TYPE => $node->ensureFile()->mimeType(),

@@ -144,6 +144,12 @@ abstract class LazyNode implements Node
 
     private function resolvePath(callable $generator): string
     {
+        if (isset($this->attributes[Metadata::FILENAME])) {
+            $this->path = new Path($this->attributes[Metadata::FILENAME]);
+
+            return $generator();
+        }
+
         $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Metadata::EXTENSION]) ? '.' : '', $this->attributes[Metadata::EXTENSION] ?? ''));
         $path = $generator();
 
