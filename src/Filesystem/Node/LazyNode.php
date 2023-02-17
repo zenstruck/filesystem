@@ -153,10 +153,10 @@ abstract class LazyNode implements Node
         $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Metadata::EXTENSION]) ? '.' : '', $this->attributes[Metadata::EXTENSION] ?? ''));
         $path = $generator();
 
-        if (\str_contains($path, self::PLACEHOLDER)) {
-            throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.');
-        }
-
-        return $path;
+        return match (true) {
+            \str_contains($path, self::PLACEHOLDER) && isset($this->attributes[Metadata::EXTENSION]) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.'),
+            \str_contains($path, self::PLACEHOLDER) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path.'),
+            default => $path,
+        };
     }
 }
