@@ -118,14 +118,22 @@ class Mapping
             return $namer;
         }
 
-        if (2 !== \count($parts = \explode(':', $namer, 2))) {
+        if (2 === \count($parts = \explode(':', $namer, 2))) {
+            return match ($parts[0]) {
+                'expression' => new Expression($parts[1]),
+                'twig' => new Template($parts[1]),
+                default => throw new \InvalidArgumentException(\sprintf('Unable to parse namer "%s".', $namer)),
+            };
+        }
+
+        if (\class_exists($namer)) {
             return new Namer($namer);
         }
 
-        return match ($parts[0]) {
-            'expression' => new Expression($parts[1]),
-            'twig' => new Template($parts[1]),
-            default => new Namer($namer),
-        };
+        if (\str_starts_with($namer, '@')) {
+            return new Namer(\mb_substr($namer, 1));
+        }
+
+        throw new \InvalidArgumentException(\sprintf('Unable to parse namer "%s".', $namer));
     }
 }
