@@ -21,9 +21,9 @@ use Zenstruck\Filesystem\Node\Path\Namer;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Stateless extends Mapping
 {
-    public function __construct(string $filesystem, string|Namer $namer, array $namerContext = [])
+    public function __construct(string $filesystem, string|Namer $namer)
     {
-        parent::__construct(Metadata::PATH, $filesystem, $namer, $namerContext);
+        parent::__construct(Metadata::PATH, $filesystem, $namer);
     }
 
     public function filesystem(): string

@@ -23,11 +23,10 @@ abstract class Stateful extends Mapping
         string|array $metadata,
         ?string $filesystem = null,
         string|Namer|null $namer = null,
-        array $namerContext = [],
         public bool $deleteOnRemove = true,
         public bool $deleteOnUpdate = true,
         public array $column = [],
     ) {
-        parent::__construct($metadata, $filesystem, $namer, $namerContext);
+        parent::__construct($metadata, $filesystem, $namer);
     }
 }

@@ -23,12 +23,11 @@ final class StoreAsPath extends Stateful
     public function __construct(
         string $filesystem,
         string|Namer|null $namer = null,
-        array $namerContext = [],
         bool $deleteOnRemove = true,
         bool $deleteOnUpdate = true,
         array $column = [],
     ) {
-        parent::__construct(Metadata::PATH, $filesystem, $namer, $namerContext, $deleteOnRemove, $deleteOnUpdate, $column);
+        parent::__construct(Metadata::PATH, $filesystem, $namer, $deleteOnRemove, $deleteOnUpdate, $column);
     }
 
     public function filesystem(): string

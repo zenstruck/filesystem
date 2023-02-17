@@ -27,7 +27,6 @@ class Mapping
     public const METADATA = 'metadata';
     public const FILESYSTEM = 'filesystem';
     public const NAMER = 'namer';
-    public const NAMER_CONTEXT = 'namer_context';
 
     /** @var Format */
     public string|array $metadata;
@@ -41,10 +40,9 @@ class Mapping
         string|array $metadata,
         private ?string $filesystem = null,
         string|Namer|null $namer = null,
-        array $namerContext = [],
     ) {
         $this->metadata = $metadata;
-        $this->namer = self::parseNamer($namer, $namerContext);
+        $this->namer = self::parseNamer($namer);
 
         if (!$this->filesystem && $this->requiresFilesystem()) {
             throw new \LogicException('A filesystem is required if not serializing the DSN.');
@@ -70,7 +68,6 @@ class Mapping
             $array[self::METADATA] ?? (isset($array[self::FILESYSTEM]) ? Metadata::PATH : Metadata::DSN),
             $filesystem,
             $array[self::NAMER] ?? null,
-            $array[self::NAMER_CONTEXT] ?? [],
         );
     }
 
@@ -115,24 +112,20 @@ class Mapping
         return true;
     }
 
-    private static function parseNamer(string|Namer|null $namer, array $context): ?Namer
+    private static function parseNamer(string|Namer|null $namer): ?Namer
     {
-        if (null === $namer) {
-            return null;
-        }
-
-        if ($namer instanceof Namer) {
-            return $namer->with($context);
+        if (null === $namer || $namer instanceof Namer) {
+            return $namer;
         }
 
         if (2 !== \count($parts = \explode(':', $namer, 2))) {
-            return new Namer($namer, $context);
+            return new Namer($namer);
         }
 
         return match ($parts[0]) {
-            'expression' => new Expression($parts[1], $context),
-            'twig' => new Template($parts[1], $context),
-            default => new Namer($namer, $context),
+            'expression' => new Expression($parts[1]),
+            'twig' => new Template($parts[1]),
+            default => new Namer($namer),
         };
     }
 }
