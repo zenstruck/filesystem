@@ -92,11 +92,9 @@ class Mapping
      */
     final public function requiresPathGenerator(): bool
     {
-        if (\is_string($this->metadata)) {
-            return false;
-        }
+        $metadata = (array) $this->metadata;
 
-        return !\in_array(Metadata::DSN, $this->metadata, true) && !\in_array(Metadata::PATH, $this->metadata, true);
+        return !\in_array(Metadata::DSN, $metadata, true) && !\in_array(Metadata::PATH, $metadata, true);
     }
 
     private function requiresFilesystem(): bool

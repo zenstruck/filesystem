@@ -19,7 +19,7 @@ use Zenstruck\Filesystem\Node\File\Image;
  *
  * @TODO make enum in PHP 8.1
  *
- * @phpstan-type Format = self::PATH|self::DSN|array<int|self::*,self::*|string|list<string>>
+ * @phpstan-type Format = self::PATH|self::DSN|self::FILENAME|array<int|self::*,self::*|string|list<string>>
  * @phpstan-type Serialized = string|array<string,scalar|array<string,scalar>>
  */
 final class Metadata
@@ -119,6 +119,14 @@ final class Metadata
 
         if (self::DSN === $metadata) {
             return $node->dsn();
+        }
+
+        if (self::FILENAME === $metadata) {
+            return $node->path()->name();
+        }
+
+        if (\is_string($metadata)) {
+            throw new \InvalidArgumentException(\sprintf('Unable to serialize node "%s" with metadata "%s".', $node->dsn(), $metadata));
         }
 
         $ret = [];

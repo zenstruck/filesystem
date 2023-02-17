@@ -69,6 +69,10 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
         $mapping = Mapping::fromArray($context);
 
+        if (Metadata::FILENAME === $mapping->metadata) {
+            $data = [Metadata::FILENAME => $data];
+        }
+
         /** @var LazyNode $node */
         $node = new (self::TYPE_MAP[$type])($data);
         $filesystem = $mapping->filesystem();
