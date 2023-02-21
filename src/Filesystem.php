@@ -67,9 +67,4 @@ interface Filesystem
      * } $config
      */
     public function write(string $path, mixed $value, array $config = []): Node;
-
-    /**
-     * @throws \LogicException if no last node available
-     */
-    public function last(): Node;
 }

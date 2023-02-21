@@ -91,17 +91,6 @@ final class ScopedFilesystem implements Filesystem
         return $this->inner->write($this->prefix($path), $value, $config);
     }
 
-    public function last(): Node
-    {
-        $last = $this->inner->last();
-
-        if (\str_starts_with($last->path(), $this->prefix)) {
-            return $last;
-        }
-
-        throw new \LogicException('Last operation was not on the scoped filesystem.');
-    }
-
     private function prefix(string $path): string
     {
         $path = \trim($path, '\\/');

@@ -67,8 +67,6 @@ $filesystem->chmod('some/file.txt', 'private'); // Zenstruck\Filesystem\Node (so
 
 // utility methods
 $filesystem->name(); // string - human-readable name for the filesystem
-
-$filesystem->last(); // Zenstruck\Filesystem\Node the node of the last write operation
 ```
 
 ### `Node`

@@ -26,8 +26,6 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class MultiFilesystem implements Filesystem
 {
-    private ?Filesystem $last = null;
-
     public function __construct(private array|ContainerInterface $filesystems, private ?string $default = null)
     {
     }
@@ -132,15 +130,6 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->write($path, $value, $config);
     }
 
-    public function last(?string $name = null): Node
-    {
-        if ($name) {
-            return $this->get($name)->last();
-        }
-
-        return $this->last?->last() ?? $this->get()->last();
-    }
-
     private function get(?string $name = null): Filesystem
     {
         $name ??= $this->default;
@@ -203,6 +192,6 @@ final class MultiFilesystem implements Filesystem
     {
         $parts = Dsn::normalize($path);
 
-        return [$this->last = $this->get($parts[0]), $parts[1]];
+        return [$this->get($parts[0]), $parts[1]];
     }
 }

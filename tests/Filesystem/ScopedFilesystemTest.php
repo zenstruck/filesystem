@@ -93,25 +93,6 @@ final class ScopedFilesystemTest extends FilesystemTest
         $this->assertSame('scoped', $filesystem->name());
     }
 
-    /**
-     * @test
-     */
-    public function last_fails_if_not_performed_on_self(): void
-    {
-        $primary = in_memory_filesystem();
-        $scoped = new ScopedFilesystem($primary, 'foo/bar');
-
-        $scoped->write('baz.txt', 'content');
-
-        $this->assertSame('foo/bar/baz.txt', $scoped->last()->path()->toString());
-
-        $primary->write('something.txt', 'content');
-
-        $this->expectException(\LogicException::class);
-
-        $scoped->last();
-    }
-
     protected function createFilesystem(): ScopedFilesystem
     {
         return new ScopedFilesystem(in_memory_filesystem(), '');

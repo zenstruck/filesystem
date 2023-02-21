@@ -85,10 +85,5 @@ trait DecoratedFilesystem
         return $this->inner()->write($path, $value, $config);
     }
 
-    public function last(): Node
-    {
-        return $this->inner()->last();
-    }
-
     abstract protected function inner(): Filesystem;
 }

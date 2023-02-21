@@ -169,11 +169,6 @@ final class TestFilesystem implements Filesystem
         return new TestNode($this->inner()->write($path, $value, $config));
     }
 
-    public function last(): TestNode
-    {
-        return new TestNode($this->inner()->last());
-    }
-
     /**
      * Create a "real" local file for a "filesystem" file.
      *

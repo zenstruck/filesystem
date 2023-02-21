@@ -182,7 +182,6 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertTrue($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
-        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -200,7 +199,6 @@ abstract class FilesystemTest extends TestCase
 
         $this->assertFalse($fs->has('some/file.txt'));
         $this->assertTrue($fs->has('another/file.txt'));
-        $this->assertSame('another/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -216,20 +214,6 @@ abstract class FilesystemTest extends TestCase
         $fs->delete('some/file.txt');
 
         $this->assertFalse($fs->has('some/file.txt'));
-    }
-
-    /**
-     * @test
-     */
-    public function cannot_access_last_after_delete(): void
-    {
-        $fs = $this->createFilesystem();
-        $fs->mkdir('foo');
-        $fs->delete('foo');
-
-        $this->expectException(\LogicException::class);
-
-        $fs->last();
     }
 
     /**
@@ -262,7 +246,6 @@ abstract class FilesystemTest extends TestCase
         $fs->mkdir('dir');
 
         $this->assertTrue($fs->has('dir'));
-        $this->assertSame('dir', $fs->last()->ensureDirectory()->path()->toString());
     }
 
     /**
@@ -278,7 +261,6 @@ abstract class FilesystemTest extends TestCase
         $fs->chmod('some/file.txt', 'private');
 
         $this->assertSame('private', $fs->file('some/file.txt')->visibility());
-        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path()->toString());
     }
 
     /**
@@ -317,7 +299,6 @@ abstract class FilesystemTest extends TestCase
         $this->assertTrue($fs->has('foo/file1.txt'));
         $this->assertTrue($fs->has('foo/sub2'));
         $this->assertTrue($fs->has('foo/sub2/file2.txt'));
-        $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
     }
 
     /**
@@ -339,7 +320,6 @@ abstract class FilesystemTest extends TestCase
         $this->assertTrue($fs->has('foo/file1.txt'));
         $this->assertTrue($fs->has('foo/sub2'));
         $this->assertTrue($fs->has('foo/sub2/file2.txt'));
-        $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
         $this->assertSame([
             'foo/file1.txt',
             'foo/sub2/file2.txt',
@@ -368,18 +348,6 @@ abstract class FilesystemTest extends TestCase
     public static function invalidWriteValueProvider(): iterable
     {
         yield [['array']];
-    }
-
-    /**
-     * @test
-     */
-    public function cannot_access_last_if_no_operation_performed(): void
-    {
-        $fs = $this->createFilesystem();
-
-        $this->expectException(\LogicException::class);
-
-        $fs->last();
     }
 
     abstract protected function createFilesystem(): Filesystem;
