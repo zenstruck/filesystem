@@ -331,6 +331,8 @@ abstract class FilesystemTest extends TestCase
             $nodes[] = $file->path()->toString();
         }]);
 
+        \sort($nodes);
+
         $this->assertTrue($fs->has('foo'));
         $this->assertTrue($fs->has('foo/file1.txt'));
         $this->assertTrue($fs->has('foo/sub2'));
@@ -338,8 +340,8 @@ abstract class FilesystemTest extends TestCase
         $this->assertSame('foo', $fs->last()->ensureDirectory()->path()->toString());
         $this->assertSame([
             'foo/file1.txt',
-            'foo/sub2/sub3/file2.txt',
             'foo/sub2/file2.txt',
+            'foo/sub2/sub3/file2.txt',
         ], $nodes);
     }
 
