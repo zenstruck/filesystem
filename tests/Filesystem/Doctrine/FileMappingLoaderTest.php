@@ -30,14 +30,14 @@ final class FileMappingLoaderTest extends DoctrineTestCase
     public function can_load_files_for_object(): void
     {
         $object = new Entity2('FoO');
-        $object->setFile1($this->filesystem()->write('some/file1.txt', 'content1')->last()->ensureFile());
-        $object->setImage1($this->filesystem()->write('some/image1.png', 'content2')->last()->ensureImage());
-        $object->setFile2($this->filesystem()->write('some/file2.txt', 'content3')->last()->ensureFile());
-        $object->setImage2($this->filesystem()->write('some/image2.png', 'content4')->last()->ensureImage());
-        $object->setFile3($this->filesystem()->write('some/file3.txt', 'content5')->last()->ensureFile());
-        $object->setImage3($this->filesystem()->write('some/image3.png', 'content6')->last()->ensureImage());
-        $object->setFile4($this->filesystem()->write('some/file4.txt', 'content7')->last()->ensureFile());
-        $object->setImage4($this->filesystem()->write('some/image4.png', fixture('metadata.jpg'))->last()->ensureImage());
+        $object->setFile1($this->filesystem()->write('some/file1.txt', 'content1')->ensureFile());
+        $object->setImage1($this->filesystem()->write('some/image1.png', 'content2')->ensureImage());
+        $object->setFile2($this->filesystem()->write('some/file2.txt', 'content3')->ensureFile());
+        $object->setImage2($this->filesystem()->write('some/image2.png', 'content4')->ensureImage());
+        $object->setFile3($this->filesystem()->write('some/file3.txt', 'content5')->ensureFile());
+        $object->setImage3($this->filesystem()->write('some/image3.png', 'content6')->ensureImage());
+        $object->setFile4($this->filesystem()->write('some/file4.txt', 'content7')->ensureFile());
+        $object->setImage4($this->filesystem()->write('some/image4.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->filesystem()->write('foo.txt', 'content20');
         $this->filesystem()->write('foo.jpg', 'content21');

@@ -59,18 +59,14 @@ final class ScopedFilesystem implements Filesystem
         return $this->inner->has($this->prefix($path));
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
-        $this->inner->copy($this->prefix($source), $this->prefix($destination), $config);
-
-        return $this;
+        return $this->inner->copy($this->prefix($source), $this->prefix($destination), $config);
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
-        $this->inner->move($this->prefix($source), $this->prefix($destination), $config);
-
-        return $this;
+        return $this->inner->move($this->prefix($source), $this->prefix($destination), $config);
     }
 
     public function delete(string $path, array $config = []): static
@@ -80,25 +76,19 @@ final class ScopedFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
-        $this->inner->mkdir($this->prefix($path), $config);
-
-        return $this;
+        return $this->inner->mkdir($this->prefix($path), $config);
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
-        $this->inner->chmod($this->prefix($path), $visibility);
-
-        return $this;
+        return $this->inner->chmod($this->prefix($path), $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
-        $this->inner->write($this->prefix($path), $value, $config);
-
-        return $this;
+        return $this->inner->write($this->prefix($path), $value, $config);
     }
 
     public function last(): Node

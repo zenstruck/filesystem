@@ -71,7 +71,8 @@ class LazyFileTest extends TestCase
      */
     public function can_set_path_and_filesystem(): void
     {
-        $filesystem = in_memory_filesystem()->write('some/image.png', 'content');
+        $filesystem = in_memory_filesystem();
+        $filesystem->write('some/image.png', 'content');
         $file = $this->createLazyFile();
 
         $file->setFilesystem($filesystem);
@@ -102,7 +103,8 @@ class LazyFileTest extends TestCase
      */
     public function can_use_callable_for_filesystem(): void
     {
-        $filesystem = in_memory_filesystem()->write('some/image.png', 'content');
+        $filesystem = in_memory_filesystem();
+        $filesystem->write('some/image.png', 'content');
         $count = 0;
         $file = $this->createLazyFile('some/image.png');
         $file->setFilesystem(function() use (&$count, $filesystem) {
@@ -145,6 +147,8 @@ class LazyFileTest extends TestCase
      */
     public function can_create_with_attributes(): void
     {
+        $fs = in_memory_filesystem();
+        $fs->write('some/file.png', 'content');
         $file = $this->createLazyFile([
             'path' => 'some/file.png',
             'dsn' => 'some://path',
@@ -155,7 +159,7 @@ class LazyFileTest extends TestCase
             'checksum' => 'foo',
             'public_url' => 'http://example.com',
         ]);
-        $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
+        $file->setFilesystem($fs);
 
         $this->assertSame('some://path', $file->dsn()->toString());
         $this->assertEquals(new \DateTimeImmutable('2023-01-01'), $file->lastModified());
@@ -183,6 +187,8 @@ class LazyFileTest extends TestCase
      */
     public function multiple_checksums(): void
     {
+        $fs = in_memory_filesystem();
+        $fs->write('some/file.png', 'content');
         $file = $this->createLazyFile([
             'path' => 'some/file.png',
             'checksum' => [
@@ -190,7 +196,7 @@ class LazyFileTest extends TestCase
                 'sha1' => 'bar',
             ],
         ]);
-        $file->setFilesystem(in_memory_filesystem()->write('some/file.png', 'content'));
+        $file->setFilesystem($fs);
 
         $this->assertSame('foo', $file->checksum('md5'));
         $this->assertSame('bar', $file->checksum('sha1'));
@@ -255,8 +261,10 @@ class LazyFileTest extends TestCase
 
     protected function createFile(\SplFileInfo $file, string $path): File
     {
+        $this->filesystem->write($path, $file);
+
         $lazyFile = new LazyFile($path);
-        $lazyFile->setFilesystem($this->filesystem->write($path, $file));
+        $lazyFile->setFilesystem($this->filesystem);
 
         return $lazyFile;
     }

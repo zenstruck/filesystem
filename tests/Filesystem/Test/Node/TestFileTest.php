@@ -25,6 +25,6 @@ class TestFileTest extends TestCase
 
     protected function createFile(\SplFileInfo $file, string $path): File
     {
-        return new TestFile($this->filesystem->write($path, $file)->last()->ensureFile());
+        return new TestFile($this->filesystem->write($path, $file)->ensureFile());
     }
 }

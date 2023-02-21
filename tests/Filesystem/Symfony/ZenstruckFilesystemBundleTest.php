@@ -48,7 +48,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertFalse($service->privateFilesystem->has('file1.txt'));
         $this->assertTrue($service->scopedFilesystem->has('file3.txt'));
 
-        $this->assertSame('some/prefix/foo/bar.txt', $service->scopedFilesystem->write('foo/bar.txt', '')->last()->path()->toString());
+        $this->assertSame('some/prefix/foo/bar.txt', $service->scopedFilesystem->write('foo/bar.txt', '')->path()->toString());
     }
 
     /**
@@ -81,7 +81,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         /** @var Service $service */
         $service = self::getContainer()->get(Service::class);
 
-        $file = in_memory_filesystem()->write('some/file.txt', 'content')->last()->ensureFile();
+        $file = in_memory_filesystem()->write('some/file.txt', 'content')->ensureFile();
 
         $this->assertSame('9a0364b.txt', $service->pathGenerator->generate(Expression::checksum(7), $file));
     }
@@ -91,7 +91,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
      */
     public function can_generate_urls(): void
     {
-        $publicFile = $this->filesystem()->write('public://foo/file.png', 'content')->last()->ensureImage();
+        $publicFile = $this->filesystem()->write('public://foo/file.png', 'content')->ensureImage();
 
         $this->assertSame('/prefix/foo/file.png', $publicFile->publicUrl());
         $this->assertStringContainsString('/temp/foo/file.png', $publicFile->temporaryUrl('tomorrow'));
@@ -100,7 +100,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertSame('http://localhost/transform/foo/file.png?filter=grayscale', $publicFile->transformUrl('grayscale'));
         $this->assertSame('http://localhost/transform/foo/file.png?w=100&h=200', $publicFile->transformUrl(['w' => 100, 'h' => 200]));
 
-        $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->last()->ensureImage();
+        $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
         $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl());
         $this->assertStringContainsString('_hash=', $privateFile->publicUrl());
@@ -124,14 +124,13 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
 
         $this->assertEmpty($subscriber->events);
 
-        $this->filesystem()
-            ->write('foo', 'bar')
-            ->mkdir('bar')
-            ->chmod('foo', 'public')
-            ->copy('foo', 'file.png')
-            ->delete('foo')
-            ->move('file.png', 'file2.png')
-        ;
+        $fs = $this->filesystem();
+        $fs->write('foo', 'bar');
+        $fs->mkdir('bar');
+        $fs->chmod('foo', 'public');
+        $fs->copy('foo', 'file.png');
+        $fs->delete('foo');
+        $fs->move('file.png', 'file2.png');
 
         $this->assertCount(12, $subscriber->events);
     }

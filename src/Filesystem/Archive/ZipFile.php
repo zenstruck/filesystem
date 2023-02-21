@@ -65,11 +65,9 @@ final class ZipFile extends \SplFileInfo implements Filesystem
             default => '',
         };
 
-        $filesystem
-            ->beginTransaction()
-            ->write($path, $what, $config)
-            ->commit($config['commit_progress'] ?? null)
-        ;
+        $filesystem->beginTransaction();
+        $filesystem->write($path, $what, $config);
+        $filesystem->commit($config['commit_progress'] ?? null);
 
         return $filesystem;
     }

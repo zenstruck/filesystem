@@ -25,12 +25,11 @@ final class FilesystemPurgeCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        $this->filesystem()
-            ->write('file.txt', 'content')
-            ->write('foo/file.txt', 'content')
-            ->write('foo/bar/file.txt', 'content')
-            ->write('file2.txt', 'content')
-        ;
+        $fs = $this->filesystem();
+        $fs->write('file.txt', 'content');
+        $fs->write('foo/file.txt', 'content');
+        $fs->write('foo/bar/file.txt', 'content');
+        $fs->write('file2.txt', 'content');
 
         \touch(TEMP_DIR.'/../public/foo/bar/file.txt', (new \DateTime('-45 days'))->getTimestamp());
     }

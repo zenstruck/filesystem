@@ -58,15 +58,16 @@ final class FlysystemDirectoryTest extends TestCase
 
     protected function createDirectory(\SplFileInfo $directory, string $path): Directory
     {
-        return in_memory_filesystem()->write($path, $directory)->directory($path);
+        $fs = in_memory_filesystem();
+
+        return $fs->write($path, $directory)->ensureDirectory();
     }
 
     private static function forDateDirectory(): TestDirectory
     {
-        $filesystem = temp_filesystem()
-            ->write('foo.txt', 'foo')
-            ->write('bar/baz.txt', 'baz')
-        ;
+        $filesystem = temp_filesystem();
+        $filesystem->write('foo.txt', 'foo');
+        $filesystem->write('bar/baz.txt', 'baz');
 
         \touch(tempfile('foo.txt'), (new \DateTime('-1 hour'))->getTimestamp());
         \touch(tempfile('bar/baz.txt'), (new \DateTime('-15 minutes'))->getTimestamp());

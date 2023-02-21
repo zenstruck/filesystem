@@ -48,7 +48,7 @@ final class FlysystemFilesystemTest extends FilesystemTest
     public function node_has_dsn(): void
     {
         $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter(), 'public');
-        $node = $filesystem->write('file.txt', 'content')->last();
+        $node = $filesystem->write('file.txt', 'content');
 
         $this->assertSame('public://file.txt', (string) $node->dsn());
         $this->assertSame('public', $node->dsn()->filesystem());

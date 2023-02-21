@@ -105,7 +105,7 @@ final class LoggableFilesystem implements Filesystem
         return $this->inner()->has($path);
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
         $this->log(
             $this->config[Operation::COPY] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -116,12 +116,10 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        $this->inner()->copy($source, $destination, $config);
-
-        return $this;
+        return $this->inner()->copy($source, $destination, $config);
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
         $this->log(
             $this->config[Operation::MOVE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -132,9 +130,7 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        $this->inner()->move($source, $destination, $config);
-
-        return $this;
+        return $this->inner()->move($source, $destination, $config);
     }
 
     public function delete(string $path, array $config = []): static
@@ -152,7 +148,7 @@ final class LoggableFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
         $this->log(
             $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -162,12 +158,10 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        $this->inner()->mkdir($path, $config);
-
-        return $this;
+        return $this->inner()->mkdir($path, $config);
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
         $this->log(
             $this->config[Operation::CHMOD] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -178,12 +172,10 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        $this->inner()->chmod($path, $visibility);
-
-        return $this;
+        return $this->inner()->chmod($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
         $this->log(
             $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -194,9 +186,7 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        $this->inner()->write($path, $value, $config);
-
-        return $this;
+        return $this->inner()->write($path, $value, $config);
     }
 
     protected function inner(): Filesystem

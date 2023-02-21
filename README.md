@@ -46,7 +46,7 @@ $filesystem->file('some/path.txt'); // Zenstruck\Filesystem\Node\File or throws 
 $filesystem->image('some/path.png'); // Zenstruck\Filesystem\Node\File\Image or throws NodeNotFound or NodeTypeMismatch (if exists but not an image)
 $filesystem->directory('some/path'); // Zenstruck\Filesystem\Node\Directory or throws NodeNotFound or NodeTypeMismatch (if exists but not a directory)
 
-// write operations
+// write operations (returns Node)
 $filesystem->write('some/path.txt', 'string contents'); // write a string
 $filesystem->write('some/path.txt', $resource); // write a resource
 $filesystem->write('some/path.txt', new \SplFileInfo('path/to/local/file.txt')); // write a local file
@@ -54,16 +54,16 @@ $filesystem->write('some/prefix', new \SplFileInfo('path/to/local/directory')); 
 $filesystem->write('some/path.txt', $file); // write a Zenstruck\Filesystem\Node\File
 $filesystem->write('some/prefix', $directory); // write a Zenstruck\Filesystem\Node\Directory
 
-$filesystem->copy('from/file.txt', 'dest/file.txt');
+$filesystem->copy('from/file.txt', 'dest/file.txt'); // Zenstruck\Filesystem\Node\File (dest/file.txt)
 
-$filesystem->move('from/file.txt', 'dest/file.txt');
+$filesystem->move('from/file.txt', 'dest/file.txt'); // Zenstruck\Filesystem\Node\File (dest/file.txt)
 
-$filesystem->delete('some/file.txt');
-$filesystem->delete('some/directory');
+$filesystem->delete('some/file.txt'); // returns self
+$filesystem->delete('some/directory'); // returns self
 
-$filesystem->mkdir('some/directory');
+$filesystem->mkdir('some/directory'); // Zenstruck\Filesystem\Node\Directory (some/directory)
 
-$filesystem->chmod('some/file.txt', 'private');
+$filesystem->chmod('some/file.txt', 'private'); // Zenstruck\Filesystem\Node (some/file.txt)
 
 // utility methods
 $filesystem->name(); // string - human-readable name for the filesystem
@@ -317,13 +317,13 @@ $scopedFilesystem = new ScopedFilesystem($primaryFilesystem, 'some/prefix');
 // paths are prefixed
 $scopedFilesystem
     ->write('file.txt', 'content')
-    ->file('file.txt')->path()->toString(); // "some/prefix/file.txt"
+    ->ensureFile()->path()->toString(); // "some/prefix/file.txt"
 ;
 
 // prefix is stripped from path
 $scopedFilesystem
     ->write('some/prefix/file.txt', 'content')
-    ->file('file.txt')->path()->toString(); // "some/prefix/file.txt"
+    ->ensureFile()->path()->toString(); // "some/prefix/file.txt"
 ;
 ```
 
@@ -410,13 +410,12 @@ $filesystem = new EventDispatcherFilesystem($inner, $dispatcher, [
     Operation::MKDIR => true,
 ]);
 
-$filesystem
-    ->write('foo', 'bar') // PreWriteEvent/PostWriteEvent dispatched
-    ->mkdir('bar') // PreMkdirEvent/PostMkdirEvent dispatched
-    ->chmod('foo', 'public') // PreChmodEvent/PostChmodEvent dispatched
-    ->copy('foo', 'file.png') // PreCopyEvent/PostCopyEvent dispatched
-    ->delete('foo') // PreDeleteEvent/PostDeleteEvent dispatched
-    ->move('file.png', 'file2.png') // PreMoveEvent/PostMoveEvent dispatched
+$filesystem->write('foo', 'bar'); // PreWriteEvent/PostWriteEvent dispatched
+$filesystem->mkdir('bar'); // PreMkdirEvent/PostMkdirEvent dispatched
+$filesystem->chmod('foo', 'public'); // PreChmodEvent/PostChmodEvent dispatched
+$filesystem->copy('foo', 'file.png'); // PreCopyEvent/PostCopyEvent dispatched
+$filesystem->delete('foo'); // PreDeleteEvent/PostDeleteEvent dispatched
+$filesystem->move('file.png', 'file2.png'); // PreMoveEvent/PostMoveEvent dispatched
 ;
 ```
 
@@ -580,10 +579,9 @@ class MyTest extends TestCase
 
     public function test_1(): void
     {
-        $this->filesystem() // instance of TestFilesystem wrapping an in-memory filesystem
-            ->write('file.txt', 'content')
-            ->assertExists('file.txt')
-        ;
+        $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping an in-memory filesystem
+        $filesystem->write('file.txt', 'content');
+        $filesystem->assertExists('file.txt');
     }
 }
 ```
@@ -604,10 +602,9 @@ class MyTest extends TestCase implements FilesystemProvider
 
     public function test_1(): void
     {
-        $this->filesystem() // instance of TestFilesystem wrapping the AdapterFilesystem defined below
-            ->write('file.txt', 'content')
-            ->assertExists('file.txt')
-        ;
+        $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping the AdapterFilesystem defined below
+        $filesystem->write('file.txt', 'content');
+        $filesystem->assertExists('file.txt');
     }
 
     public function createFilesystem(): Filesystem|FilesystemAdapter|string;
@@ -639,11 +636,9 @@ class MyTest extends TestCase implements FixtureFilesystemProvider
     {
         $filesystem = $this->filesystem(); // instance of TestFilesystem wrapping a MultiFilesystem
 
-        $filesystem
-            ->write('file.txt', 'content') // accesses your test filesystem
-            ->assertExists('file.txt')
-            ->copy('fixture://some/file.txt', 'file.txt') // copy a fixture to your test filesystem
-        ;
+        $filesystem->write('file.txt', 'content'); // accesses your test filesystem
+        $filesystem->assertExists('file.txt');
+        $filesystem->copy('fixture://some/file.txt', 'file.txt'); // copy a fixture to your test filesystem
     }
 
     public function createFixtureFilesystem(): Filesystem|FilesystemAdapter|string;
@@ -675,17 +670,13 @@ class MyTest extends TestCase implements FilesystemProvider
 
     public function test_1(): void
     {
-        $this->filesystem()
-            ->write('file.txt', 'content')
-            ->assertExists('file.txt')
-        ;
+        $this->filesystem()->write('file.txt', 'content')
+        $this->filesystem()->assertExists('file.txt')
     }
 
     public function test_2(): void
     {
-        $this->filesystem()
-            ->assertNotExists('file.txt') // file created in test_1 was deleted before this test
-        ;
+        $this->filesystem()->assertNotExists('file.txt'); // file created in test_1 was deleted before this test
     }
 
     public function createFilesystem(): Filesystem|FilesystemAdapter|string;

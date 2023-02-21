@@ -79,6 +79,6 @@ final class SerializableImageTest extends SerializableFileTest
 
     protected function createFile(\SplFileInfo $file, string $path, string|array $metadata = []): SerializableImage
     {
-        return new SerializableImage($this->filesystem->write($path, $file)->last()->ensureImage(), $metadata);
+        return new SerializableImage($this->filesystem->write($path, $file)->ensureImage(), $metadata);
     }
 }

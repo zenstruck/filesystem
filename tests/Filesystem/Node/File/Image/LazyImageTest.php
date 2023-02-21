@@ -94,8 +94,10 @@ final class LazyImageTest extends LazyFileTest
 
     protected function createFile(\SplFileInfo $file, string $path): Image
     {
+        $this->filesystem->write($path, $file);
+
         $image = new LazyImage($path);
-        $image->setFilesystem($this->filesystem->write($path, $file));
+        $image->setFilesystem($this->filesystem);
 
         return $image;
     }

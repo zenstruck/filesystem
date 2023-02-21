@@ -54,31 +54,31 @@ final class NodeNormalizerTest extends KernelTestCase
     public static function normalizeProvider(): iterable
     {
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             [],
             File::class,
             'public://some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir')->last()->ensureDirectory(),
+            fn(Filesystem $f) => $f->mkdir('some/dir')->ensureDirectory(),
             [],
             Directory::class,
             'public://some/dir',
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => 'public'],
             File::class,
             'some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir')->last()->ensureDirectory(),
+            fn(Filesystem $f) => $f->mkdir('some/dir')->ensureDirectory(),
             ['filesystem' => 'public'],
             Directory::class,
             'some/dir',
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => 'public', 'metadata' => [Metadata::PATH, Metadata::CHECKSUM, Metadata::SIZE]],
             File::class,
             [
@@ -88,7 +88,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => new Mapping([Metadata::PATH, Metadata::CHECKSUM, Metadata::SIZE], 'public')],
             File::class,
             [
@@ -98,7 +98,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->last()->ensureImage(),
+            fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
             ['metadata' => [Metadata::DSN, Metadata::SIZE, Metadata::DIMENSIONS]],
             Image::class,
             [
@@ -111,7 +111,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('9a0364b9e99bb480dd25e1f0284c8555.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('9a0364b9e99bb480dd25e1f0284c8555.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => [Metadata::CHECKSUM, Metadata::SIZE, Metadata::EXTENSION],
@@ -125,7 +125,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => [Metadata::CHECKSUM, Metadata::SIZE, Metadata::FILENAME],
@@ -139,7 +139,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content')->last(),
+            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => Metadata::FILENAME,

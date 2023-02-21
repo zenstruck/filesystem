@@ -24,6 +24,6 @@ class FlysystemFileTest extends TestCase
 
     protected function createFile(\SplFileInfo $file, string $path): File
     {
-        return $this->filesystem->write($path, $file)->last()->ensureFile();
+        return $this->filesystem->write($path, $file)->ensureFile();
     }
 }

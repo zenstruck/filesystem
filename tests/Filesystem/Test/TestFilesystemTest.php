@@ -27,12 +27,11 @@ final class TestFilesystemTest extends FilesystemTest
      */
     public function can_make_assertions(): void
     {
-        $filesystem = $this->createFilesystem()
-            ->mkdir('foo')
-            ->write('file1.txt', 'contents1')
-            ->write('nested/file2.txt', 'contents1')
-            ->write('symfony.png', fixture('symfony.png'))
-        ;
+        $filesystem = $this->createFilesystem();
+        $filesystem->mkdir('foo');
+        $filesystem->write('file1.txt', 'contents1');
+        $filesystem->write('nested/file2.txt', 'contents1');
+        $filesystem->write('symfony.png', fixture('symfony.png'));
 
         $filesystem
             ->assertExists('foo')
@@ -84,7 +83,10 @@ final class TestFilesystemTest extends FilesystemTest
      */
     public function can_create_real_file(): void
     {
-        $file = $this->createFilesystem()->write('file1.txt', 'contents')->realFile('file1.txt');
+        $fs = $this->createFilesystem();
+        $fs->write('file1.txt', 'contents');
+
+        $file = $fs->realFile('file1.txt');
 
         $this->assertFileExists($file);
         $this->assertSame('/tmp/file1.txt', (string) $file);

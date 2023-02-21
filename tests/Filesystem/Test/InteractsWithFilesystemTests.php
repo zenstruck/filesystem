@@ -29,7 +29,6 @@ trait InteractsWithFilesystemTests
         $this->assertSame($this->filesystem(), $this->filesystem());
 
         $this->filesystem()->write('file.txt', 'content')
-            ->last()
             ->ensureFile()
             ->assertContentIs('content')
         ;
@@ -40,7 +39,8 @@ trait InteractsWithFilesystemTests
      */
     public function created_filesystem_is_purged(): void
     {
-        $filesystem = $this->filesystem()->write('file.txt', 'content');
+        $filesystem = $this->filesystem();
+        $filesystem->write('file.txt', 'content');
 
         $filesystem->assertExists('file.txt');
 

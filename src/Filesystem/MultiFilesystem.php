@@ -72,39 +72,34 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->has($path);
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
         [$sourceFilesystem, $sourcePath] = $this->parsePath($source);
         [$destFilesystem, $destPath] = $this->parsePath($destination);
 
         if ($sourceFilesystem === $destFilesystem) {
             // same filesystem
-            $sourceFilesystem->copy($sourcePath, $destPath, $config);
-
-            return $this;
+            return $sourceFilesystem->copy($sourcePath, $destPath, $config);
         }
 
-        $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config);
-
-        return $this;
+        return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config)->ensureFile();
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
         [$sourceFilesystem, $sourcePath] = $this->parsePath($source);
         [$destFilesystem, $destPath] = $this->parsePath($destination);
 
         if ($sourceFilesystem === $destFilesystem) {
             // same filesystem
-            $sourceFilesystem->move($sourcePath, $destPath, $config);
-
-            return $this;
+            return $sourceFilesystem->move($sourcePath, $destPath, $config);
         }
 
-        $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config);
-        $sourceFilesystem->delete($sourcePath);
-
-        return $this;
+        try {
+            return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config)->ensureFile();
+        } finally {
+            $sourceFilesystem->delete($sourcePath);
+        }
     }
 
     public function delete(string $path, array $config = []): static
@@ -116,31 +111,25 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 
-        $filesystem->mkdir($path, $config);
-
-        return $this;
+        return $filesystem->mkdir($path, $config);
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
         [$filesystem, $path] = $this->parsePath($path);
 
-        $filesystem->chmod($path, $visibility);
-
-        return $this;
+        return $filesystem->chmod($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
         [$filesystem, $path] = $this->parsePath($path);
 
-        $filesystem->write($path, $value, $config);
-
-        return $this;
+        return $filesystem->write($path, $value, $config);
     }
 
     public function last(?string $name = null): Node

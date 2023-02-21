@@ -24,6 +24,6 @@ final class FlysystemImageTest extends FlysystemFileTest
 
     protected function createFile(\SplFileInfo $file, string $path): Image
     {
-        return $this->filesystem->write($path, $file)->last()->ensureImage();
+        return $this->filesystem->write($path, $file)->ensureImage();
     }
 }

@@ -140,12 +140,10 @@ final class ZipFileTest extends FilesystemTest
      */
     public function can_zip_directory(): void
     {
-        $dir = in_memory_filesystem()
-            ->write('sub/file1.txt', 'contents 1')
-            ->write('sub/nested/file2.txt', 'contents 2')
-            ->directory('sub')
-            ->recursive()
-        ;
+        $fs = in_memory_filesystem();
+        $fs->write('sub/file1.txt', 'contents 1');
+        $fs->write('sub/nested/file2.txt', 'contents 2');
+        $dir = $fs->directory('sub')->recursive();
 
         $archive = ZipFile::zip($dir);
 
@@ -160,7 +158,7 @@ final class ZipFileTest extends FilesystemTest
      */
     public function can_zip_file(): void
     {
-        $file = in_memory_filesystem()->write('nested/file.txt', 'contents')->last()->ensureFile();
+        $file = in_memory_filesystem()->write('nested/file.txt', 'contents')->ensureFile();
 
         $archive = ZipFile::zip($file);
 
@@ -188,10 +186,9 @@ final class ZipFileTest extends FilesystemTest
      */
     public function can_zip_spl_directory(): void
     {
-        temp_filesystem()
-            ->write('file1.txt', 'contents 1')
-            ->write('nested/file2.txt', 'contents 2')
-        ;
+        $fs = temp_filesystem();
+        $fs->write('file1.txt', 'contents 1');
+        $fs->write('nested/file2.txt', 'contents 2');
 
         $archive = ZipFile::zip(TEMP_DIR);
 

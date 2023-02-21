@@ -30,8 +30,8 @@ final class Entity1NodeLifecycleListenerTest extends NodeLifecycleListenerTest
     {
         $class = $this->entityClass();
         $object = new $class('FoO');
-        $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->last()->ensureFile());
-        $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->last()->ensureImage());
+        $object->setFile1($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->setImage1($this->filesystem()->write('some/image.png', 'content2')->ensureImage());
 
         $this->filesystem()->write('foo.txt', 'content3');
         $this->filesystem()->write('foo.jpg', 'content4');

@@ -102,18 +102,14 @@ final class TraceableFilesystem implements Filesystem
         return $this->track(fn() => $this->inner()->has($path), Operation::READ, $path);
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
-        $this->track(fn() => $this->inner()->copy($source, $destination, $config), Operation::COPY, $source, $destination);
-
-        return $this;
+        return $this->track(fn() => $this->inner()->copy($source, $destination, $config), Operation::COPY, $source, $destination);
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
-        $this->track(fn() => $this->inner()->move($source, $destination, $config), Operation::MOVE, $source, $destination);
-
-        return $this;
+        return $this->track(fn() => $this->inner()->move($source, $destination, $config), Operation::MOVE, $source, $destination);
     }
 
     public function delete(string $path, array $config = []): static
@@ -123,29 +119,23 @@ final class TraceableFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
-        $this->track(fn() => $this->inner()->mkdir($path, $config), Operation::MKDIR, $path);
-
-        return $this;
+        return $this->track(fn() => $this->inner()->mkdir($path, $config), Operation::MKDIR, $path);
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
-        $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
-
-        return $this;
+        return $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
-        $this->track(
+        return $this->track(
             fn() => $this->inner()->write($path, $value, $config),
             Operation::WRITE, $path,
             \get_debug_type($value)
         );
-
-        return $this;
     }
 
     protected function inner(): Filesystem

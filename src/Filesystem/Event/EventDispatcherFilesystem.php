@@ -14,6 +14,9 @@ namespace Zenstruck\Filesystem\Event;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
+use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Operation;
 
 /**
@@ -33,22 +36,22 @@ final class EventDispatcherFilesystem implements Filesystem
     ) {
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
         $this->dispatch($event = new PreCopyEvent($this, $source, $destination, $config), Operation::COPY);
-        $this->inner->copy($event->source, $event->destination, $event->config);
+        $file = $this->inner->copy($event->source, $event->destination, $event->config);
         $this->dispatch(new PostCopyEvent($event), Operation::COPY);
 
-        return $this;
+        return $file;
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
         $this->dispatch($event = new PreMoveEvent($this, $source, $destination, $config), Operation::MOVE);
-        $this->inner->move($event->source, $event->destination, $event->config);
+        $file = $this->inner->move($event->source, $event->destination, $event->config);
         $this->dispatch(new PostMoveEvent($event), Operation::MOVE);
 
-        return $this;
+        return $file;
     }
 
     public function delete(string $path, array $config = []): static
@@ -60,31 +63,31 @@ final class EventDispatcherFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
         $this->dispatch($event = new PreMkdirEvent($this, $path, $config), Operation::MKDIR);
-        $this->inner->mkdir($event->path, $event->config);
+        $directory = $this->inner->mkdir($event->path, $event->config);
         $this->dispatch(new PostMkdirEvent($event), Operation::MKDIR);
 
-        return $this;
+        return $directory;
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
         $this->dispatch($event = new PreChmodEvent($this, $path, $visibility), Operation::CHMOD);
-        $this->inner->chmod($event->path, $event->visibility);
+        $node = $this->inner->chmod($event->path, $event->visibility);
         $this->dispatch(new PostChmodEvent($event), Operation::CHMOD);
 
-        return $this;
+        return $node;
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
         $this->dispatch($event = new PreWriteEvent($this, $path, $value, $config), Operation::WRITE);
-        $this->inner->write($event->path, $event->value, $event->config);
+        $node = $this->inner->write($event->path, $event->value, $event->config);
         $this->dispatch(new PostWriteEvent($event), Operation::WRITE);
 
-        return $this;
+        return $node;
     }
 
     protected function inner(): Filesystem

@@ -25,14 +25,21 @@ abstract class MultiFilesystemTest extends FilesystemTest
      */
     public function can_nest_multi_filesystems(): void
     {
+        $first = in_memory_filesystem();
+        $first->write('file1.txt', 'content 1');
+        $third = in_memory_filesystem();
+        $third->write('file2.txt', 'content 2');
+        $fifth = in_memory_filesystem();
+        $fifth->write('file3.txt', 'content 3');
+
         $filesystem = $this->createMultiFilesystem(
             [
-                'first' => in_memory_filesystem()->write('file1.txt', 'content 1'),
+                'first' => $first,
                 'second' => $this->createMultiFilesystem([
-                    'third' => in_memory_filesystem()->write('file2.txt', 'content 2'),
+                    'third' => $third,
                 ]),
                 'fourth' => $this->createMultiFilesystem([
-                    'fifth' => in_memory_filesystem()->write('file3.txt', 'content 3'),
+                    'fifth' => $fifth,
                 ]),
             ],
         );
@@ -44,10 +51,10 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $filesystem = $this->createMultiFilesystem(
             [
                 '_default_' => $this->createMultiFilesystem([
-                    'public' => in_memory_filesystem()->write('file1.txt', 'content 1'),
-                    'private' => in_memory_filesystem()->write('file2.txt', 'content 2'),
+                    'public' => $first,
+                    'private' => $third,
                 ], 'public'),
-                'fixtures' => in_memory_filesystem()->write('file3.txt', 'content 3'),
+                'fixtures' => $fifth,
             ],
             '_default_'
         );
@@ -96,7 +103,8 @@ abstract class MultiFilesystemTest extends FilesystemTest
      */
     public function can_get_last(): void
     {
-        $filesystem = $this->createFilesystem()->write('foo.txt', 'content');
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('foo.txt', 'content');
 
         $this->assertSame('content', $filesystem->last()->ensureFile()->contents());
 

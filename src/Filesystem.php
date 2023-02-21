@@ -50,15 +50,15 @@ interface Filesystem
 
     public function has(string $path): bool;
 
-    public function copy(string $source, string $destination, array $config = []): static;
+    public function copy(string $source, string $destination, array $config = []): File;
 
-    public function move(string $source, string $destination, array $config = []): static;
+    public function move(string $source, string $destination, array $config = []): File;
 
     public function delete(string $path, array $config = []): static;
 
-    public function mkdir(string $path, array $config = []): static;
+    public function mkdir(string $path, array $config = []): Directory;
 
-    public function chmod(string $path, string $visibility): static;
+    public function chmod(string $path, string $visibility): Node;
 
     /**
      * @param resource|string|\SplFileInfo|Node $value
@@ -66,7 +66,7 @@ interface Filesystem
      *     progress?: callable(File=):void
      * } $config
      */
-    public function write(string $path, mixed $value, array $config = []): static;
+    public function write(string $path, mixed $value, array $config = []): Node;
 
     /**
      * @throws \LogicException if no last node available

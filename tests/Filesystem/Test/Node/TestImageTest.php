@@ -24,6 +24,6 @@ final class TestImageTest extends TestFileTest
 
     protected function createFile(\SplFileInfo $file, string $path): Image
     {
-        return new TestImage($this->filesystem->write($path, $file)->last()->ensureImage());
+        return new TestImage($this->filesystem->write($path, $file)->ensureImage());
     }
 }

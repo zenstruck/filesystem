@@ -33,15 +33,13 @@ final class LoggableFilesystemTest extends FilesystemTest
         $resource = Stream::inMemory();
         $logger = new Logger(LogLevel::DEBUG, $resource->get());
 
-        $filesystem = (new LoggableFilesystem(in_memory_filesystem(), $logger))
-            ->write('foo', 'bar')
-            ->mkdir('bar')
-            ->chmod('foo', 'public')
-            ->copy('foo', 'file.png')
-            ->delete('foo')
-            ->move('file.png', 'file2.png')
-        ;
-
+        $filesystem = (new LoggableFilesystem(in_memory_filesystem(), $logger));
+        $filesystem->write('foo', 'bar');
+        $filesystem->mkdir('bar');
+        $filesystem->chmod('foo', 'public');
+        $filesystem->copy('foo', 'file.png');
+        $filesystem->delete('foo');
+        $filesystem->move('file.png', 'file2.png');
         $filesystem->node('file2.png');
         $filesystem->file('file2.png');
         $filesystem->image('file2.png');
@@ -80,15 +78,12 @@ final class LoggableFilesystemTest extends FilesystemTest
             Operation::MKDIR => LogLevel::NOTICE,
         ]);
 
-        $filesystem
-            ->write('foo', 'bar')
-            ->mkdir('bar')
-            ->chmod('foo', 'public')
-            ->copy('foo', 'file.png')
-            ->delete('foo')
-            ->move('file.png', 'file2.png')
-        ;
-
+        $filesystem->write('foo', 'bar');
+        $filesystem->mkdir('bar');
+        $filesystem->chmod('foo', 'public');
+        $filesystem->copy('foo', 'file.png');
+        $filesystem->delete('foo');
+        $filesystem->move('file.png', 'file2.png');
         $filesystem->node('file2.png');
         $filesystem->file('file2.png');
         $filesystem->image('file2.png');
@@ -118,15 +113,13 @@ final class LoggableFilesystemTest extends FilesystemTest
         $resource = Stream::inMemory();
         $logger = new Logger(LogLevel::DEBUG, $resource->get());
 
-        $filesystem = (new LoggableFilesystem(in_memory_filesystem(), $logger, [Operation::READ => false]))
-            ->write('foo', 'bar')
-            ->mkdir('bar')
-            ->chmod('foo', 'public')
-            ->copy('foo', 'file.png')
-            ->delete('foo')
-            ->move('file.png', 'file2.png')
-        ;
-
+        $filesystem = (new LoggableFilesystem(in_memory_filesystem(), $logger, [Operation::READ => false]));
+        $filesystem->write('foo', 'bar');
+        $filesystem->mkdir('bar');
+        $filesystem->chmod('foo', 'public');
+        $filesystem->copy('foo', 'file.png');
+        $filesystem->delete('foo');
+        $filesystem->move('file.png', 'file2.png');
         $filesystem->node('file2.png');
         $filesystem->file('file2.png');
         $filesystem->image('file2.png');

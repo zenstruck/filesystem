@@ -25,8 +25,11 @@ final class LazyDirectoryTest extends TestCase
 
     protected function createDirectory(\SplFileInfo $directory, string $path): Directory
     {
+        $fs = in_memory_filesystem();
+        $fs->write($path, $directory);
+
         $ret = new LazyDirectory($path);
-        $ret->setFilesystem(in_memory_filesystem()->write($path, $directory));
+        $ret->setFilesystem($fs);
 
         return $ret;
     }

@@ -26,14 +26,13 @@ final class TraceableFilesystemTest extends FilesystemTest
      */
     public function can_access_statistics_and_operations(): void
     {
-        $filesystem = $this->createFilesystem()
-            ->write('foo', 'bar')
-            ->mkdir('bar')
-            ->chmod('foo', 'public')
-            ->copy('foo', 'file.png')
-            ->delete('foo')
-            ->move('file.png', 'file2.png')
-        ;
+        $filesystem = $this->createFilesystem();
+        $filesystem->write('foo', 'bar');
+        $filesystem->mkdir('bar');
+        $filesystem->chmod('foo', 'public');
+        $filesystem->copy('foo', 'file.png');
+        $filesystem->delete('foo');
+        $filesystem->move('file.png', 'file2.png');
 
         $filesystem->node('file2.png');
         $filesystem->file('file2.png');
@@ -88,7 +87,8 @@ final class TraceableFilesystemTest extends FilesystemTest
     {
         $filesystem = new TraceableFilesystem(in_memory_filesystem(), $stopwatch = new Stopwatch());
 
-        $filesystem->write('foo.txt', 'content')->delete('foo.txt');
+        $filesystem->write('foo.txt', 'content');
+        $filesystem->delete('foo.txt');
 
         $this->assertCount(2, $stopwatch->getEvent('filesystem.default')->getPeriods());
     }

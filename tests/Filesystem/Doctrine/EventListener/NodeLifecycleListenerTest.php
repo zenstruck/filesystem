@@ -46,8 +46,8 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->last()->ensureFile());
-        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->last()->ensureImage());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
@@ -78,8 +78,8 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
 
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->last()->ensureFile());
-        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->last()->ensureImage());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
@@ -89,8 +89,8 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
         $fromDb = repository($class)->first()->object();
 
-        $fromDb->{'setFile'.$num}($this->filesystem()->write('some/new-file.txt', 'content3')->last()->ensureFile());
-        $object->{'setImage'.$num}($this->filesystem()->write('some/new-image.png', fixture('metadata.jpg'))->last()->ensureImage());
+        $fromDb->{'setFile'.$num}($this->filesystem()->write('some/new-file.txt', 'content3')->ensureFile());
+        $object->{'setImage'.$num}($this->filesystem()->write('some/new-image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->flushAndAssertNoChangesFor($object);
 
@@ -108,8 +108,8 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->last()->ensureFile());
-        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->last()->ensureImage());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
@@ -137,14 +137,14 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->last()->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
 
         $this->assertSame('content1', $object->{'getFile'.$num}()->contents());
 
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'new content')->last()->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'new content')->ensureFile());
 
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
@@ -264,7 +264,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('Foo');
-        $object->setImage4($this->filesystem()->write('some/image.png', fixture('symfony.png'))->last()->ensureImage());
+        $object->setImage4($this->filesystem()->write('some/image.png', fixture('symfony.png'))->ensureImage());
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);

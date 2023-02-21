@@ -103,6 +103,6 @@ class SerializableFileTest extends TestCase
 
     protected function createFile(\SplFileInfo $file, string $path, array|string $metadata = []): SerializableFile
     {
-        return new SerializableFile($this->filesystem->write($path, $file)->last()->ensureFile(), $metadata);
+        return new SerializableFile($this->filesystem->write($path, $file)->ensureFile(), $metadata);
     }
 }

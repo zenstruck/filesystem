@@ -56,7 +56,8 @@ abstract class FilesystemTest extends TestCase
      */
     public function can_get_file(): void
     {
-        $fs = $this->createFilesystem()->write('some/file.txt', 'content');
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.txt', 'content');
 
         $this->assertTrue($fs->file('some/file.txt')->ensureExists()->exists());
     }
@@ -79,7 +80,8 @@ abstract class FilesystemTest extends TestCase
      */
     public function can_get_image(): void
     {
-        $fs = $this->createFilesystem()->write('some/file.png', 'content');
+        $fs = $this->createFilesystem();
+        $fs->write('some/file.png', 'content');
 
         $this->assertTrue($fs->image('some/file.png')->exists());
     }
@@ -115,7 +117,8 @@ abstract class FilesystemTest extends TestCase
      */
     public function can_get_directory(): void
     {
-        $fs = $this->createFilesystem()->write('some/file1.txt', 'content');
+        $fs = $this->createFilesystem();
+        $fs->write('some/file1.txt', 'content');
 
         $this->assertTrue($fs->directory('some')->exists());
     }
@@ -125,11 +128,10 @@ abstract class FilesystemTest extends TestCase
      */
     public function can_get_root_directory(): void
     {
-        $fs = $this->createFilesystem()
-            ->write('file1.txt', 'content')
-            ->write('file2.txt', 'content')
-            ->write('nested/file3.txt', 'content')
-        ;
+        $fs = $this->createFilesystem();
+        $fs->write('file1.txt', 'content');
+        $fs->write('file2.txt', 'content');
+        $fs->write('nested/file3.txt', 'content');
 
         $this->assertCount(3, $fs->directory());
         $this->assertCount(2, $fs->directory()->files());
@@ -287,10 +289,10 @@ abstract class FilesystemTest extends TestCase
     {
         $fs = $this->createFilesystem();
 
-        $file = $fs->write('some/file.txt', $value)->last()->ensureFile();
+        $file = $fs->write('some/file.txt', $value)->ensureFile();
 
         $this->assertSame('content', $file->contents());
-        $this->assertSame('some/file.txt', $fs->last()->ensureFile()->path()->toString());
+        $this->assertSame('some/file.txt', $file->path()->toString());
     }
 
     public static function writeValueProvider(): iterable
@@ -298,7 +300,7 @@ abstract class FilesystemTest extends TestCase
         yield ['content'];
         yield [TempFile::for('content')];
         yield [Stream::inMemory()->write('content')->rewind()->get()];
-        yield [in_memory_filesystem()->write('file.txt', 'content')->last()->ensureFile()];
+        yield [in_memory_filesystem()->write('file.txt', 'content')->ensureFile()];
     }
 
     /**

@@ -33,9 +33,7 @@ use Zenstruck\Stream;
 final class FlysystemFilesystem implements Filesystem
 {
     private Operator $operator;
-
-    /** @var \Closure():Node|\LogicException */
-    private \Closure|\LogicException $last;
+    private Node|\LogicException $last;
 
     public function __construct(
         FilesystemOperator|FilesystemAdapter|string $flysystem,
@@ -86,22 +84,20 @@ final class FlysystemFilesystem implements Filesystem
         return $this->operator->has($path);
     }
 
-    public function copy(string $source, string $destination, array $config = []): static
+    public function copy(string $source, string $destination, array $config = []): File
     {
         // todo: copy dir?
         $this->operator->copy($source, $destination, $config);
-        $this->last = fn() => new FlysystemFile($destination, $this->operator);
 
-        return $this;
+        return $this->last = new FlysystemFile($destination, $this->operator);
     }
 
-    public function move(string $source, string $destination, array $config = []): static
+    public function move(string $source, string $destination, array $config = []): File
     {
         // todo: move dir?
         $this->operator->move($source, $destination, $config);
-        $this->last = fn() => new FlysystemFile($destination, $this->operator);
 
-        return $this;
+        return $this->last = new FlysystemFile($destination, $this->operator);
     }
 
     public function delete(string $path, array $config = []): static
@@ -121,23 +117,21 @@ final class FlysystemFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): static
+    public function mkdir(string $path, array $config = []): Directory
     {
         $this->operator->createDirectory($path, $config);
-        $this->last = fn() => new FlysystemDirectory($path, $this->operator);
 
-        return $this;
+        return $this->last = new FlysystemDirectory($path, $this->operator);
     }
 
-    public function chmod(string $path, string $visibility): static
+    public function chmod(string $path, string $visibility): Node
     {
         $this->operator->setVisibility($path, $visibility);
-        $this->last = fn() => new FlysystemNode($path, $this->operator);
 
-        return $this;
+        return $this->last = new FlysystemNode($path, $this->operator);
     }
 
-    public function write(string $path, mixed $value, array $config = []): static
+    public function write(string $path, mixed $value, array $config = []): Node
     {
         if ($value instanceof \SplFileInfo && $value->isDir()) {
             $value = (new self($value))->directory()->recursive();
@@ -153,9 +147,7 @@ final class FlysystemFilesystem implements Filesystem
                 $progress($this->last()->ensureFile());
             }
 
-            $this->last = fn() => new FlysystemDirectory($path, $this->operator);
-
-            return $this;
+            return $this->last = new FlysystemDirectory($path, $this->operator);
         }
 
         if ($value instanceof \SplFileInfo && !$value instanceof File) {
@@ -180,13 +172,11 @@ final class FlysystemFilesystem implements Filesystem
 
         $this->operator->writeStream($path, $value->autoClose()->get(), $config);
 
-        $this->last = fn() => new FlysystemFile($path, $this->operator);
-
-        return $this;
+        return $this->last = new FlysystemFile($path, $this->operator);
     }
 
     public function last(): Node
     {
-        return \is_callable($this->last) ? ($this->last)() : throw $this->last;
+        return $this->last instanceof Node ? $this->last : throw $this->last;
     }
 }

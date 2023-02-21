@@ -84,7 +84,6 @@ final class FileResponseTest extends TestCase
     {
         return in_memory_filesystem()
             ->write('some/file.txt', 'content')
-            ->last()
             ->ensureFile()
         ;
     }
