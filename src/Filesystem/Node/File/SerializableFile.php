@@ -54,24 +54,4 @@ class SerializableFile implements File, \JsonSerializable
     {
         return $this->file;
     }
-
-    /**
-     * @return list<array{0:string,1:string|null}>
-     */
-    private static function parseMetadata(int|string $key, array|string $value): array
-    {
-        if (\is_int($key) && \is_string($value)) {
-            return [[$value, null]];
-        }
-
-        if (\is_string($value)) {
-            return [[$key, $value]];
-        }
-
-        if (\is_int($key)) {
-            throw new \LogicException('Invalid metadata format.');
-        }
-
-        return \array_map(static fn(string $v) => [$key, $v], $value);
-    }
 }
