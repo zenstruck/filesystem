@@ -65,7 +65,7 @@ final class EventDispatcherFilesystem implements Filesystem
 
     public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        $this->dispatch($event = new PreMkdirEvent($this, $path, $config), Operation::MKDIR);
+        $this->dispatch($event = new PreMkdirEvent($this, $path, $content, $config), Operation::MKDIR);
         $directory = $this->inner->mkdir($event->path, $content, $event->config);
         $this->dispatch(new PostMkdirEvent($event), Operation::MKDIR);
 

@@ -30,6 +30,11 @@ final class PostMkdirEvent extends PostOperationEvent
         return $this->event->path;
     }
 
+    public function content(): \SplFileInfo|Directory|null
+    {
+        return $this->event->content;
+    }
+
     public function config(): array
     {
         return $this->event->config;

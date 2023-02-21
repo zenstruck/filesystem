@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Event;
 
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Node\Directory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -21,8 +22,12 @@ final class PreMkdirEvent extends PreOperationEvent
     /**
      * @internal
      */
-    public function __construct(Filesystem $filesystem, public string $path, public array $config = [])
-    {
+    public function __construct(
+        Filesystem $filesystem,
+        public string $path,
+        public \SplFileInfo|Directory|null $content,
+        public array $config = [],
+    ) {
         parent::__construct($filesystem);
     }
 }
