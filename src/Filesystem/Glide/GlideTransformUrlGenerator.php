@@ -26,7 +26,7 @@ final class GlideTransformUrlGenerator implements TransformUrlGenerator
 
     public function transformUrl(string $path, array|string $filter, Config $config): string
     {
-        $filter = match (true) {
+        $filter = match (true) { // @phpstan-ignore-line https://github.com/phpstan/phpstan/issues/8937
             \is_string($filter) => ['p' => $filter], // is glide "preset"
             \is_array($filter) && !array_is_list($filter) => $filter, // is standard glide parameters
             \is_array($filter) => ['p' => \implode(',', $filter)], // is array of "presets"
