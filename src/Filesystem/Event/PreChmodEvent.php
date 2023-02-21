@@ -18,6 +18,9 @@ use Zenstruck\Filesystem;
  */
 final class PreChmodEvent extends PreOperationEvent
 {
+    /**
+     * @internal
+     */
     public function __construct(Filesystem $filesystem, public string $path, public string $visibility)
     {
         parent::__construct($filesystem);

@@ -18,6 +18,9 @@ use Zenstruck\Filesystem;
  */
 abstract class PreOperationEvent extends OperationEvent
 {
+    /**
+     * @internal
+     */
     public function __construct(private Filesystem $filesystem)
     {
     }

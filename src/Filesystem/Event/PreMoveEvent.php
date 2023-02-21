@@ -18,6 +18,9 @@ use Zenstruck\Filesystem;
  */
 final class PreMoveEvent extends PreOperationEvent
 {
+    /**
+     * @internal
+     */
     public function __construct(Filesystem $filesystem, public string $source, public string $destination, public array $config = [])
     {
         parent::__construct($filesystem);

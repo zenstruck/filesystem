@@ -21,6 +21,8 @@ use Zenstruck\Filesystem;
 abstract class PostOperationEvent extends OperationEvent
 {
     /**
+     * @internal
+     *
      * @param T $event
      */
     public function __construct(protected PreOperationEvent $event)

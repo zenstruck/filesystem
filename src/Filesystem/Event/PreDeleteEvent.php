@@ -18,6 +18,9 @@ use Zenstruck\Filesystem;
  */
 final class PreDeleteEvent extends PreOperationEvent
 {
+    /**
+     * @internal
+     */
     public function __construct(Filesystem $filesystem, public string $path, public array $config = [])
     {
         parent::__construct($filesystem);
