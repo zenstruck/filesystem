@@ -171,9 +171,9 @@ final class ExpressionPathGeneratorTest extends TestCase
         $file = $this->file('some/pA Th.tXt', 'content');
 
         $this->assertSame(
-            'prefix/string/prop1-value/pa-th--9a0364b.txt',
+            'prefix/string/prop1-value/pa-th--9A0364B.txt',
             $this->name($file, [
-                'expression' => 'prefix/{object|slug}/{object.prop3|lower}/{file.path.basename|slug}--{checksum:7|lower}{ext}',
+                'expression' => 'prefix/{object|slug}/{object.prop3|lower}/{file.path.basename|slug}--{checksum:7|upper}{ext}',
                 'object' => new ContextObject(),
             ])
         );

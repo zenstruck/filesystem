@@ -40,7 +40,7 @@ final class ExpressionPathGenerator implements Generator
         }
 
         return (string) \preg_replace_callback(
-            '#{([\w.:\-\[\]]+)(\(([\w\s,\-]+)?\))?(\|(slug|slugify|lower))?}#',
+            '#{([\w.:\-\[\]]+)(\(([\w\s,\-]+)?\))?(\|(slug|slugify|lower|upper))?}#',
             function($matches) use ($node, $context) {
                 $value = match ($matches[1]) {
                     'name' => $this->slugify($node->path()->basename()),
@@ -53,6 +53,7 @@ final class ExpressionPathGenerator implements Generator
                 return match ($matches[5] ?? null) {
                     'slug', 'slugify' => $this->slugify($value),
                     'lower' => \mb_strtolower($value),
+                    'upper' => \mb_strtoupper($value),
                     default => $value,
                 };
             },
