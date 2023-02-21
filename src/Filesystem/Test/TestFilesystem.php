@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Test;
 use Zenstruck\Assert;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
+use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
@@ -154,9 +155,9 @@ final class TestFilesystem implements Filesystem
         return new TestFile($this->inner()->move($source, $destination, $config));
     }
 
-    public function mkdir(string $path, array $config = []): TestDirectory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): TestDirectory
     {
-        return new TestDirectory($this->inner()->mkdir($path, $config));
+        return new TestDirectory($this->inner()->mkdir($path, $content, $config));
     }
 
     public function chmod(string $path, string $visibility): TestNode
@@ -164,9 +165,9 @@ final class TestFilesystem implements Filesystem
         return new TestNode($this->inner()->chmod($path, $visibility));
     }
 
-    public function write(string $path, mixed $value, array $config = []): TestNode
+    public function write(string $path, mixed $value, array $config = []): TestFile
     {
-        return new TestNode($this->inner()->write($path, $value, $config));
+        return new TestFile($this->inner()->write($path, $value, $config));
     }
 
     /**

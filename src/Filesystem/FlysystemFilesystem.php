@@ -15,6 +15,8 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\PathPrefixer;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToWriteFile;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
@@ -113,11 +115,32 @@ final class FlysystemFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        $this->operator->createDirectory($path, $config);
+        if (!$content) {
+            $this->operator->createDirectory($path, $config);
 
-        return new FlysystemDirectory($path, $this->operator);
+            return new FlysystemDirectory($path, $this->operator);
+        }
+
+        if ($content instanceof \SplFileInfo && $content->isDir()) {
+            $content = (new self($content))->directory()->recursive();
+        }
+
+        if ($content instanceof Directory) {
+            $prefixer = new PathPrefixer($path);
+            $prefixLength = \mb_strlen($content->path());
+            $progress = $config['progress'] ?? static fn() => null;
+
+            foreach ($content->files() as $file) {
+                $file = $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config); // @phpstan-ignore-line
+                $progress($file);
+            }
+
+            return new FlysystemDirectory($path, $this->operator);
+        }
+
+        throw UnableToCreateDirectory::atLocation($path, \sprintf('"%s" is either not a directory or does not exist.', $content));
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -127,35 +150,22 @@ final class FlysystemFilesystem implements Filesystem
         return new FlysystemNode($path, $this->operator);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
-        if ($value instanceof \SplFileInfo && $value->isDir()) {
-            $value = (new self($value))->directory()->recursive();
-        }
-
-        if ($value instanceof Directory) {
-            $prefixer = new PathPrefixer($path);
-            $prefixLength = \mb_strlen($value->path());
-            $progress = $config['progress'] ?? static fn() => null;
-
-            foreach ($value->files() as $file) {
-                $node = $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config);
-                $progress($node->ensureFile());
-            }
-
-            return new FlysystemDirectory($path, $this->operator);
+        if ($value instanceof \SplFileInfo && !$value->isFile()) {
+            throw UnableToWriteFile::atLocation($path, \sprintf('"%s" is either not a file or does not exist.', $value));
         }
 
         if ($value instanceof \SplFileInfo && !$value instanceof File) {
-            $value = Stream::open($value, 'r');
+            $value = Stream::open($value, 'r')->autoClose();
         }
 
         if ($value instanceof File) {
-            $value = $value->stream();
+            $value = $value->stream()->autoClose();
         }
 
         if (\is_string($value)) {
-            $value = Stream::wrap($value);
+            $value = Stream::wrap($value)->autoClose();
         }
 
         if (\is_resource($value)) {
@@ -166,7 +176,7 @@ final class FlysystemFilesystem implements Filesystem
             throw new \InvalidArgumentException(\sprintf('Unable to write "%s".', \get_debug_type($value)));
         }
 
-        $this->operator->writeStream($path, $value->autoClose()->get(), $config);
+        $this->operator->writeStream($path, $value->get(), $config);
 
         return new FlysystemFile($path, $this->operator);
     }

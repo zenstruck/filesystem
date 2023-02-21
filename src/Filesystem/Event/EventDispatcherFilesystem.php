@@ -63,10 +63,10 @@ final class EventDispatcherFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
         $this->dispatch($event = new PreMkdirEvent($this, $path, $config), Operation::MKDIR);
-        $directory = $this->inner->mkdir($event->path, $event->config);
+        $directory = $this->inner->mkdir($event->path, $content, $event->config);
         $this->dispatch(new PostMkdirEvent($event), Operation::MKDIR);
 
         return $directory;
@@ -81,13 +81,13 @@ final class EventDispatcherFilesystem implements Filesystem
         return $node;
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         $this->dispatch($event = new PreWriteEvent($this, $path, $value, $config), Operation::WRITE);
-        $node = $this->inner->write($event->path, $event->value, $event->config);
+        $file = $this->inner->write($event->path, $event->value, $event->config);
         $this->dispatch(new PostWriteEvent($event), Operation::WRITE);
 
-        return $node;
+        return $file;
     }
 
     protected function inner(): Filesystem

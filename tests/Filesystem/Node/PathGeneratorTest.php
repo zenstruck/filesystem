@@ -30,7 +30,7 @@ final class PathGeneratorTest extends TestCase
      */
     public function can_generate_paths(PathGenerator $generator): void
     {
-        $file = in_memory_filesystem()->write('some/file.txt', 'content')->ensureFile();
+        $file = in_memory_filesystem()->write('some/file.txt', 'content');
 
         $this->assertSame('from/callback', $generator->generate(fn(File $f, array $context) => 'from/callback', $file));
         $this->assertSame('from/custom.txt', $generator->generate('custom', $file));
@@ -45,7 +45,7 @@ final class PathGeneratorTest extends TestCase
      */
     public function namer_not_found(PathGenerator $generator): void
     {
-        $file = in_memory_filesystem()->write('some/file.txt', 'content')->ensureFile();
+        $file = in_memory_filesystem()->write('some/file.txt', 'content');
 
         $this->expectException(\InvalidArgumentException::class);
 

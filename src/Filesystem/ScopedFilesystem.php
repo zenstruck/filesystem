@@ -76,9 +76,9 @@ final class ScopedFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        return $this->inner->mkdir($this->prefix($path), $config);
+        return $this->inner->mkdir($this->prefix($path), $content, $config);
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -86,7 +86,7 @@ final class ScopedFilesystem implements Filesystem
         return $this->inner->chmod($this->prefix($path), $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         return $this->inner->write($this->prefix($path), $value, $config);
     }

@@ -30,13 +30,13 @@ final class FileMappingLoaderTest extends DoctrineTestCase
     public function can_load_files_for_object(): void
     {
         $object = new Entity2('FoO');
-        $object->setFile1($this->filesystem()->write('some/file1.txt', 'content1')->ensureFile());
+        $object->setFile1($this->filesystem()->write('some/file1.txt', 'content1'));
         $object->setImage1($this->filesystem()->write('some/image1.png', 'content2')->ensureImage());
-        $object->setFile2($this->filesystem()->write('some/file2.txt', 'content3')->ensureFile());
+        $object->setFile2($this->filesystem()->write('some/file2.txt', 'content3'));
         $object->setImage2($this->filesystem()->write('some/image2.png', 'content4')->ensureImage());
-        $object->setFile3($this->filesystem()->write('some/file3.txt', 'content5')->ensureFile());
+        $object->setFile3($this->filesystem()->write('some/file3.txt', 'content5'));
         $object->setImage3($this->filesystem()->write('some/image3.png', 'content6')->ensureImage());
-        $object->setFile4($this->filesystem()->write('some/file4.txt', 'content7')->ensureFile());
+        $object->setFile4($this->filesystem()->write('some/file4.txt', 'content7'));
         $object->setImage4($this->filesystem()->write('some/image4.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->filesystem()->write('foo.txt', 'content20');

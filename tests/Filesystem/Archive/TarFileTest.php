@@ -32,7 +32,7 @@ final class TarFileTest extends TestCase
         $this->assertCount(1, $archive->directory()->files());
         $this->assertCount(1, $archive->directory()->directories());
         $this->assertCount(3, $archive->directory()->recursive());
-        $this->assertSame('contents 1', $archive->directory()->files()->first()->ensureFile()->contents());
+        $this->assertSame('contents 1', $archive->directory()->files()->first()->contents());
     }
 
     public static function tarFileProvider(): iterable

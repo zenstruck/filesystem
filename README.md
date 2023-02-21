@@ -46,13 +46,11 @@ $filesystem->file('some/path.txt'); // Zenstruck\Filesystem\Node\File or throws 
 $filesystem->image('some/path.png'); // Zenstruck\Filesystem\Node\File\Image or throws NodeNotFound or NodeTypeMismatch (if exists but not an image)
 $filesystem->directory('some/path'); // Zenstruck\Filesystem\Node\Directory or throws NodeNotFound or NodeTypeMismatch (if exists but not a directory)
 
-// write operations (returns Node)
+// write operations (returns Zenstruck\Filesystem\File)
 $filesystem->write('some/path.txt', 'string contents'); // write a string
 $filesystem->write('some/path.txt', $resource); // write a resource
 $filesystem->write('some/path.txt', new \SplFileInfo('path/to/local/file.txt')); // write a local file
-$filesystem->write('some/prefix', new \SplFileInfo('path/to/local/directory')); // write a local directory
 $filesystem->write('some/path.txt', $file); // write a Zenstruck\Filesystem\Node\File
-$filesystem->write('some/prefix', $directory); // write a Zenstruck\Filesystem\Node\Directory
 
 $filesystem->copy('from/file.txt', 'dest/file.txt'); // Zenstruck\Filesystem\Node\File (dest/file.txt)
 
@@ -61,7 +59,10 @@ $filesystem->move('from/file.txt', 'dest/file.txt'); // Zenstruck\Filesystem\Nod
 $filesystem->delete('some/file.txt'); // returns self
 $filesystem->delete('some/directory'); // returns self
 
-$filesystem->mkdir('some/directory'); // Zenstruck\Filesystem\Node\Directory (some/directory)
+// mkdir operations (returns Zenstruck\Filesystem\Node\Directory)
+$filesystem->mkdir('some/directory'); // create an empty directory
+$filesystem->mkdir('some/prefix', $directory); // create directory with files from Zenstruck\Filesystem\Node\Directory
+$filesystem->mkdir('some/prefix', new \SplFileInfo('path/to/local/directory')); // create directory with files from local directory
 
 $filesystem->chmod('some/file.txt', 'private'); // Zenstruck\Filesystem\Node (some/file.txt)
 
@@ -315,13 +316,13 @@ $scopedFilesystem = new ScopedFilesystem($primaryFilesystem, 'some/prefix');
 // paths are prefixed
 $scopedFilesystem
     ->write('file.txt', 'content')
-    ->ensureFile()->path()->toString(); // "some/prefix/file.txt"
+    ->path()->toString(); // "some/prefix/file.txt"
 ;
 
 // prefix is stripped from path
 $scopedFilesystem
     ->write('some/prefix/file.txt', 'content')
-    ->ensureFile()->path()->toString(); // "some/prefix/file.txt"
+    ->path()->toString(); // "some/prefix/file.txt"
 ;
 ```
 

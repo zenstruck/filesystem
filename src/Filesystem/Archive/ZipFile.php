@@ -19,6 +19,7 @@ use Zenstruck\Filesystem\Archive\Zip\ZipArchiveAdapter;
 use Zenstruck\Filesystem\DecoratedFilesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\TempFile;
 
@@ -46,7 +47,7 @@ final class ZipFile extends \SplFileInfo implements Filesystem
      *     commit_progress?: callable(float):void
      * } $config
      */
-    public static function zip(Node|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
+    public static function zip(File|Directory|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
     {
         $filesystem = new self($filename);
         $what = \is_string($what) ? new \SplFileInfo($what) : $what;
@@ -66,7 +67,13 @@ final class ZipFile extends \SplFileInfo implements Filesystem
         };
 
         $filesystem->beginTransaction();
-        $filesystem->write($path, $what, $config);
+
+        if ($what instanceof Directory || ($what instanceof \SplFileInfo && $what->isDir())) {
+            $filesystem->mkdir($path, $what, $config);
+        } else {
+            $filesystem->write($path, $what, $config);
+        }
+
         $filesystem->commit($config['commit_progress'] ?? null);
 
         return $filesystem;

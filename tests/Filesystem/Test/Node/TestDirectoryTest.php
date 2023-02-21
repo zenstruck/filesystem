@@ -25,6 +25,6 @@ final class TestDirectoryTest extends TestCase
 
     protected function createDirectory(\SplFileInfo $directory, string $path): Directory
     {
-        return new TestDirectory(in_memory_filesystem()->write($path, $directory)->ensureDirectory());
+        return new TestDirectory(in_memory_filesystem()->mkdir($path, $directory));
     }
 }

@@ -46,7 +46,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1'));
         $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->em()->persist($object);
@@ -78,7 +78,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
 
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1'));
         $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->flushAndAssertNoChangesFor($object);
@@ -89,7 +89,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
         $fromDb = repository($class)->first()->object();
 
-        $fromDb->{'setFile'.$num}($this->filesystem()->write('some/new-file.txt', 'content3')->ensureFile());
+        $fromDb->{'setFile'.$num}($this->filesystem()->write('some/new-file.txt', 'content3'));
         $object->{'setImage'.$num}($this->filesystem()->write('some/new-image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->flushAndAssertNoChangesFor($object);
@@ -108,7 +108,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1'));
         $object->{'setImage'.$num}($this->filesystem()->write('some/image.png', fixture('metadata.jpg'))->ensureImage());
 
         $this->em()->persist($object);
@@ -137,14 +137,14 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     {
         $class = $this->entityClass();
         $object = new $class('foo');
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1')->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'content1'));
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
 
         $this->assertSame('content1', $object->{'getFile'.$num}()->contents());
 
-        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'new content')->ensureFile());
+        $object->{'setFile'.$num}($this->filesystem()->write('some/file.txt', 'new content'));
 
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();

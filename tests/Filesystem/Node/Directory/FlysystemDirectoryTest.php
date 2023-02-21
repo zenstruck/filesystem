@@ -58,9 +58,7 @@ final class FlysystemDirectoryTest extends TestCase
 
     protected function createDirectory(\SplFileInfo $directory, string $path): Directory
     {
-        $fs = in_memory_filesystem();
-
-        return $fs->write($path, $directory)->ensureDirectory();
+        return in_memory_filesystem()->mkdir($path, $directory);
     }
 
     private static function forDateDirectory(): TestDirectory

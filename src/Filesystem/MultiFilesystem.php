@@ -80,7 +80,7 @@ final class MultiFilesystem implements Filesystem
             return $sourceFilesystem->copy($sourcePath, $destPath, $config);
         }
 
-        return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config)->ensureFile();
+        return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config);
     }
 
     public function move(string $source, string $destination, array $config = []): File
@@ -94,7 +94,7 @@ final class MultiFilesystem implements Filesystem
         }
 
         try {
-            return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config)->ensureFile();
+            return $destFilesystem->write($destPath, $sourceFilesystem->file($sourcePath), $config);
         } finally {
             $sourceFilesystem->delete($sourcePath);
         }
@@ -109,11 +109,11 @@ final class MultiFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 
-        return $filesystem->mkdir($path, $config);
+        return $filesystem->mkdir($path, $content, $config);
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -123,7 +123,7 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->chmod($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         [$filesystem, $path] = $this->parsePath($path);
 

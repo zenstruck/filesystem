@@ -81,7 +81,7 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         /** @var Service $service */
         $service = self::getContainer()->get(Service::class);
 
-        $file = in_memory_filesystem()->write('some/file.txt', 'content')->ensureFile();
+        $file = in_memory_filesystem()->write('some/file.txt', 'content');
 
         $this->assertSame('9a0364b.txt', $service->pathGenerator->generate(Expression::checksum(7), $file));
     }

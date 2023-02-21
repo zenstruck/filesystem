@@ -158,7 +158,7 @@ final class ZipFileTest extends FilesystemTest
      */
     public function can_zip_file(): void
     {
-        $file = in_memory_filesystem()->write('nested/file.txt', 'contents')->ensureFile();
+        $file = in_memory_filesystem()->write('nested/file.txt', 'contents');
 
         $archive = ZipFile::zip($file);
 

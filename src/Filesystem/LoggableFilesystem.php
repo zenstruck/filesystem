@@ -148,7 +148,7 @@ final class LoggableFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
         $this->log(
             $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
@@ -158,7 +158,7 @@ final class LoggableFilesystem implements Filesystem
             ]
         );
 
-        return $this->inner()->mkdir($path, $config);
+        return $this->inner()->mkdir($path, $content, $config);
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -175,7 +175,7 @@ final class LoggableFilesystem implements Filesystem
         return $this->inner()->chmod($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         $this->log(
             $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],

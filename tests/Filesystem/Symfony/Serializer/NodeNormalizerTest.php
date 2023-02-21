@@ -60,7 +60,7 @@ final class NodeNormalizerTest extends KernelTestCase
             'public://some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir')->ensureDirectory(),
+            fn(Filesystem $f) => $f->mkdir('some/dir'),
             [],
             Directory::class,
             'public://some/dir',
@@ -72,7 +72,7 @@ final class NodeNormalizerTest extends KernelTestCase
             'some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir')->ensureDirectory(),
+            fn(Filesystem $f) => $f->mkdir('some/dir'),
             ['filesystem' => 'public'],
             Directory::class,
             'some/dir',

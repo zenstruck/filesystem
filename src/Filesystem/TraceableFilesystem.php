@@ -119,9 +119,9 @@ final class TraceableFilesystem implements Filesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        return $this->track(fn() => $this->inner()->mkdir($path, $config), Operation::MKDIR, $path);
+        return $this->track(fn() => $this->inner()->mkdir($path, $content, $config), Operation::MKDIR, $path);
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -129,7 +129,7 @@ final class TraceableFilesystem implements Filesystem
         return $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         return $this->track(
             fn() => $this->inner()->write($path, $value, $config),

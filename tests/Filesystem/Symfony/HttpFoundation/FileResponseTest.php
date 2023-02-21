@@ -82,9 +82,6 @@ final class FileResponseTest extends TestCase
 
     private function createFile(): File
     {
-        return in_memory_filesystem()
-            ->write('some/file.txt', 'content')
-            ->ensureFile()
-        ;
+        return in_memory_filesystem()->write('some/file.txt', 'content');
     }
 }

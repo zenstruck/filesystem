@@ -271,7 +271,7 @@ abstract class FilesystemTest extends TestCase
     {
         $fs = $this->createFilesystem();
 
-        $file = $fs->write('some/file.txt', $value)->ensureFile();
+        $file = $fs->write('some/file.txt', $value);
 
         $this->assertSame('content', $file->contents());
         $this->assertSame('some/file.txt', $file->path()->toString());
@@ -282,18 +282,18 @@ abstract class FilesystemTest extends TestCase
         yield ['content'];
         yield [TempFile::for('content')];
         yield [Stream::inMemory()->write('content')->rewind()->get()];
-        yield [in_memory_filesystem()->write('file.txt', 'content')->ensureFile()];
+        yield [in_memory_filesystem()->write('file.txt', 'content')];
     }
 
     /**
      * @test
-     * @dataProvider writeDirectoryProvider
+     * @dataProvider mkdirContentsProvider
      */
-    public function can_write_directory(mixed $value): void
+    public function can_mkdir_with_contents(mixed $value): void
     {
         $fs = $this->createFilesystem();
 
-        $fs->write('foo', $value);
+        $fs->mkdir('foo', $value);
 
         $this->assertTrue($fs->has('foo'));
         $this->assertTrue($fs->has('foo/file1.txt'));
@@ -303,14 +303,14 @@ abstract class FilesystemTest extends TestCase
 
     /**
      * @test
-     * @dataProvider writeDirectoryProvider
+     * @dataProvider mkdirContentsProvider
      */
-    public function can_write_directory_with_progress(mixed $value): void
+    public function can_mkdir_with_contents_and_progress(mixed $value): void
     {
         $fs = $this->createFilesystem();
         $nodes = [];
 
-        $fs->write('foo', $value, ['progress' => function(File $file) use (&$nodes) {
+        $fs->mkdir('foo', $value, ['progress' => function(File $file) use (&$nodes) {
             $nodes[] = $file->path()->toString();
         }]);
 
@@ -327,7 +327,7 @@ abstract class FilesystemTest extends TestCase
         ], $nodes);
     }
 
-    public static function writeDirectoryProvider(): iterable
+    public static function mkdirContentsProvider(): iterable
     {
         yield [fixture_filesystem()->directory('sub1')->recursive()];
         yield [fixture('sub1')];

@@ -27,7 +27,7 @@ final class TwigPathGeneratorTest extends KernelTestCase
      */
     public function can_render_template(): void
     {
-        $file = in_memory_filesystem()->write('some/file.txt', 'content')->ensureFile();
+        $file = in_memory_filesystem()->write('some/file.txt', 'content');
 
         $this->assertSame('inline/file.txt', $this->generate('inline/{{ file.path.basename }}.{{ file.path.extension }}', $file));
         $this->assertSame('from-file/file.txt', $this->generate('can_render_template.twig', $file));

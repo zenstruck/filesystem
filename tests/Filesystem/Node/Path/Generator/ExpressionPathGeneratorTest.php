@@ -199,7 +199,7 @@ final class ExpressionPathGeneratorTest extends TestCase
 
     private function file(string $path, string $content = ''): File
     {
-        return in_memory_filesystem()->write($path, $content)->ensureFile();
+        return in_memory_filesystem()->write($path, $content);
     }
 }
 

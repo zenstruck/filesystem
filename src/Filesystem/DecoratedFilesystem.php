@@ -70,9 +70,9 @@ trait DecoratedFilesystem
         return $this;
     }
 
-    public function mkdir(string $path, array $config = []): Directory
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        return $this->inner()->mkdir($path, $config);
+        return $this->inner()->mkdir($path, $content, $config);
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -80,7 +80,7 @@ trait DecoratedFilesystem
         return $this->inner()->chmod($path, $visibility);
     }
 
-    public function write(string $path, mixed $value, array $config = []): Node
+    public function write(string $path, mixed $value, array $config = []): File
     {
         return $this->inner()->write($path, $value, $config);
     }

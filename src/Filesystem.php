@@ -56,15 +56,17 @@ interface Filesystem
 
     public function delete(string $path, array $config = []): static;
 
-    public function mkdir(string $path, array $config = []): Directory;
-
-    public function chmod(string $path, string $visibility): Node;
-
     /**
-     * @param resource|string|\SplFileInfo|Node $value
      * @param array{
      *     progress?: callable(File=):void
      * } $config
      */
-    public function write(string $path, mixed $value, array $config = []): Node;
+    public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory;
+
+    public function chmod(string $path, string $visibility): Node;
+
+    /**
+     * @param resource|string|\SplFileInfo|File $value
+     */
+    public function write(string $path, mixed $value, array $config = []): File;
 }
