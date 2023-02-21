@@ -35,6 +35,6 @@ final class ArchiveResponse extends BinaryFileResponse
 
     public static function zip(File|Directory|\SplFileInfo|string $what, ?string $filename = 'archive.zip', array $config = [], int $status = 200, array $headers = [], bool $public = true, bool $autoEtag = false, bool $autoLastModified = true): self
     {
-        return new self(ZipFile::zip($what, config: $config), $filename, $status, $headers, $public, $autoEtag, $autoLastModified);
+        return new self(ZipFile::compress($what, config: $config), $filename, $status, $headers, $public, $autoEtag, $autoLastModified);
     }
 }

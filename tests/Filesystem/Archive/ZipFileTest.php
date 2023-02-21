@@ -145,7 +145,7 @@ final class ZipFileTest extends FilesystemTest
         $fs->write('sub/nested/file2.txt', 'contents 2');
         $dir = $fs->directory('sub')->recursive();
 
-        $archive = ZipFile::zip($dir);
+        $archive = ZipFile::compress($dir);
 
         $this->assertFileExists($archive);
 
@@ -160,7 +160,7 @@ final class ZipFileTest extends FilesystemTest
     {
         $file = in_memory_filesystem()->write('nested/file.txt', 'contents');
 
-        $archive = ZipFile::zip($file);
+        $archive = ZipFile::compress($file);
 
         $this->assertFileExists($archive);
 
@@ -174,7 +174,7 @@ final class ZipFileTest extends FilesystemTest
     {
         \file_put_contents($file = TEMP_DIR.'/file.txt', 'contents');
 
-        $archive = ZipFile::zip($file);
+        $archive = ZipFile::compress($file);
 
         $this->assertFileExists($archive);
 
@@ -190,7 +190,7 @@ final class ZipFileTest extends FilesystemTest
         $fs->write('file1.txt', 'contents 1');
         $fs->write('nested/file2.txt', 'contents 2');
 
-        $archive = ZipFile::zip(TEMP_DIR);
+        $archive = ZipFile::compress(TEMP_DIR);
 
         $this->assertFileExists($archive);
 

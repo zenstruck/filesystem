@@ -47,7 +47,7 @@ final class ZipFile extends \SplFileInfo implements Filesystem
      *     commit_progress?: callable(float):void
      * } $config
      */
-    public static function zip(File|Directory|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
+    public static function compress(File|Directory|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
     {
         $filesystem = new self($filename);
         $what = \is_string($what) ? new \SplFileInfo($what) : $what;

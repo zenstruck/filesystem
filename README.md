@@ -474,10 +474,10 @@ Static helper for quickly creating `zip` archives:
 ```php
 use Zenstruck\Filesystem\Archive\ZipFile;
 
-$zipFile = ZipFile::zip('/some/local/file.txt');
+$zipFile = ZipFile::compress('/some/local/file.txt');
 
 // can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
-$zipFile = ZipFile::zip('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+$zipFile = ZipFile::compress('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
 ```
 
 ### `TarFile`
