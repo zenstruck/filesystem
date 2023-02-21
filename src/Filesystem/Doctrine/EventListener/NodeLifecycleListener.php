@@ -24,6 +24,7 @@ use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
+use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -85,11 +86,11 @@ final class NodeLifecycleListener
             $property = self::property($metadata->getReflectionClass(), $field);
             $property->setAccessible(true);
 
-            $file = new $class();
-            $file->setFilesystem(fn() => $this->filesystem($mapping));
-            $file->setPath(fn() => $this->generatePath($mapping, $file, $object, $field));
+            $node = new $class();
+            $node->setFilesystem(fn() => $this->filesystem($mapping));
+            $node->setPath(fn() => $this->generatePath($mapping, $node, $object, $field));
 
-            $property->setValue($object, $file);
+            $property->setValue($object, $node);
         }
     }
 
@@ -255,11 +256,11 @@ final class NodeLifecycleListener
         return $lazyFile;
     }
 
-    private function generatePath(Mapping $mapping, File $file, object $object, string $field): string
+    private function generatePath(Mapping $mapping, Node $node, object $object, string $field): string
     {
         return $this->container->get(PathGenerator::class)->generate(
             $mapping->namer() ?? throw new \LogicException(\sprintf('To save pending files/images, a "namer" must be configured in the filesystem mapping for "%s::$%s".', $object::class, $field)),
-            $file,
+            $node,
             ['this' => $object]
         );
     }

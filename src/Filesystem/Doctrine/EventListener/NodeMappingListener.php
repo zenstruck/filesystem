@@ -28,6 +28,8 @@ use Zenstruck\Filesystem\Doctrine\Types\FilePathType;
 use Zenstruck\Filesystem\Doctrine\Types\ImageDsnType;
 use Zenstruck\Filesystem\Doctrine\Types\ImageMetadataType;
 use Zenstruck\Filesystem\Doctrine\Types\ImagePathType;
+use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
@@ -63,13 +65,20 @@ final class NodeMappingListener
         foreach (self::mappedPropertiesFor($class) as [$property, $mapping]) {
             $type = $property->getType();
 
-            if (!$type instanceof \ReflectionNamedType || !\in_array($nodeClass = $type->getName(), [File::class, Image::class])) {
-                throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s" or "%s" typehint (and not be a union/intersection).', $property->class, $property->name, File::class, Image::class));
+            if (!$type instanceof \ReflectionNamedType) {
+                throw new \LogicException(\sprintf('Property "%s::$%s" must have a typehint and not be a union/intersection.', $property->class, $property->name));
             }
+
+            $nodeClass = $type->getName();
 
             if ($mapping instanceof Stateless) {
                 $collection->statelessMappings[$property->name] = [
-                    File::class === $nodeClass ? LazyFile::class : LazyImage::class,
+                    match (true) {
+                        Image::class === $nodeClass => LazyImage::class,
+                        File::class === $nodeClass => LazyFile::class,
+                        Directory::class === $nodeClass => LazyDirectory::class,
+                        default => throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s", "%s" or "%s" typehint.', $property->class, $property->name, File::class, Directory::class, Image::class))
+                    },
                     $mapping,
                 ];
 
@@ -78,6 +87,10 @@ final class NodeMappingListener
 
             if (!$mapping instanceof Stateful) {
                 throw new MappingException(\sprintf('Unknown mapping type "%s" for %s::$%s.', $mapping::class, $class->name, $property->name));
+            }
+
+            if (!\in_array($nodeClass, [File::class, Image::class])) {
+                throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s" or "%s" typehint.', $property->class, $property->name, File::class, Image::class));
             }
 
             Metadata::validate($nodeClass, $mapping->metadata); // @phpstan-ignore-line

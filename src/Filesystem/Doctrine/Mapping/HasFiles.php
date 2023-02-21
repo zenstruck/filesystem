@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
-use Zenstruck\Filesystem\Node\File\LazyFile;
+use Zenstruck\Filesystem\Node\LazyNode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -29,7 +29,7 @@ final class HasFiles
     /**
      * @internal
      *
-     * @var array<string,array{0:class-string<LazyFile>,1:Stateless}>
+     * @var array<string,array{0:class-string<LazyNode>,1:Stateless}>
      */
     public array $statelessMappings = [];
 

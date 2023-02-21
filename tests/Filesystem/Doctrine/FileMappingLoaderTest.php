@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Doctrine;
 
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
+use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Fixtures\Entity\Entity2;
@@ -40,6 +41,8 @@ final class FileMappingLoaderTest extends DoctrineTestCase
 
         $this->filesystem()->write('foo.txt', 'content20');
         $this->filesystem()->write('foo.jpg', 'content21');
+        $this->filesystem()->write('some/dir/foo/file1.txt', 'content22');
+        $this->filesystem()->write('some/dir/foo/file2.txt', 'content23');
 
         $this->em()->persist($object);
         $this->flushAndAssertNoChangesFor($object);
@@ -71,5 +74,14 @@ final class FileMappingLoaderTest extends DoctrineTestCase
         $this->assertSame('content20', $fromDb->getVirtualFile1()->contents());
         $this->assertInstanceOf(LazyImage::class, $fromDb->getVirtualImage1());
         $this->assertSame('content21', $fromDb->getVirtualImage1()->contents());
+        $this->assertInstanceOf(LazyDirectory::class, $fromDb->getVirtualDir1());
+        $this->assertCount(2, $fromDb->getVirtualDir1());
+
+        $files = \iterator_to_array($fromDb->getVirtualDir1());
+
+        $this->assertTrue($files[0]->exists());
+        $this->assertTrue($files[1]->exists());
+        $this->assertSame('some/dir/foo/file1.txt', $files[0]->path()->toString());
+        $this->assertSame('some/dir/foo/file2.txt', $files[1]->path()->toString());
     }
 }

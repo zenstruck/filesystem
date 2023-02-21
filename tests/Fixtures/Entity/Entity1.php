@@ -13,6 +13,8 @@ namespace Zenstruck\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Filesystem\Doctrine\Mapping as Filesystem;
+use Zenstruck\Filesystem\Node\Directory;
+use Zenstruck\Filesystem\Node\Directory\PlaceholderDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
@@ -57,6 +59,9 @@ class Entity1
 
     #[Filesystem\Stateless('public', namer: 'expression:{this.title|slug}.jpg')]
     private Image $virtualImage1;
+
+    #[Filesystem\Stateless('public', namer: 'expression:some/dir/{this.title|slug}')]
+    private Directory $virtualDir1;
 
     #[Filesystem\StoreAsDsn('public', namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}')]
     private ?File $file2 = null;
@@ -157,6 +162,7 @@ class Entity1
         $this->unique = $unique;
         $this->virtualFile1 = new PlaceholderFile();
         $this->virtualImage1 = new PlaceholderImage();
+        $this->virtualDir1 = new PlaceholderDirectory();
     }
 
     public function getId(): ?int
@@ -207,6 +213,11 @@ class Entity1
     public function getVirtualImage1(): ?File
     {
         return $this->virtualImage1->exists() ? $this->virtualImage1 : null;
+    }
+
+    public function getVirtualDir1(): ?Directory
+    {
+        return $this->virtualDir1->exists() ? $this->virtualDir1 : null;
     }
 
     public function getFile2(): ?File
