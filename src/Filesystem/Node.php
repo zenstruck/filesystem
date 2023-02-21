@@ -11,6 +11,10 @@
 
 namespace Zenstruck\Filesystem;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\Directory;
@@ -39,14 +43,30 @@ interface Node
     public function directory(): ?Directory;
 
     /**
+     * @see FilesystemReader::lastModified()
+     *
      * @return \DateTimeImmutable In the PHP default timezone
+     *
+     * @throws UnableToRetrieveMetadata
+     * @throws FilesystemException
      */
     public function lastModified(): \DateTimeImmutable;
 
+    /**
+     * @see FilesystemReader::visibility()
+     *
+     * @throws UnableToRetrieveMetadata
+     * @throws FilesystemException
+     */
     public function visibility(): string;
 
     /**
      * Check if the node still exists.
+     *
+     * @see FilesystemReader::has()
+     *
+     * @throws UnableToCheckExistence
+     * @throws FilesystemException
      */
     public function exists(): bool;
 
@@ -57,21 +77,26 @@ interface Node
 
     /**
      * @throws NodeNotFound
+     * @throws UnableToCheckExistence
+     * @throws FilesystemException
      */
     public function ensureExists(): static;
 
     /**
-     * @throws NodeTypeMismatch if this node is not a file
+     * @throws NodeTypeMismatch    if this node is not a file
+     * @throws FilesystemException
      */
     public function ensureFile(): File;
 
     /**
-     * @throws NodeTypeMismatch if this node is not a directory
+     * @throws NodeTypeMismatch    if this node is not a directory
+     * @throws FilesystemException
      */
     public function ensureDirectory(): Directory;
 
     /**
-     * @throws NodeTypeMismatch if this node is not an image file
+     * @throws NodeTypeMismatch    if this node is not an image file
+     * @throws FilesystemException
      */
     public function ensureImage(): Image;
 }

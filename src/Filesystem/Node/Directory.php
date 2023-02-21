@@ -11,14 +11,15 @@
 
 namespace Zenstruck\Filesystem\Node;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
+use League\Flysystem\UnableToListContents;
 use Zenstruck\Filesystem\Node;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @extends \IteratorAggregate<Node|File|Directory>
- *
- * @method Node[]|File[]|Directory[] getIterator()
  */
 interface Directory extends Node, \IteratorAggregate
 {
@@ -147,4 +148,14 @@ interface Directory extends Node, \IteratorAggregate
      * @param string|string[] $patterns A pattern (a regexp or a string) or an array of patterns
      */
     public function notMatchingPath(string|array $patterns): static;
+
+    /**
+     * @see FilesystemReader::listContents()
+     *
+     * @return Node[]|File[]|Directory[]|\Traversable<Node|File|Directory>
+     *
+     * @throws UnableToListContents
+     * @throws FilesystemException
+     */
+    public function getIterator(): \Traversable;
 }

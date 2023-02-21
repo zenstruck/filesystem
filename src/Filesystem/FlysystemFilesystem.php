@@ -15,8 +15,6 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\PathPrefixer;
-use League\Flysystem\UnableToCreateDirectory;
-use League\Flysystem\UnableToWriteFile;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
@@ -140,7 +138,7 @@ final class FlysystemFilesystem implements Filesystem
             return new FlysystemDirectory($path, $this->operator);
         }
 
-        throw UnableToCreateDirectory::atLocation($path, \sprintf('"%s" is either not a directory or does not exist.', $content));
+        throw new \InvalidArgumentException(\sprintf('"%s" is either not a directory or does not exist.', $content));
     }
 
     public function chmod(string $path, string $visibility): Node
@@ -153,7 +151,7 @@ final class FlysystemFilesystem implements Filesystem
     public function write(string $path, mixed $value, array $config = []): File
     {
         if ($value instanceof \SplFileInfo && !$value->isFile()) {
-            throw UnableToWriteFile::atLocation($path, \sprintf('"%s" is either not a file or does not exist.', $value));
+            throw new \InvalidArgumentException(\sprintf('"%s" is either not a file or does not exist.', $value));
         }
 
         if ($value instanceof \SplFileInfo && !$value instanceof File) {
