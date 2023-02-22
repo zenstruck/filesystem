@@ -33,7 +33,14 @@ final class ArchiveResponse extends BinaryFileResponse
         }
     }
 
-    public static function zip(File|Directory|\SplFileInfo|string $what, ?string $filename = 'archive.zip', array $config = [], int $status = 200, array $headers = [], bool $public = true, bool $autoEtag = false, bool $autoLastModified = true): self
+    /**
+     * @param File|Directory|\SplFileInfo|non-empty-array<array-key,File|\SplFileInfo> $what
+     * @param string|null                                                    $filename Content-Disposition filename
+     * @param array{
+     *     commit_progress?: callable(float):void
+     * } $config
+     */
+    public static function zip(File|Directory|\SplFileInfo|array $what, ?string $filename = 'archive.zip', array $config = [], int $status = 200, array $headers = [], bool $public = true, bool $autoEtag = false, bool $autoLastModified = true): self
     {
         return new self(ZipFile::compress($what, config: $config), $filename, $status, $headers, $public, $autoEtag, $autoLastModified);
     }

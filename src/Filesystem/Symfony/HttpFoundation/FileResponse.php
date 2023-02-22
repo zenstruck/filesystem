@@ -34,6 +34,9 @@ final class FileResponse extends StreamedResponse
         }
     }
 
+    /**
+     * @param string|null $filename Content-Disposition filename (defaults to $file's name)
+     */
     public static function inline(File $file, ?string $filename = null, int $status = 200, array $headers = []): self
     {
         $disposition = HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_INLINE, $filename ?? $file->path()->name());
@@ -41,6 +44,9 @@ final class FileResponse extends StreamedResponse
         return new self($file, $status, \array_merge($headers, ['Content-Disposition' => $disposition]));
     }
 
+    /**
+     * @param string|null $filename Content-Disposition filename (defaults to $file's name)
+     */
     public static function attachment(File $file, ?string $filename = null, int $status = 200, array $headers = []): self
     {
         $disposition = HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $filename ?? $file->path()->name());

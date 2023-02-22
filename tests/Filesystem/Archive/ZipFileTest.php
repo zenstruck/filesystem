@@ -174,7 +174,7 @@ final class ZipFileTest extends FilesystemTest
     {
         \file_put_contents($file = TEMP_DIR.'/file.txt', 'contents');
 
-        $archive = ZipFile::compress($file);
+        $archive = ZipFile::compress(new \SplFileInfo($file));
 
         $this->assertFileExists($archive);
 
@@ -190,12 +190,35 @@ final class ZipFileTest extends FilesystemTest
         $fs->write('file1.txt', 'contents 1');
         $fs->write('nested/file2.txt', 'contents 2');
 
-        $archive = ZipFile::compress(TEMP_DIR);
+        $archive = ZipFile::compress(new \SplFileInfo(TEMP_DIR));
 
         $this->assertFileExists($archive);
 
         $this->assertSame('contents 1', $archive->file('file1.txt')->contents());
         $this->assertSame('contents 2', $archive->file('nested/file2.txt')->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function can_zip_array_of_contents(): void
+    {
+        \file_put_contents($file = TEMP_DIR.'/file1.txt', 'contents 1');
+
+        $fs = temp_filesystem();
+        $file2 = $fs->write('file2.txt', 'contents 2');
+        $file3 = $fs->write('nested/file3.txt', 'contents 3');
+
+        $archive = ZipFile::compress([
+            new \SplFileInfo($file),
+            'rename.txt' => $file2,
+            $file3,
+        ]);
+
+        $this->assertCount(3, $archive->directory());
+        $this->assertSame('contents 1', $archive->file('file1.txt')->contents());
+        $this->assertSame('contents 2', $archive->file('rename.txt')->contents());
+        $this->assertSame('contents 3', $archive->file('file3.txt')->contents());
     }
 
     protected function createFilesystem(): Filesystem

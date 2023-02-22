@@ -474,10 +474,31 @@ Static helper for quickly creating `zip` archives:
 ```php
 use Zenstruck\Filesystem\Archive\ZipFile;
 
-$zipFile = ZipFile::compress('/some/local/file.txt');
+// compress a local file
+$zipFile = ZipFile::compress(new \SplFileInfo('/some/local/file.txt')); // ZipFile (temp file deleted on script end)
 
-// can take a local file, local directory, or instance of Zenstruck\Filesystem\Node\File|Directory
-$zipFile = ZipFile::compress('some/local/directory'); // all files/directories (recursive) in "some/local/directory" are zipped
+// compress a local directory (all files (recursive) in "some/local/directory" are added to archive)
+$zipFile = ZipFile::compress(new \SplFileInfo('some/local/directory'));
+
+/** @var \Zenstruck\Filesystem\Node\File $file */
+
+// compress a filesystem file
+$zipFile = ZipFile::compress($file);
+
+/** @var \Zenstruck\Filesystem\Node\Directory $directory */
+
+// compress a filesystem directory
+$zipFile = ZipFile::compress($directory);
+
+// compress several local/filesystem files
+$zipFile = ZipFile::compress([
+    new \SplFileInfo('/some/local/file.txt'),
+    $file,
+    'customize/path.txt' => $file, // use a string array key to set the path for the file
+]);
+
+// customize the output filename (will not be deleted at end of script)
+$zipFile = ZipFile::compress(..., filename: 'path/to/archive.zip');
 ```
 
 ### `TarFile`

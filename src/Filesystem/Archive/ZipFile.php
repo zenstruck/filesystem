@@ -43,40 +43,66 @@ final class ZipFile extends \SplFileInfo implements Filesystem
     }
 
     /**
+     * @param File|Directory|\SplFileInfo|non-empty-array<array-key,File|\SplFileInfo> $what
+     * @param string|null                                                              $filename The filename to save the zip as
      * @param array{
      *     commit_progress?: callable(float):void
      * } $config
      */
-    public static function compress(File|Directory|\SplFileInfo|string $what, ?string $filename = null, array $config = []): self
+    public static function compress(File|Directory|\SplFileInfo|array $what, ?string $filename = null, array $config = []): self
     {
         $filesystem = new self($filename);
-        $what = \is_string($what) ? new \SplFileInfo($what) : $what;
 
         if (\file_exists($filesystem)) {
-            throw new \RuntimeException(\sprintf('Unable to zip %s, destination filename (%s) already exists.', $what instanceof Node ? $what->path() : $what, $filename));
+            throw new \RuntimeException(\sprintf('Unable to zip "%s", destination filename (%s) already exists.', match (true) {
+                $what instanceof Node => $what->path(), $what instanceof \SplFileInfo => $what, default => \get_debug_type($what),
+            }, $filename));
         }
 
         if ($what instanceof \SplFileInfo && !\file_exists($what)) {
             throw new \RuntimeException(\sprintf('Unable to zip %s, this file does not exist.', $what));
         }
 
-        $path = match (true) {
-            $what instanceof \SplFileInfo && !$what->isDir() => $what->getFilename(),
-            $what instanceof File => $what->path()->name(),
-            default => '',
-        };
-
         $filesystem->beginTransaction();
 
         if ($what instanceof Directory || ($what instanceof \SplFileInfo && $what->isDir())) {
-            $filesystem->mkdir($path, $what, $config);
-        } else {
-            $filesystem->write($path, $what, $config);
+            $filesystem->mkdir('', $what, $config);
+
+            return $filesystem->commit($config['commit_progress'] ?? null);
         }
 
-        $filesystem->commit($config['commit_progress'] ?? null);
+        if (!\is_array($what)) {
+            $what = [$what];
+        }
 
-        return $filesystem;
+        if (!$what) {
+            throw new \InvalidArgumentException('Array of files is empty.');
+        }
+
+        foreach ($what as $key => $file) {
+            $path = match (true) {
+                \is_string($key) => $key,
+                $file instanceof \SplFileInfo => $file->getFilename(),
+                $file instanceof File => $file->path()->name(),
+                default => throw new \InvalidArgumentException(\sprintf('File "%s" is invalid.', \get_debug_type($file))),
+            };
+
+            $filesystem->write(
+                match (true) {
+                    \is_string($key) => $key,
+                    $file instanceof \SplFileInfo => $file->getFilename(),
+                    $file instanceof File => $file->path()->name(),
+                    default => throw new \InvalidArgumentException(\sprintf('File "%s" is invalid.', \get_debug_type($file))),
+                },
+                match (true) {
+                    $file instanceof \SplFileInfo && $file->isFile(), $file instanceof File => $file,
+                    default => throw new \InvalidArgumentException(\sprintf('File "%s" is invalid.', \get_debug_type($file))),
+                },
+                $config
+            );
+        }
+
+        return $filesystem->commit($config['commit_progress'] ?? null);
     }
 
     public function delete(string $path = '', array $config = []): static
