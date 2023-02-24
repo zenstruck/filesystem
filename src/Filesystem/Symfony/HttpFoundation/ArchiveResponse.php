@@ -35,7 +35,7 @@ final class ArchiveResponse extends BinaryFileResponse
 
     /**
      * @param File|Directory|\SplFileInfo|non-empty-array<array-key,File|\SplFileInfo> $what
-     * @param string|null                                                    $filename Content-Disposition filename
+     * @param string|null                                                              $filename Content-Disposition filename
      * @param array{
      *     commit_progress?: callable(float):void
      * } $config
