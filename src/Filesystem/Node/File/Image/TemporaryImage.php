@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\TemporaryFile;
 

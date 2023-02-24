@@ -40,7 +40,7 @@ class TemporaryFile implements File
         $image = $this->ensureTemporary(
             $this->inner()->ensureImage()
         );
-        assert($image instanceof TemporaryImage);
+        \assert($image instanceof TemporaryImage);
 
         return $image;
     }
@@ -53,7 +53,7 @@ class TemporaryFile implements File
     /**
      * @throws FilesystemException
      */
-    private function ensureTemporary(Node $node): TemporaryFile
+    private function ensureTemporary(Node $node): self
     {
         if ($node instanceof self) {
             return $node;
@@ -63,6 +63,6 @@ class TemporaryFile implements File
             return new TemporaryImage($node);
         }
 
-        return new TemporaryFile($node->ensureFile());
+        return new self($node->ensureFile());
     }
 }

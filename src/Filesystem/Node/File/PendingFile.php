@@ -63,7 +63,7 @@ class PendingFile extends \SplFileInfo implements File
     public function saveToTemporary(Filesystem $filesystem): File
     {
         do {
-            $directory = (string) microtime();
+            $directory = (string) \microtime();
         } while ($filesystem->has($directory));
 
         return $filesystem->write($directory.'/.'.$this->path()->name(), $this);

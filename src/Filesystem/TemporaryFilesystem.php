@@ -52,7 +52,7 @@ class TemporaryFilesystem implements Filesystem
         $image = $this->ensureTemporary(
             $this->inner()->image($path)
         );
-        assert($image instanceof TemporaryImage);
+        \assert($image instanceof TemporaryImage);
 
         return $image;
     }

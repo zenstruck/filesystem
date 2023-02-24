@@ -29,7 +29,6 @@ use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
-use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
@@ -37,7 +36,6 @@ use Zenstruck\Filesystem\Node\File\SerializableFile;
 use Zenstruck\Filesystem\Node\File\TemporaryFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
-use Zenstruck\Filesystem\TemporaryFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
