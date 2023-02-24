@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\TemporaryFile;
 
@@ -20,4 +21,13 @@ use Zenstruck\Filesystem\Node\File\TemporaryFile;
 final class TemporaryImage extends TemporaryFile implements Image
 {
     use DecoratedImage;
+
+    public function __construct(private Image $image)
+    {
+    }
+
+    protected function inner(): Image
+    {
+        return $this->image;
+    }
 }
