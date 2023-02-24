@@ -45,6 +45,8 @@ use Zenstruck\Filesystem\ScopedFilesystem;
 use Zenstruck\Filesystem\Symfony\Command\FilesystemPurgeCommand;
 use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\HttpKernel\FilesystemDataCollector;
+use Zenstruck\Filesystem\Symfony\HttpKernel\PendingFileValueResolver;
+use Zenstruck\Filesystem\Symfony\HttpKernel\RequestFilesExtractor;
 use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTemporaryUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
@@ -154,6 +156,19 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         if ($config['lifecycle']['delete_on_remove']) {
             $listener->addTag('doctrine.event_listener', ['event' => 'postRemove']);
         }
+
+        // value resolver
+        $container->register('.zenstruck_document.value_resolver.request_files_extractor', RequestFilesExtractor::class)
+            ->addArgument(new Reference('property_accessor'))
+        ;
+        $container->register('.zenstruck_document.value_resolver.pending_document', PendingFileValueResolver::class)
+            ->addTag('controller.argument_value_resolver', ['priority' => 110])
+            ->addArgument(
+                new ServiceLocatorArgument([
+                    RequestFilesExtractor::class => new Reference('.zenstruck_document.value_resolver.request_files_extractor'),
+                ])
+            )
+        ;
 
         if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
             $container->register('.zenstruck_filesystem.doctrine.twig_extension', MappingManagerExtension::class)
