@@ -12,11 +12,14 @@
 namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 
 
+use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Zenstruck\Filesystem\Attribute\UploadedFile as UploadedFileAttribute;
+use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -31,15 +34,14 @@ class RequestFilesExtractor
     public function extractFilesFromRequest(
         Request $request,
         string $path,
-        ?string $expectedType = null
+        bool $returnArray = false,
+        bool $returnImage = false,
     ): PendingFile|array|null {
-        $expectedType ??= PendingFile::class;
-
         $path = $this->canonizePath($path);
 
         $files = $this->propertyAccessor->getValue($request->files->all(), $path);
 
-        if (!is_a($expectedType, PendingFile::class, true)) {
+        if ($returnArray) {
             if (!$files) {
                 return [];
             }
@@ -49,7 +51,7 @@ class RequestFilesExtractor
             }
 
             return \array_map(
-                static fn(UploadedFile $file) => new PendingFile($file),
+                static fn(UploadedFile $file) => $returnImage ? new PendingImage($file) : new PendingFile($file),
                 $files
             );
         }
@@ -62,7 +64,19 @@ class RequestFilesExtractor
             return null;
         }
 
-        return new PendingFile($files);
+        $file = new PendingFile($files);
+
+        if ($returnImage) {
+            try {
+                return $file->ensureImage();
+            } catch (NodeTypeMismatch|FilesystemException) {
+                // Incorrect images should be skipped
+
+                return null;
+            }
+        }
+
+        return $file;
     }
 
     public static function supports(ArgumentMetadata $argument): bool

@@ -18,7 +18,8 @@ namespace Zenstruck\Filesystem\Attribute;
 final class UploadedFile
 {
     public function __construct(
-        public ?string $path = null
+        public ?string $path = null,
+        public bool $image = false,
     ) {
     }
 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Symfony\HttpKernel\RequestFilesExtractor;
 
@@ -66,6 +67,21 @@ class RequestFilesExtractorTest extends TestCase
         self::assertNotNull($document);
         self::assertInstanceOf(PendingFile::class, $document);
         self::assertSame("some content\n", $document->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function returns_image_for_correct_path(): void
+    {
+        $extractor = self::extractor();
+
+        $request = Request::create('');
+        $request->files->set('file', self::uploadedImage());
+
+        $document = $extractor->extractFilesFromRequest($request, 'file', returnImage: true);
+        self::assertNotNull($document);
+        self::assertInstanceOf(PendingImage::class, $document);
     }
 
     /**
@@ -168,6 +184,15 @@ class RequestFilesExtractorTest extends TestCase
         return new UploadedFile(
             __DIR__.'/../../../Fixtures/files/textfile.txt',
             'test.txt',
+            test: true
+        );
+    }
+
+    private static function uploadedImage(): UploadedFile
+    {
+        return new UploadedFile(
+            __DIR__.'/../../../Fixtures/files/symfony.png',
+            'symfony.png',
             test: true
         );
     }

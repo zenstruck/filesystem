@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -52,7 +53,12 @@ if (\interface_exists(ValueResolverInterface::class)) {
                 $this->extractor()->extractFilesFromRequest(
                     $request,
                     $path,
-                    $argument->getType()
+                    !is_a(
+                        $argument->getType() ?? PendingFile::class,
+                        PendingFile::class,
+                        true
+                    ),
+                    $attributes[0]?->image || PendingImage::class === $argument->getType()
                 ),
             ];
         }
