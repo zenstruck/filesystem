@@ -22,6 +22,16 @@ abstract class PlaceholderNodeTest extends TestCase
     /**
      * @test
      */
+    public function can_provide_a_dummy_path(): void
+    {
+        $node = $this->createNode('some/path');
+
+        $this->assertSame('some/path', $node->path()->toString());
+    }
+
+    /**
+     * @test
+     */
     public function exists_is_always_false(): void
     {
         $node = $this->createNode();
@@ -41,5 +51,5 @@ abstract class PlaceholderNodeTest extends TestCase
         $node->path();
     }
 
-    abstract protected function createNode(): PlaceholderNode;
+    abstract protected function createNode(?string $path = null): PlaceholderNode;
 }

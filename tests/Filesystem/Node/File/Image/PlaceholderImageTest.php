@@ -19,8 +19,8 @@ use Zenstruck\Tests\Filesystem\Node\File\PlaceholderFileTest;
  */
 final class PlaceholderImageTest extends PlaceholderFileTest
 {
-    protected function createNode(): PlaceholderImage
+    protected function createNode(?string $path = null): PlaceholderImage
     {
-        return new PlaceholderImage();
+        return new PlaceholderImage($path);
     }
 }

@@ -20,6 +20,20 @@ abstract class PlaceholderNode implements Node
 {
     use DecoratedNode;
 
+    private Path $path;
+
+    public function __construct(?string $path = null)
+    {
+        if ($path) {
+            $this->path = new Path($path);
+        }
+    }
+
+    public function path(): Path
+    {
+        return $this->path ?? $this->inner()->path();
+    }
+
     public function exists(): bool
     {
         return false;

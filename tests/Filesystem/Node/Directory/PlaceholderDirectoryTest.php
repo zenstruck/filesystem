@@ -56,8 +56,8 @@ final class PlaceholderDirectoryTest extends PlaceholderNodeTest
         );
     }
 
-    protected function createNode(): PlaceholderNode
+    protected function createNode(?string $path = null): PlaceholderNode
     {
-        return new PlaceholderDirectory();
+        return new PlaceholderDirectory($path);
     }
 }
