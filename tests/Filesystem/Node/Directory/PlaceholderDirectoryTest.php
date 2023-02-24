@@ -11,24 +11,15 @@
 
 namespace Zenstruck\Tests\Filesystem\Node\Directory;
 
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Directory\PlaceholderDirectory;
+use Zenstruck\Filesystem\Node\PlaceholderNode;
+use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PlaceholderDirectoryTest extends TestCase
+final class PlaceholderDirectoryTest extends PlaceholderNodeTest
 {
-    /**
-     * @test
-     */
-    public function exists_is_always_false(): void
-    {
-        $dir = new PlaceholderDirectory();
-
-        $this->assertFalse($dir->exists());
-    }
-
     /**
      * @test
      */
@@ -65,15 +56,8 @@ final class PlaceholderDirectoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function cannot_call_node_methods(): void
+    protected function createNode(): PlaceholderNode
     {
-        $dir = new PlaceholderDirectory();
-
-        $this->expectException(\LogicException::class);
-
-        $dir->path();
+        return new PlaceholderDirectory();
     }
 }

@@ -11,37 +11,15 @@
 
 namespace Zenstruck\Tests\Filesystem\Node\File;
 
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
+use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class PlaceholderFileTest extends TestCase
+class PlaceholderFileTest extends PlaceholderNodeTest
 {
-    /**
-     * @test
-     */
-    public function exists_is_always_false(): void
-    {
-        $file = $this->createFile();
-
-        $this->assertFalse($file->exists());
-    }
-
-    /**
-     * @test
-     */
-    public function any_other_method_results_in_error(): void
-    {
-        $file = $this->createFile();
-
-        $this->expectException(\LogicException::class);
-
-        $file->path();
-    }
-
-    protected function createFile(): PlaceholderFile
+    protected function createNode(): PlaceholderFile
     {
         return new PlaceholderFile();
     }

@@ -12,7 +12,6 @@
 namespace Zenstruck\Tests\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
-use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 use Zenstruck\Tests\Filesystem\Node\File\PlaceholderFileTest;
 
 /**
@@ -20,7 +19,7 @@ use Zenstruck\Tests\Filesystem\Node\File\PlaceholderFileTest;
  */
 final class PlaceholderImageTest extends PlaceholderFileTest
 {
-    protected function createFile(): PlaceholderFile
+    protected function createNode(): PlaceholderImage
     {
         return new PlaceholderImage();
     }
