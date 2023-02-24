@@ -13,7 +13,6 @@ namespace Zenstruck\Filesystem;
 
 use League\Flysystem\FilesystemException;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\TemporaryImage;

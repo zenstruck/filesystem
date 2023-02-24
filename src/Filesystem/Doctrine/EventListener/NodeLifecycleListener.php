@@ -34,8 +34,10 @@ use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
+use Zenstruck\Filesystem\Node\File\TemporaryFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
+use Zenstruck\Filesystem\TemporaryFilesystem;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -143,7 +145,10 @@ final class NodeLifecycleListener
             $original = $metadata->getFieldValue($object, $field);
             $new = null;
 
-            if ($original instanceof PendingFile) {
+            if (
+                $original instanceof PendingFile
+                || $original instanceof TemporaryFile
+            ) {
                 $new = $this->convertPendingFile($mapping, $original, $object, $field);
             }
 
@@ -176,7 +181,10 @@ final class NodeLifecycleListener
             $old = $event->getOldValue($field);
             $new = $event->getNewValue($field);
 
-            if ($new instanceof PendingFile) {
+            if (
+                $new instanceof PendingFile
+                || $new instanceof TemporaryFile
+            ) {
                 $new = $this->convertPendingFile($mapping, $new, $object, $field);
 
                 // just setting the new value does not update the property so refresh the object on flush
@@ -231,7 +239,7 @@ final class NodeLifecycleListener
         return new SerializableFile($file, $mapping->metadata);
     }
 
-    private function convertPendingFile(Mapping $mapping, PendingFile $file, object $object, string $field): LazyFile
+    private function convertPendingFile(Mapping $mapping, PendingFile|TemporaryFile $file, object $object, string $field): LazyFile
     {
         if (!$mapping->filesystem()) {
             throw new \LogicException(\sprintf('In order to save pending files, the %s::$%s mapping must have a filesystem configured.', $object::class, $field));
@@ -246,11 +254,16 @@ final class NodeLifecycleListener
             $this->postFlushOperations[] = fn() => $this->filesystem($mapping)->write($path, $file);
         }
 
+        if ($file instanceof TemporaryFile) {
+            $filesystem = $this->filesystem($mapping);
+            $this->postFlushOperations[] = static fn() => $filesystem->delete($filesystem->directory($path)->path());
+        }
+
         if ($mapping instanceof StoreAsDsn) {
             $path = Dsn::create($mapping->filesystem(), $path);
         }
 
-        $lazyFile = $file instanceof PendingImage ? new LazyImage($path) : new LazyFile($path);
+        $lazyFile = $file instanceof Image ? new LazyImage($path) : new LazyFile($path);
         $lazyFile->setFilesystem($this->filesystem($mapping));
 
         return $lazyFile;
