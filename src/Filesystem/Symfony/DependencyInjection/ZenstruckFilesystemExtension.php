@@ -49,6 +49,7 @@ use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTemporaryUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
+use Zenstruck\Filesystem\TemporaryFilesystem;
 use Zenstruck\Filesystem\Test\Node\Foundry\LazyMock;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
@@ -372,6 +373,13 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $filesystemDef
                 ->setLazy(true)
                 ->addTag('proxy', ['interface' => Filesystem::class])
+            ;
+        }
+
+        if ($config['temporary']) {
+            $container->register('.zenstruck_filesystem.filesystem.temporary_'.$name, TemporaryFilesystem::class)
+                ->setDecoratedService($filesystemId)
+                ->setArguments([new Reference('.inner')])
             ;
         }
 
