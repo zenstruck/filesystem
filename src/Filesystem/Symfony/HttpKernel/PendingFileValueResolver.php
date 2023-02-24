@@ -41,10 +41,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
         {
             $attributes = $argument->getAttributes(UploadedFile::class);
 
-            if (
-                empty($attributes)
-                && PendingFile::class !== $argument->getType()
-            ) {
+            if (!RequestFilesExtractor::supports($argument)) {
                 return [];
             }
 
@@ -55,7 +52,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
                 $this->extractor()->extractFilesFromRequest(
                     $request,
                     $path,
-                    PendingFile::class !== $argument->getType()
+                    $argument->getType()
                 ),
             ];
         }
@@ -76,8 +73,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
 
         public function supports(Request $request, ArgumentMetadata $argument): bool
         {
-            return PendingFile::class === $argument->getType()
-                || !empty($argument->getAttributes(UploadedFile::class));
+            return RequestFilesExtractor::supports($argument);
         }
 
         /**
@@ -95,7 +91,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
                 $this->extractor()->extractFilesFromRequest(
                     $request,
                     $path,
-                    PendingFile::class !== $argument->getType()
+                    $argument->getType()
                 ),
             ];
         }

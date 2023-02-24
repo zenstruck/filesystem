@@ -14,7 +14,9 @@ namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Zenstruck\Filesystem\Attribute\UploadedFile as UploadedFileAttribute;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -29,13 +31,15 @@ class RequestFilesExtractor
     public function extractFilesFromRequest(
         Request $request,
         string $path,
-        bool $returnArray = false
+        ?string $expectedType = null
     ): PendingFile|array|null {
+        $expectedType ??= PendingFile::class;
+
         $path = $this->canonizePath($path);
 
         $files = $this->propertyAccessor->getValue($request->files->all(), $path);
 
-        if ($returnArray) {
+        if (!is_a($expectedType, PendingFile::class, true)) {
             if (!$files) {
                 return [];
             }
@@ -59,6 +63,18 @@ class RequestFilesExtractor
         }
 
         return new PendingFile($files);
+    }
+
+    public static function supports(ArgumentMetadata $argument): bool
+    {
+        $attributes = $argument->getAttributes(UploadedFileAttribute::class);
+
+        if (empty($attributes)) {
+            $type = $argument->getType();
+            return $type && is_a($type, PendingFile::class, true);
+        }
+
+        return true;
     }
 
     /**
