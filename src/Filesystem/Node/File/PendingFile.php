@@ -162,7 +162,11 @@ class PendingFile extends \SplFileInfo implements File
             return (string) $this->uploadedFile->getStream();
         }
 
-        return @\file_get_contents($this) ?: throw UnableToReadFile::fromLocation($this);
+        if (false === $contents = @\file_get_contents($this)) {
+            throw UnableToReadFile::fromLocation($this);
+        }
+
+        return $contents;
     }
 
     public function read()

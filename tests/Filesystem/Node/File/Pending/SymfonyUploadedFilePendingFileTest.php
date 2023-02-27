@@ -25,7 +25,6 @@ final class SymfonyUploadedFilePendingFileTest extends PendingFileTest
     protected function createPendingFile(\SplFileInfo $file, string $filename): PendingFile
     {
         $file = TempFile::for($file);
-        \chmod($file, 0644);
 
         return new PendingFile(new SymfonyUploadedFile(
             $file,

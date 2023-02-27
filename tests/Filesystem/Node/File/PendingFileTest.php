@@ -99,8 +99,6 @@ class PendingFileTest extends TestCase
     {
         $file = TempFile::for($file, \pathinfo($path, \PATHINFO_EXTENSION) ?: null);
 
-        \chmod($file, 0644);
-
         return $this->createPendingFile($file, \pathinfo($path, \PATHINFO_BASENAME));
     }
 

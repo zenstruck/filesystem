@@ -16,7 +16,7 @@
         "league/flysystem": "^3.11",
         "zenstruck/image": "^0.4.1",
         "zenstruck/stream": "^1.2",
-        "zenstruck/temp-file": "^1.1"
+        "zenstruck/temp-file": "^1.2.1"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.8",
