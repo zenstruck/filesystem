@@ -19,7 +19,6 @@ use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
-use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
 use Zenstruck\Image\TransformerRegistry as ImageTransformerRegistry;
 
 /**

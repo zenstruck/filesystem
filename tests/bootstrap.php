@@ -17,7 +17,7 @@ use League\Flysystem\UrlGeneration\PrefixPublicUrlGenerator;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
+use Zenstruck\Filesystem\Flysystem\TransformUrlGenerator;
 use Zenstruck\Filesystem\FlysystemFilesystem;
 
 require_once __DIR__.'/../vendor/autoload.php';

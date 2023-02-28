@@ -12,7 +12,7 @@
 namespace Zenstruck\Filesystem\Symfony\Routing;
 
 use League\Flysystem\Config;
-use Zenstruck\Filesystem\Feature\TransformUrlGenerator;
+use Zenstruck\Filesystem\Flysystem\TransformUrlGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

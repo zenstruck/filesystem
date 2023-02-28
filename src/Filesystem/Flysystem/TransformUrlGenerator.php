@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Feature;
+namespace Zenstruck\Filesystem\Flysystem;
 
 use League\Flysystem\Config;
 
