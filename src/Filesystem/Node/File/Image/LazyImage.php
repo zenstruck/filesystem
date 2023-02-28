@@ -13,7 +13,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Image\Dimensions;
 
 /**
@@ -27,8 +27,8 @@ final class LazyImage extends LazyFile implements Image
 
     public function transformUrl(array|string $filter): string
     {
-        if (\is_string($filter) && isset($this->attributes[Metadata::TRANSFORM_URL][$filter])) {
-            return $this->attributes[Metadata::TRANSFORM_URL][$filter];
+        if (\is_string($filter) && isset($this->attributes[Mapping::TRANSFORM_URL][$filter])) {
+            return $this->attributes[Mapping::TRANSFORM_URL][$filter];
         }
 
         return $this->inner()->transformUrl($filter);
@@ -36,27 +36,27 @@ final class LazyImage extends LazyFile implements Image
 
     public function dimensions(): Dimensions
     {
-        if (!isset($this->attributes[Metadata::DIMENSIONS])) {
+        if (!isset($this->attributes[Mapping::DIMENSIONS])) {
             return $this->inner()->dimensions();
         }
 
-        $dimensions = $this->attributes[Metadata::DIMENSIONS];
+        $dimensions = $this->attributes[Mapping::DIMENSIONS];
 
         if ($dimensions instanceof Dimensions) {
             return $dimensions;
         }
 
-        return $this->attributes[Metadata::DIMENSIONS] = new Dimensions($dimensions);
+        return $this->attributes[Mapping::DIMENSIONS] = new Dimensions($dimensions);
     }
 
     public function iptc(): array
     {
-        return $this->attributes[Metadata::IPTC] ?? $this->inner()->iptc();
+        return $this->attributes[Mapping::IPTC] ?? $this->inner()->iptc();
     }
 
     public function exif(): array
     {
-        return $this->attributes[Metadata::EXIF] ?? $this->inner()->exif();
+        return $this->attributes[Mapping::EXIF] ?? $this->inner()->exif();
     }
 
     public function ensureImage(): self

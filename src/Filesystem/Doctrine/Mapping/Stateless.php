@@ -12,7 +12,6 @@
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
@@ -23,7 +22,7 @@ final class Stateless extends Mapping
 {
     public function __construct(string $filesystem, string|Namer $namer)
     {
-        parent::__construct(Metadata::PATH, $filesystem, $namer);
+        parent::__construct(self::PATH, $filesystem, $namer);
     }
 
     public function filesystem(): string

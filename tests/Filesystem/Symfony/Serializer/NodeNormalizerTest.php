@@ -19,7 +19,6 @@ use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 
@@ -79,7 +78,7 @@ final class NodeNormalizerTest extends KernelTestCase
         ];
         yield [
             fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
-            ['filesystem' => 'public', 'metadata' => [Metadata::PATH, Metadata::CHECKSUM, Metadata::SIZE]],
+            ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE]],
             File::class,
             [
                 'path' => 'some/file.txt',
@@ -89,7 +88,7 @@ final class NodeNormalizerTest extends KernelTestCase
         ];
         yield [
             fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
-            ['filesystem' => new Mapping([Metadata::PATH, Metadata::CHECKSUM, Metadata::SIZE], 'public')],
+            ['filesystem' => new Mapping([Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE], 'public')],
             File::class,
             [
                 'path' => 'some/file.txt',
@@ -99,7 +98,7 @@ final class NodeNormalizerTest extends KernelTestCase
         ];
         yield [
             fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
-            ['metadata' => [Metadata::DSN, Metadata::SIZE, Metadata::DIMENSIONS]],
+            ['metadata' => [Mapping::DSN, Mapping::SIZE, Mapping::DIMENSIONS]],
             Image::class,
             [
                 'dsn' => 'public://some/image.png',
@@ -114,7 +113,7 @@ final class NodeNormalizerTest extends KernelTestCase
             fn(Filesystem $f) => $f->write('9a0364b9e99bb480dd25e1f0284c8555.txt', 'content'),
             [
                 'filesystem' => 'public',
-                'metadata' => [Metadata::CHECKSUM, Metadata::SIZE, Metadata::EXTENSION],
+                'metadata' => [Mapping::CHECKSUM, Mapping::SIZE, Mapping::EXTENSION],
                 'namer' => Expression::checksum(),
             ],
             File::class,
@@ -128,7 +127,7 @@ final class NodeNormalizerTest extends KernelTestCase
             fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
-                'metadata' => [Metadata::CHECKSUM, Metadata::SIZE, Metadata::FILENAME],
+                'metadata' => [Mapping::CHECKSUM, Mapping::SIZE, Mapping::FILENAME],
                 'namer' => new Expression('some/prefix/{name}{ext}'),
             ],
             File::class,
@@ -142,7 +141,7 @@ final class NodeNormalizerTest extends KernelTestCase
             fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
-                'metadata' => Metadata::FILENAME,
+                'metadata' => Mapping::FILENAME,
                 'namer' => new Expression('some/prefix/{name}{ext}'),
             ],
             File::class,

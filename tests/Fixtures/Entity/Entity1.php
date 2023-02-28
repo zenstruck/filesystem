@@ -19,7 +19,7 @@ use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Tests\Fixtures\CustomObjectPathGenerator;
 
 #[ORM\Entity]
@@ -86,13 +86,13 @@ class Entity1
 
     #[Filesystem\StoreWithMetadata(
         metadata: [
-            Metadata::PATH,
-            Metadata::LAST_MODIFIED,
-            Metadata::VISIBILITY,
-            Metadata::MIME_TYPE,
-            Metadata::SIZE,
-            Metadata::CHECKSUM,
-            Metadata::PUBLIC_URL,
+            Mapping::PATH,
+            Mapping::LAST_MODIFIED,
+            Mapping::VISIBILITY,
+            Mapping::MIME_TYPE,
+            Mapping::SIZE,
+            Mapping::CHECKSUM,
+            Mapping::PUBLIC_URL,
         ],
         filesystem: 'public',
         namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
@@ -101,17 +101,17 @@ class Entity1
 
     #[Filesystem\StoreWithMetadata(
         metadata: [
-            Metadata::DSN,
-            Metadata::LAST_MODIFIED,
-            Metadata::VISIBILITY,
-            Metadata::MIME_TYPE,
-            Metadata::SIZE,
-            Metadata::CHECKSUM,
-            Metadata::PUBLIC_URL,
-            Metadata::TRANSFORM_URL => 'grayscale',
-            Metadata::DIMENSIONS,
-            Metadata::EXIF,
-            Metadata::IPTC,
+            Mapping::DSN,
+            Mapping::LAST_MODIFIED,
+            Mapping::VISIBILITY,
+            Mapping::MIME_TYPE,
+            Mapping::SIZE,
+            Mapping::CHECKSUM,
+            Mapping::PUBLIC_URL,
+            Mapping::TRANSFORM_URL => 'grayscale',
+            Mapping::DIMENSIONS,
+            Mapping::EXIF,
+            Mapping::IPTC,
         ],
         filesystem: 'public',
         namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',
@@ -122,13 +122,13 @@ class Entity1
 
     #[Filesystem\StoreWithMetadata(
         metadata: [
-            Metadata::EXTENSION,
-            Metadata::LAST_MODIFIED,
-            Metadata::VISIBILITY,
-            Metadata::MIME_TYPE,
-            Metadata::SIZE,
-            Metadata::CHECKSUM,
-            Metadata::PUBLIC_URL,
+            Mapping::EXTENSION,
+            Mapping::LAST_MODIFIED,
+            Mapping::VISIBILITY,
+            Mapping::MIME_TYPE,
+            Mapping::SIZE,
+            Mapping::CHECKSUM,
+            Mapping::PUBLIC_URL,
         ],
         filesystem: 'public',
         namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
@@ -137,17 +137,17 @@ class Entity1
 
     #[Filesystem\StoreWithMetadata(
         metadata: [
-            Metadata::EXTENSION,
-            Metadata::LAST_MODIFIED,
-            Metadata::VISIBILITY,
-            Metadata::MIME_TYPE,
-            Metadata::SIZE,
-            Metadata::CHECKSUM,
-            Metadata::PUBLIC_URL,
-            Metadata::TRANSFORM_URL => 'grayscale',
-            Metadata::DIMENSIONS,
-            Metadata::EXIF,
-            Metadata::IPTC,
+            Mapping::EXTENSION,
+            Mapping::LAST_MODIFIED,
+            Mapping::VISIBILITY,
+            Mapping::MIME_TYPE,
+            Mapping::SIZE,
+            Mapping::CHECKSUM,
+            Mapping::PUBLIC_URL,
+            Mapping::TRANSFORM_URL => 'grayscale',
+            Mapping::DIMENSIONS,
+            Mapping::EXIF,
+            Mapping::IPTC,
         ],
         filesystem: 'public',
         namer: 'expression:images/{this.title|slug}-{checksum:7}{ext}',

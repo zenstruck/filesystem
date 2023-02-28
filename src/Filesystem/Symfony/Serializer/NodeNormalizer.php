@@ -27,7 +27,6 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**
@@ -50,7 +49,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string
     {
-        return Metadata::serialize($object, Mapping::fromArray($context)->metadata);
+        return Mapping::fromArray($context)->serialize($object);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -69,8 +68,8 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
         $mapping = Mapping::fromArray($context);
 
-        if (Metadata::FILENAME === $mapping->metadata) {
-            $data = [Metadata::FILENAME => $data];
+        if (Mapping::FILENAME === $mapping->metadata) {
+            $data = [Mapping::FILENAME => $data];
         }
 
         /** @var LazyNode $node */
@@ -78,7 +77,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         $filesystem = $mapping->filesystem();
 
         if (!$filesystem) { // filesystem defined in context always takes priority
-            [$filesystem] = Dsn::normalize(\is_string($data) ? $data : $data[Metadata::DSN] ?? '');
+            [$filesystem] = Dsn::normalize(\is_string($data) ? $data : $data[Mapping::DSN] ?? '');
         }
 
         if ($filesystem) {

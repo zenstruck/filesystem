@@ -13,25 +13,29 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\DecoratedNode;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
+use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  *
- * @phpstan-import-type Format from Metadata
- * @phpstan-import-type Serialized from Metadata
+ * @phpstan-import-type Format from Mapping
+ * @phpstan-import-type Serialized from Mapping
  */
 class SerializableFile implements File, \JsonSerializable
 {
     use DecoratedFile, DecoratedNode;
 
+    private Mapping $mapping;
+
     /**
      * @param Format $metadata
      */
-    public function __construct(private File $file, private string|array $metadata)
+    public function __construct(private File $file, string|array $metadata)
     {
+        $this->mapping = new Mapping($metadata, filesystem: 'none', namer: new Namer('none'));
     }
 
     /**
@@ -47,7 +51,7 @@ class SerializableFile implements File, \JsonSerializable
      */
     public function serialize(): string|array
     {
-        return Metadata::serialize($this, $this->metadata);
+        return $this->mapping->serialize($this);
     }
 
     protected function inner(): File

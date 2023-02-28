@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Tests\Filesystem\Node\File\ImageTests;
 use Zenstruck\Tests\Filesystem\Node\File\SerializableFileTest;
 
@@ -29,8 +29,8 @@ final class SerializableImageTest extends SerializableFileTest
     public function serialize_metadata(): void
     {
         $serialized = $this->createFile(fixture('metadata.jpg'), 'some/image.jpg', [
-            Metadata::EXIF,
-            Metadata::IPTC,
+            Mapping::EXIF,
+            Mapping::IPTC,
         ])->serialize();
 
         $this->assertSame(16, $serialized['exif']['computed.Height']);
@@ -43,7 +43,7 @@ final class SerializableImageTest extends SerializableFileTest
 
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::DIMENSIONS,
+                Mapping::DIMENSIONS,
             ]),
             [
                 'dimensions' => [
@@ -55,7 +55,7 @@ final class SerializableImageTest extends SerializableFileTest
 
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::TRANSFORM_URL => 'grayscale',
+                Mapping::TRANSFORM_URL => 'grayscale',
             ]),
             [
                 'transform_url' => [
@@ -66,7 +66,7 @@ final class SerializableImageTest extends SerializableFileTest
 
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::TRANSFORM_URL => ['grayscale', 'thumbnail'],
+                Mapping::TRANSFORM_URL => ['grayscale', 'thumbnail'],
             ]),
             [
                 'transform_url' => [

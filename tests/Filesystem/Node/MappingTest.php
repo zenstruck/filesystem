@@ -13,7 +13,6 @@ namespace Zenstruck\Tests\Filesystem\Node;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\Path\Namer;
 use Zenstruck\Filesystem\Twig\Template;
@@ -29,7 +28,7 @@ final class MappingTest extends TestCase
      */
     public function valid_namer($value, $expected): void
     {
-        $mapping = new Mapping(Metadata::DSN, namer: $value);
+        $mapping = new Mapping(Mapping::DSN, namer: $value);
 
         $this->assertEquals($expected, $mapping->namer());
     }
@@ -53,7 +52,7 @@ final class MappingTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Unable to parse namer "%s".', $value));
 
-        new Mapping(Metadata::DSN, namer: $value);
+        new Mapping(Mapping::DSN, namer: $value);
     }
 
     public static function invalidNamerProvider(): iterable

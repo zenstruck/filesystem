@@ -13,7 +13,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\LazyNode;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,22 +26,22 @@ class LazyFile extends LazyNode implements File
 
     public function mimeType(): string
     {
-        return $this->attributes[Metadata::MIME_TYPE] ?? $this->inner()->mimeType();
+        return $this->attributes[Mapping::MIME_TYPE] ?? $this->inner()->mimeType();
     }
 
     public function size(): int
     {
-        return $this->attributes[Metadata::SIZE] ?? $this->inner()->size();
+        return $this->attributes[Mapping::SIZE] ?? $this->inner()->size();
     }
 
     public function checksum(?string $algo = null): string
     {
-        if (null === $algo && \is_string($this->attributes[Metadata::CHECKSUM] ?? null)) {
-            return $this->attributes[Metadata::CHECKSUM];
+        if (null === $algo && \is_string($this->attributes[Mapping::CHECKSUM] ?? null)) {
+            return $this->attributes[Mapping::CHECKSUM];
         }
 
-        if ($algo && isset($this->attributes[Metadata::CHECKSUM][$algo])) {
-            return $this->attributes[Metadata::CHECKSUM][$algo];
+        if ($algo && isset($this->attributes[Mapping::CHECKSUM][$algo])) {
+            return $this->attributes[Mapping::CHECKSUM][$algo];
         }
 
         return $this->inner()->checksum($algo);
@@ -49,8 +49,8 @@ class LazyFile extends LazyNode implements File
 
     public function publicUrl(array $config = []): string
     {
-        if (!$config && isset($this->attributes[Metadata::PUBLIC_URL])) {
-            return $this->attributes[Metadata::PUBLIC_URL];
+        if (!$config && isset($this->attributes[Mapping::PUBLIC_URL])) {
+            return $this->attributes[Mapping::PUBLIC_URL];
         }
 
         return $this->inner()->publicUrl($config);

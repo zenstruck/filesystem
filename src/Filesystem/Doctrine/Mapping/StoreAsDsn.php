@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Doctrine\Mapping;
 
-use Zenstruck\Filesystem\Node\Metadata;
 use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
@@ -27,6 +26,6 @@ final class StoreAsDsn extends Stateful
         bool $deleteOnUpdate = true,
         array $column = [],
     ) {
-        parent::__construct(Metadata::DSN, $filesystem, $namer, $deleteOnRemove, $deleteOnUpdate, $column);
+        parent::__construct(self::DSN, $filesystem, $namer, $deleteOnRemove, $deleteOnUpdate, $column);
     }
 }

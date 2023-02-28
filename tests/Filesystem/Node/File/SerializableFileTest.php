@@ -13,7 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Node\File;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Tests\Filesystem\Node\FileTests;
 
 /**
@@ -39,24 +39,24 @@ class SerializableFileTest extends TestCase
     public function serialize_last_modified(): void
     {
         $file = $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-            Metadata::LAST_MODIFIED,
+            Mapping::LAST_MODIFIED,
         ]);
 
-        $this->assertSame($file->serialize()[Metadata::LAST_MODIFIED], $file->lastModified()->format('c'));
+        $this->assertSame($file->serialize()[Mapping::LAST_MODIFIED], $file->lastModified()->format('c'));
     }
 
     protected function serializedProvider(): iterable
     {
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::PATH,
-                Metadata::DSN,
-                Metadata::VISIBILITY,
-                Metadata::MIME_TYPE,
-                Metadata::CHECKSUM,
-                Metadata::SIZE,
-                Metadata::PUBLIC_URL,
-                Metadata::EXTENSION,
+                Mapping::PATH,
+                Mapping::DSN,
+                Mapping::VISIBILITY,
+                Mapping::MIME_TYPE,
+                Mapping::CHECKSUM,
+                Mapping::SIZE,
+                Mapping::PUBLIC_URL,
+                Mapping::EXTENSION,
             ]),
             [
                 'path' => 'some/image.jpg',
@@ -72,8 +72,8 @@ class SerializableFileTest extends TestCase
 
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::PATH,
-                Metadata::CHECKSUM => 'sha1',
+                Mapping::PATH,
+                Mapping::CHECKSUM => 'sha1',
             ]),
             [
                 'path' => 'some/image.jpg',
@@ -85,8 +85,8 @@ class SerializableFileTest extends TestCase
 
         yield [
             $this->createFile(fixture('symfony.jpg'), 'some/image.jpg', [
-                Metadata::PATH,
-                Metadata::CHECKSUM => ['sha1', 'md5'],
+                Mapping::PATH,
+                Mapping::CHECKSUM => ['sha1', 'md5'],
             ]),
             [
                 'path' => 'some/image.jpg',
@@ -97,8 +97,8 @@ class SerializableFileTest extends TestCase
             ],
         ];
 
-        yield [$this->createFile(fixture('symfony.jpg'), 'some/image.jpg', Metadata::PATH), 'some/image.jpg'];
-        yield [$this->createFile(fixture('symfony.jpg'), 'some/image.jpg', Metadata::DSN), 'default://some/image.jpg'];
+        yield [$this->createFile(fixture('symfony.jpg'), 'some/image.jpg', Mapping::PATH), 'some/image.jpg'];
+        yield [$this->createFile(fixture('symfony.jpg'), 'some/image.jpg', Mapping::DSN), 'default://some/image.jpg'];
     }
 
     protected function createFile(\SplFileInfo $file, string $path, array|string $metadata = []): SerializableFile

@@ -41,7 +41,7 @@ abstract class LazyNode implements Node
     public function __construct(string|callable|array|null $attributes = null)
     {
         match (true) {
-            \is_string($attributes) && \str_contains($attributes, '://') => $this->attributes = [Metadata::DSN => $attributes],
+            \is_string($attributes) && \str_contains($attributes, '://') => $this->attributes = [Mapping::DSN => $attributes],
             \is_string($attributes) || \is_callable($attributes) => $this->path = $attributes,
             \is_array($attributes) => $this->attributes = $attributes,
             default => null,
@@ -66,7 +66,7 @@ abstract class LazyNode implements Node
 
     public function path(): Path
     {
-        $this->path ??= $this->attributes[Metadata::PATH] ?? null;
+        $this->path ??= $this->attributes[Mapping::PATH] ?? null;
 
         if ($this->path instanceof Path) {
             return $this->path;
@@ -75,34 +75,34 @@ abstract class LazyNode implements Node
         return $this->path = match (true) {
             \is_callable($this->path) => new Path($this->resolvePath($this->path)),
             \is_string($this->path) => new Path($this->path),
-            isset($this->attributes[Metadata::DSN]) => $this->dsn()->path(),
+            isset($this->attributes[Mapping::DSN]) => $this->dsn()->path(),
             default => throw new \RuntimeException('Path not set.'),
         };
     }
 
     public function dsn(): Dsn
     {
-        if (!isset($this->attributes[Metadata::DSN])) {
+        if (!isset($this->attributes[Mapping::DSN])) {
             return $this->inner()->dsn();
         }
 
-        if (!$this->attributes[Metadata::DSN] instanceof Dsn) {
-            $this->attributes[Metadata::DSN] = Dsn::wrap($this->attributes[Metadata::DSN]);
+        if (!$this->attributes[Mapping::DSN] instanceof Dsn) {
+            $this->attributes[Mapping::DSN] = Dsn::wrap($this->attributes[Mapping::DSN]);
         }
 
-        return $this->attributes[Metadata::DSN];
+        return $this->attributes[Mapping::DSN];
     }
 
     public function lastModified(): \DateTimeImmutable
     {
-        if (!isset($this->attributes[Metadata::LAST_MODIFIED])) {
+        if (!isset($this->attributes[Mapping::LAST_MODIFIED])) {
             return $this->inner()->lastModified();
         }
 
-        $lastModified = $this->attributes[Metadata::LAST_MODIFIED];
+        $lastModified = $this->attributes[Mapping::LAST_MODIFIED];
 
         if ($lastModified instanceof \DateTimeImmutable) {
-            return $this->attributes[Metadata::LAST_MODIFIED];
+            return $this->attributes[Mapping::LAST_MODIFIED];
         }
 
         $lastModified = \is_numeric($lastModified) ? \DateTimeImmutable::createFromFormat('U', (string) $lastModified) : new \DateTimeImmutable($lastModified);
@@ -112,7 +112,7 @@ abstract class LazyNode implements Node
 
     public function visibility(): string
     {
-        return $this->attributes[Metadata::VISIBILITY] ?? $this->inner()->visibility();
+        return $this->attributes[Mapping::VISIBILITY] ?? $this->inner()->visibility();
     }
 
     public function exists(): bool
@@ -144,17 +144,17 @@ abstract class LazyNode implements Node
 
     private function resolvePath(callable $generator): string
     {
-        if (isset($this->attributes[Metadata::FILENAME])) {
-            $this->path = new Path($this->attributes[Metadata::FILENAME]);
+        if (isset($this->attributes[Mapping::FILENAME])) {
+            $this->path = new Path($this->attributes[Mapping::FILENAME]);
 
             return $generator();
         }
 
-        $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Metadata::EXTENSION]) ? '.' : '', $this->attributes[Metadata::EXTENSION] ?? ''));
+        $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Mapping::EXTENSION]) ? '.' : '', $this->attributes[Mapping::EXTENSION] ?? ''));
         $path = $generator();
 
         return match (true) {
-            \str_contains($path, self::PLACEHOLDER) && isset($this->attributes[Metadata::EXTENSION]) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.'),
+            \str_contains($path, self::PLACEHOLDER) && isset($this->attributes[Mapping::EXTENSION]) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.'),
             \str_contains($path, self::PLACEHOLDER) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path.'),
             default => $path,
         };

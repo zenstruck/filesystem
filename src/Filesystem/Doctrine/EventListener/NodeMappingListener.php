@@ -35,7 +35,6 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Filesystem\Node\Metadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -93,7 +92,7 @@ final class NodeMappingListener
                 throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s" or "%s" typehint.', $property->class, $property->name, File::class, Image::class));
             }
 
-            Metadata::validate($nodeClass, $mapping->metadata); // @phpstan-ignore-line
+            $mapping->validate($nodeClass); // @phpstan-ignore-line
 
             if ($metadata->hasField($property->name) && isset($metadata->getFieldMapping($property->name)['declared'])) {
                 // using inheritance mapping - field already mapped on parent

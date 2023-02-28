@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
-use Zenstruck\Filesystem\Node\Metadata;
+use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\PathGenerator;
 use Zenstruck\Tests\Filesystem\Node\FileTests;
@@ -228,8 +228,8 @@ class LazyFileTest extends TestCase
     public function can_generate_path(): void
     {
         $file = $this->createLazyFile([
-            Metadata::CHECKSUM => 'foobar',
-            Metadata::EXTENSION => 'jpg',
+            Mapping::CHECKSUM => 'foobar',
+            Mapping::EXTENSION => 'jpg',
         ]);
 
         $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{checksum}{ext}'), $file));
@@ -243,8 +243,8 @@ class LazyFileTest extends TestCase
     public function generated_path_cannot_contain_placeholder(): void
     {
         $file = $this->createLazyFile([
-            Metadata::CHECKSUM => 'foobar',
-            Metadata::EXTENSION => 'jpg',
+            Mapping::CHECKSUM => 'foobar',
+            Mapping::EXTENSION => 'jpg',
         ]);
 
         $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{name}{ext}'), $file));
