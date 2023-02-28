@@ -133,7 +133,7 @@ final class LoggableFilesystem implements Filesystem
         return $this->inner()->move($source, $destination, $config);
     }
 
-    public function delete(string $path, array $config = []): static
+    public function delete(string $path, array $config = []): self
     {
         $this->log(
             $this->config[Operation::DELETE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
