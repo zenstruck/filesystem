@@ -19,7 +19,6 @@ use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Filesystem\Exception\UnsupportedFeature;
-use Zenstruck\Image\TransformerRegistry as ImageTransformerRegistry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -28,8 +27,6 @@ use Zenstruck\Image\TransformerRegistry as ImageTransformerRegistry;
  */
 final class Operator implements FilesystemOperator
 {
-    private ImageTransformerRegistry $imageTransformerRegistry;
-
     public function __construct(
         private FilesystemOperator $inner,
         private string $name,
@@ -40,19 +37,6 @@ final class Operator implements FilesystemOperator
     public function transformUrl(string $path, array|string $filter, array $config = []): string
     {
         return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter, new Config($config));
-    }
-
-    public function imageTransformer(): ImageTransformerRegistry
-    {
-        if (isset($this->imageTransformerRegistry)) {
-            return $this->imageTransformerRegistry;
-        }
-
-        try {
-            return $this->feature(ImageTransformerRegistry::class);
-        } catch (UnsupportedFeature) {
-            return $this->imageTransformerRegistry = new ImageTransformerRegistry();
-        }
     }
 
     public function name(): string

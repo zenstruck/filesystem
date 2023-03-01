@@ -13,8 +13,8 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
-use Zenstruck\Image as LocalImage;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\ImageFileInfo;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,9 +24,7 @@ interface Image extends File
     public function transformUrl(array|string $filter): string;
 
     /**
-     * @template T of object
-     *
-     * @param object|callable(T):T $filter
+     * @param object|callable(object):object $filter
      */
     public function transform(callable|object $filter, array $options = []): PendingImage;
 
@@ -36,5 +34,5 @@ interface Image extends File
 
     public function iptc(): array;
 
-    public function tempFile(): LocalImage;
+    public function tempFile(): ImageFileInfo;
 }

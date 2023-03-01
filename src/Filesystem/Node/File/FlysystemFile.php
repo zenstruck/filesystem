@@ -82,13 +82,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function tempFile(): \SplFileInfo
     {
-        if ($this->tempFile) {
-            return $this->tempFile;
-        }
-
-        $stream = Stream::wrap($this->read())->autoClose();
-
-        return $this->tempFile = TempFile::for($stream->get());
+        return $this->tempFile ??= $this->createTempFile();
     }
 
     public function exists(): bool
@@ -121,5 +115,12 @@ class FlysystemFile extends FlysystemNode implements File
         $image->size = $this->size;
 
         return $image;
+    }
+
+    protected function createTempFile(): \SplFileInfo
+    {
+        $stream = Stream::wrap($this->read())->autoClose();
+
+        return TempFile::for($stream->get());
     }
 }

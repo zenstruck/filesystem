@@ -14,8 +14,8 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use Psr\Http\Message\UploadedFileInterface;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Image as LocalImage;
-use Zenstruck\Image\TransformerRegistry;
+use Zenstruck\Image\Dimensions;
+use Zenstruck\ImageFileInfo;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,23 +23,15 @@ use Zenstruck\Image\TransformerRegistry;
  */
 final class PendingImage extends PendingFile implements Image
 {
-    use DecoratedImage;
+    private ImageFileInfo $localImage;
 
-    private bool $isPsrFile = false;
-
-    public function __construct(\SplFileInfo|string|UploadedFileInterface $filename, private ?TransformerRegistry $transformerRegistry = null)
+    public function __construct(\SplFileInfo|string|UploadedFileInterface $filename)
     {
         parent::__construct($filename);
-
-        if ($filename instanceof UploadedFileInterface && !$filename instanceof \SplFileInfo) {
-            $this->isPsrFile = true;
-        }
     }
 
     /**
-     * @template T of object
-     *
-     * @param object|callable(T):T $filter
+     * @param object|callable(object):object $filter
      */
     public function transformInPlace(object|callable $filter, array $options = []): self
     {
@@ -50,12 +42,22 @@ final class PendingImage extends PendingFile implements Image
 
     public function transform(callable|object $filter, array $options = []): self
     {
-        $file = $this->isPsrFile ? $this->localImage() : $this;
+        return new self($this->localImage()->transform($filter, $options));
+    }
 
-        return new self(
-            $this->transformerRegistry()->transform($file, $filter, $options),
-            $this->transformerRegistry()
-        );
+    public function dimensions(): Dimensions
+    {
+        return $this->localImage()->dimensions();
+    }
+
+    public function exif(): array
+    {
+        return $this->localImage()->exif();
+    }
+
+    public function iptc(): array
+    {
+        return $this->localImage()->iptc();
     }
 
     public function transformUrl(array|string $filter): string
@@ -63,17 +65,20 @@ final class PendingImage extends PendingFile implements Image
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }
 
-    protected function localImage(): LocalImage
+    public function refresh(): static
     {
-        if ($this->isPsrFile) {
-            return $this->localImage = $this->tempFile();
-        }
+        unset($this->localImage);
 
-        return $this->localImage ??= new LocalImage($this);
+        return parent::refresh();
     }
 
-    private function transformerRegistry(): TransformerRegistry
+    public function tempFile(): ImageFileInfo
     {
-        return $this->transformerRegistry ??= new TransformerRegistry();
+        return new ImageFileInfo(parent::tempFile());
+    }
+
+    private function localImage(): ImageFileInfo
+    {
+        return $this->localImage ??= new ImageFileInfo($this);
     }
 }

@@ -15,7 +15,7 @@ use Zenstruck\Assert;
 use Zenstruck\Filesystem\Node\File\DecoratedFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\DecoratedImage;
-use Zenstruck\Image as LocalImage;
+use Zenstruck\ImageFileInfo;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,9 +42,9 @@ final class TestImage extends TestNode implements Image
         return $this;
     }
 
-    public function tempFile(): LocalImage
+    public function tempFile(): ImageFileInfo
     {
-        return new LocalImage($this->inner->tempFile());
+        return ImageFileInfo::wrap($this->inner->tempFile());
     }
 
     protected function inner(): Image

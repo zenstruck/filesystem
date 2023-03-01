@@ -11,8 +11,9 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
-use Zenstruck\Image as LocalImage;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\ImageFileInfo;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -21,8 +22,6 @@ use Zenstruck\Image\Dimensions;
  */
 trait DecoratedImage
 {
-    private ?LocalImage $localImage = null;
-
     public function transformUrl(array|string $filter): string
     {
         return $this->inner()->transformUrl($filter);
@@ -35,33 +34,23 @@ trait DecoratedImage
 
     public function dimensions(): Dimensions
     {
-        return $this->localImage()->dimensions();
+        return $this->inner()->dimensions();
     }
 
     public function iptc(): array
     {
-        return $this->localImage()->iptc();
+        return $this->inner()->iptc();
     }
 
     public function exif(): array
     {
-        return $this->localImage()->exif();
+        return $this->inner()->exif();
     }
 
-    public function tempFile(): LocalImage
+    public function tempFile(): ImageFileInfo
     {
-        return new LocalImage(parent::tempFile());
+        return $this->inner()->tempFile();
     }
 
-    public function refresh(): static
-    {
-        $this->localImage?->refresh();
-
-        return parent::refresh();
-    }
-
-    protected function localImage(): LocalImage
-    {
-        return $this->localImage ??= $this->tempFile();
-    }
+    abstract protected function inner(): Image;
 }
