@@ -798,6 +798,7 @@ $validator->validate($image, new PendingImageConstraint(maxWidth: 200, maxHeight
 #### Functional/Integration Testing
 
 TODO: Note about `Mock::pendingFile()/pendingImage()`.
+TODO: Note about `Foundry\LazyMock::pendingFile()/pendingImage()`.
 
 ##### Testing Performance
 

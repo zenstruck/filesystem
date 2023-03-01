@@ -49,6 +49,7 @@ use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTemporaryUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
+use Zenstruck\Filesystem\Test\Node\Foundry\LazyMock;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
 use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
@@ -111,6 +112,12 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if ($mergedConfig['doctrine']['enabled']) {
             $this->registerDoctrine($container, $mergedConfig['doctrine']);
+        }
+
+        if (isset($container->getParameter('kernel.bundles')['ZenstruckFoundryBundle'])) {
+            $container->register('.zenstruck_filesystem.test.foundry.faker_provider', LazyMock::class)
+                ->addTag('foundry.faker_provider')
+            ;
         }
     }
 
