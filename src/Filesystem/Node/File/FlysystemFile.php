@@ -28,6 +28,7 @@ class FlysystemFile extends FlysystemNode implements File
     private ?int $size = null;
     private ?string $mimeType = null;
     private array $checksum = [];
+    private ?\SplFileInfo $tempFile = null;
 
     public function guessExtension(): ?string
     {
@@ -81,9 +82,13 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function tempFile(): \SplFileInfo
     {
+        if ($this->tempFile) {
+            return $this->tempFile;
+        }
+
         $stream = Stream::wrap($this->read())->autoClose();
 
-        return TempFile::for($stream->get());
+        return $this->tempFile = TempFile::for($stream->get());
     }
 
     public function exists(): bool
@@ -98,7 +103,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function refresh(): static
     {
-        $this->size = $this->mimeType = null;
+        $this->size = $this->mimeType = $this->tempFile = null;
         $this->checksum = [];
 
         return parent::refresh();
