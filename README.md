@@ -153,11 +153,6 @@ $file->path()->toString(); // "/path/to/local/file.txt"
 
 $file = new PendingFile($uploadedFile);
 $file->path()->toString(); // $uploadedFile->getClientOriginalName()
-
-/** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
-
-$file = new PendingFile($uploadedFile);
-$file->path()->toString(); // $uploadedFile->getClientFilename()
 ```
 
 #### `Image`

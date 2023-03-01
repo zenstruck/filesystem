@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Node\File\Image;
 
-use Psr\Http\Message\UploadedFileInterface;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Image\Dimensions;
@@ -25,7 +24,7 @@ final class PendingImage extends PendingFile implements Image
 {
     private ImageFileInfo $localImage;
 
-    public function __construct(\SplFileInfo|string|UploadedFileInterface $filename)
+    public function __construct(\SplFileInfo|string $filename)
     {
         parent::__construct($filename);
     }

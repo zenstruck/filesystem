@@ -15,7 +15,6 @@ use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
-use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Zenstruck\Filesystem;
@@ -34,18 +33,14 @@ use Zenstruck\TempFile;
  */
 class PendingFile extends \SplFileInfo implements File
 {
-    private SymfonyFile|UploadedFileInterface|null $uploadedFile = null;
+    private SymfonyFile|null $uploadedFile = null;
     private Path $path;
     private \SplFileInfo $tempFile;
 
-    public function __construct(string|\SplFileInfo|UploadedFileInterface $filename)
+    public function __construct(string|\SplFileInfo $filename)
     {
-        if ($filename instanceof SymfonyFile || $filename instanceof UploadedFileInterface) {
+        if ($filename instanceof SymfonyFile) {
             $this->uploadedFile = $filename;
-        }
-
-        if ($filename instanceof UploadedFileInterface && !$filename instanceof \SplFileInfo) {
-            $filename = TempFile::new();
         }
 
         parent::__construct($filename);
@@ -73,10 +68,6 @@ class PendingFile extends \SplFileInfo implements File
 
         if ($this->uploadedFile instanceof SymfonyUploadedFile) {
             return $this->path = new Path($this->uploadedFile->getClientOriginalName());
-        }
-
-        if ($this->uploadedFile instanceof UploadedFileInterface && $clientFileName = $this->uploadedFile->getClientFilename()) {
-            return $this->path = new Path($clientFileName);
         }
 
         return $this->path = new Path($this);
@@ -109,10 +100,6 @@ class PendingFile extends \SplFileInfo implements File
         }
 
         if ($this->uploadedFile instanceof SymfonyFile && $mimeType = $this->uploadedFile->getMimeType()) {
-            return $mimeType;
-        }
-
-        if ($this->uploadedFile instanceof UploadedFileInterface && $mimeType = $this->uploadedFile->getClientMediaType()) {
             return $mimeType;
         }
 
@@ -149,19 +136,11 @@ class PendingFile extends \SplFileInfo implements File
 
     public function size(): int
     {
-        if ($this->uploadedFile instanceof UploadedFileInterface && $size = $this->uploadedFile->getSize()) {
-            return $size;
-        }
-
         return $this->getSize();
     }
 
     public function contents(): string
     {
-        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            return (string) $this->uploadedFile->getStream();
-        }
-
         if (false === $contents = @\file_get_contents($this)) {
             throw UnableToReadFile::fromLocation($this);
         }
@@ -176,12 +155,6 @@ class PendingFile extends \SplFileInfo implements File
 
     public function stream(): Stream
     {
-        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            $resource = $this->uploadedFile->getStream()->detach() ?? throw UnableToReadFile::fromLocation($this->path());
-
-            return Stream::wrap($resource);
-        }
-
         return Stream::open($this, 'r');
     }
 
@@ -194,21 +167,7 @@ class PendingFile extends \SplFileInfo implements File
 
     public function tempFile(): \SplFileInfo
     {
-        if (isset($this->tempFile)) {
-            return $this->tempFile;
-        }
-
-        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            $stream = Stream::wrap($this->read());
-            $stream->putContents($this);
-            $stream->close();
-            \chmod($this, 0644);
-            $this->refresh();
-
-            return $this->tempFile = $this;
-        }
-
-        return $this->tempFile = TempFile::for($this);
+        return $this->tempFile ??= TempFile::for($this);
     }
 
     /**
@@ -273,12 +232,6 @@ class PendingFile extends \SplFileInfo implements File
 
     private function localFlysystem(): Flysystem
     {
-        $file = $this;
-
-        if ($this->uploadedFile instanceof UploadedFileInterface && !$this->uploadedFile instanceof \SplFileInfo) {
-            $file = $this->tempFile();
-        }
-
-        return new Flysystem(new LocalFilesystemAdapter(\dirname($file)));
+        return new Flysystem(new LocalFilesystemAdapter(\dirname($this)));
     }
 }
