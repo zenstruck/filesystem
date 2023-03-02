@@ -29,7 +29,6 @@ use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
-use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
@@ -143,8 +142,8 @@ final class NodeLifecycleListener
             $original = $metadata->getFieldValue($object, $field);
             $new = null;
 
-            if ($original instanceof PendingFile) {
-                $new = $this->convertPendingFile($mapping, $original, $object, $field);
+            if (self::needsToBeSaved($original, $mapping)) {
+                $new = $this->saveFile($mapping, $original, $object, $field);
             }
 
             if ($original && $mapping instanceof StoreWithMetadata && !$original instanceof SerializableFile) {
@@ -176,8 +175,8 @@ final class NodeLifecycleListener
             $old = $event->getOldValue($field);
             $new = $event->getNewValue($field);
 
-            if ($new instanceof PendingFile) {
-                $new = $this->convertPendingFile($mapping, $new, $object, $field);
+            if (self::needsToBeSaved($new, $mapping)) {
+                $new = $this->saveFile($mapping, $new, $object, $field);
 
                 // just setting the new value does not update the property so refresh the object on flush
                 $this->postFlushOperations[] = static fn() => $event->getObjectManager()->refresh($object);
@@ -222,6 +221,21 @@ final class NodeLifecycleListener
         $this->postFlushOperations = $this->onFailureOperations = [];
     }
 
+    private static function needsToBeSaved(?File $file, Mapping $mapping): bool
+    {
+        if (!$file) {
+            return false;
+        }
+
+        if ($file instanceof PendingFile) {
+            return true;
+        }
+
+        $filesystem = $mapping->filesystem();
+
+        return $filesystem && $mapping->namer() && $filesystem !== $file->dsn()->filesystem();
+    }
+
     private static function createSerialized(StoreWithMetadata $mapping, File $file): SerializableFile
     {
         if ($file instanceof Image) {
@@ -231,7 +245,7 @@ final class NodeLifecycleListener
         return new SerializableFile($file, $mapping->metadata);
     }
 
-    private function convertPendingFile(Mapping $mapping, PendingFile $file, object $object, string $field): LazyFile
+    private function saveFile(Mapping $mapping, File $file, object $object, string $field): LazyFile
     {
         if (!$mapping->filesystem()) {
             throw new \LogicException(\sprintf('In order to save pending files, the %s::$%s mapping must have a filesystem configured.', $object::class, $field));
@@ -250,7 +264,7 @@ final class NodeLifecycleListener
             $path = Dsn::create($mapping->filesystem(), $path);
         }
 
-        $lazyFile = $file instanceof PendingImage ? new LazyImage($path) : new LazyFile($path);
+        $lazyFile = $file instanceof Image ? new LazyImage($path) : new LazyFile($path);
         $lazyFile->setFilesystem($this->filesystem($mapping));
 
         return $lazyFile;

@@ -310,6 +310,46 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
     }
 
     /**
+     * @test
+     */
+    public function persist_and_update_file_with_different_filesystem(): void
+    {
+        $file1 = $this->filesystem()->write('private://file1.txt', 'content 1');
+        $file2 = $this->filesystem()->write('private://file2.txt', 'content 2');
+        $class = $this->entityClass();
+        $object = new $class('Foo');
+        $object->setFile1($file1);
+
+        $this->em()->persist($object);
+        $this->em()->flush();
+        $this->em()->clear();
+
+        $fromDb = repository($class)->first()->object();
+        $this->loadMappingFor($fromDb);
+
+        $file = $fromDb->getFile1();
+
+        $this->assertTrue($file->exists());
+        $this->assertSame('public', $file->dsn()->filesystem());
+        $this->assertSame('files/foo-9297ab3.txt', $file->path()->toString());
+        $this->filesystem()->assertExists('files/foo-9297ab3.txt');
+
+        $fromDb->setFile1($file2);
+        $this->em()->flush();
+        $this->em()->clear();
+
+        $fromDb = repository($class)->first()->object();
+        $this->loadMappingFor($fromDb);
+
+        $file = $fromDb->getFile1();
+
+        $this->assertTrue($file->exists());
+        $this->assertSame('public', $file->dsn()->filesystem());
+        $this->assertSame('files/foo-6685cd6.txt', $file->path()->toString());
+        $this->filesystem()->assertNotExists('files/foo-9297ab3.txt');
+    }
+
+    /**
      * @return class-string
      */
     abstract protected function entityClass(): string;
