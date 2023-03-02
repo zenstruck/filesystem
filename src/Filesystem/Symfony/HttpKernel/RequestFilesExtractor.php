@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 
-
 use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,7 +84,8 @@ class RequestFilesExtractor
 
         if (empty($attributes)) {
             $type = $argument->getType();
-            return $type && is_a($type, PendingFile::class, true);
+
+            return $type && \is_a($type, PendingFile::class, true);
         }
 
         return true;

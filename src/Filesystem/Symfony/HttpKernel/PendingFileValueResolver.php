@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -46,19 +45,22 @@ if (\interface_exists(ValueResolverInterface::class)) {
                 return [];
             }
 
-            $path = $attributes[0]?->path
+            /** @var UploadedFile|null $attribute */
+            $attribute = $attributes[0];
+
+            $path = $attribute?->path
                 ?? $argument->getName();
 
             return [
                 $this->extractor()->extractFilesFromRequest(
                     $request,
                     $path,
-                    !is_a(
+                    !\is_a(
                         $argument->getType() ?? PendingFile::class,
                         PendingFile::class,
                         true
                     ),
-                    $attributes[0]?->image || PendingImage::class === $argument->getType()
+                    $attribute?->image || PendingImage::class === $argument->getType()
                 ),
             ];
         }
@@ -90,14 +92,22 @@ if (\interface_exists(ValueResolverInterface::class)) {
             $attributes = $argument->getAttributes(UploadedFile::class);
             \assert(!empty($attributes));
 
-            $path = $attributes[0]?->path
+            /** @var UploadedFile|null $attribute */
+            $attribute = $attributes[0];
+
+            $path = $attribute?->path
                 ?? $argument->getName();
 
             return [
                 $this->extractor()->extractFilesFromRequest(
                     $request,
                     $path,
-                    $argument->getType()
+                    !\is_a(
+                        $argument->getType() ?? PendingFile::class,
+                        PendingFile::class,
+                        true
+                    ),
+                    $attribute?->image || PendingImage::class === $argument->getType()
                 ),
             ];
         }
