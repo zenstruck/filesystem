@@ -26,7 +26,7 @@ use Zenstruck\Filesystem\Node\File\PlaceholderFile;
  */
 abstract class StringType extends BaseStringType
 {
-    final public function convertToDatabaseValue($value, AbstractPlatform $platform): string|array|null
+    final public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
