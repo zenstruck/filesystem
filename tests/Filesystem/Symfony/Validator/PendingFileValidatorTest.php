@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Symfony\Validator;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -45,6 +46,7 @@ class PendingFileValidatorTest extends ConstraintValidatorTestCase
         yield [new LazyImage('some-path'), new PendingFileConstraint(mimeTypes: ['image/png'])];
         yield [new PendingFile(fixture('symfony.png')), new PendingFileConstraint(mimeTypes: ['image/png'])];
         yield [new PendingImage(fixture('symfony.png')), new PendingFileConstraint(mimeTypes: ['image/png'])];
+        yield [new PendingFile(new UploadedFile(fixture('symfony.png'), 'symfony.png', test: true)), new PendingFileConstraint(mimeTypes: ['image/png'])];
     }
 
     /**
@@ -62,7 +64,9 @@ class PendingFileValidatorTest extends ConstraintValidatorTestCase
     public static function invalidValues(): iterable
     {
         yield [new PendingFile(fixture('symfony.jpg')), new PendingFileConstraint(mimeTypes: ['image/png']), 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.'];
+        yield [new PendingFile(new UploadedFile(fixture('symfony.jpg'), 'symfony.jpg', test: true)), new PendingFileConstraint(mimeTypes: ['image/png']), 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.'];
         yield [new PendingImage(fixture('symfony.jpg')), new PendingFileConstraint(mimeTypes: ['image/png']), 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.'];
+        yield [new PendingFile(new UploadedFile(fixture('symfony.jpg'), 'symfony.jpg', error: \UPLOAD_ERR_CANT_WRITE, test: true)), new PendingFileConstraint(), 'Cannot write temporary file to disk.'];
     }
 
     /**

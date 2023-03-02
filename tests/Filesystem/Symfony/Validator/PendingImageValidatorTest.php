@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Symfony\Validator;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintValidator;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
@@ -30,12 +31,15 @@ final class PendingImageValidatorTest extends PendingFileValidatorTest
         yield ['', new PendingImageConstraint()];
         yield [new LazyImage('some-path'), new PendingImageConstraint()];
         yield [new PendingImage(fixture('symfony.png')), new PendingImageConstraint()];
+        yield [new PendingImage(new UploadedFile(fixture('symfony.png'), 'symfony.png', test: true)), new PendingImageConstraint(mimeTypes: ['image/png'])];
     }
 
     public static function invalidValues(): iterable
     {
         yield [new PendingImage(fixture('archive.zip')), new PendingImageConstraint(), 'This file is not a valid image.'];
         yield [new PendingImage(fixture('symfony.jpg')), new PendingImageConstraint(maxHeight: 10), 'The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.'];
+        yield [new PendingImage(new UploadedFile(fixture('symfony.jpg'), 'symfony.jpg', test: true)), new PendingImageConstraint(maxHeight: 10), 'The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.'];
+        yield [new PendingImage(new UploadedFile(fixture('symfony.jpg'), 'symfony.jpg', error: \UPLOAD_ERR_CANT_WRITE, test: true)), new PendingImageConstraint(), 'Cannot write temporary file to disk.'];
     }
 
     public static function exceptionValues(): iterable

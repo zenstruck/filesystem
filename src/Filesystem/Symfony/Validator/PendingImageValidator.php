@@ -35,6 +35,10 @@ final class PendingImageValidator extends ImageValidator
             throw new UnexpectedTypeException($value, PendingImage::class);
         }
 
+        if ($value instanceof PendingImage) {
+            $value = $value->uploadedFile() ?? $value;
+        }
+
         parent::validate($value, $constraint);
     }
 }

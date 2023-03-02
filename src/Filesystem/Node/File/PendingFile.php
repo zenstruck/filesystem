@@ -45,6 +45,11 @@ class PendingFile extends \SplFileInfo implements File
         parent::__construct($filename);
     }
 
+    public function uploadedFile(): ?SymfonyFile
+    {
+        return $this->uploadedFile;
+    }
+
     public function path(): Path
     {
         if (isset($this->path)) {

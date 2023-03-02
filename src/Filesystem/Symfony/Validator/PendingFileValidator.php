@@ -35,6 +35,10 @@ final class PendingFileValidator extends FileValidator
             throw new UnexpectedTypeException($value, PendingFile::class);
         }
 
+        if ($value instanceof PendingFile) {
+            $value = $value->uploadedFile() ?? $value;
+        }
+
         parent::validate($value, $constraint);
     }
 }
