@@ -47,7 +47,7 @@ class PendingFile extends \SplFileInfo implements File
     }
 
     /**
-     * @param callable(self):string $path
+     * @param string|null|callable(self):string $path
      */
     public function saveTo(Filesystem $filesystem, string|callable|null $path = null): static
     {
@@ -58,6 +58,15 @@ class PendingFile extends \SplFileInfo implements File
         $filesystem->write($path ?? $this->path()->name(), $this);
 
         return $this;
+    }
+
+    public function saveToTemporary(Filesystem $filesystem): File
+    {
+        do {
+            $directory = (string) \microtime();
+        } while ($filesystem->has($directory));
+
+        return $filesystem->write($directory.'/.'.$this->path()->name(), $this);
     }
 
     public function path(): Path

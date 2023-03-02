@@ -266,6 +266,13 @@ final class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->booleanNode('temporary')
+                                ->defaultFalse()
+                                ->info(<<<EOF
+                                    If true, this filesystem will be configured to store
+                                    uploaded files in a serializable way.
+                                    EOF)
+                            ->end()
                             ->booleanNode('reset_before_tests')
                                 ->defaultFalse()
                                 ->info(<<<EOF
