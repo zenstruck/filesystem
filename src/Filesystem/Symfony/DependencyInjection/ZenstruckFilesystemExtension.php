@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
@@ -166,6 +167,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addArgument(
                 new ServiceLocatorArgument([
                     RequestFilesExtractor::class => new Reference('.zenstruck_document.value_resolver.request_files_extractor'),
+                    ValidatorInterface::class => new Reference(ValidatorInterface::class),
                 ])
             )
         ;

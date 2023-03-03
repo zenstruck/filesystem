@@ -13,6 +13,9 @@ namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
@@ -38,18 +41,37 @@ trait PendingFileValueResolverTrait
     {
         $attribute = UploadedFile::forArgument($argument);
 
-        return [
-            $this->extractor()->extractFilesFromRequest(
+        $files = $this->extractor()->extractFilesFromRequest(
                 $request,
                 $attribute->path,
                 $attribute->multiple,
                 $attribute->image,
-            ),
-        ];
+            );
+
+        if ($files && $attribute->constraints) {
+            $errors = $this->validator()->validate(
+                $files,
+                $attribute->constraints
+            );
+
+            if (count($errors)) {
+                throw new HttpException(
+                    $attribute->errorStatus,
+                    (string) $errors
+                );
+            }
+        }
+
+        return [$files];
     }
 
     private function extractor(): RequestFilesExtractor
     {
         return $this->locator->get(RequestFilesExtractor::class);
+    }
+
+    private function validator(): ValidatorInterface
+    {
+        return $this->locator->get(ValidatorInterface::class);
     }
 }

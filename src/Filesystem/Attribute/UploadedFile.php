@@ -30,7 +30,7 @@ final class UploadedFile
         public ?array $constraints = null,
         public ?int $errorStatus = null,
     ) {
-        if ($this->image && !$this->constraints) {
+        if ($this->image && [] === $this->constraints) {
             if ($this->multiple) {
                 $this->constraints = [
                     new All([new PendingImageConstraint()])
@@ -63,7 +63,7 @@ final class UploadedFile
                 File::class,
                 true
             ),
-            constraints: $attribute?->constraints,
+            constraints: $attribute?->constraints ?? [],
             errorStatus: $attribute?->errorStatus ?? 422,
         );
     }
