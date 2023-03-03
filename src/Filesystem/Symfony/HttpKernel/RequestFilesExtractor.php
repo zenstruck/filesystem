@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Zenstruck\Filesystem\Attribute\UploadedFile as UploadedFileAttribute;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
@@ -85,7 +86,7 @@ class RequestFilesExtractor
         if (empty($attributes)) {
             $type = $argument->getType();
 
-            return $type && \is_a($type, PendingFile::class, true);
+            return $type && \is_a($type, File::class, true);
         }
 
         return true;

@@ -45,7 +45,7 @@ class ArgumentResolverController
     }
 
     #[Route('/single-file', name: 'single-file')]
-    public function singleFile(?PendingFile $file): Response
+    public function singleFile(?File $file): Response
     {
         return new Response($file?->contents() ?? '');
     }
@@ -53,7 +53,7 @@ class ArgumentResolverController
     #[Route('/single-file-with-path', name: 'single-file-with-path')]
     public function singleFileWithPath(
         #[UploadedFile('data[file]')]
-        ?PendingFile $file
+        ?File $file
     ): Response {
         return new Response($file?->contents() ?? '');
     }

@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
+use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
@@ -56,11 +58,16 @@ if (\interface_exists(ValueResolverInterface::class)) {
                     $request,
                     $path,
                     !\is_a(
-                        $argument->getType() ?? PendingFile::class,
-                        PendingFile::class,
+                        $argument->getType() ?? File::class,
+                        File::class,
                         true
                     ),
-                    $attribute?->image || PendingImage::class === $argument->getType()
+                    $attribute?->image
+                    || is_a(
+                        $argument->getType() ?? File::class,
+                        Image::class,
+                        true
+                    ),
                 ),
             ];
         }
@@ -103,12 +110,17 @@ if (\interface_exists(ValueResolverInterface::class)) {
                     $request,
                     $path,
                     !\is_a(
-                        $argument->getType() ?? PendingFile::class,
-                        PendingFile::class,
+                        $argument->getType() ?? File::class,
+                        File::class,
                         true
                     ),
-                    $attribute?->image || PendingImage::class === $argument->getType()
-                ),
+                    $attribute?->image
+                    || is_a(
+                        $argument->getType() ?? File::class,
+                        Image::class,
+                        true
+                    ),
+                )
             ];
         }
 
