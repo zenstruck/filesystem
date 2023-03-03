@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\Image;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -27,6 +28,14 @@ class ArgumentResolverController
         array $files
     ): Response {
         return new Response((string) \count($files));
+    }
+
+    #[Route('/multiple-images', name: 'multiple-images')]
+    public function multipleImages(
+        #[UploadedFile(image: true)]
+        array $images
+    ): Response {
+        return new Response((string) \count($images));
     }
 
     #[Route('/multiple-files-with-path', name: 'multiple-files-with-path')]
@@ -47,6 +56,12 @@ class ArgumentResolverController
     public function singleFile(?File $file): Response
     {
         return new Response($file?->contents() ?? '');
+    }
+
+    #[Route('/single-image', name: 'single-image')]
+    public function singleImage(Image $image): Response
+    {
+        return new Response((string) $image->dimensions()->width());
     }
 
     #[Route('/single-file-with-path', name: 'single-file-with-path')]

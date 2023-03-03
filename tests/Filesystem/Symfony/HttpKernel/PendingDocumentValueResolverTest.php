@@ -56,6 +56,14 @@ class PendingDocumentValueResolverTest extends WebTestCase
         );
 
         self::assertSame("some content\n", $client->getResponse()->getContent());
+
+        $client->request(
+            'GET',
+            'single-image',
+            files: ['image' => self::uploadedImage()]
+        );
+
+        self::assertSame("563", $client->getResponse()->getContent());
     }
 
     /**
@@ -95,6 +103,14 @@ class PendingDocumentValueResolverTest extends WebTestCase
         );
 
         self::assertSame('1', $client->getResponse()->getContent());
+
+        $client->request(
+            'GET',
+            'multiple-images',
+            files: ['images' => self::uploadedImage()]
+        );
+
+        self::assertSame('1', $client->getResponse()->getContent());
     }
 
     /**
@@ -125,6 +141,15 @@ class PendingDocumentValueResolverTest extends WebTestCase
         return new UploadedFile(
             __DIR__.'/../../../Fixtures/files/textfile.txt',
             'test.txt',
+            test: true
+        );
+    }
+
+    private static function uploadedImage(): UploadedFile
+    {
+        return new UploadedFile(
+            __DIR__.'/../../../Fixtures/files/symfony.png',
+            'symfony.png',
             test: true
         );
     }
