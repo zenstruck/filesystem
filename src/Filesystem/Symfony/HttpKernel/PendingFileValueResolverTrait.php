@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -37,29 +36,14 @@ trait PendingFileValueResolverTrait
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $attributes = $argument->getAttributes(UploadedFile::class);
-
-        /** @var UploadedFile|null $attribute */
-        $attribute = $attributes[0] ?? null;
-
-        $path = $attribute?->path
-            ?? $argument->getName();
+        $attribute = UploadedFile::forArgument($argument);
 
         return [
             $this->extractor()->extractFilesFromRequest(
                 $request,
-                $path,
-                !\is_a(
-                    $argument->getType() ?? File::class,
-                    File::class,
-                    true
-                ),
-                $attribute?->image
-                || \is_a(
-                    $argument->getType() ?? File::class,
-                    Image::class,
-                    true
-                ),
+                $attribute->path,
+                $attribute->multiple,
+                $attribute->image,
             ),
         ];
     }
