@@ -123,6 +123,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
     private function registerDoctrine(ContainerBuilder $container, array $config): void
     {
         $container->register('.zenstruck_filesystem.doctrine.mapping_listener', NodeMappingListener::class)
+            ->addArgument(new Reference(FilesystemRegistry::class))
             ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
         ;
 

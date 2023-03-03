@@ -28,6 +28,8 @@ use Zenstruck\Filesystem\Doctrine\Types\FilePathType;
 use Zenstruck\Filesystem\Doctrine\Types\ImageDsnType;
 use Zenstruck\Filesystem\Doctrine\Types\ImageMetadataType;
 use Zenstruck\Filesystem\Doctrine\Types\ImagePathType;
+use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File;
@@ -44,6 +46,10 @@ use Zenstruck\Filesystem\Node\Mapping;
 final class NodeMappingListener
 {
     public const OPTION_KEY = '_zsfs';
+
+    public function __construct(private FilesystemRegistry $filesystems)
+    {
+    }
 
     /**
      * @param LoadClassMetadataEventArgs<ClassMetadata<object>,ObjectManager> $event
@@ -62,6 +68,8 @@ final class NodeMappingListener
         }
 
         foreach (self::mappedPropertiesFor($class) as [$property, $mapping]) {
+            $this->ensureFilesystemExists($mapping->filesystem(), $property);
+
             $type = $property->getType();
 
             if (!$type instanceof \ReflectionNamedType) {
@@ -155,5 +163,18 @@ final class NodeMappingListener
                 }
             }
         } while ($class = $class->getParentClass());
+    }
+
+    private function ensureFilesystemExists(?string $filesystem, \ReflectionProperty $property): void
+    {
+        if (!$filesystem) {
+            return;
+        }
+
+        try {
+            $this->filesystems->get($filesystem);
+        } catch (UnregisteredFilesystem $e) {
+            throw new \LogicException(\sprintf('Property "%s::$%s" configured a filesystem ("%s") that does not exist.', $property->class, $property->name, $filesystem), previous: $e);
+        }
     }
 }
