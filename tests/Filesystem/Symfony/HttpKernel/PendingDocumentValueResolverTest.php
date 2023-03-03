@@ -136,6 +136,24 @@ class PendingDocumentValueResolverTest extends WebTestCase
         self::assertSame('1', $client->getResponse()->getContent());
     }
 
+
+    /**
+     * @test
+     */
+    public function returns_exception_for_invalid_file(): void
+    {
+        $client = self::createClient();
+
+        $client->request(
+            'GET',
+            'single-image',
+            files: ['image' => self::uploadedFile()]
+        );
+        $response = $client->getResponse();
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
     private static function uploadedFile(): UploadedFile
     {
         return new UploadedFile(
