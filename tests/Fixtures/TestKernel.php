@@ -184,5 +184,6 @@ final class TestKernel extends Kernel
         $routes->add('private_public', '/private/{path}')
             ->requirements(['path' => '.+'])
         ;
+        $routes->import(__DIR__.'/Controller', 'annotation');
     }
 }

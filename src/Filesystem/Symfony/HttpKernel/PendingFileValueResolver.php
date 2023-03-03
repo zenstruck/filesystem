@@ -46,7 +46,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
             }
 
             /** @var UploadedFile|null $attribute */
-            $attribute = $attributes[0];
+            $attribute = $attributes[0] ?? null;
 
             $path = $attribute?->path
                 ?? $argument->getName();
@@ -93,7 +93,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
             \assert(!empty($attributes));
 
             /** @var UploadedFile|null $attribute */
-            $attribute = $attributes[0];
+            $attribute = $attributes[0] ?? null;
 
             $path = $attribute?->path
                 ?? $argument->getName();
