@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -70,5 +71,16 @@ class ArgumentResolverController
         ?File $file
     ): Response {
         return new Response($file?->contents() ?? '');
+    }
+
+    #[Route('/validated-file', name: 'validated-file')]
+    public function validatedFile(
+        #[UploadedFile(
+            constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])],
+            errorStatus: 500,
+        )]
+        File $file
+    ): Response {
+        return new Response($file->contents());
     }
 }

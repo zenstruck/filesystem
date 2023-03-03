@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Symfony\HttpKernel;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -150,8 +151,16 @@ class PendingDocumentValueResolverTest extends WebTestCase
             files: ['image' => self::uploadedFile()]
         );
         $response = $client->getResponse();
-
         self::assertSame(422, $response->getStatusCode());
+
+        $client->request(
+            'GET',
+            'validated-file',
+            files: ['file' => self::uploadedFile()]
+        );
+        $response = $client->getResponse();
+
+        self::assertSame(500, $response->getStatusCode());
     }
 
     private static function uploadedFile(): UploadedFile
