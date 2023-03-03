@@ -77,7 +77,7 @@ class ArgumentResolverController
     public function validatedFile(
         #[UploadedFile(
             constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])],
-            errorStatus: 500,
+            errorStatus: 500
         )]
         File $file
     ): Response {
