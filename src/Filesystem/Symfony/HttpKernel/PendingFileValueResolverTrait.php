@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
@@ -27,7 +28,6 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 trait PendingFileValueResolverTrait
 {
     public function __construct(
-        /** @var ServiceProviderInterface<RequestFilesExtractor> $locator */
         private ServiceProviderInterface $locator
     ) {
     }
@@ -41,9 +41,9 @@ trait PendingFileValueResolverTrait
 
         $files = $this->extractor()->extractFilesFromRequest(
             $request,
-            $attribute->path,
-            $attribute->multiple,
-            $attribute->image,
+            (string) $attribute->path,
+            (bool) $attribute->multiple,
+            (bool) $attribute->image,
         );
 
         if ($files && $attribute->constraints) {
@@ -53,7 +53,9 @@ trait PendingFileValueResolverTrait
             );
 
             if (\count($errors)) {
-                throw new HttpException($attribute->errorStatus, (string) $errors);
+                \assert($errors instanceof ConstraintViolationList);
+
+                throw new HttpException((int) $attribute->errorStatus, (string) $errors);
             }
         }
 
