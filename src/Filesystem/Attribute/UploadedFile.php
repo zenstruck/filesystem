@@ -33,7 +33,7 @@ final class UploadedFile
         if ($this->image && [] === $this->constraints) {
             if ($this->multiple) {
                 $this->constraints = [
-                    new All([new PendingImageConstraint()])
+                    new All([new PendingImageConstraint()]),
                 ];
             } else {
                 $this->constraints = [new PendingImageConstraint()];
@@ -48,7 +48,7 @@ final class UploadedFile
         $attribute = null;
         if (!empty($attributes)) {
             $attribute = $attributes[0];
-            assert($attribute instanceof self);
+            \assert($attribute instanceof self);
         }
 
         return new self(

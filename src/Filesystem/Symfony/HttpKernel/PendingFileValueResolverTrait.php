@@ -14,11 +14,9 @@ namespace Zenstruck\Filesystem\Symfony\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
-use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -42,11 +40,11 @@ trait PendingFileValueResolverTrait
         $attribute = UploadedFile::forArgument($argument);
 
         $files = $this->extractor()->extractFilesFromRequest(
-                $request,
-                $attribute->path,
-                $attribute->multiple,
-                $attribute->image,
-            );
+            $request,
+            $attribute->path,
+            $attribute->multiple,
+            $attribute->image,
+        );
 
         if ($files && $attribute->constraints) {
             $errors = $this->validator()->validate(
@@ -54,11 +52,8 @@ trait PendingFileValueResolverTrait
                 $attribute->constraints
             );
 
-            if (count($errors)) {
-                throw new HttpException(
-                    $attribute->errorStatus,
-                    (string) $errors
-                );
+            if (\count($errors)) {
+                throw new HttpException($attribute->errorStatus, (string) $errors);
             }
         }
 
