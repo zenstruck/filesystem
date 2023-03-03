@@ -16,6 +16,7 @@ use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateless;
@@ -37,6 +38,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\Mapping;
+use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -47,7 +49,7 @@ final class NodeMappingListener
 {
     public const OPTION_KEY = '_zsfs';
 
-    public function __construct(private FilesystemRegistry $filesystems)
+    public function __construct(private FilesystemRegistry $filesystems, private ContainerInterface $pathGenerators)
     {
     }
 
@@ -69,6 +71,7 @@ final class NodeMappingListener
 
         foreach (self::mappedPropertiesFor($class) as [$property, $mapping]) {
             $this->ensureFilesystemExists($mapping->filesystem(), $property);
+            $this->ensurePathGeneratorExists($mapping->namer(), $property);
 
             $type = $property->getType();
 
@@ -163,6 +166,17 @@ final class NodeMappingListener
                 }
             }
         } while ($class = $class->getParentClass());
+    }
+
+    private function ensurePathGeneratorExists(?Namer $namer, \ReflectionProperty $property): void
+    {
+        if (!$namer) {
+            return;
+        }
+
+        if (!$this->pathGenerators->has($namer->id())) {
+            throw new \LogicException(\sprintf('Property "%s::$%s" configured a path generator ("%s") that does not exist.', $property->class, $property->name, $namer->id()));
+        }
     }
 
     private function ensureFilesystemExists(?string $filesystem, \ReflectionProperty $property): void

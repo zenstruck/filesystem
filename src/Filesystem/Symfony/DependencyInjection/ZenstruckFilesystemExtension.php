@@ -124,6 +124,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
     {
         $container->register('.zenstruck_filesystem.doctrine.mapping_listener', NodeMappingListener::class)
             ->addArgument(new Reference(FilesystemRegistry::class))
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem.path_generator', 'key')))
             ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
         ;
 
