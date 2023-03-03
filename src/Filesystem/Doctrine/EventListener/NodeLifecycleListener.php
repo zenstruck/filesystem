@@ -24,6 +24,7 @@ use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
@@ -321,13 +322,13 @@ final class NodeLifecycleListener
         };
 
         // todo name might be null
-        return $this->container->get('filesystem_locator')->get($name);
+        return $this->container->get(FilesystemRegistry::class)->get($name);
     }
 
     private function filesystem(Mapping $mapping): Filesystem
     {
         // todo filesystem might be null
-        return $this->container->get('filesystem_locator')->get($mapping->filesystem());
+        return $this->container->get(FilesystemRegistry::class)->get($mapping->filesystem());
     }
 
     /**

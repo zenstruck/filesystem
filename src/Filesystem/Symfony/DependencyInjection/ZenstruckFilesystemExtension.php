@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -33,6 +32,7 @@ use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\Doctrine\Twig\FileMappingLoaderExtension;
 use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\Flysystem\TransformUrlGenerator;
 use Zenstruck\Filesystem\FlysystemFilesystem;
@@ -64,17 +64,16 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
-        $locator = $container->register('zenstruck_filesystem.filesystem_locator', ServiceLocator::class)
-            ->addArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key'))
-            ->addTag('container.service_locator')
+        $registry = $container->register(FilesystemRegistry::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key')))
         ;
 
         $multi = $container->register(MultiFilesystem::class)
-            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
+            ->addArgument(new Reference(FilesystemRegistry::class))
         ;
 
         if ('test' === $container->getParameter('kernel.environment')) {
-            $locator->setPublic(true);
+            $registry->setPublic(true);
             $multi->setPublic(true);
         }
 
@@ -96,14 +95,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         $container->register('.zenstruck_filesystem.node_normalizer', NodeNormalizer::class)
             ->addArgument(new ServiceLocatorArgument([
                 PathGenerator::class => new Reference(PathGenerator::class),
-                'filesystem_locator' => new Reference('zenstruck_filesystem.filesystem_locator'),
+                FilesystemRegistry::class => new Reference(FilesystemRegistry::class),
             ]))
             ->addTag('serializer.normalizer')
         ;
 
         // commands
         $container->register('.zenstruck_filesystem.purge_command', FilesystemPurgeCommand::class)
-            ->addArgument(new Reference('zenstruck_filesystem.filesystem_locator'))
+            ->addArgument(new Reference(FilesystemRegistry::class))
             ->addTag('console.command')
         ;
 
@@ -138,7 +137,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         $listener = $container->register('.zenstruck_filesystem.doctrine.lifecycle_listener', NodeLifecycleListener::class)
             ->addArgument(new ServiceLocatorArgument([
                 PathGenerator::class => new Reference(PathGenerator::class),
-                'filesystem_locator' => new Reference('zenstruck_filesystem.filesystem_locator'),
+                FilesystemRegistry::class => new Reference(FilesystemRegistry::class),
             ]))
             ->addTag('doctrine.event_listener', ['event' => 'preUpdate'])
             ->addTag('doctrine.event_listener', ['event' => 'postFlush'])

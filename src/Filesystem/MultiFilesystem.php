@@ -12,8 +12,6 @@
 namespace Zenstruck\Filesystem;
 
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
 use Zenstruck\Filesystem\Node\Directory;
@@ -26,8 +24,11 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class MultiFilesystem implements Filesystem
 {
-    public function __construct(private array|ContainerInterface $filesystems, private ?string $default = null)
+    private FilesystemRegistry $filesystems;
+
+    public function __construct(array|ContainerInterface|FilesystemRegistry $filesystems, private ?string $default = null)
     {
+        $this->filesystems = $filesystems instanceof FilesystemRegistry ? $filesystems : new FilesystemRegistry($filesystems);
     }
 
     public function name(?string $filesystem = null): string
@@ -142,31 +143,24 @@ final class MultiFilesystem implements Filesystem
             throw new \LogicException('Default filesystem name not set.');
         }
 
-        if (\is_array($this->filesystems) && \array_key_exists($name, $this->filesystems)) {
-            return $this->filesystems[$name];
-        }
-
-        if ($this->filesystems instanceof ContainerInterface) {
-            try {
-                return $this->filesystems->get($name);
-            } catch (NotFoundExceptionInterface $e) {
+        try {
+            return $this->filesystems->get($name);
+        } catch (UnregisteredFilesystem $e) {
+            if ($nested = $this->getFromNested($name)) {
+                return $nested;
             }
-        }
 
-        if ($nested = $this->getFromNested($name)) {
-            return $nested;
+            throw $e;
         }
-
-        throw new UnregisteredFilesystem($name, $e ?? null);
     }
 
     private function getFromNested(?string $key): ?Filesystem
     {
-        $names = \array_keys(match (true) {
-            \is_array($this->filesystems) => $this->filesystems,
-            $this->filesystems instanceof ServiceProviderInterface => $this->filesystems->getProvidedServices(),
-            default => [],
-        });
+        try {
+            $names = $this->filesystems->names();
+        } catch (\LogicException) {
+            return null;
+        }
 
         foreach ($names as $name) {
             $nested = $this->get($name);

@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Filesystem\Symfony\Command;
 
-use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\FilesystemRegistry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -28,7 +27,7 @@ use Zenstruck\Filesystem;
 #[AsCommand('zenstruck:filesystem:purge', 'Purge files from a filesystem based on a filter')]
 final class FilesystemPurgeCommand extends Command
 {
-    public function __construct(private ContainerInterface $filesystems)
+    public function __construct(private FilesystemRegistry $filesystems)
     {
         parent::__construct();
     }
@@ -46,12 +45,7 @@ final class FilesystemPurgeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        try {
-            /** @var Filesystem $filesystem */
-            $filesystem = $this->filesystems->get($input->getArgument('filesystem'));
-        } catch (NotFoundExceptionInterface $e) {
-            throw new \RuntimeException(\sprintf('Filesystem "%s" does not exist.', $input->getArgument('filesystem')), previous: $e);
-        }
+        $filesystem = $this->filesystems->get($input->getArgument('filesystem'));
 
         $io = new SymfonyStyle($input, $output);
         $olderThan = self::parseOlderThan($input->getOption('older-than'));
