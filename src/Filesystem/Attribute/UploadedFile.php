@@ -12,8 +12,10 @@
 namespace Zenstruck\Filesystem\Attribute;
 
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Validator\Constraints\All;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -25,7 +27,18 @@ final class UploadedFile
         public ?string $path = null,
         public ?bool $image = null,
         public ?bool $multiple = null,
+        public ?array $constraints = null,
+        public ?int $errorStatus = null,
     ) {
+        if ($this->image && !$this->constraints) {
+            if ($this->multiple) {
+                $this->constraints = [
+                    new All([new PendingImageConstraint()])
+                ];
+            } else {
+                $this->constraints = [new PendingImageConstraint()];
+            }
+        }
     }
 
     public static function forArgument(ArgumentMetadata $argument): self
@@ -39,17 +52,19 @@ final class UploadedFile
         }
 
         return new self(
-            path: $attribute->path ?? $argument->getName(),
-            image: $attribute->image ?? \is_a(
+            path: $attribute?->path ?? $argument->getName(),
+            image: $attribute?->image ?? \is_a(
                 $argument->getType() ?? File::class,
                 Image::class,
                 true
             ),
-            multiple: $attribute->multiple ?? !\is_a(
+            multiple: $attribute?->multiple ?? !\is_a(
                 $argument->getType() ?? File::class,
                 File::class,
                 true
             ),
+            constraints: $attribute?->constraints,
+            errorStatus: $attribute?->errorStatus ?? 422,
         );
     }
 }
