@@ -15,11 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Contracts\Service\ServiceProviderInterface;
-use Zenstruck\Filesystem\Attribute\UploadedFile;
-use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -30,10 +25,8 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 if (\interface_exists(ValueResolverInterface::class)) {
     class PendingFileValueResolver implements ValueResolverInterface
     {
-        public function __construct(
-            /** @var ServiceProviderInterface<RequestFilesExtractor> $locator */
-            private ServiceProviderInterface $locator
-        ) {
+        use PendingFileValueResolverTrait {
+            resolve as resolveArgument;
         }
 
         /**
@@ -41,92 +34,21 @@ if (\interface_exists(ValueResolverInterface::class)) {
          */
         public function resolve(Request $request, ArgumentMetadata $argument): iterable
         {
-            $attributes = $argument->getAttributes(UploadedFile::class);
-
             if (!RequestFilesExtractor::supports($argument)) {
                 return [];
             }
 
-            /** @var UploadedFile|null $attribute */
-            $attribute = $attributes[0] ?? null;
-
-            $path = $attribute?->path
-                ?? $argument->getName();
-
-            return [
-                $this->extractor()->extractFilesFromRequest(
-                    $request,
-                    $path,
-                    !\is_a(
-                        $argument->getType() ?? File::class,
-                        File::class,
-                        true
-                    ),
-                    $attribute?->image
-                    || is_a(
-                        $argument->getType() ?? File::class,
-                        Image::class,
-                        true
-                    ),
-                ),
-            ];
-        }
-
-        private function extractor(): RequestFilesExtractor
-        {
-            return $this->locator->get(RequestFilesExtractor::class);
+            return $this->resolveArgument($request, $argument);
         }
     }
 } else {
     class PendingFileValueResolver implements ArgumentValueResolverInterface
     {
-        public function __construct(
-            /** @var ServiceProviderInterface<RequestFilesExtractor> $locator */
-            private ServiceProviderInterface $locator
-        ) {
-        }
+        use PendingFileValueResolverTrait;
 
         public function supports(Request $request, ArgumentMetadata $argument): bool
         {
             return RequestFilesExtractor::supports($argument);
-        }
-
-        /**
-         * @return iterable<PendingFile|array|null>
-         */
-        public function resolve(Request $request, ArgumentMetadata $argument): iterable
-        {
-            $attributes = $argument->getAttributes(UploadedFile::class);
-            \assert(!empty($attributes));
-
-            /** @var UploadedFile|null $attribute */
-            $attribute = $attributes[0] ?? null;
-
-            $path = $attribute?->path
-                ?? $argument->getName();
-
-            return [
-                $this->extractor()->extractFilesFromRequest(
-                    $request,
-                    $path,
-                    !\is_a(
-                        $argument->getType() ?? File::class,
-                        File::class,
-                        true
-                    ),
-                    $attribute?->image
-                    || is_a(
-                        $argument->getType() ?? File::class,
-                        Image::class,
-                        true
-                    ),
-                )
-            ];
-        }
-
-        private function extractor(): RequestFilesExtractor
-        {
-            return $this->locator->get(RequestFilesExtractor::class);
         }
     }
 }

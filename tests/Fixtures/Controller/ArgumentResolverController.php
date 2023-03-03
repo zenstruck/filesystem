@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
