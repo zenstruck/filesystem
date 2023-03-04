@@ -1,6 +1,7 @@
 # zenstruck/filesystem
 
 [![CI](https://github.com/zenstruck/filesystem/actions/workflows/ci.yml/badge.svg)](https://github.com/zenstruck/filesystem/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/zenstruck/filesystem/branch/1.x/graph/badge.svg?token=5Cwx8YJkxN)](https://codecov.io/gh/zenstruck/filesystem)
 
 This library is a wrapper for the excellent [league/flysystem](https://flysystem.thephpleague.com/docs/)
 _File Storage Abstraction_ library. It provides an _alternate_ [API](#api) with the following major
