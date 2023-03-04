@@ -1,5 +1,7 @@
 # zenstruck/filesystem
 
+[![CI](https://github.com/zenstruck/filesystem/actions/workflows/ci.yml/badge.svg)](https://github.com/zenstruck/filesystem/actions/workflows/ci.yml)
+
 This library is a wrapper for the excellent [league/flysystem](https://flysystem.thephpleague.com/docs/)
 _File Storage Abstraction_ library. It provides an _alternate_ [API](#api) with the following major
 changes:
