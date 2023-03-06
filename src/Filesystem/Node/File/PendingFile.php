@@ -35,6 +35,7 @@ class PendingFile extends \SplFileInfo implements File
     private SymfonyFile|null $uploadedFile = null;
     private Path $path;
     private \SplFileInfo $tempFile;
+    private Flysystem $localFlysystem;
 
     public function __construct(string|\SplFileInfo $filename)
     {
@@ -231,6 +232,6 @@ class PendingFile extends \SplFileInfo implements File
 
     private function localFlysystem(): Flysystem
     {
-        return new Flysystem(new LocalFilesystemAdapter(\dirname($this)));
+        return $this->localFlysystem ??= new Flysystem(new LocalFilesystemAdapter(\dirname($this)));
     }
 }
