@@ -27,8 +27,6 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
  */
 class FlysystemNode implements Node
 {
-    private const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
-
     private ?\DateTimeImmutable $lastModified = null;
     private ?string $visibility = null;
     private Path $path;
@@ -138,7 +136,7 @@ class FlysystemNode implements Node
 
         $file = $this->ensureFile();
 
-        if (!\in_array($file->guessExtension(), self::IMAGE_EXTENSIONS, true)) {
+        if (!$file->isImage()) {
             throw new NodeTypeMismatch(\sprintf('Expected file at path "%s" to be an image but is "%s".', $this->path(), $file->mimeType()));
         }
 

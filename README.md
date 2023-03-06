@@ -126,6 +126,8 @@ $file->size(); // int
 
 $file->guessExtension(); // string|null - returns extension if available or attempts to guess from mime-type
 
+$file->isImage(); // bool
+
 $file->checksum(); // string - using FilesystemAdapter's default algorithm
 $file->checksum('md5'); // string - specify the algorithm
 

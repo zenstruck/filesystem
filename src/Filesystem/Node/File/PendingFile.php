@@ -220,6 +220,15 @@ class PendingFile extends \SplFileInfo implements File
         return $image;
     }
 
+    public function isImage(): bool
+    {
+        if ($this instanceof Image) {
+            return true;
+        }
+
+        return \in_array($this->guessExtension(), Image::IMAGE_EXTENSIONS, true);
+    }
+
     private function localFlysystem(): Flysystem
     {
         return new Flysystem(new LocalFilesystemAdapter(\dirname($this)));

@@ -117,6 +117,15 @@ class FlysystemFile extends FlysystemNode implements File
         return $image;
     }
 
+    public function isImage(): bool
+    {
+        if ($this instanceof FlysystemImage) {
+            return true;
+        }
+
+        return \in_array($this->guessExtension(), Image::IMAGE_EXTENSIONS, true);
+    }
+
     protected function createTempFile(): \SplFileInfo
     {
         $stream = Stream::wrap($this->read())->autoClose();

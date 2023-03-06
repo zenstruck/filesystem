@@ -21,6 +21,8 @@ use Zenstruck\ImageFileInfo;
  */
 interface Image extends File
 {
+    public const IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'apng', 'avif', 'jfif', 'pjpeg', 'pjp', 'webp'];
+
     public function transformUrl(array|string $filter): string;
 
     /**
