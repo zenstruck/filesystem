@@ -17,6 +17,9 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
+use Zenstruck\Filesystem\Node\File\Image\PendingImage;
+use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Stream;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -150,13 +153,24 @@ final class LoggableFilesystem implements Filesystem
 
     public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        $this->log(
-            $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
-            'Creating directory "{path}" on filesystem "{filesystem}"',
-            [
-                'path' => $path,
-            ]
-        );
+        if ($content) {
+            $this->log(
+                $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
+                'Creating directory "{path}" containing "{what}" on filesystem "{filesystem}"',
+                [
+                    'path' => $path,
+                    'what' => $content instanceof Directory ? "directory({$content->path()->name()})" : "local-directory({$content->getFilename()})",
+                ]
+            );
+        } else {
+            $this->log(
+                $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
+                'Creating directory "{path}" on filesystem "{filesystem}"',
+                [
+                    'path' => $path,
+                ]
+            );
+        }
 
         return $this->inner()->mkdir($path, $content, $config);
     }
@@ -181,7 +195,16 @@ final class LoggableFilesystem implements Filesystem
             $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Writing "{what}" to "{path}" on filesystem "{filesystem}"',
             [
-                'what' => \get_debug_type($value),
+                'what' => match (true) {
+                    $value instanceof PendingImage => "pending-image({$value->path()->name()})",
+                    $value instanceof PendingFile => "pending-file({$value->path()->name()})",
+                    $value instanceof Image => "image({$value->path()})",
+                    $value instanceof File => "file({$value->path()})",
+                    $value instanceof \SplFileInfo => "local-file({$value->getFilename()})",
+                    $value instanceof Stream => "resource({$value->type()})",
+                    \is_resource($value) => \sprintf('resource(%s)', \get_resource_type($value)),
+                    default => \get_debug_type($value),
+                },
                 'path' => $path,
             ]
         );
