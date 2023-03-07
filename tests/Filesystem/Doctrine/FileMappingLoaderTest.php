@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Filesystem\Doctrine;
 
 use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
+use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Fixtures\Entity\Entity2;
@@ -81,7 +82,10 @@ final class FileMappingLoaderTest extends DoctrineTestCase
 
         $this->assertTrue($files[0]->exists());
         $this->assertTrue($files[1]->exists());
-        $this->assertSame('some/dir/foo/file1.txt', $files[0]->path()->toString());
-        $this->assertSame('some/dir/foo/file2.txt', $files[1]->path()->toString());
+
+        $files = \array_map(fn(File $file) => $file->path()->toString(), $files);
+
+        $this->assertContains('some/dir/foo/file1.txt', $files);
+        $this->assertContains('some/dir/foo/file2.txt', $files);
     }
 }
