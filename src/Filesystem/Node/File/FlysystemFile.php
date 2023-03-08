@@ -25,9 +25,6 @@ use Zenstruck\TempFile;
  */
 class FlysystemFile extends FlysystemNode implements File
 {
-    private ?int $size = null;
-    private ?string $mimeType = null;
-    private array $checksum = [];
     private ?\SplFileInfo $tempFile = null;
 
     public function guessExtension(): ?string
@@ -41,7 +38,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function size(): int
     {
-        return $this->size ??= $this->operator->fileSize($this->path());
+        return $this->cache['size'] ??= $this->operator->fileSize($this->path());
     }
 
     public function contents(): string
@@ -61,14 +58,12 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function checksum(?string $algo = null): string
     {
-        $config = $algo ? ['checksum_algo' => $algo] : [];
-
-        return $this->checksum[$algo] ??= $this->operator->checksum($this->path(), $config);
+        return $this->cache['checksum'][$algo] ??= $this->operator->checksum($this->path(), $algo ? ['checksum_algo' => $algo] : []);
     }
 
     public function publicUrl(array $config = []): string
     {
-        return $this->operator->publicUrl($this->path(), $config);
+        return $this->cache['public-url'][\serialize($config)] ??= $this->operator->publicUrl($this->path(), $config);
     }
 
     public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
@@ -92,29 +87,14 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function mimeType(): string
     {
-        return $this->mimeType ??= $this->operator->mimeType($this->path());
+        return $this->cache['mime-type'] ??= $this->operator->mimeType($this->path());
     }
 
     public function refresh(): static
     {
-        $this->size = $this->mimeType = $this->tempFile = null;
-        $this->checksum = [];
+        $this->tempFile = null;
 
         return parent::refresh();
-    }
-
-    public function ensureImage(): Image
-    {
-        if ($this instanceof FlysystemImage) {
-            return $this;
-        }
-
-        $image = parent::ensureImage();
-        $image->checksum = $this->checksum;
-        $image->mimeType = $this->mimeType;
-        $image->size = $this->size;
-
-        return $image;
     }
 
     public function isImage(): bool

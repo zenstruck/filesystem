@@ -30,7 +30,7 @@ final class FlysystemImage extends FlysystemFile implements Image
 
     public function transformUrl(array|string $filter, array $config = []): string
     {
-        return $this->operator->transformUrl($this->path(), $filter, $config);
+        return $this->cache['transform-url'][\serialize([$filter, $config])] ??= $this->operator->transformUrl($this->path(), $filter, $config);
     }
 
     public function dimensions(): Dimensions

@@ -27,10 +27,11 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
  */
 abstract class FlysystemNode implements Node
 {
-    private ?\DateTimeImmutable $lastModified = null;
-    private ?string $visibility = null;
     private Path $path;
     private Dsn $dsn;
+
+    /** @var array<string,mixed> */
+    protected array $cache = [];
 
     public function __construct(string|Path $path, protected Operator $operator)
     {
@@ -56,19 +57,19 @@ abstract class FlysystemNode implements Node
 
     public function lastModified(): \DateTimeImmutable
     {
-        return $this->lastModified ??= \DateTimeImmutable::createFromFormat('U', $this->operator->lastModified($this->path())) // @phpstan-ignore-line
+        return $this->cache['last-modified'] ??= \DateTimeImmutable::createFromFormat('U', $this->operator->lastModified($this->path())) // @phpstan-ignore-line
             ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
         ;
     }
 
     public function visibility(): string
     {
-        return $this->visibility ??= $this->operator->visibility($this->path());
+        return $this->cache['visibility'] ??= $this->operator->visibility($this->path());
     }
 
     public function refresh(): static
     {
-        $this->lastModified = $this->visibility = null;
+        $this->cache = [];
 
         return $this;
     }
@@ -135,8 +136,7 @@ abstract class FlysystemNode implements Node
         }
 
         $image = new FlysystemImage($this->path(), $this->operator);
-        $image->lastModified = $this->lastModified;
-        $image->visibility = $this->visibility;
+        $image->cache = $this->cache;
 
         return $image;
     }
