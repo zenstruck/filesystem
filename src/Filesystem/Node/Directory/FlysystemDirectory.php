@@ -14,7 +14,6 @@ namespace Zenstruck\Filesystem\Node\Directory;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Finder;
-use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\Directory\Iterator\DateRangeFilterIterator;
@@ -24,7 +23,6 @@ use Zenstruck\Filesystem\Node\Directory\Iterator\PathFilterIterator;
 use Zenstruck\Filesystem\Node\Directory\Iterator\SizeRangeFilterIterator;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\FlysystemFile;
-use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\FlysystemNode;
 
 /**
@@ -58,16 +56,6 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         }
 
         return null;
-    }
-
-    public function exists(): bool
-    {
-        return $this->operator->directoryExists($this->path());
-    }
-
-    public function mimeType(): string
-    {
-        return 'dir';
     }
 
     public function getIterator(): \Traversable
@@ -214,11 +202,6 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         $clone->notPaths = \array_merge($this->notPaths, (array) $patterns);
 
         return $clone;
-    }
-
-    public function ensureImage(): Image
-    {
-        throw new NodeTypeMismatch(\sprintf('Expected node at path "%s" to be an image but is a directory.', $this->path()));
     }
 
     private static function normalizeTimestamp(\DateTimeInterface|int|string $timestamp): string

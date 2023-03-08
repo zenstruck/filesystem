@@ -34,7 +34,7 @@ final class ScopedFilesystem implements Filesystem
         return $this->name ??= \sprintf('%s-scoped-to-%s', $this->inner->name(), $this->prefix);
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
         return $this->inner->node($this->prefix($path));
     }
@@ -81,7 +81,7 @@ final class ScopedFilesystem implements Filesystem
         return $this->inner->mkdir($this->prefix($path), $content, $config);
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         return $this->inner->chmod($this->prefix($path), $visibility);
     }

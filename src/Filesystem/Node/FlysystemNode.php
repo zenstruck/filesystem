@@ -25,7 +25,7 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
  *
  * @internal
  */
-class FlysystemNode implements Node
+abstract class FlysystemNode implements Node
 {
     private ?\DateTimeImmutable $lastModified = null;
     private ?string $visibility = null;
@@ -75,7 +75,7 @@ class FlysystemNode implements Node
 
     public function exists(): bool
     {
-        return $this->operator->has($this->path());
+        return $this->operator->{$this instanceof File ? 'fileExists' : 'directoryExists'}($this->path());
     }
 
     public function ensureExists(): static
@@ -97,14 +97,6 @@ class FlysystemNode implements Node
             return $this;
         }
 
-        if ($this->operator->fileExists($this->path())) {
-            $file = new FlysystemFile($this->path(), $this->operator);
-            $file->lastModified = $this->lastModified;
-            $file->visibility = $this->visibility;
-
-            return $file;
-        }
-
         throw NodeTypeMismatch::expectedFileAt($this->path());
     }
 
@@ -112,14 +104,6 @@ class FlysystemNode implements Node
     {
         if ($this instanceof FlysystemDirectory) {
             return $this;
-        }
-
-        if ($this->operator->directoryExists($this->path())) {
-            $directory = new FlysystemDirectory($this->path(), $this->operator);
-            $directory->lastModified = $this->lastModified;
-            $directory->visibility = $this->visibility;
-
-            return $directory;
         }
 
         throw NodeTypeMismatch::expectedDirectoryAt($this->path());

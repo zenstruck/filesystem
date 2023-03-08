@@ -125,9 +125,11 @@ final class TestFilesystem implements Filesystem
         return $this;
     }
 
-    public function node(string $path): TestNode
+    public function node(string $path): TestFile|TestDirectory
     {
-        return new TestNode($this->inner()->node($path));
+        $node = $this->inner()->node($path);
+
+        return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
     }
 
     public function file(string $path): TestFile
@@ -160,9 +162,11 @@ final class TestFilesystem implements Filesystem
         return new TestDirectory($this->inner()->mkdir($path, $content, $config));
     }
 
-    public function chmod(string $path, string $visibility): TestNode
+    public function chmod(string $path, string $visibility): TestFile|TestDirectory
     {
-        return new TestNode($this->inner()->chmod($path, $visibility));
+        $node = $this->inner()->chmod($path, $visibility);
+
+        return $node instanceof File ? new TestFile($node) : new TestDirectory($node);
     }
 
     public function write(string $path, mixed $value, array $config = []): TestFile

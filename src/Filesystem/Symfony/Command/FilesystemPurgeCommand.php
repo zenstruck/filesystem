@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\FilesystemRegistry;
 
 /**
@@ -97,7 +96,7 @@ final class FilesystemPurgeCommand extends Command
         }
 
         foreach ($directory->directories() as $directory) {
-            if (!self::isEmpty($directory)) {
+            if ($directory->first()) {
                 continue;
             }
 
@@ -133,14 +132,5 @@ final class FilesystemPurgeCommand extends Command
         }
 
         return new \DateTimeImmutable($value);
-    }
-
-    private static function isEmpty(Filesystem\Node\Directory $directory): bool
-    {
-        foreach ($directory as $node) {
-            return false;
-        }
-
-        return true;
     }
 }

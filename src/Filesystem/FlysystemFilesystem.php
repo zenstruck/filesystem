@@ -17,6 +17,7 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\PathPrefixer;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\Flysystem\Operator;
 use Zenstruck\Filesystem\Node\Directory;
@@ -24,7 +25,6 @@ use Zenstruck\Filesystem\Node\Directory\FlysystemDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\FlysystemFile;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Node\FlysystemNode;
 use Zenstruck\Stream;
 
 /**
@@ -57,9 +57,17 @@ final class FlysystemFilesystem implements Filesystem
         return $this->operator->name();
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
-        return (new FlysystemNode($path, $this->operator))->ensureExists();
+        if ($this->operator->fileExists($path)) {
+            return new FlysystemFile($path, $this->operator);
+        }
+
+        if ($this->operator->directoryExists($path)) {
+            return new FlysystemDirectory($path, $this->operator);
+        }
+
+        throw new NodeNotFound($path, $this->operator->name());
     }
 
     public function file(string $path): File
@@ -141,11 +149,11 @@ final class FlysystemFilesystem implements Filesystem
         throw new \InvalidArgumentException(\sprintf('"%s" is either not a directory or does not exist.', $content));
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         $this->operator->setVisibility($path, $visibility);
 
-        return new FlysystemNode($path, $this->operator);
+        return $this->node($path);
     }
 
     public function write(string $path, mixed $value, array $config = []): File

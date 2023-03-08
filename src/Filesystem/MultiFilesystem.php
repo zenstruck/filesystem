@@ -36,7 +36,7 @@ final class MultiFilesystem implements Filesystem
         return $this->get($filesystem)->name();
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 
@@ -117,7 +117,7 @@ final class MultiFilesystem implements Filesystem
         return $filesystem->mkdir($path, $content, $config);
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         [$filesystem, $path] = $this->parsePath($path);
 

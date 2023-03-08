@@ -28,7 +28,7 @@ trait DecoratedFilesystem
         return $this->inner()->name();
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
         return $this->inner()->node($path);
     }
@@ -75,7 +75,7 @@ trait DecoratedFilesystem
         return $this->inner()->mkdir($path, $content, $config);
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         return $this->inner()->chmod($path, $visibility);
     }

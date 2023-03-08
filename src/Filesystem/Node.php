@@ -77,6 +77,7 @@ interface Node
 
     /**
      * @throws NodeNotFound
+     * @throws NodeTypeMismatch       if exists but the wrong type
      * @throws UnableToCheckExistence
      * @throws FilesystemException
      */

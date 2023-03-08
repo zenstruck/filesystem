@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Node\DecoratedNode;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class TestNode implements Node
+abstract class TestNode implements Node
 {
     use DecoratedNode;
 

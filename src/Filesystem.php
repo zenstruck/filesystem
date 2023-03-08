@@ -24,7 +24,6 @@ use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
 use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -46,7 +45,7 @@ interface Filesystem
      * @throws UnableToCheckExistence
      * @throws FilesystemException
      */
-    public function node(string $path): Node;
+    public function node(string $path): File|Directory;
 
     /**
      * Return a "file" object for the path.
@@ -147,7 +146,7 @@ interface Filesystem
      * @throws UnableToSetVisibility
      * @throws FilesystemException
      */
-    public function chmod(string $path, string $visibility): Node;
+    public function chmod(string $path, string $visibility): File|Directory;
 
     /**
      * Create/overwrite file in the filesystem.

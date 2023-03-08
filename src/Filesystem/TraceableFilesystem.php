@@ -77,7 +77,7 @@ final class TraceableFilesystem implements Filesystem
         $this->operations = [];
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
         return $this->track(fn() => $this->inner()->node($path), Operation::READ, $path, 'node');
     }
@@ -124,7 +124,7 @@ final class TraceableFilesystem implements Filesystem
         return $this->track(fn() => $this->inner()->mkdir($path, $content, $config), Operation::MKDIR, $path);
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         return $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
     }

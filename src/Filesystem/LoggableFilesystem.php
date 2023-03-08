@@ -43,7 +43,7 @@ final class LoggableFilesystem implements Filesystem
     ) {
     }
 
-    public function node(string $path): Node
+    public function node(string $path): File|Directory
     {
         $this->log(
             $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
@@ -175,7 +175,7 @@ final class LoggableFilesystem implements Filesystem
         return $this->inner()->mkdir($path, $content, $config);
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         $this->log(
             $this->config[Operation::CHMOD] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],

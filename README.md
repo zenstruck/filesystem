@@ -44,7 +44,7 @@ composer require zenstruck/filesystem
 
 // read operations
 $filesystem->has('some/path'); // bool
-$filesystem->node('some/path'); // Zenstruck\Filesystem\Node or throws NodeNotFound
+$filesystem->node('some/path'); // Zenstruck\Filesystem\Node\File|Zenstruck\Filesystem\Node\Directory or throws NodeNotFound
 $filesystem->file('some/path.txt'); // Zenstruck\Filesystem\Node\File or throws NodeNotFound or NodeTypeMismatch (if exists but not a file)
 $filesystem->image('some/path.png'); // Zenstruck\Filesystem\Node\File\Image or throws NodeNotFound or NodeTypeMismatch (if exists but not an image)
 $filesystem->directory('some/path'); // Zenstruck\Filesystem\Node\Directory or throws NodeNotFound or NodeTypeMismatch (if exists but not a directory)

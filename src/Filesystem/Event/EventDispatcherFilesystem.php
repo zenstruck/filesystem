@@ -14,7 +14,6 @@ namespace Zenstruck\Filesystem\Event;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\DecoratedFilesystem;
-use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\Directory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Operation;
@@ -72,7 +71,7 @@ final class EventDispatcherFilesystem implements Filesystem
         return $directory;
     }
 
-    public function chmod(string $path, string $visibility): Node
+    public function chmod(string $path, string $visibility): File|Directory
     {
         $this->dispatch($event = new PreChmodEvent($this, $path, $visibility), Operation::CHMOD);
         $node = $this->inner->chmod($event->path, $event->visibility);
