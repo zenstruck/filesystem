@@ -106,6 +106,4 @@ interface File extends Node
      * end of the script.
      */
     public function tempFile(): \SplFileInfo;
-
-    public function isImage(): bool;
 }

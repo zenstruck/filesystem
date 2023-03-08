@@ -73,6 +73,16 @@ abstract class FlysystemNode implements Node
         return $this;
     }
 
+    public function isDirectory(): bool
+    {
+        return $this instanceof FlysystemDirectory;
+    }
+
+    public function isFile(): bool
+    {
+        return $this instanceof FlysystemFile;
+    }
+
     public function exists(): bool
     {
         return $this->operator->{$this instanceof File ? 'fileExists' : 'directoryExists'}($this->path());

@@ -204,6 +204,11 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         return $clone;
     }
 
+    public function isImage(): bool
+    {
+        return false;
+    }
+
     private static function normalizeTimestamp(\DateTimeInterface|int|string $timestamp): string
     {
         if (\is_numeric($timestamp)) {

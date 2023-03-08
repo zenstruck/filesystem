@@ -44,10 +44,33 @@ trait FileTests
     /**
      * @test
      */
+    public function non_image_metadata_with_extension(): void
+    {
+        $file = $this->createFile(fixture('archive.zip'), 'some/file.zip');
+
+        $this->assertFalse($file->isDirectory());
+        $this->assertFalse($file->isImage());
+        $this->assertTrue($file->isFile());
+        $this->assertTrue($file->exists());
+        $this->assertSame('public', $file->visibility());
+        $this->assertSame('application/zip', $file->mimeType());
+        $this->assertSame(\date_default_timezone_get(), $file->lastModified()->getTimezone()->getName());
+        $this->assertSame('zip', $file->guessExtension());
+        $this->assertSame(562, $file->size());
+        $this->assertSame('0a4a9b1c162b2b4ccfa9db645f8b7eaa', $file->checksum());
+        $this->assertSame('de4b982f42d1a100f3f9f170cd44b273561f212c', $file->checksum('sha1'));
+    }
+
+    /**
+     * @test
+     */
     public function metadata_with_extension(): void
     {
         $file = $this->createFile(fixture('symfony.png'), 'some/file.png');
 
+        $this->assertFalse($file->isDirectory());
+        $this->assertTrue($file->isImage());
+        $this->assertTrue($file->isFile());
         $this->assertTrue($file->exists());
         $this->assertSame('public', $file->visibility());
         $this->assertSame('image/png', $file->mimeType());
@@ -61,10 +84,33 @@ trait FileTests
     /**
      * @test
      */
+    public function non_image_metadata_without_extension(): void
+    {
+        $file = $this->createFile(fixture('archive.zip'), 'some/file');
+
+        $this->assertFalse($file->isDirectory());
+        $this->assertFalse($file->isImage());
+        $this->assertTrue($file->isFile());
+        $this->assertTrue($file->exists());
+        $this->assertSame('public', $file->visibility());
+        $this->assertSame('application/zip', $file->mimeType());
+        $this->assertSame(\date_default_timezone_get(), $file->lastModified()->getTimezone()->getName());
+        $this->assertSame('zip', $file->guessExtension());
+        $this->assertSame(562, $file->size());
+        $this->assertSame('0a4a9b1c162b2b4ccfa9db645f8b7eaa', $file->checksum());
+        $this->assertSame('de4b982f42d1a100f3f9f170cd44b273561f212c', $file->checksum('sha1'));
+    }
+
+    /**
+     * @test
+     */
     public function metadata_without_extension(): void
     {
         $file = $this->createFile(fixture('symfony.png'), 'some/file');
 
+        $this->assertFalse($file->isDirectory());
+        $this->assertTrue($file->isImage());
+        $this->assertTrue($file->isFile());
         $this->assertNull($file->path()->extension());
         $this->assertSame('png', $file->guessExtension());
         $this->assertSame('image/png', $file->mimeType());

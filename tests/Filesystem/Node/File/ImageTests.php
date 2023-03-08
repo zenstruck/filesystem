@@ -22,6 +22,22 @@ trait ImageTests
     /**
      * @test
      */
+    public function non_image_metadata_with_extension(): void
+    {
+        $this->markTestSkipped();
+    }
+
+    /**
+     * @test
+     */
+    public function non_image_metadata_without_extension(): void
+    {
+        $this->markTestSkipped();
+    }
+
+    /**
+     * @test
+     */
     public function can_get_image_metadata(): void
     {
         $image = $this->createFile(fixture('symfony.png'), 'symfony.png');

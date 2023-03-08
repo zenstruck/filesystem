@@ -99,6 +99,10 @@ $node->directory(); // Zenstruck\Filesystem\Node\Directory|null - parent directo
 $node->visibility(); // string - ie "public" or "private"
 $node->lastModified(); // \DateTimeImmutable (in currently configured timezone)
 
+$node->isDirectory(); // bool
+$node->isFile(); // bool
+$node->isImage(); // bool
+
 $node->exists(); // bool
 $node->ensureExists(); // static or throws NodeNotFound
 
@@ -125,8 +129,6 @@ $file->read(); // "raw" resource
 $file->size(); // int
 
 $file->guessExtension(); // string|null - returns extension if available or attempts to guess from mime-type
-
-$file->isImage(); // bool
 
 $file->checksum(); // string - using FilesystemAdapter's default algorithm
 $file->checksum('md5'); // string - specify the algorithm

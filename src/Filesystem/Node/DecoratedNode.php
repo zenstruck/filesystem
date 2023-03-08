@@ -58,6 +58,21 @@ trait DecoratedNode
         return $this;
     }
 
+    public function isDirectory(): bool
+    {
+        return $this->inner()->isDirectory();
+    }
+
+    public function isFile(): bool
+    {
+        return $this->inner()->isFile();
+    }
+
+    public function isImage(): bool
+    {
+        return $this->inner()->isImage();
+    }
+
     public function ensureExists(): static
     {
         $this->inner()->ensureExists();

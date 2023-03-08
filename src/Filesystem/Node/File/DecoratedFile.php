@@ -71,10 +71,5 @@ trait DecoratedFile
         return $this->inner()->tempFile();
     }
 
-    public function isImage(): bool
-    {
-        return $this->inner()->isImage();
-    }
-
     abstract protected function inner(): File;
 }

@@ -75,6 +75,12 @@ interface Node
      */
     public function refresh(): static;
 
+    public function isDirectory(): bool;
+
+    public function isFile(): bool;
+
+    public function isImage(): bool;
+
     /**
      * @throws NodeNotFound
      * @throws NodeTypeMismatch       if exists but the wrong type

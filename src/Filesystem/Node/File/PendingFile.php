@@ -221,6 +221,11 @@ class PendingFile extends \SplFileInfo implements File
         return $image;
     }
 
+    public function isFile(): bool
+    {
+        return true;
+    }
+
     public function isImage(): bool
     {
         if ($this instanceof Image) {
@@ -228,6 +233,11 @@ class PendingFile extends \SplFileInfo implements File
         }
 
         return \in_array($this->guessExtension(), Image::IMAGE_EXTENSIONS, true);
+    }
+
+    public function isDirectory(): bool
+    {
+        return false;
     }
 
     private function localFlysystem(): Flysystem

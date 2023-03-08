@@ -27,6 +27,9 @@ trait DirectoryTests
     {
         $dir = $this->createDirectory(fixture('sub1'), 'foo/bar');
 
+        $this->assertTrue($dir->isDirectory());
+        $this->assertFalse($dir->isImage());
+        $this->assertFalse($dir->isFile());
         $this->assertTrue($dir->exists());
         $this->assertSame('foo/bar', $dir->path()->toString());
         $this->assertSame('bar', $dir->path()->name());
