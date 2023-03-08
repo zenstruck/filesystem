@@ -27,11 +27,10 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
  */
 abstract class FlysystemNode implements Node
 {
-    private Path $path;
-    private Dsn $dsn;
-
     /** @var array<string,mixed> */
     protected array $cache = [];
+    private Path $path;
+    private Dsn $dsn;
 
     public function __construct(string|Path $path, protected Operator $operator)
     {
