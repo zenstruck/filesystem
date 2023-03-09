@@ -172,6 +172,7 @@ final class AdapterFactory
                         'key' => $parsed['user'] ?? null,
                         'secret' => $parsed['pass'] ?? null,
                     ],
+                    'version' => $parsed['query']['version'] ?? 'latest',
                 ]),
                 $parsed['host'] ?? throw new \InvalidArgumentException('A bucket must be set as the host.'), // bucket
                 $parsed['path'] ?? '', // prefix
