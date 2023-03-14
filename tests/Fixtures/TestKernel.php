@@ -169,7 +169,7 @@ final class TestKernel extends Kernel
             ->setAutowired(true)
             ->setAutoconfigured(true)
         ;
-        $c->register('logger', NullLogger::class); // disable logging
+//        $c->register('logger', NullLogger::class); // disable logging
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
@@ -186,6 +186,6 @@ final class TestKernel extends Kernel
         $routes->add('private_public', '/private/{path}')
             ->requirements(['path' => '.+'])
         ;
-        $routes->import(__DIR__.'/Controller', 'attribute');
+        $routes->import(__DIR__.'/Controller', 'annotation');
     }
 }
