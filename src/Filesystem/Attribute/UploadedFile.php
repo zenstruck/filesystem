@@ -12,57 +12,27 @@
 namespace Zenstruck\Filesystem\Attribute;
 
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\Validator\Constraints\All;
-use Zenstruck\Filesystem\Node\File;
-use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
+use Zenstruck\Filesystem\Node\Path\Expression;
+use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-final class UploadedFile
+final class UploadedFile extends PendingUploadedFile
 {
+    public string|Namer $namer;
+
     public function __construct(
-        public ?string $path = null,
-        public ?array $constraints = null,
-        public int $errorStatus = 422,
-        public ?bool $image = null,
+        public string $filesystem,
+        string|Namer|null $namer = null,
+        ?string $path = null,
+        ?array $constraints = null,
+        int $errorStatus = 422,
+        ?bool $image = null,
     ) {
-    }
+        parent::__construct($path, $constraints, $errorStatus, $image);
 
-    public static function forArgument(ArgumentMetadata $argument): self
-    {
-        $attributes = $argument->getAttributes(self::class);
-
-        $attribute = null;
-        if (!empty($attributes)) {
-            $attribute = $attributes[0];
-            \assert($attribute instanceof self);
-        }
-
-        $constraints = $attribute?->constraints;
-        $image = $attribute?->image ?? \is_a(
-            $argument->getType() ?? File::class,
-            Image::class,
-            true
-        );
-
-        if (null === $constraints && $image) {
-            if ('array' === $argument->getType()) {
-                $constraints = [
-                    new All([new PendingImageConstraint()]),
-                ];
-            } else {
-                $constraints = [new PendingImageConstraint()];
-            }
-        }
-
-        return new self(
-            path: $attribute?->path ?? $argument->getName(),
-            constraints: $constraints,
-            errorStatus: $attribute?->errorStatus ?? 422,
-            image: $image,
-        );
+        $this->namer = $namer ?? Expression::uniqueSlug();
     }
 }

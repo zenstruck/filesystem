@@ -69,6 +69,22 @@ class PendingDocumentValueResolverTest extends WebTestCase
     /**
      * @test
      */
+    public function inject_stored(): void
+    {
+        $client = self::createClient();
+
+        $client->request(
+            'GET',
+            'single-stored-file',
+            files: ['file' => self::uploadedFile()]
+        );
+
+        self::assertSame("some content\n", $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
     public function inject_on_typed_argument_with_path(): void
     {
         $client = self::createClient();

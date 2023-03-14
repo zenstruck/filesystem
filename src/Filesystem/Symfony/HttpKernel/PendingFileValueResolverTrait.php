@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
-use Zenstruck\Filesystem\Attribute\UploadedFile;
+use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Exception\IncorrectFileHttpException;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
@@ -38,7 +38,7 @@ trait PendingFileValueResolverTrait
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $attribute = UploadedFile::forArgument($argument);
+        $attribute = PendingUploadedFile::forArgument($argument);
 
         $files = $this->extractor()->extractFilesFromRequest(
             $request,

@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Fixtures\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -25,7 +26,7 @@ class ArgumentResolverController
 {
     #[Route('/multiple-files', name: 'multiple-files')]
     public function multipleFiles(
-        #[UploadedFile]
+        #[PendingUploadedFile]
         array $files
     ): Response {
         return new Response((string) \count($files));
@@ -33,7 +34,7 @@ class ArgumentResolverController
 
     #[Route('/multiple-images', name: 'multiple-images')]
     public function multipleImages(
-        #[UploadedFile(image: true)]
+        #[PendingUploadedFile(image: true)]
         array $images
     ): Response {
         return new Response((string) \count($images));
@@ -41,7 +42,7 @@ class ArgumentResolverController
 
     #[Route('/multiple-files-with-path', name: 'multiple-files-with-path')]
     public function multipleFilesWithPath(
-        #[UploadedFile('data[files]')]
+        #[PendingUploadedFile('data[files]')]
         array $files
     ): Response {
         return new Response((string) \count($files));
@@ -59,6 +60,14 @@ class ArgumentResolverController
         return new Response($file?->contents() ?? '');
     }
 
+    #[Route('/single-stored-file', name: 'single-stored-file')]
+    public function singleStoredFile(
+        #[UploadedFile('public')]
+        ?File $file
+    ): Response{
+        return new Response($file?->contents() ?? '');
+    }
+
     #[Route('/single-image', name: 'single-image')]
     public function singleImage(Image $image): Response
     {
@@ -67,7 +76,7 @@ class ArgumentResolverController
 
     #[Route('/single-file-with-path', name: 'single-file-with-path')]
     public function singleFileWithPath(
-        #[UploadedFile('data[file]')]
+        #[PendingUploadedFile('data[file]')]
         ?File $file
     ): Response {
         return new Response($file?->contents() ?? '');

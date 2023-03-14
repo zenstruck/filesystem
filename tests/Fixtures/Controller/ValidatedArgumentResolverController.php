@@ -14,7 +14,7 @@ namespace Zenstruck\Tests\Fixtures\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Zenstruck\Filesystem\Attribute\UploadedFile;
+use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;
 
@@ -25,7 +25,7 @@ class ValidatedArgumentResolverController
 {
     #[Route('/validated-file', name: 'validated-file')]
     public function validatedFile(
-        #[UploadedFile(
+        #[PendingUploadedFile(
             constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])],
             errorStatus: 500
         )]

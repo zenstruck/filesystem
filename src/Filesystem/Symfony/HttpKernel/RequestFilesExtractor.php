@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Zenstruck\Filesystem\Attribute\UploadedFile as UploadedFileAttribute;
+use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
+use Zenstruck\Filesystem\Attribute\PendingUploadedFile as UploadedFileAttribute;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
@@ -81,7 +82,7 @@ class RequestFilesExtractor
 
     public static function supports(ArgumentMetadata $argument): bool
     {
-        $attributes = $argument->getAttributes(UploadedFileAttribute::class);
+        $attributes = $argument->getAttributes(PendingUploadedFile::class, ArgumentMetadata::IS_INSTANCEOF);
 
         if (empty($attributes)) {
             $type = $argument->getType();
