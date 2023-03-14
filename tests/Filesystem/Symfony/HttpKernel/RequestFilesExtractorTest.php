@@ -182,7 +182,7 @@ class RequestFilesExtractorTest extends TestCase
     private static function uploadedFile(): UploadedFile
     {
         return new UploadedFile(
-            __DIR__.'/../../../Fixtures/files/textfile.txt',
+            fixture('textfile.txt'),
             'test.txt',
             test: true
         );
@@ -191,7 +191,7 @@ class RequestFilesExtractorTest extends TestCase
     private static function uploadedImage(): UploadedFile
     {
         return new UploadedFile(
-            __DIR__.'/../../../Fixtures/files/symfony.png',
+            fixture('symfony.png'),
             'symfony.png',
             test: true
         );

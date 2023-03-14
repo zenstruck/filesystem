@@ -28,7 +28,7 @@ final class UploadedFile
         public ?bool $image = null,
         public ?bool $multiple = null,
         public ?array $constraints = null,
-        public ?int $errorStatus = null,
+        public int $errorStatus = 422,
     ) {
         if ($this->image && [] === $this->constraints) {
             if ($this->multiple) {
