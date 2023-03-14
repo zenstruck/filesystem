@@ -26,7 +26,6 @@ final class UploadedFile
     public function __construct(
         public ?string $path = null,
         public ?bool $image = null,
-        public ?bool $multiple = null,
         public ?array $constraints = null,
         public int $errorStatus = 422,
     ) {
@@ -62,11 +61,6 @@ final class UploadedFile
         return new self(
             path: $attribute?->path ?? $argument->getName(),
             image: $image,
-            multiple: $attribute?->multiple ?? !\is_a(
-                $argument->getType() ?? File::class,
-                File::class,
-                true
-            ),
             constraints: $constraints,
             errorStatus: $attribute?->errorStatus ?? 422,
         );

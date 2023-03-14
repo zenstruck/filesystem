@@ -43,7 +43,7 @@ trait PendingFileValueResolverTrait
         $files = $this->extractor()->extractFilesFromRequest(
             $request,
             (string) $attribute->path,
-            (bool) $attribute->multiple,
+            'array' === $argument->getType(),
             (bool) $attribute->image,
         );
 
