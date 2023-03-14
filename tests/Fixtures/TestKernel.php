@@ -169,7 +169,7 @@ final class TestKernel extends Kernel
             ->setAutowired(true)
             ->setAutoconfigured(true)
         ;
-//        $c->register('logger', NullLogger::class); // disable logging
+        $c->register('logger', NullLogger::class); // disable logging
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
@@ -186,6 +186,10 @@ final class TestKernel extends Kernel
         $routes->add('private_public', '/private/{path}')
             ->requirements(['path' => '.+'])
         ;
-        $routes->import(__DIR__.'/Controller', 'annotation');
+        $routes->import(__DIR__.'/Controller/ArgumentResolverController.php', 'annotation');
+
+        if (PHP_VERSION_ID >= 80100) {
+            $routes->import(__DIR__.'/Controller/ValidatedArgumentResolverController.php', 'annotation');
+        }
     }
 }

@@ -72,15 +72,4 @@ class ArgumentResolverController
     ): Response {
         return new Response($file?->contents() ?? '');
     }
-
-    #[Route('/validated-file', name: 'validated-file')]
-    public function validatedFile(
-        #[UploadedFile(
-            constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])],
-            errorStatus: 500
-        )]
-        File $file
-    ): Response {
-        return new Response($file->contents());
-    }
 }

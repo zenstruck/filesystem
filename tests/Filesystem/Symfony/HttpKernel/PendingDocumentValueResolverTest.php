@@ -151,14 +151,16 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $response = $client->getResponse();
         self::assertSame(422, $response->getStatusCode());
 
-        $client->request(
-            'GET',
-            'validated-file',
-            files: ['file' => self::uploadedFile()]
-        );
-        $response = $client->getResponse();
+        if (PHP_VERSION_ID >= 80100) {
+            $client->request(
+                'GET',
+                'validated-file',
+                files: ['file' => self::uploadedFile()]
+            );
+            $response = $client->getResponse();
 
-        self::assertSame(500, $response->getStatusCode());
+            self::assertSame(500, $response->getStatusCode());
+        }
     }
 
     private static function uploadedFile(): UploadedFile
