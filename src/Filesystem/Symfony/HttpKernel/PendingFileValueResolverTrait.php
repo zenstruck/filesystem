@@ -42,7 +42,7 @@ trait PendingFileValueResolverTrait
     }
 
     /**
-     * @return iterable<PendingFile|array|null>
+     * @return iterable<File|array|null>
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
