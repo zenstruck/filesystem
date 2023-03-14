@@ -79,7 +79,10 @@ class PendingDocumentValueResolverTest extends WebTestCase
             files: ['file' => self::uploadedFile()]
         );
 
-        self::assertSame("some content\n", $client->getResponse()->getContent());
+        self::assertSame(
+            "public://eb9c2bf0eb63f3a7bc0ea37ef18aeba5/test.txt:some content\n",
+            $client->getResponse()->getContent()
+        );
     }
 
     /**

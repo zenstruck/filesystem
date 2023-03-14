@@ -63,9 +63,15 @@ class ArgumentResolverController
     #[Route('/single-stored-file', name: 'single-stored-file')]
     public function singleStoredFile(
         #[UploadedFile('public')]
-        ?File $file
+        File $file
     ): Response{
-        return new Response($file?->contents() ?? '');
+        return new Response(
+            sprintf(
+                '%s:%s',
+                $file->dsn(),
+                $file->contents()
+            )
+        );
     }
 
     #[Route('/single-image', name: 'single-image')]

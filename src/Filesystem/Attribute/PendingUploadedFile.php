@@ -20,7 +20,7 @@ use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
 class PendingUploadedFile
 {
     public function __construct(

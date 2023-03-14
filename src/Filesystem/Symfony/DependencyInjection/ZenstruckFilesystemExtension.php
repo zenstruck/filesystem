@@ -166,6 +166,8 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('controller.argument_value_resolver', ['priority' => 110])
             ->addArgument(
                 new ServiceLocatorArgument([
+                    FilesystemRegistry::class => new Reference(FilesystemRegistry::class),
+                    PathGenerator::class => new Reference(PathGenerator::class),
                     RequestFilesExtractor::class => new Reference('.zenstruck_document.value_resolver.request_files_extractor'),
                     ValidatorInterface::class => new Reference(ValidatorInterface::class),
                 ])

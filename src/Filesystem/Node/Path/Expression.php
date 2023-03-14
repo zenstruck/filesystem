@@ -33,11 +33,6 @@ final class Expression extends Namer implements \Stringable
         return new self('{name}{ext}');
     }
 
-    public static function uniqueSlug(): self
-    {
-        return new self('{checksum}/{name}{ext}');
-    }
-
     /**
      * @param ?positive-int $length
      */

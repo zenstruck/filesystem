@@ -17,9 +17,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
+use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
+use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Exception\IncorrectFileHttpException;
+use Zenstruck\Filesystem\FilesystemRegistry;
+use Zenstruck\Filesystem\Node;
+use Zenstruck\Filesystem\Node\File;
+use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Filesystem\Node\Mapping;
+use Zenstruck\Filesystem\Node\PathGenerator;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -47,7 +55,11 @@ trait PendingFileValueResolverTrait
             (bool) $attribute->image,
         );
 
-        if ($files && $attribute->constraints) {
+        if (!$files) {
+            return [$files];
+        }
+
+        if ($attribute->constraints) {
             $errors = $this->validator()->validate(
                 $files,
                 $attribute->constraints
@@ -60,12 +72,49 @@ trait PendingFileValueResolverTrait
             }
         }
 
+        if ($attribute instanceof UploadedFile) {
+            if (is_array($files)) {
+                $files = array_map(
+                    fn (PendingFile $file) => $this->saveFile($attribute, $file),
+                    $files
+                );
+            } else {
+                $files = $this->saveFile($attribute, $files);
+            }
+        }
+
         return [$files];
+    }
+
+    private function saveFile(UploadedFile $uploadedFile, PendingFile $file): File
+    {
+        $path = $this->generatePath($uploadedFile, $file);
+        $file = $this->filesystem($uploadedFile->filesystem)
+            ->write($path, $file);
+
+        if ($uploadedFile->image) {
+            return $file->ensureImage();
+        }
+
+        return $file;
     }
 
     private function extractor(): RequestFilesExtractor
     {
         return $this->locator->get(RequestFilesExtractor::class);
+    }
+
+    private function filesystem(string $filesystem): Filesystem
+    {
+        return $this->locator->get(FilesystemRegistry::class)->get($filesystem);
+    }
+
+    private function generatePath(UploadedFile $uploadedFile, Node $node): string
+    {
+        return $this->locator->get(PathGenerator::class)->generate(
+            $uploadedFile->namer,
+            $node
+        );
     }
 
     private function validator(): ValidatorInterface

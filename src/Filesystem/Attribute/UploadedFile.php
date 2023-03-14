@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Node\Path\Namer;
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
 final class UploadedFile extends PendingUploadedFile
 {
     public string|Namer $namer;
@@ -33,6 +33,6 @@ final class UploadedFile extends PendingUploadedFile
     ) {
         parent::__construct($path, $constraints, $errorStatus, $image);
 
-        $this->namer = $namer ?? Expression::uniqueSlug();
+        $this->namer = $namer ?? new Expression('{checksum}/{name}{ext}');
     }
 }
