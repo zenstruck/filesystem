@@ -18,6 +18,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
+use Zenstruck\Filesystem\Exception\IncorrectFileHttpException;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
@@ -55,7 +56,7 @@ trait PendingFileValueResolverTrait
             if (\count($errors)) {
                 \assert($errors instanceof ConstraintViolationList);
 
-                throw new HttpException((int) $attribute->errorStatus, (string) $errors);
+                throw new IncorrectFileHttpException($attribute->errorStatus, (string) $errors);
             }
         }
 
