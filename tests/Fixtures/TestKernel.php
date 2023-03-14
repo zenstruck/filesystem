@@ -13,6 +13,7 @@ namespace Zenstruck\Tests\Fixtures;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use League\Glide\Urls\UrlBuilder;
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -168,6 +169,7 @@ final class TestKernel extends Kernel
             ->setAutowired(true)
             ->setAutoconfigured(true)
         ;
+        $c->register('logger', NullLogger::class); // disable logging
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
