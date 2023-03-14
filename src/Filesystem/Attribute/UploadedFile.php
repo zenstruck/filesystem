@@ -30,15 +30,6 @@ final class UploadedFile
         public ?array $constraints = null,
         public int $errorStatus = 422,
     ) {
-        if ($this->image && [] === $this->constraints) {
-            if ($this->multiple) {
-                $this->constraints = [
-                    new All([new PendingImageConstraint()]),
-                ];
-            } else {
-                $this->constraints = [new PendingImageConstraint()];
-            }
-        }
     }
 
     public static function forArgument(ArgumentMetadata $argument): self
@@ -51,19 +42,32 @@ final class UploadedFile
             \assert($attribute instanceof self);
         }
 
+        $constraints = $attribute?->constraints;
+        $image = $attribute?->image ?? \is_a(
+            $argument->getType() ?? File::class,
+            Image::class,
+            true
+        );
+
+        if (null === $constraints && $image) {
+            if ('array' === $argument->getType()) {
+                $constraints = [
+                    new All([new PendingImageConstraint()]),
+                ];
+            } else {
+                $constraints = [new PendingImageConstraint()];
+            }
+        }
+
         return new self(
             path: $attribute?->path ?? $argument->getName(),
-            image: $attribute?->image ?? \is_a(
-                $argument->getType() ?? File::class,
-                Image::class,
-                true
-            ),
+            image: $image,
             multiple: $attribute?->multiple ?? !\is_a(
                 $argument->getType() ?? File::class,
                 File::class,
                 true
             ),
-            constraints: $attribute?->constraints ?? [],
+            constraints: $constraints,
             errorStatus: $attribute?->errorStatus ?? 422,
         );
     }
