@@ -117,7 +117,7 @@ abstract class LazyNode implements Node
 
     public function exists(): bool
     {
-        return $this->filesystem()->has($this->path());
+        return $this->attributes['_exists'] ??= $this->filesystem()->has($this->path());
     }
 
     public function refresh(): static

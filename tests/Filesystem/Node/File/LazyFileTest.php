@@ -130,7 +130,8 @@ class LazyFileTest extends TestCase
 
         $filesystem->write('some/file.png', 'content');
 
-        $this->assertTrue($file->exists());
+        $this->assertFalse($file->exists());
+        $this->assertTrue($file->refresh()->exists());
     }
 
     /**
