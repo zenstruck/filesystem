@@ -128,6 +128,10 @@ abstract class FlysystemNode implements Node
             return $this;
         }
 
+        if (isset($this->cache['image'])) {
+            return $this->cache['image'];
+        }
+
         $file = $this->ensureFile();
 
         if (!$file->isImage()) {
@@ -137,6 +141,6 @@ abstract class FlysystemNode implements Node
         $image = new FlysystemImage($this->path(), $this->operator);
         $image->cache = $this->cache;
 
-        return $image;
+        return $this->cache['image'] = $image;
     }
 }
