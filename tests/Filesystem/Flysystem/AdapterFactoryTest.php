@@ -73,4 +73,19 @@ final class AdapterFactoryTest extends TestCase
         $this->assertTrue($first->fileExists('foo'));
         $this->assertFalse($second->fileExists('foo'));
     }
+
+    /**
+     * @test
+     */
+    public function can_configure_local_adapter_visibility(): void
+    {
+        $defaultAdapter = AdapterFactory::createAdapter(TEMP_DIR);
+        $customVisibilityAdapter = AdapterFactory::createAdapter(TEMP_DIR.'?visibility[default_for_directories]=public');
+
+        $defaultAdapter->write('dir1/file1.txt', 'content', new Config());
+        $customVisibilityAdapter->write('dir2/file2.txt', 'content', new Config());
+
+        $this->assertSame('700', \sprintf('%o', \fileperms(TEMP_DIR.'/dir1') & 0777));
+        $this->assertSame('755', \sprintf('%o', \fileperms(TEMP_DIR.'/dir2') & 0777));
+    }
 }

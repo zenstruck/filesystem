@@ -24,6 +24,8 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -56,13 +58,27 @@ final class AdapterFactory
         $parsed = self::parse($dsn);
 
         return match ($parsed['scheme'] ?? null) {
-            null, 'file' => new LocalFilesystemAdapter($dsn),
+            null, 'file' => self::createLocalAdapter($dsn, $parsed),
             'flysystem+ftp', 'flysystem+ftps' => self::createFtpAdapter($parsed),
             'flysystem+sftp' => self::createSftpAdapter($parsed),
             'flysystem+s3' => self::createS3Adapter($parsed),
             'in-memory' => self::createInMemoryAdapter($parsed),
             default => throw new \InvalidArgumentException(\sprintf('Could not create FilesystemAdapter for DSN "%s".', $dsn)),
         };
+    }
+
+    private static function createLocalAdapter(string $dsn, array $parsed): LocalFilesystemAdapter
+    {
+        $parsed = self::normalizeQuery($parsed);
+        $visibility = $parsed['query']['visibility'] ?? [];
+
+        return new LocalFilesystemAdapter(
+            \explode('?', $dsn)[0],
+            PortableVisibilityConverter::fromArray(
+                $visibility,
+                $visibility['default_for_directories'] ?? Visibility::PRIVATE
+            )
+        );
     }
 
     private static function parse(string $dsn): array
