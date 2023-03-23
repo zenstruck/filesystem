@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Node\File;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class MappingContext
+final class MappingManager
 {
     /** @var \WeakMap<object,true> */
     private \WeakMap $loaded;

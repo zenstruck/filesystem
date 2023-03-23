@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Fixtures;
 
 use Zenstruck\Filesystem;
-use Zenstruck\Filesystem\Doctrine\MappingContext;
+use Zenstruck\Filesystem\Doctrine\MappingManager;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Filesystem\Node\PathGenerator;
 
@@ -30,7 +30,7 @@ final class Service
         public Filesystem $staticFilesystem,
         public MultiFilesystem $multiFilesystem,
         public PathGenerator $pathGenerator,
-        public MappingContext $objectFileLoader,
+        public MappingManager $objectFileLoader,
     ) {
     }
 }

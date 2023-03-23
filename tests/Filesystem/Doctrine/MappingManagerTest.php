@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Doctrine;
 
-use Zenstruck\Filesystem\Doctrine\MappingContext;
+use Zenstruck\Filesystem\Doctrine\MappingManager;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
@@ -23,7 +23,7 @@ use function Zenstruck\Foundry\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class MappingContextTest extends DoctrineTestCase
+final class MappingManagerTest extends DoctrineTestCase
 {
     /**
      * @test
@@ -108,8 +108,8 @@ final class MappingContextTest extends DoctrineTestCase
         repository(Entity2::class)->assert()->exists(['image1' => $queryImage1]);
     }
 
-    private function mappingContext(): MappingContext
+    private function mappingContext(): MappingManager
     {
-        return self::getContainer()->get(MappingContext::class);
+        return self::getContainer()->get(MappingManager::class);
     }
 }

@@ -14,24 +14,24 @@ namespace Zenstruck\Filesystem\Doctrine\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use Zenstruck\Filesystem\Doctrine\MappingContext;
+use Zenstruck\Filesystem\Doctrine\MappingManager;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class MappingContextExtension extends AbstractExtension
+final class MappingManagerExtension extends AbstractExtension
 {
     public function getFilters(): array
     {
         return [
-            new TwigFilter('load_files', [MappingContext::class, 'load']),
+            new TwigFilter('load_files', [MappingManager::class, 'load']),
         ];
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('load_files', [MappingContext::class, 'load']),
+            new TwigFunction('load_files', [MappingManager::class, 'load']),
         ];
     }
 }
