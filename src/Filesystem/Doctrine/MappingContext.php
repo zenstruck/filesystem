@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FileMappingLoader
+final class MappingContext
 {
     /** @var \WeakMap<object,true> */
     private \WeakMap $loaded;

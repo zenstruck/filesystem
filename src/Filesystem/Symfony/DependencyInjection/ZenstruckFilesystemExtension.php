@@ -29,8 +29,8 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
-use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
-use Zenstruck\Filesystem\Doctrine\Twig\FileMappingLoaderExtension;
+use Zenstruck\Filesystem\Doctrine\MappingContext;
+use Zenstruck\Filesystem\Doctrine\Twig\MappingContextExtension;
 use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
 use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
@@ -128,7 +128,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
         ;
 
-        $container->register(FileMappingLoader::class)
+        $container->register(MappingContext::class)
             ->setArguments([
                 new Reference('doctrine'),
                 new Reference('.zenstruck_filesystem.doctrine.lifecycle_listener'),
@@ -156,7 +156,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
-            $container->register('.zenstruck_filesystem.doctrine.twig_extension', FileMappingLoaderExtension::class)
+            $container->register('.zenstruck_filesystem.doctrine.twig_extension', MappingContextExtension::class)
                 ->addTag('twig.extension')
             ;
         }

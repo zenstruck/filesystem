@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Doctrine;
 
-use Zenstruck\Filesystem\Doctrine\FileMappingLoader;
+use Zenstruck\Filesystem\Doctrine\MappingContext;
 use Zenstruck\Filesystem\Node\Directory\LazyDirectory;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
@@ -23,7 +23,7 @@ use function Zenstruck\Foundry\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FileMappingLoaderTest extends DoctrineTestCase
+final class MappingContextTest extends DoctrineTestCase
 {
     /**
      * @test
@@ -50,9 +50,9 @@ final class FileMappingLoaderTest extends DoctrineTestCase
         $this->em()->clear();
 
         $fromDb = repository(Entity2::class)->first()->object();
-        $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb);
-        $fromDb = self::getContainer()->get(FileMappingLoader::class)($fromDb); // ensure multiple calls work
-        self::getContainer()->get(FileMappingLoader::class)([$fromDb]);
+        $fromDb = self::getContainer()->get(MappingContext::class)($fromDb);
+        $fromDb = self::getContainer()->get(MappingContext::class)($fromDb); // ensure multiple calls work
+        self::getContainer()->get(MappingContext::class)([$fromDb]);
 
         $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
         $this->assertSame('content1', $fromDb->getFile1()->contents());
