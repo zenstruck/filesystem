@@ -53,6 +53,6 @@ abstract class DoctrineTestCase extends KernelTestCase implements FixtureFilesys
 
     protected function loadMappingFor(object $object): object
     {
-        return (self::getContainer()->get(Service::class)->objectFileLoader)($object);
+        return self::getContainer()->get(Service::class)->objectFileLoader->load($object);
     }
 }

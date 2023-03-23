@@ -37,12 +37,12 @@ final class MappingContext
      *
      * @return T
      */
-    public function __invoke(object|iterable $object): object|iterable
+    public function load(object|iterable $object): object|iterable
     {
         if (\is_iterable($object)) {
             foreach ($object as $item) {
                 if (\is_object($item)) {
-                    $this($item);
+                    $this->load($item);
                 }
             }
 

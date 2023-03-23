@@ -24,14 +24,14 @@ final class MappingContextExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('load_files', [MappingContext::class, '__invoke']),
+            new TwigFilter('load_files', [MappingContext::class, 'load']),
         ];
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('load_files', [MappingContext::class, '__invoke']),
+            new TwigFunction('load_files', [MappingContext::class, 'load']),
         ];
     }
 }
