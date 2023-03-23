@@ -17,7 +17,6 @@ use Doctrine\DBAL\Types\StringType as BaseStringType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,10 +33,6 @@ abstract class StringType extends BaseStringType
 
         if ($value instanceof PendingFile) {
             throw new \LogicException('A pending file cannot be added directly to the database - use the event listener.');
-        }
-
-        if ($value instanceof PlaceholderFile) {
-            throw new \LogicException('A placeholder file cannot be added to the database.');
         }
 
         if (!$value instanceof File) {
