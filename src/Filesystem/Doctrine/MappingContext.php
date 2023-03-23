@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Doctrine;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
+use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -60,5 +61,14 @@ final class MappingContext
         $this->loaded[$object] = true;
 
         return $object;
+    }
+
+    public function createQueryFile(object $object, string $property, File $file): File
+    {
+        if (!$om = $this->registry->getManagerForClass($object::class)) {
+            throw new \InvalidArgumentException(\sprintf('Class "%s" is not managed by Doctrine.', $object::class));
+        }
+
+        return $this->listener->createQueryFile($object, $om, $property, $file);
     }
 }

@@ -23,6 +23,7 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Doctrine\Mapping\HasFiles;
 use Zenstruck\Filesystem\Doctrine\Mapping\Stateful;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsDsn;
+use Zenstruck\Filesystem\Doctrine\Mapping\StoreAsPath;
 use Zenstruck\Filesystem\Doctrine\Mapping\StoreWithMetadata;
 use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
@@ -30,9 +31,11 @@ use Zenstruck\Filesystem\Node\Dsn;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
+use Zenstruck\Filesystem\Node\File\Image\PlaceholderImage;
 use Zenstruck\Filesystem\Node\File\Image\SerializableImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Filesystem\Node\File\PlaceholderFile;
 use Zenstruck\Filesystem\Node\File\SerializableFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
@@ -52,6 +55,25 @@ final class NodeLifecycleListener
 
     public function __construct(private ContainerInterface $container)
     {
+    }
+
+    public function createQueryFile(object $object, ObjectManager $om, string $field, File $file): File
+    {
+        [$object,, $collection] = self::extract($object, $om);
+
+        if (!$collection) {
+            throw new \InvalidArgumentException(\sprintf('No file mappings found for "%s".', $object::class));
+        }
+
+        $mapping = $collection->statefulMappings[$field] ?? throw new \InvalidArgumentException(\sprintf('%s::$%s is not mapped.', $object::class, $field));
+
+        if (!$mapping instanceof StoreAsPath) {
+            throw new \LogicException('Only StoreAsPath mappings are currently supported.');
+        }
+
+        $path = $this->generatePath($mapping, $file, $object, $field);
+
+        return $file instanceof Image ? new PlaceholderImage($path) : new PlaceholderFile($path);
     }
 
     public function load(object $object, ObjectManager $om, bool $force): void

@@ -50,9 +50,9 @@ final class MappingContextTest extends DoctrineTestCase
         $this->em()->clear();
 
         $fromDb = repository(Entity2::class)->first()->object();
-        $fromDb = self::getContainer()->get(MappingContext::class)->load($fromDb);
-        $fromDb = self::getContainer()->get(MappingContext::class)->load($fromDb); // ensure multiple calls work
-        self::getContainer()->get(MappingContext::class)->load([$fromDb]);
+        $fromDb = $this->mappingContext()->load($fromDb);
+        $fromDb = $this->mappingContext()->load($fromDb); // ensure multiple calls work
+        $this->mappingContext()->load([$fromDb]);
 
         $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
         $this->assertSame('content1', $fromDb->getFile1()->contents());
@@ -87,5 +87,29 @@ final class MappingContextTest extends DoctrineTestCase
 
         $this->assertContains('some/dir/foo/file1.txt', $files);
         $this->assertContains('some/dir/foo/file2.txt', $files);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_files_for_querying(): void
+    {
+        $object = new Entity2('FoO');
+        $object->setFile1($file1 = $this->filesystem()->write('private://some/file1.txt', 'content1'));
+        $object->setImage1($image1 = $this->filesystem()->write('private://some/image1.jpg', 'content1')->ensureImage());
+        $this->em()->persist($object);
+        $this->em()->flush();
+        $this->em()->clear();
+
+        $queryFile1 = $this->mappingContext()->createQueryFile($object, 'file1', $file1);
+        $queryImage1 = $this->mappingContext()->createQueryFile($object, 'image1', $image1);
+
+        repository(Entity2::class)->assert()->exists(['file1' => $queryFile1]);
+        repository(Entity2::class)->assert()->exists(['image1' => $queryImage1]);
+    }
+
+    private function mappingContext(): MappingContext
+    {
+        return self::getContainer()->get(MappingContext::class);
     }
 }
