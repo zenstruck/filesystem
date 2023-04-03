@@ -19,6 +19,8 @@ use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
+ *
+ * @readonly
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
 class PendingUploadedFile

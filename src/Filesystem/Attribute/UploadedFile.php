@@ -17,6 +17,8 @@ use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
+ *
+ * @readonly
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
 final class UploadedFile extends PendingUploadedFile

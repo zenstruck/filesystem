@@ -36,9 +36,7 @@ use Zenstruck\Filesystem\Symfony\Exception\IncorrectFileHttpException;
  */
 trait PendingFileValueResolverTrait
 {
-    public function __construct(
-        private ServiceProviderInterface $locator
-    ) {
+    /** @phpstan-ignore-line */public function __construct(private ServiceProviderInterface $locator) {
     }
 
     /**
