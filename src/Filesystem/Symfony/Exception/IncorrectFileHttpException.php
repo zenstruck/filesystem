@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Filesystem\Exception;
+namespace Zenstruck\Filesystem\Symfony\Exception;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

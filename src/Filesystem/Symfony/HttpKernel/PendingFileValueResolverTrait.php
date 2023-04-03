@@ -20,7 +20,6 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
-use Zenstruck\Filesystem\Exception\IncorrectFileHttpException;
 use Zenstruck\Filesystem\FilesystemRegistry;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Filesystem\Node\File;
@@ -28,6 +27,7 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
+use Zenstruck\Filesystem\Symfony\Exception\IncorrectFileHttpException;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
