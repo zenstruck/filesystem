@@ -39,8 +39,8 @@ trait PendingFileValueResolverTrait
     }
 
         /**
-     * @return iterable<File|array|null>
-     */
+         * @return iterable<File|array|null>
+         */
         public function resolve(Request $request, ArgumentMetadata $argument): iterable
         {
             $attribute = PendingUploadedFile::forArgument($argument);
