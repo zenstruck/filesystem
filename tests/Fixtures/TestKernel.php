@@ -188,7 +188,7 @@ final class TestKernel extends Kernel
         ;
         $routes->import(__DIR__.'/Controller/ArgumentResolverController.php', 'annotation');
 
-        if (PHP_VERSION_ID >= 80100) {
+        if (\PHP_VERSION_ID >= 80100) {
             $routes->import(__DIR__.'/Controller/ValidatedArgumentResolverController.php', 'annotation');
         }
     }

@@ -17,7 +17,6 @@ use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Attribute\UploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
-use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -64,9 +63,9 @@ class ArgumentResolverController
     public function singleStoredFile(
         #[UploadedFile('public')]
         File $file
-    ): Response{
+    ): Response {
         return new Response(
-            sprintf(
+            \sprintf(
                 '%s:%s',
                 $file->dsn(),
                 $file->contents()

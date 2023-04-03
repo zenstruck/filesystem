@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
-use Zenstruck\Filesystem\Attribute\PendingUploadedFile as UploadedFileAttribute;
 use Zenstruck\Filesystem\Exception\NodeTypeMismatch;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;

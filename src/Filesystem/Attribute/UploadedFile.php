@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Filesystem\Attribute;
 
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\Path\Namer;
 
@@ -20,7 +19,7 @@ use Zenstruck\Filesystem\Node\Path\Namer;
  *
  * @readonly
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class UploadedFile extends PendingUploadedFile
 {
     public string|Namer $namer;

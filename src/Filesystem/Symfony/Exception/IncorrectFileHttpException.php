@@ -18,5 +18,4 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class IncorrectFileHttpException extends HttpException
 {
-
 }

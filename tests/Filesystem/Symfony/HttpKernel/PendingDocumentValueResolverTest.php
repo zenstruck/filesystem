@@ -170,7 +170,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $response = $client->getResponse();
         self::assertSame(422, $response->getStatusCode());
 
-        if (PHP_VERSION_ID >= 80100) {
+        if (\PHP_VERSION_ID >= 80100) {
             $client->request(
                 'GET',
                 'validated-file',
