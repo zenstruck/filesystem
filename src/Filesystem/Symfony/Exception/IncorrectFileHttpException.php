@@ -11,11 +11,11 @@
 
 namespace Zenstruck\Filesystem\Symfony\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
  */
-class IncorrectFileHttpException extends HttpException
+class IncorrectFileHttpException extends UnprocessableEntityHttpException
 {
 }

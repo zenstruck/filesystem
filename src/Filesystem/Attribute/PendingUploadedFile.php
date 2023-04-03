@@ -28,7 +28,6 @@ class PendingUploadedFile
     public function __construct(
         public ?string $path = null,
         public ?array $constraints = null,
-        public int $errorStatus = 422,
         public ?bool $image = null,
     ) {
     }

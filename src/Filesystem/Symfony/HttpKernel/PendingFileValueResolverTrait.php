@@ -65,7 +65,7 @@ trait PendingFileValueResolverTrait
                 if (\count($errors)) {
                     \assert($errors instanceof ConstraintViolationList);
 
-                    throw new IncorrectFileHttpException($attribute->errorStatus, (string) $errors);
+                    throw new IncorrectFileHttpException((string) $errors);
                 }
             }
 

@@ -29,10 +29,9 @@ final class UploadedFile extends PendingUploadedFile
         string|Namer|null $namer = null,
         ?string $path = null,
         ?array $constraints = null,
-        int $errorStatus = 422,
         ?bool $image = null,
     ) {
-        parent::__construct($path, $constraints, $errorStatus, $image);
+        parent::__construct($path, $constraints, $image);
 
         $this->namer = $namer ?? new Expression('{checksum}/{name}{ext}');
     }

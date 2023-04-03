@@ -178,7 +178,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
             );
             $response = $client->getResponse();
 
-            self::assertSame(500, $response->getStatusCode());
+            self::assertSame(422, $response->getStatusCode());
         }
     }
 
