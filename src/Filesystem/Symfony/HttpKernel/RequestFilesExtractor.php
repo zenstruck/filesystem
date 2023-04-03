@@ -25,6 +25,8 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
+ *
+ * @internal
  */
 class RequestFilesExtractor
 {
