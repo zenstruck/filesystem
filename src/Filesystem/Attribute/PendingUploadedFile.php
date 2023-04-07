@@ -32,6 +32,9 @@ class PendingUploadedFile
     ) {
     }
 
+    /**
+     * @internal
+     */
     public static function forArgument(ArgumentMetadata $argument): self
     {
         $attributes = $argument->getAttributes(self::class, ArgumentMetadata::IS_INSTANCEOF);
@@ -40,7 +43,7 @@ class PendingUploadedFile
             $attribute = $attributes[0];
             \assert($attribute instanceof self);
         } else {
-            $attribute = new self();
+            $attribute = new static();
         }
 
         $attribute->path ??= $argument->getName();
