@@ -104,6 +104,6 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return array_map(static fn() => true, self::TYPE_MAP);
+        return \array_map(static fn() => true, self::TYPE_MAP);
     }
 }
