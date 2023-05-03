@@ -13,7 +13,6 @@ namespace Zenstruck\Filesystem\Symfony\Serializer;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Zenstruck\Filesystem\FilesystemRegistry;
@@ -33,7 +32,7 @@ use Zenstruck\Filesystem\Node\PathGenerator;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     private const TYPE_MAP = [
         File::class => LazyFile::class,
@@ -103,8 +102,8 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return isset(self::TYPE_MAP[$type]);
     }
 
-    public function hasCacheableSupportsMethod(): bool
+    public function getSupportedTypes(?string $format): array
     {
-        return true;
+        return array_map(static fn() => true, self::TYPE_MAP);
     }
 }
