@@ -39,13 +39,12 @@ trait InteractsWithFilesystemTests
      */
     public function created_filesystem_is_purged(): void
     {
-        $filesystem = $this->filesystem();
-        $filesystem->write('file.txt', 'content');
+        $this->filesystem()->write('file.txt', 'content');
 
-        $filesystem->assertExists('file.txt');
+        $this->filesystem()->assertExists('file.txt');
 
         $this->_resetFilesystems();
 
-        $filesystem->assertNotExists('file.txt');
+        $this->filesystem()->assertNotExists('file.txt');
     }
 }

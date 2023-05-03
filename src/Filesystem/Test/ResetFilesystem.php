@@ -41,6 +41,8 @@ trait ResetFilesystem
 
             self::ensureKernelShutdown();
 
+            unset($this->_testFilesystem);
+
             return;
         }
 
