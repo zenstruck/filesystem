@@ -26,7 +26,7 @@ final class LazyFilesystem implements Filesystem
     /**
      * @param callable():Filesystem $filesystem
      */
-    public function __construct(callable $filesystem)
+    public function __construct(callable $filesystem, private bool $cache = true)
     {
         $this->filesystem = $filesystem;
     }
@@ -35,6 +35,10 @@ final class LazyFilesystem implements Filesystem
     {
         if ($this->filesystem instanceof Filesystem) {
             return $this->filesystem;
+        }
+
+        if (!$this->cache) {
+            return ($this->filesystem)();
         }
 
         return $this->filesystem = ($this->filesystem)();
