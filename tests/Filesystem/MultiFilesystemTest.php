@@ -12,6 +12,8 @@
 namespace Zenstruck\Tests\Filesystem;
 
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
+use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 use Zenstruck\Tests\FilesystemTest;
 
@@ -62,6 +64,33 @@ abstract class MultiFilesystemTest extends FilesystemTest
         $this->assertSame('content 1', $filesystem->file('file1.txt')->contents());
         $this->assertSame('content 2', $filesystem->file('private://file2.txt')->contents());
         $this->assertSame('content 3', $filesystem->file('fixtures://file3.txt')->contents());
+    }
+
+    /**
+     * @test
+     */
+    public function can_wrap_nested_multi_filesystem(): void
+    {
+        $first = in_memory_filesystem();
+        $first->write('file1.txt', 'content 1');
+        $second = in_memory_filesystem();
+        $second->write('file2.txt', 'content 2');
+
+        $filesystem = $this->createMultiFilesystem(
+            [
+                'first' => $first,
+                '_default_' => new LazyFilesystem(fn() => $this->createMultiFilesystem([
+                    'second' => $second,
+                ])),
+            ],
+            '_default_'
+        );
+
+        $this->assertSame('content 2', $filesystem->file('second://file2.txt')->contents());
+
+        $this->expectException(UnregisteredFilesystem::class);
+
+        $filesystem->file('invalid://file.txt');
     }
 
     /**

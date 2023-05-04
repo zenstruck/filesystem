@@ -186,6 +186,15 @@ final class MultiFilesystem implements Filesystem
     {
         $parts = Dsn::normalize($path);
 
-        return [$this->get($parts[0]), $parts[1]];
+        try {
+            return [$this->get($parts[0]), $parts[1]];
+        } catch (UnregisteredFilesystem $e) {
+            if ($this->default) {
+                // the default filesystem might be wrapping a MultiFilesystem
+                return [$this->get($this->default), $path];
+            }
+
+            throw $e;
+        }
     }
 }
