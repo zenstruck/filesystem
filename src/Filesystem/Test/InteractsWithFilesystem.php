@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
 use Zenstruck\Filesystem\FlysystemFilesystem;
+use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
 
 /**
@@ -55,11 +56,16 @@ trait InteractsWithFilesystem
                 $filesystem = new FlysystemFilesystem($filesystem);
             }
         } elseif ($this instanceof KernelTestCase) {
-            try {
-                $filesystem = self::getContainer()->get(MultiFilesystem::class);
-            } catch (NotFoundExceptionInterface $e) {
-                throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
-            }
+            $filesystem = new LazyFilesystem(
+                function() {
+                    try {
+                        return self::getContainer()->get(MultiFilesystem::class);
+                    } catch (NotFoundExceptionInterface $e) {
+                        throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
+                    }
+                },
+                cache: false
+            );
         } else {
             if (!\class_exists(InMemoryFilesystemAdapter::class)) {
                 throw new \LogicException(\sprintf('league/flysystem-memory is required to use "%s". Install with "composer require --dev league/flysystem-memory".', __TRAIT__));

@@ -26,15 +26,31 @@ class KernelTest extends KernelTestCase
      */
     public function filesystems_are_deleted_before_each_test(): void
     {
-        $this->filesystem()->write('private://some/file1.txt', 'content');
-        $this->filesystem()->write('no_reset://some/file2.txt', 'content');
+        $filesystem = $this->filesystem();
+        $filesystem->write('private://some/file1.txt', 'content');
+        $filesystem->write('no_reset://some/file2.txt', 'content');
 
-        $this->filesystem()->assertExists('private://some/file1.txt');
-        $this->filesystem()->assertExists('no_reset://some/file2.txt');
+        $filesystem->assertExists('private://some/file1.txt');
+        $filesystem->assertExists('no_reset://some/file2.txt');
 
         $this->_resetFilesystems();
 
-        $this->filesystem()->assertNotExists('private://some/file1.txt');
-        $this->filesystem()->assertExists('no_reset://some/file2.txt');
+        $filesystem->assertNotExists('private://some/file1.txt');
+        $filesystem->assertExists('no_reset://some/file2.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function filesystem_persists_between_kernel_reboots(): void
+    {
+        $filesystem = $this->filesystem();
+        $filesystem->write('private://some/file1.txt', 'content');
+
+        $filesystem->assertExists('private://some/file1.txt');
+
+        self::ensureKernelShutdown();
+
+        $filesystem->assertExists('private://some/file1.txt');
     }
 }
