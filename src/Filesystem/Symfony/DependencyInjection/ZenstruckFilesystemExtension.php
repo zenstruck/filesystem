@@ -312,7 +312,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                         $config['public_url']['route']['sign'],
                         $config['public_url']['route']['expires'],
                     ])
-            ;
+                ;
 
                 $features[PublicUrlGenerator::class] = new Reference($id);
 
@@ -372,7 +372,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                         $config['image_url']['route']['sign'],
                         $config['image_url']['route']['expires'],
                     ])
-            ;
+                ;
 
                 $features[TransformUrlGenerator::class] = new Reference($id);
 
