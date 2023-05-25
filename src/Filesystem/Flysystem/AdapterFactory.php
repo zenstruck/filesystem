@@ -71,14 +71,15 @@ final class AdapterFactory
     {
         $parsed = self::normalizeQuery($parsed);
         $visibility = $parsed['query']['visibility'] ?? [];
-
-        return new LocalFilesystemAdapter(
-            \explode('?', $dsn)[0],
-            PortableVisibilityConverter::fromArray(
-                $visibility,
-                $visibility['default_for_directories'] ?? Visibility::PRIVATE
-            )
+        $visibilityConverter = new PortableVisibilityConverter(
+            (int) \octdec($visibility['file']['public'] ?? '0644'),
+            (int) \octdec($visibility['file']['private'] ?? '0600'),
+            (int) \octdec($visibility['dir']['public'] ?? '0755'),
+            (int) \octdec($visibility['dir']['private'] ?? '0700'),
+            $visibility['default_for_directories'] ?? Visibility::PRIVATE
         );
+
+        return new LocalFilesystemAdapter(\explode('?', $dsn)[0], $visibilityConverter);
     }
 
     private static function parse(string $dsn): array

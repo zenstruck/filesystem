@@ -19,14 +19,19 @@ use League\Flysystem\InMemory\StaticInMemoryAdapterRegistry;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Filesystem\Flysystem\AdapterFactory;
+use Zenstruck\Tests\InteractsWithTempDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class AdapterFactoryTest extends TestCase
 {
+    use InteractsWithTempDirectory;
+
     /**
      * @after
      */
@@ -80,12 +85,29 @@ final class AdapterFactoryTest extends TestCase
     public function can_configure_local_adapter_visibility(): void
     {
         $defaultAdapter = AdapterFactory::createAdapter(TEMP_DIR);
-        $customVisibilityAdapter = AdapterFactory::createAdapter(TEMP_DIR.'?visibility[default_for_directories]=public');
+        $customVisibilityAdapter = AdapterFactory::createAdapter(TEMP_DIR.'?visibility[default_for_directories]=public&visibility[dir][public]=0775');
 
         $defaultAdapter->write('dir1/file1.txt', 'content', new Config());
         $customVisibilityAdapter->write('dir2/file2.txt', 'content', new Config());
 
         $this->assertSame('700', \sprintf('%o', \fileperms(TEMP_DIR.'/dir1') & 0777));
-        $this->assertSame('755', \sprintf('%o', \fileperms(TEMP_DIR.'/dir2') & 0777));
+        $this->assertSame('775', \sprintf('%o', \fileperms(TEMP_DIR.'/dir2') & 0777));
+    }
+
+    /**
+     * @test
+     */
+    public function temp(): void
+    {
+        $adapter = new LocalFilesystemAdapter(TEMP_DIR, new PortableVisibilityConverter(
+            directoryPublic: 0775,
+            defaultForDirectories: 'public'
+        ));
+
+        dump($adapter);
+
+        $adapter->write('dir2/file2.txt', 'content', new Config());
+
+        $this->assertSame('775', \sprintf('%o', \fileperms(TEMP_DIR.'/dir2') & 0777));
     }
 }
