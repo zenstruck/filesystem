@@ -18,6 +18,9 @@ use Zenstruck\Filesystem\Node\Path\Namer;
  */
 final class Template extends Namer implements \Stringable
 {
+    /**
+     * @param array<string,mixed> $context
+     */
     public function __construct(private string $value, array $context = [])
     {
         $context['template'] = $this;

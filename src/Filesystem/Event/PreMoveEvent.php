@@ -20,6 +20,8 @@ final class PreMoveEvent extends PreOperationEvent
 {
     /**
      * @internal
+     *
+     * @param array<string,mixed> $config
      */
     public function __construct(Filesystem $filesystem, public string $source, public string $destination, public array $config = [])
     {

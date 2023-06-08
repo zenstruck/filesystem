@@ -19,5 +19,8 @@ use League\Flysystem\Config;
  */
 interface TransformUrlGenerator
 {
+    /**
+     * @param string[]|string $filter
+     */
     public function transformUrl(string $path, array|string $filter, Config $config): string;
 }

@@ -37,10 +37,20 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
 
     private ?int $mode = null;
     private bool $recursive = false;
+
+    /** @var callable[] */
     private array $filters = [];
+
+    /** @var string[] */
     private array $filenames = [];
+
+    /** @var string[] */
     private array $notFilenames = [];
+
+    /** @var string[] */
     private array $paths = [];
+
+    /** @var string[] */
     private array $notPaths = [];
 
     /** @var NumberComparator[] */

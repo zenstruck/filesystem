@@ -31,6 +31,7 @@ final class PendingImage extends PendingFile implements Image
 
     /**
      * @param object|callable(object):object $filter
+     * @param array<string,mixed>            $options
      */
     public function transformInPlace(object|callable $filter, array $options = []): self
     {

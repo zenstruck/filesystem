@@ -20,6 +20,9 @@ use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
  */
 final class RouteTemporaryUrlGenerator implements TemporaryUrlGenerator
 {
+    /**
+     * @param array<string,mixed> $routeParameters
+     */
     public function __construct(
         private SignedUrlGenerator $router,
         private string $route,

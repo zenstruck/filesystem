@@ -33,6 +33,9 @@ final class PathGenerator
     {
     }
 
+    /**
+     * @param array<string,mixed> $context
+     */
     public function generate(string|Namer|callable $namer, Node $node, array $context = []): string
     {
         if (\is_string($namer)) {

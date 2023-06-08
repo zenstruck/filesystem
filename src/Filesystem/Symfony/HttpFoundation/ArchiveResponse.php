@@ -22,6 +22,9 @@ use Zenstruck\Filesystem\Node\File;
  */
 final class ArchiveResponse extends BinaryFileResponse
 {
+    /**
+     * @param array<string,string|string[]> $headers
+     */
     private function __construct(\SplFileInfo $file, ?string $filename, int $status, array $headers, bool $public, bool $autoEtag, bool $autoLastModified)
     {
         parent::__construct($file, $status, $headers, $public, null, $autoEtag, $autoLastModified);
@@ -36,9 +39,8 @@ final class ArchiveResponse extends BinaryFileResponse
     /**
      * @param File|Directory|\SplFileInfo|non-empty-array<array-key,File|\SplFileInfo> $what
      * @param string|null                                                              $filename Content-Disposition filename
-     * @param array{
-     *     commit_progress?: callable(float):void
-     * } $config
+     * @param array{commit_progress?: callable(float):void}                            $config
+     * @param array<string,string|string[]>                                            $headers
      */
     public static function zip(File|Directory|\SplFileInfo|array $what, ?string $filename = 'archive.zip', array $config = [], int $status = 200, array $headers = [], bool $public = true, bool $autoEtag = false, bool $autoLastModified = true): self
     {

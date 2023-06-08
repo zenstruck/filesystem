@@ -19,11 +19,11 @@ use Zenstruck\Filesystem\Node\Path\Generator;
  */
 final class CallbackPathGenerator implements Generator
 {
-    /** @var callable(Node,array):string */
+    /** @var callable(Node,array<string,mixed>):string */
     private $callback;
 
     /**
-     * @param callable(Node,array):string $callback
+     * @param callable(Node,array<string,mixed>):string $callback
      */
     public function __construct(callable $callback)
     {

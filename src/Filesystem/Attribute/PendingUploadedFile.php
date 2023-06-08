@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Attribute;
 
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\All;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image;
@@ -26,6 +27,9 @@ use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class PendingUploadedFile
 {
+    /**
+     * @param Constraint[]|null $constraints
+     */
     public function __construct(
         public ?string $path = null,
         public ?array $constraints = null,

@@ -28,9 +28,9 @@ final class FlysystemImage extends FlysystemFile implements Image
         return new PendingImage($this->tempFile()->transform($filter, $options));
     }
 
-    public function transformUrl(array|string $filter, array $config = []): string
+    public function transformUrl(array|string $filter): string
     {
-        return $this->cache['transform-url'][\serialize([$filter, $config])] ??= $this->operator->transformUrl($this->path(), $filter, $config);
+        return $this->cache['transform-url'][\serialize([$filter])] ??= $this->operator->transformUrl($this->path(), $filter);
     }
 
     public function dimensions(): Dimensions

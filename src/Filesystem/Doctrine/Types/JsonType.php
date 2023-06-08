@@ -69,5 +69,8 @@ abstract class JsonType extends BaseJsonType
         return true;
     }
 
+    /**
+     * @param array<string,mixed> $data
+     */
     abstract protected function dataToFile(array $data): LazyFile;
 }

@@ -42,8 +42,9 @@ final class RegisterDoctrineTypePass implements CompilerPassInterface
             return;
         }
 
-        /** @var array $typeDefinition */
         $typeDefinition = $container->getParameter('doctrine.dbal.connection_factory.types');
+
+        \assert(\is_array($typeDefinition));
 
         foreach (self::TYPES as $type) {
             if (!isset($typeDefinition[$type::NAME])) {

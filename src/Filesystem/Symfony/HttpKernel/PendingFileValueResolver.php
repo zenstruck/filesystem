@@ -30,7 +30,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
         }
 
         /**
-         * @return iterable<PendingFile|array|null>
+         * @return iterable<PendingFile|PendingFile[]|null>
          */
         public function resolve(Request $request, ArgumentMetadata $argument): iterable
         {

@@ -75,7 +75,7 @@ class Mapping
     /**
      * @internal
      */
-    public static function fromArray(array $array): self
+    public static function fromArray(array $array): self // @phpstan-ignore-line
     {
         $filesystem = $array['filesystem'] ?? null;
 

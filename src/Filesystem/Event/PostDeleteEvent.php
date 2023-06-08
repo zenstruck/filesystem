@@ -23,6 +23,9 @@ final class PostDeleteEvent extends PostOperationEvent
         return $this->event->path;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function config(): array
     {
         return $this->event->config;

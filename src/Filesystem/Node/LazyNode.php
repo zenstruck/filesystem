@@ -27,6 +27,7 @@ abstract class LazyNode implements Node
 
     protected Node $inner;
 
+    /** @var array<string,mixed> */
     protected array $attributes = [];
 
     /** @var null|Filesystem|callable():Filesystem */
@@ -36,7 +37,7 @@ abstract class LazyNode implements Node
     private $path;
 
     /**
-     * @param null|string|array|callable():string $attributes
+     * @param null|string|array<string,mixed>|callable():string $attributes
      */
     public function __construct(string|callable|array|null $attributes = null)
     {
