@@ -88,6 +88,8 @@ interface File extends Node
     /**
      * @see FilesystemReader::publicUrl()
      *
+     * @param array<string,mixed> $config
+     *
      * @throws UnableToGeneratePublicUrl
      * @throws FilesystemException
      */
@@ -95,6 +97,8 @@ interface File extends Node
 
     /**
      * @see FilesystemReader::temporaryUrl()
+     *
+     * @param array<string,mixed> $config
      *
      * @throws UnableToGenerateTemporaryUrl
      * @throws FilesystemException

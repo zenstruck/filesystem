@@ -35,6 +35,9 @@ final class PostWriteEvent extends PostOperationEvent
         return $this->event->value;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function config(): array
     {
         return $this->event->config;

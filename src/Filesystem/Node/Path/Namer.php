@@ -16,6 +16,9 @@ namespace Zenstruck\Filesystem\Node\Path;
  */
 class Namer
 {
+    /**
+     * @param array<string,mixed> $context
+     */
     public function __construct(private string $id, private array $context = [])
     {
     }
@@ -25,11 +28,17 @@ class Namer
         return $this->id;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     final public function context(): array
     {
         return $this->context;
     }
 
+    /**
+     * @param array<string,mixed> $context
+     */
     final public function with(array $context): static
     {
         $clone = clone $this;

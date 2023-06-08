@@ -98,7 +98,7 @@ final class ExpressionPathGenerator implements Generator
         return \mb_strtolower($this->slugger ? $this->slugger->slug($value) : \str_replace(' ', '-', $value));
     }
 
-    private static function parseVariable(string $variable, ?string $arguments, Node $node, array $context): string
+    private static function parseVariable(string $variable, ?string $arguments, Node $node, array $context): string // @phpstan-ignore-line
     {
         if (\count($parts = \explode(':', $variable)) > 1) {
             return match (\mb_strtolower($parts[0])) {
@@ -121,7 +121,7 @@ final class ExpressionPathGenerator implements Generator
         throw new \LogicException(\sprintf('Unable to parse expression variable {%s}.', $variable));
     }
 
-    private static function parseVariableValue(string $variable, array $arguments, array $context): mixed
+    private static function parseVariableValue(string $variable, array $arguments, array $context): mixed // @phpstan-ignore-line
     {
         if (\array_key_exists($variable, $context)) {
             return $context[$variable];
@@ -130,7 +130,7 @@ final class ExpressionPathGenerator implements Generator
         return self::dotAccess($context, $variable, $arguments);
     }
 
-    private static function parseChecksum(File $file, array $parts): string
+    private static function parseChecksum(File $file, array $parts): string // @phpstan-ignore-line
     {
         unset($parts[0]); // removes "checksum"
 
@@ -147,7 +147,7 @@ final class ExpressionPathGenerator implements Generator
     /**
      * Quick and dirty "dot" accessor that works for objects and arrays.
      */
-    private static function dotAccess(object|array &$what, string $path, array $arguments): mixed
+    private static function dotAccess(object|array &$what, string $path, array $arguments): mixed // @phpstan-ignore-line
     {
         $current = &$what;
 

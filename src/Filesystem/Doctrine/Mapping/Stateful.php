@@ -16,9 +16,15 @@ use Zenstruck\Filesystem\Node\Path\Namer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type Format from Mapping
  */
 abstract class Stateful extends Mapping
 {
+    /**
+     * @param Format              $metadata
+     * @param array<string,mixed> $column
+     */
     public function __construct(
         string|array $metadata,
         ?string $filesystem = null,

@@ -20,6 +20,8 @@ final class PreWriteEvent extends PreOperationEvent
 {
     /**
      * @internal
+     *
+     * @param array<string,mixed> $config
      */
     public function __construct(Filesystem $filesystem, public string $path, public mixed $value, public array $config = [])
     {

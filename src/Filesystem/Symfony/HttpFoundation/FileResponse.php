@@ -21,6 +21,9 @@ use Zenstruck\Stream;
  */
 final class FileResponse extends StreamedResponse
 {
+    /**
+     * @param array<string,string|string[]> $headers
+     */
     public function __construct(File $file, int $status = 200, array $headers = [])
     {
         parent::__construct(static fn() => Stream::inOutput()->write($file->read()), $status, $headers);
@@ -35,7 +38,8 @@ final class FileResponse extends StreamedResponse
     }
 
     /**
-     * @param string|null $filename Content-Disposition filename (defaults to $file's name)
+     * @param string|null                   $filename Content-Disposition filename (defaults to $file's name)
+     * @param array<string,string|string[]> $headers
      */
     public static function inline(File $file, ?string $filename = null, int $status = 200, array $headers = []): self
     {
@@ -45,7 +49,8 @@ final class FileResponse extends StreamedResponse
     }
 
     /**
-     * @param string|null $filename Content-Disposition filename (defaults to $file's name)
+     * @param string|null                   $filename Content-Disposition filename (defaults to $file's name)
+     * @param array<string,string|string[]> $headers
      */
     public static function attachment(File $file, ?string $filename = null, int $status = 200, array $headers = []): self
     {

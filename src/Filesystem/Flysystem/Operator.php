@@ -27,6 +27,9 @@ use Zenstruck\Filesystem\Exception\UnsupportedFeature;
  */
 final class Operator implements FilesystemOperator
 {
+    /**
+     * @param array<class-string,object>|ContainerInterface $features
+     */
     public function __construct(
         private FilesystemOperator $inner,
         private string $name,
@@ -34,9 +37,12 @@ final class Operator implements FilesystemOperator
     ) {
     }
 
-    public function transformUrl(string $path, array|string $filter, array $config = []): string
+    /**
+     * @param string[]|string $filter
+     */
+    public function transformUrl(string $path, array|string $filter): string
     {
-        return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter, new Config($config));
+        return $this->feature(TransformUrlGenerator::class)->transformUrl($path, $filter, new Config([]));
     }
 
     public function name(): string
@@ -44,7 +50,7 @@ final class Operator implements FilesystemOperator
         return $this->name;
     }
 
-    public function publicUrl(string $path, array $config = []): string
+    public function publicUrl(string $path, array $config = []): string // @phpstan-ignore-line
     {
         try {
             return $this->feature(PublicUrlGenerator::class)->publicUrl($path, new Config($config));
@@ -53,7 +59,7 @@ final class Operator implements FilesystemOperator
         }
     }
 
-    public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, array $config = []): string
+    public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, array $config = []): string // @phpstan-ignore-line
     {
         try {
             return $this->feature(TemporaryUrlGenerator::class)->temporaryUrl($path, $expiresAt, new Config($config));
@@ -62,7 +68,7 @@ final class Operator implements FilesystemOperator
         }
     }
 
-    public function checksum(string $path, array $config = []): string
+    public function checksum(string $path, array $config = []): string // @phpstan-ignore-line
     {
         return $this->inner->checksum($path, $config);
     }
@@ -117,12 +123,12 @@ final class Operator implements FilesystemOperator
         return $this->inner->visibility($path);
     }
 
-    public function write(string $location, string $contents, array $config = []): void
+    public function write(string $location, string $contents, array $config = []): void // @phpstan-ignore-line
     {
         $this->inner->write($location, $contents, $config);
     }
 
-    public function writeStream(string $location, $contents, array $config = []): void
+    public function writeStream(string $location, $contents, array $config = []): void // @phpstan-ignore-line
     {
         $this->inner->writeStream($location, $contents, $config);
     }
@@ -142,17 +148,17 @@ final class Operator implements FilesystemOperator
         $this->inner->deleteDirectory($location);
     }
 
-    public function createDirectory(string $location, array $config = []): void
+    public function createDirectory(string $location, array $config = []): void // @phpstan-ignore-line
     {
         $this->inner->createDirectory($location, $config);
     }
 
-    public function move(string $source, string $destination, array $config = []): void
+    public function move(string $source, string $destination, array $config = []): void // @phpstan-ignore-line
     {
         $this->inner->move($source, $destination, $config);
     }
 
-    public function copy(string $source, string $destination, array $config = []): void
+    public function copy(string $source, string $destination, array $config = []): void // @phpstan-ignore-line
     {
         $this->inner->copy($source, $destination, $config);
     }
@@ -176,7 +182,7 @@ final class Operator implements FilesystemOperator
         }
 
         if (\is_array($this->features) && isset($this->features[$feature])) {
-            return $this->features[$feature];
+            return $this->features[$feature]; // @phpstan-ignore-line
         }
 
         throw new UnsupportedFeature($feature, $this->name(), $e ?? null);

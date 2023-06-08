@@ -92,6 +92,8 @@ interface Filesystem
      *
      * @see FilesystemWriter::copy()
      *
+     * @param array<string,mixed> $config
+     *
      * @throws UnableToCopyFile
      * @throws FilesystemException
      */
@@ -101,6 +103,8 @@ interface Filesystem
      * Move a file to another path within the filesystem.
      *
      * @see FilesystemWriter::move()
+     *
+     * @param array<string,mixed> $config
      *
      * @throws UnableToMoveFile
      * @throws FilesystemException
@@ -114,6 +118,8 @@ interface Filesystem
      * for $path.
      *
      * @see FilesystemWriter::delete()
+     *
+     * @param array<string,mixed> $config
      *
      * @throws UnableToDeleteFile
      * @throws UnableToDeleteDirectory
@@ -155,6 +161,7 @@ interface Filesystem
      * @see FilesystemWriter::writeStream()
      *
      * @param resource|Stream|File|\SplFileInfo|string $value
+     * @param array<string,mixed>                      $config
      *
      * @throws \InvalidArgumentException If the $value type is not supported
      * @throws UnableToWriteFile

@@ -47,12 +47,12 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param Node $object
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string // @phpstan-ignore-line
     {
         return Mapping::fromArray($context)->serialize($object);
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool // @phpstan-ignore-line
     {
         return $data instanceof Node && !$data instanceof PendingFile;
     }
@@ -60,7 +60,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param string $data
      */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node // @phpstan-ignore-line
     {
         if (!\is_string($data) && !\is_array($data)) {
             throw new UnexpectedValueException('Data must be a string or array.');
@@ -97,12 +97,12 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $node;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool // @phpstan-ignore-line
     {
         return isset(self::TYPE_MAP[$type]);
     }
 
-    public function getSupportedTypes(?string $format): array
+    public function getSupportedTypes(?string $format): array // @phpstan-ignore-line
     {
         return \array_map(static fn() => true, self::TYPE_MAP);
     }

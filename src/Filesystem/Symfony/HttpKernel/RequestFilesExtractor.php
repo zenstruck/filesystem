@@ -33,6 +33,9 @@ class RequestFilesExtractor
     {
     }
 
+    /**
+     * @return PendingFile|PendingFile[]|null
+     */
     public function extractFilesFromRequest(
         Request $request,
         string $path,

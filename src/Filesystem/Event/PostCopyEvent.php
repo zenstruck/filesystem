@@ -40,6 +40,9 @@ final class PostCopyEvent extends PostOperationEvent
         return $this->event->destination;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function config(): array
     {
         return $this->event->config;

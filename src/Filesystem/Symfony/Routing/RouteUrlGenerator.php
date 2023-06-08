@@ -22,6 +22,9 @@ use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
  */
 abstract class RouteUrlGenerator
 {
+    /**
+     * @param array<string,mixed> $routeParameters
+     */
     public function __construct(
         private ContainerInterface $container,
         private string $route,
@@ -31,6 +34,9 @@ abstract class RouteUrlGenerator
     ) {
     }
 
+    /**
+     * @param array<string,mixed> $routeParameters
+     */
     final protected function generate(string $path, array $routeParameters, ?bool $sign, string|\DateTimeInterface|null $expires): string
     {
         $routeParameters = \array_merge($this->routeParameters, $routeParameters, ['path' => $path]);

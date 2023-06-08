@@ -26,6 +26,9 @@ final class MultiFilesystem implements Filesystem
 {
     private FilesystemRegistry $filesystems;
 
+    /**
+     * @param array<string,Filesystem>|ContainerInterface|FilesystemRegistry $filesystems
+     */
     public function __construct(array|ContainerInterface|FilesystemRegistry $filesystems, private ?string $default = null)
     {
         $this->filesystems = $filesystems instanceof FilesystemRegistry ? $filesystems : new FilesystemRegistry($filesystems);

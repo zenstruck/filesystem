@@ -35,6 +35,9 @@ final class PostMkdirEvent extends PostOperationEvent
         return $this->event->content;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function config(): array
     {
         return $this->event->config;

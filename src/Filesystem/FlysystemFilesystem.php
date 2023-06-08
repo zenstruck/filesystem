@@ -34,6 +34,9 @@ final class FlysystemFilesystem implements Filesystem
 {
     private Operator $operator;
 
+    /**
+     * @param array<class-string,object>|ContainerInterface $features
+     */
     public function __construct(
         FilesystemOperator|FilesystemAdapter|string $flysystem,
         ?string $name = null,

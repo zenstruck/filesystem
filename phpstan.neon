@@ -3,5 +3,3 @@ parameters:
     treatPhpDocTypesAsCertain: false
     paths:
         - src
-    ignoreErrors:
-        - '#no value type specified in iterable type array#'

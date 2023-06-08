@@ -65,7 +65,7 @@ use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
  */
 final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
-    protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
+    protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore-line
     {
         $registry = $container->register(FilesystemRegistry::class)
             ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key')))
@@ -123,7 +123,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerDoctrine(ContainerBuilder $container, array $config): void
+    private function registerDoctrine(ContainerBuilder $container, array $config): void // @phpstan-ignore-line
     {
         $container->register('.zenstruck_filesystem.doctrine.mapping_listener', NodeMappingListener::class)
             ->addArgument(new Reference(FilesystemRegistry::class))
@@ -210,7 +210,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerFilesystems(array $mergedConfig, ContainerBuilder $container): void
+    private function registerFilesystems(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore-line
     {
         if (!$mergedConfig['filesystems']) {
             return; // no filesystems defined
@@ -229,7 +229,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void
+    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void // @phpstan-ignore-line
     {
         if ('static-in-memory' === $config['dsn']) {
             $config['dsn'] = "in-memory:{$name}";

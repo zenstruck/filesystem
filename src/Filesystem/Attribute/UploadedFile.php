@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Attribute;
 
+use Symfony\Component\Validator\Constraint;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Node\Path\Namer;
 
@@ -24,6 +25,9 @@ final class UploadedFile extends PendingUploadedFile
 {
     public string|Namer $namer;
 
+    /**
+     * @param Constraint[]|null $constraints
+     */
     public function __construct(
         public string $filesystem,
         string|Namer|null $namer = null,

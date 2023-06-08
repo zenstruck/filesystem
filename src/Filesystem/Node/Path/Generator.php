@@ -18,5 +18,8 @@ use Zenstruck\Filesystem\Node;
  */
 interface Generator
 {
+    /**
+     * @param array<string,mixed> $context
+     */
     public function generatePath(Node $node, array $context = []): string;
 }

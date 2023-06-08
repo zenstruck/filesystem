@@ -21,6 +21,8 @@ final class PreMkdirEvent extends PreOperationEvent
 {
     /**
      * @internal
+     *
+     * @param array<string,mixed> $config
      */
     public function __construct(
         Filesystem $filesystem,
