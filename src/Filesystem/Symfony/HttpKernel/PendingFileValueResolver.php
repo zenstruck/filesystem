@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Zenstruck\Filesystem\Node\File\PendingFile;
+use Zenstruck\Filesystem\Node\File;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
@@ -30,7 +30,7 @@ if (\interface_exists(ValueResolverInterface::class)) {
         }
 
         /**
-         * @return iterable<PendingFile|PendingFile[]|null>
+         * @return iterable<File|File[]|null>
          */
         public function resolve(Request $request, ArgumentMetadata $argument): iterable
         {

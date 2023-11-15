@@ -96,7 +96,7 @@ final class FilesystemPurgeCommand extends Command
         }
 
         foreach ($directory->directories() as $directory) {
-            if ($directory->first()) {
+            if ($directory->first()) { // @phpstan-ignore-line
                 continue;
             }
 
