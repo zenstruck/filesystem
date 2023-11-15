@@ -140,10 +140,12 @@ $file->temporaryUrl('+30 minutes'); // equivalent to above
 $file->tempFile(); // \SplFileInfo - temporary local file that's deleted at the end of the script
 ```
 
-> **Note**: See [`zenstruck/temp-file`](https://github.com/zenstruck/temp-file#zenstrucktemp-file) for more
+> [!NOTE]
+> See [`zenstruck/temp-file`](https://github.com/zenstruck/temp-file#zenstrucktemp-file) for more
 > details about `File::tempFile()`.
 
-> **Note**: See [`zenstruck/stream`](https://github.com/zenstruck/stream#zenstruckstream) for more
+> [!NOTE]
+> See [`zenstruck/stream`](https://github.com/zenstruck/stream#zenstruckstream) for more
 > details about `File::stream()`.
 
 #### `PendingFile`
@@ -193,7 +195,8 @@ $image->transform(
 ); // PendingImage
 ```
 
-> **Note**: See [`zenstruck/image`](https://github.com/zenstruck/image#zenstruckimage) for more
+> [!NOTE]
+> See [`zenstruck/image`](https://github.com/zenstruck/image#zenstruckimage) for more
 > details about `Image::transform()`.
 
 ##### `PendingImage`
@@ -268,7 +271,8 @@ $directories = $directory
 $directories->first(); // null|\Zenstruck\Filesystem\Node
 ```
 
-> **Note**: Most of the _advanced filters_ require `symfony/finder` (`composer require symfony/finder`).
+> [!NOTE]
+> Most of the _advanced filters_ require `symfony/finder` (`composer require symfony/finder`).
 
 ## Filesystems
 
@@ -363,7 +367,8 @@ $filesystem->file('another/file.txt'); // File from "filesystem2"
 
 ### `LoggableFilesystem`
 
-> **Note**: A `psr/log-implementation` is required.
+> [!NOTE]
+> A `psr/log-implementation` is required.
 
 ```php
 use Zenstruck\Filesystem\LoggableFilesystem;
@@ -392,7 +397,8 @@ $filesystem = new LoggableFilesystem($inner, $logger, [
 
 ### `EventDispatcherFilesystem`
 
-> **Note**: A `psr/event-dispatcher-implementation` is required.
+> [!NOTE]
+> A `psr/event-dispatcher-implementation` is required.
 
 ```php
 use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
@@ -420,13 +426,16 @@ $filesystem->move('file.png', 'file2.png'); // PreMoveEvent/PostMoveEvent dispat
 ;
 ```
 
-> **Note**: See event classes to see what is made available to them.
+> [!NOTE]
+> See event classes to see what is made available to them.
 
-> **Note**: The `Pre*Event` properties can be manipulated.
+> [!NOTE]
+> The `Pre*Event` properties can be manipulated.
 
 ### `ZipFile`
 
-> **Note**: `league/flysystem-ziparchive` is required (`composer require league/flysystem-ziparchive`).
+> [!NOTE]
+> `league/flysystem-ziparchive` is required (`composer require league/flysystem-ziparchive`).
 
 This is a special filesystem wrapping a local zip archive. It acts as both a `Filesystem` and `\SplFileInfo` object:
 
@@ -505,7 +514,8 @@ $zipFile = ZipFile::compress(..., filename: 'path/to/archive.zip');
 
 ### `TarFile`
 
-> **Note**: `league/flysystem-read-only` is required (`composer require league/flysystem-read-only`).
+> [!NOTE]
+> `league/flysystem-read-only` is required (`composer require league/flysystem-read-only`).
 
 This is a special filesystem wrapping an existing local tar(.gz/bz2) archive. It acts as both a _readonly_
 `Filesystem` and `\SplFileInfo` object:
@@ -525,7 +535,8 @@ $archive->file('some/file.txt'); // \Zenstruck\Filesystem\Node\File
 This filesystem wraps another and provides assertions for your tests. When using PHPUnit, these assertions are
 converted to PHPUnit assertions.
 
-> **Note**: `zenstruck/assert` is required to use the assertions (`composer require --dev zenstruck/assert`).
+> [!NOTE]
+> `zenstruck/assert` is required to use the assertions (`composer require --dev zenstruck/assert`).
 
 ```php
 use Zenstruck\Filesystem\Test\TestFilesystem;
@@ -589,7 +600,8 @@ $file = $filesystem->realFile('symfony.png'); // \SplFileInfo('/tmp/symfony.png'
 
 Use the `InteractsWithFilesystem` trait in your unit tests to quickly provide an in-memory filesystem.
 
-> **Note**: By default, `league/flysystem-memory` is required (`composer require --dev league/flysystem-memory`).
+> [!NOTE]
+> By default, `league/flysystem-memory` is required (`composer require --dev league/flysystem-memory`).
 
 ```php
 use PHPUnit\Framework\TestCase;
@@ -636,7 +648,8 @@ class MyTest extends TestCase implements FilesystemProvider
 }
 ```
 
-> **Note**: By default, the provided filesystem isn't reset before each test. See the
+> [!NOTE]
+> By default, the provided filesystem isn't reset before each test. See the
 > [`ResetFilesystem`](#resetfilesystem) to enable this behaviour.
 
 #### `FixtureFilesystemProvider`
@@ -670,7 +683,8 @@ class MyTest extends TestCase implements FixtureFilesystemProvider
 }
 ```
 
-> **Note**: If the [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/)
+> [!NOTE]
+> If the [`league/flysystem-read-only`](https://flysystem.thephpleague.com/docs/adapter/read-only/)
 > adapter is available, it's used to wrap your fixture adapter to ensure you don't accidentally overwrite/delete
 > your fixture files (`composer require --dev league/flysystem-read-only`).
 

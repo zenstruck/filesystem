@@ -14,6 +14,8 @@ namespace Zenstruck\Filesystem\Test\Node\Foundry;
 use Zenstruck\Filesystem\Test\Node\Mock;
 use Zenstruck\Foundry\LazyValue;
 
+use function Zenstruck\Foundry\lazy;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -25,7 +27,7 @@ final class LazyMock
      */
     public static function pendingFile(?string $filename = null, ?string $extension = null, mixed $content = null): LazyValue
     {
-        return new LazyValue(fn() => Mock::pendingFile($filename, $extension, $content));
+        return lazy(fn() => Mock::pendingFile($filename, $extension, $content));
     }
 
     /**
@@ -33,6 +35,6 @@ final class LazyMock
      */
     public static function pendingImage(int $width = 10, int $height = 10, string $type = 'png', ?string $filename = null): LazyValue
     {
-        return new LazyValue(fn() => Mock::pendingImage($width, $height, $type, $filename));
+        return lazy(fn() => Mock::pendingImage($width, $height, $type, $filename));
     }
 }
