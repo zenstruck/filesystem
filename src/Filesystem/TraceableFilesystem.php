@@ -68,7 +68,7 @@ final class TraceableFilesystem implements Filesystem
     public function totalWrites(): int
     {
         return \array_sum(
-            \array_map(fn($type) => \count($this->operations[$type] ?? []), Operation::writes())
+            \array_map(fn($type) => \count($this->operations[$type] ?? []), Operation::writes()),
         );
     }
 
@@ -134,7 +134,7 @@ final class TraceableFilesystem implements Filesystem
         return $this->track(
             fn() => $this->inner()->write($path, $value, $config),
             Operation::WRITE, $path,
-            \get_debug_type($value)
+            \get_debug_type($value),
         );
     }
 

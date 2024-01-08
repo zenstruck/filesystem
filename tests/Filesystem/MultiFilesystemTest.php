@@ -58,7 +58,7 @@ abstract class MultiFilesystemTest extends FilesystemTest
                 ], 'public'),
                 'fixtures' => $fifth,
             ],
-            '_default_'
+            '_default_',
         );
 
         $this->assertSame('content 1', $filesystem->file('file1.txt')->contents());
@@ -83,7 +83,7 @@ abstract class MultiFilesystemTest extends FilesystemTest
                     'second' => $second,
                 ])),
             ],
-            '_default_'
+            '_default_',
         );
 
         $this->assertSame('content 2', $filesystem->file('second://file2.txt')->contents());

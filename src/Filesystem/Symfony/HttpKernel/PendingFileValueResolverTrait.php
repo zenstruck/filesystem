@@ -61,7 +61,7 @@ trait PendingFileValueResolverTrait
         if ($attribute->constraints) {
             $errors = $this->validator()->validate(
                 $files,
-                $attribute->constraints
+                $attribute->constraints,
             );
 
             if (\count($errors)) {
@@ -75,7 +75,7 @@ trait PendingFileValueResolverTrait
             if (\is_array($files)) {
                 $files = \array_map(
                     fn(PendingFile $file) => $this->saveFile($attribute, $file),
-                    $files
+                    $files,
                 );
             } else {
                 $files = $this->saveFile($attribute, $files);
@@ -113,7 +113,7 @@ trait PendingFileValueResolverTrait
     {
         return $this->locator->get(PathGenerator::class)->generate(
             $uploadedFile->namer,
-            $node
+            $node,
         );
     }
 

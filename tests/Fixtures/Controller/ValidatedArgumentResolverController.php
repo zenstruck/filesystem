@@ -25,9 +25,9 @@ class ValidatedArgumentResolverController
     #[Route('/validated-file', name: 'validated-file')]
     public function validatedFile(
         #[PendingUploadedFile(
-            constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])]
+            constraints: [new PendingFileConstraint(mimeTypes: ['application/pdf'])],
         )]
-        File $file
+        File $file,
     ): Response {
         return new Response($file->contents());
     }

@@ -34,7 +34,7 @@ class RequestFilesExtractorTest extends TestCase
         $request = Request::create('');
 
         self::assertNull(
-            $extractor->extractFilesFromRequest($request, 'file')
+            $extractor->extractFilesFromRequest($request, 'file'),
         );
     }
 
@@ -49,7 +49,7 @@ class RequestFilesExtractorTest extends TestCase
         $request->files->set('upload', self::uploadedFile());
 
         self::assertNull(
-            $extractor->extractFilesFromRequest($request, 'file')
+            $extractor->extractFilesFromRequest($request, 'file'),
         );
     }
 
@@ -125,7 +125,7 @@ class RequestFilesExtractorTest extends TestCase
 
         self::assertSame(
             [],
-            $extractor->extractFilesFromRequest($request, 'file', true)
+            $extractor->extractFilesFromRequest($request, 'file', true),
         );
     }
 
@@ -141,7 +141,7 @@ class RequestFilesExtractorTest extends TestCase
 
         self::assertSame(
             [],
-            $extractor->extractFilesFromRequest($request, 'file', true)
+            $extractor->extractFilesFromRequest($request, 'file', true),
         );
     }
 
@@ -184,7 +184,7 @@ class RequestFilesExtractorTest extends TestCase
         return new UploadedFile(
             fixture('textfile.txt'),
             'test.txt',
-            test: true
+            test: true,
         );
     }
 
@@ -193,7 +193,7 @@ class RequestFilesExtractorTest extends TestCase
         return new UploadedFile(
             fixture('symfony.png'),
             'symfony.png',
-            test: true
+            test: true,
         );
     }
 
@@ -202,8 +202,8 @@ class RequestFilesExtractorTest extends TestCase
         return new RequestFilesExtractor(
             new PropertyAccessor(
                 PropertyAccessor::DISALLOW_MAGIC_METHODS,
-                PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH
-            )
+                PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH,
+            ),
         );
     }
 }

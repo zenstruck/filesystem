@@ -30,7 +30,7 @@ final class SymfonyUploadedFilePendingImageTest extends PendingImageTest
             $file,
             $filename,
             MimeTypes::getDefault()->guessMimeType($file),
-            test: true
+            test: true,
         ));
     }
 }

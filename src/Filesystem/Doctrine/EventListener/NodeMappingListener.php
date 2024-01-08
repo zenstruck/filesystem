@@ -87,7 +87,7 @@ final class NodeMappingListener
                         Image::class === $nodeClass => LazyImage::class,
                         File::class === $nodeClass => LazyFile::class,
                         Directory::class === $nodeClass => LazyDirectory::class,
-                        default => throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s", "%s" or "%s" typehint.', $property->class, $property->name, File::class, Directory::class, Image::class))
+                        default => throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s", "%s" or "%s" typehint.', $property->class, $property->name, File::class, Directory::class, Image::class)),
                     },
                     $mapping,
                 ];

@@ -26,7 +26,7 @@ class ArgumentResolverController
     #[Route('/multiple-files', name: 'multiple-files')]
     public function multipleFiles(
         #[PendingUploadedFile]
-        array $files
+        array $files,
     ): Response {
         return new Response((string) \count($files));
     }
@@ -34,7 +34,7 @@ class ArgumentResolverController
     #[Route('/multiple-images', name: 'multiple-images')]
     public function multipleImages(
         #[PendingUploadedFile(image: true)]
-        array $images
+        array $images,
     ): Response {
         return new Response((string) \count($images));
     }
@@ -42,7 +42,7 @@ class ArgumentResolverController
     #[Route('/multiple-files-with-path', name: 'multiple-files-with-path')]
     public function multipleFilesWithPath(
         #[PendingUploadedFile('data[files]')]
-        array $files
+        array $files,
     ): Response {
         return new Response((string) \count($files));
     }
@@ -62,14 +62,14 @@ class ArgumentResolverController
     #[Route('/single-stored-file', name: 'single-stored-file')]
     public function singleStoredFile(
         #[UploadedFile('public')]
-        File $file
+        File $file,
     ): Response {
         return new Response(
             \sprintf(
                 '%s:%s',
                 $file->dsn(),
-                $file->contents()
-            )
+                $file->contents(),
+            ),
         );
     }
 
@@ -82,7 +82,7 @@ class ArgumentResolverController
     #[Route('/single-file-with-path', name: 'single-file-with-path')]
     public function singleFileWithPath(
         #[PendingUploadedFile('data[file]')]
-        ?File $file
+        ?File $file,
     ): Response {
         return new Response($file?->contents() ?? '');
     }

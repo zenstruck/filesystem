@@ -54,7 +54,7 @@ class PendingFileType extends AbstractType
 
                 $event->setData($data);
             },
-            priority: -10
+            priority: -10,
         );
     }
 

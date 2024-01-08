@@ -95,7 +95,7 @@ class Entity1
             Mapping::PUBLIC_URL,
         ],
         filesystem: 'public',
-        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
+        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}',
     )]
     private ?File $file4 = null;
 
@@ -131,7 +131,7 @@ class Entity1
             Mapping::PUBLIC_URL,
         ],
         filesystem: 'public',
-        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}'
+        namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}',
     )]
     private ?File $file5 = null;
 

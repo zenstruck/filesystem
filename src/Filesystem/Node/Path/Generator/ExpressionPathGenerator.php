@@ -57,7 +57,7 @@ final class ExpressionPathGenerator implements Generator
                     default => $value,
                 };
             },
-            (string) ($context['expression'] ?? self::DEFAULT_EXPRESSION)
+            (string) ($context['expression'] ?? self::DEFAULT_EXPRESSION),
         );
     }
 
@@ -111,7 +111,7 @@ final class ExpressionPathGenerator implements Generator
         $value = self::parseVariableValue(
             $variable,
             null === $arguments ? [] : \array_map(static fn(string $v) => \trim($v), \explode(',', $arguments)),
-            $context
+            $context,
         );
 
         if (null === $value || \is_scalar($value) || $value instanceof \Stringable) {

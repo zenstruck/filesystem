@@ -64,7 +64,7 @@ trait InteractsWithFilesystem
                         throw new \LogicException('Could not get the filesystem from the service container, is the zenstruck/filesystem bundle enabled?', previous: $e);
                     }
                 },
-                cache: false
+                cache: false,
             );
         } else {
             if (!\class_exists(InMemoryFilesystemAdapter::class)) {

@@ -56,7 +56,7 @@ class PendingUploadedFile
         $attribute->image ??= \is_a(
             $argument->getType() ?? File::class,
             Image::class,
-            true
+            true,
         );
 
         if (null === $attribute->constraints && $attribute->image) {

@@ -298,7 +298,7 @@ final class NodeLifecycleListener
         return $this->container->get(PathGenerator::class)->generate(
             $mapping->namer() ?? throw new \LogicException(\sprintf('To save pending files/images, a "namer" must be configured in the filesystem mapping for "%s::$%s".', $object::class, $field)),
             $node,
-            ['this' => $object]
+            ['this' => $object],
         );
     }
 

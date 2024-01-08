@@ -170,7 +170,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                     PathGenerator::class => new Reference(PathGenerator::class),
                     RequestFilesExtractor::class => new Reference('.zenstruck_document.value_resolver.request_files_extractor'),
                     ValidatorInterface::class => new Reference(ValidatorInterface::class),
-                ])
+                ]),
             )
         ;
 
@@ -242,7 +242,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
             $container->setParameter(
                 'zenstruck_filesystem.reset_before_tests_filesystems',
-                \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]) // @phpstan-ignore-line
+                \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]), // @phpstan-ignore-line
             );
         }
 

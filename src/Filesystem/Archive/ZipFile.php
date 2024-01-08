@@ -98,7 +98,7 @@ final class ZipFile extends \SplFileInfo implements Filesystem
                     $file instanceof \SplFileInfo && $file->isFile(), $file instanceof File => $file,
                     default => throw new \InvalidArgumentException(\sprintf('File "%s" is invalid.', \get_debug_type($file))),
                 },
-                $config
+                $config,
             );
         }
 
@@ -151,9 +151,9 @@ final class ZipFile extends \SplFileInfo implements Filesystem
         return $this->inner ??= new FlysystemFilesystem(
             new ZipArchiveAdapter(
                 new BaseZipArchiveAdapter($this->provider(), '/'),
-                $this
+                $this,
             ),
-            "zip://{$this}"
+            "zip://{$this}",
         );
     }
 

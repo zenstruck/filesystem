@@ -89,7 +89,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
                 return $this->container->get(PathGenerator::class)->generate(
                     $mapping->namer(),
                     $node,
-                    $context
+                    $context,
                 );
             });
         }

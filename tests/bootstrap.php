@@ -30,12 +30,12 @@ const TEMP_DIR = __DIR__.'/../var/temp';
 
 function fixture(string $name): SplFileInfo
 {
-    return new \SplFileInfo(FIXTURE_DIR.'/'.$name);
+    return new SplFileInfo(FIXTURE_DIR.'/'.$name);
 }
 
 function tempfile(string $name): SplFileInfo
 {
-    return new \SplFileInfo(TEMP_DIR.'/'.$name);
+    return new SplFileInfo(TEMP_DIR.'/'.$name);
 }
 
 function fixture_filesystem(): Filesystem
@@ -67,6 +67,6 @@ function in_memory_filesystem(string $name = 'default'): Filesystem
                     return "/generate/{$path}?filter={$filter}";
                 }
             },
-        ]
+        ],
     );
 }

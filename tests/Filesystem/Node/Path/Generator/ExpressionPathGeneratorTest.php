@@ -28,11 +28,11 @@ final class ExpressionPathGeneratorTest extends TestCase
     {
         $this->assertMatchesRegularExpression(
             '#^foo-bar-[0-9a-z]{6}$#',
-            $this->name($this->file('some/FoO BaR', 'content'))
+            $this->name($this->file('some/FoO BaR', 'content')),
         );
         $this->assertMatchesRegularExpression(
             '#^foo-bar-[0-9a-z]{6}\.txt$#',
-            $this->name($this->file('some/FoO BaR.TxT', 'content'))
+            $this->name($this->file('some/FoO BaR.TxT', 'content')),
         );
     }
 
@@ -48,24 +48,24 @@ final class ExpressionPathGeneratorTest extends TestCase
         $this->assertSame('foo-bar.txt', $this->name($this->file('some/FoO BaR.tXt'), $context));
         $this->assertSame(
             '9a0364b9e99bb480dd25e1f0284c8555',
-            $this->name($this->file('foo/bar', 'content'), ['expression' => Expression::checksum()])
+            $this->name($this->file('foo/bar', 'content'), ['expression' => Expression::checksum()]),
         );
         $this->assertSame(
             '9a0364b9e99bb480dd25e1f0284c8555.txt',
-            $this->name($this->file('foo/bar.txt', 'content'), ['expression' => Expression::checksum()])
+            $this->name($this->file('foo/bar.txt', 'content'), ['expression' => Expression::checksum()]),
         );
         $this->assertSame(
             '9a0364b9e99bb480dd25e1f0284c8555.txt',
-            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum()])
+            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum()]),
         );
         $this->assertSame(
             '040f06fd774092478d450774f5ba30c5da78acc8.txt',
-            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum(algorithm: 'sha1')]
-            )
+            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum(algorithm: 'sha1')],
+            ),
         );
         $this->assertSame(
             '040f06f.txt',
-            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum(7, 'sha1')])
+            $this->name($this->file('foo/bar.TxT', 'content'), ['expression' => Expression::checksum(7, 'sha1')]),
         );
     }
 
@@ -78,23 +78,23 @@ final class ExpressionPathGeneratorTest extends TestCase
 
         $this->assertSame(
             'a/prefix/path--9a0364b9e99bb480dd25e1f0284c8555.txt',
-            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum}{ext}'])
+            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum}{ext}']),
         );
         $this->assertSame(
             'a/prefix/path--9a0364b.txt',
-            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:7}{ext}'])
+            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:7}{ext}']),
         );
         $this->assertSame(
             'a/prefix/path--040f06fd774092478d450774f5ba30c5da78acc8.txt',
-            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:sha1}{ext}'])
+            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:sha1}{ext}']),
         );
         $this->assertSame(
             'a/prefix/path--040f06f.txt',
-            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:7:sha1}{ext}'])
+            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:7:sha1}{ext}']),
         );
         $this->assertSame(
             'a/prefix/path--040f06f.txt',
-            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:sha1:7}{ext}'])
+            $this->name($file, ['expression' => 'a/prefix/{name}--{checksum:sha1:7}{ext}']),
         );
     }
 
@@ -144,7 +144,7 @@ final class ExpressionPathGeneratorTest extends TestCase
                 'foo.bar' => 'baz',
                 'array' => ['key' => 'value'],
                 'object' => new ContextObject(),
-            ])
+            ]),
         );
     }
 
@@ -159,7 +159,7 @@ final class ExpressionPathGeneratorTest extends TestCase
             'prefix/9a0364b9e99bb480dd25e1f0284c8555-pATh.tXt',
             $this->name($file, [
                 'expression' => 'prefix/{file.checksum}-{file.path.name}',
-            ])
+            ]),
         );
     }
 
@@ -175,7 +175,7 @@ final class ExpressionPathGeneratorTest extends TestCase
             $this->name($file, [
                 'expression' => 'prefix/{object|slug}/{object.prop3|lower}/{file.path.basename|slug}--{checksum:7|upper}{ext}',
                 'object' => new ContextObject(),
-            ])
+            ]),
         );
     }
 

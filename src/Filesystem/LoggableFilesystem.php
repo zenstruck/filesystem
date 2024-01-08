@@ -50,7 +50,7 @@ final class LoggableFilesystem implements Filesystem
             'Reading "{path}" (node) on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->node($path);
@@ -63,7 +63,7 @@ final class LoggableFilesystem implements Filesystem
             'Reading "{path}" (file) on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->file($path);
@@ -76,7 +76,7 @@ final class LoggableFilesystem implements Filesystem
             'Reading "{path}" (directory) on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->directory($path);
@@ -89,7 +89,7 @@ final class LoggableFilesystem implements Filesystem
             'Reading "{path}" (image) on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->image($path);
@@ -102,7 +102,7 @@ final class LoggableFilesystem implements Filesystem
             'Checking existence of "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->has($path);
@@ -116,7 +116,7 @@ final class LoggableFilesystem implements Filesystem
             [
                 'source' => $source,
                 'destination' => $destination,
-            ]
+            ],
         );
 
         return $this->inner()->copy($source, $destination, $config);
@@ -130,7 +130,7 @@ final class LoggableFilesystem implements Filesystem
             [
                 'source' => $source,
                 'destination' => $destination,
-            ]
+            ],
         );
 
         return $this->inner()->move($source, $destination, $config);
@@ -143,7 +143,7 @@ final class LoggableFilesystem implements Filesystem
             'Deleting "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
-            ]
+            ],
         );
 
         $this->inner()->delete($path, $config);
@@ -160,7 +160,7 @@ final class LoggableFilesystem implements Filesystem
                 [
                     'path' => $path,
                     'what' => $content instanceof Directory ? "directory({$content->path()->name()})" : "local-directory({$content->getFilename()})",
-                ]
+                ],
             );
         } else {
             $this->log(
@@ -168,7 +168,7 @@ final class LoggableFilesystem implements Filesystem
                 'Creating directory "{path}" on filesystem "{filesystem}"',
                 [
                     'path' => $path,
-                ]
+                ],
             );
         }
 
@@ -183,7 +183,7 @@ final class LoggableFilesystem implements Filesystem
             [
                 'path' => $path,
                 'visibility' => $visibility,
-            ]
+            ],
         );
 
         return $this->inner()->chmod($path, $visibility);
@@ -206,7 +206,7 @@ final class LoggableFilesystem implements Filesystem
                     default => \get_debug_type($value),
                 },
                 'path' => $path,
-            ]
+            ],
         );
 
         return $this->inner()->write($path, $value, $config);

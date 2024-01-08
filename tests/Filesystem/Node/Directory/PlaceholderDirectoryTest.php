@@ -52,7 +52,7 @@ final class PlaceholderDirectoryTest extends PlaceholderNodeTest
                 ->notMatchingPath('foo')
                 ->matchingFilename('foo')
                 ->notMatchingFilename('foo')
-                ->getIterator()
+                ->getIterator(),
         );
     }
 

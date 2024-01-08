@@ -25,7 +25,7 @@ final class RoutePublicUrlGenerator extends RouteUrlGenerator implements PublicU
             $path,
             $config->get('parameters', []),
             $config->get('sign'),
-            $config->get('expires')
+            $config->get('expires'),
         );
     }
 }

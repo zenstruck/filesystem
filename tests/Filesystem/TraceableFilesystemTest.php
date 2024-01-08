@@ -69,7 +69,7 @@ final class TraceableFilesystemTest extends FilesystemTest
                     ['file2.png', null],
                 ],
             ],
-            $operations
+            $operations,
         );
 
         $filesystem->reset();

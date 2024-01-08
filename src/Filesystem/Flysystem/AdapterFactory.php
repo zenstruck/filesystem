@@ -76,8 +76,8 @@ final class AdapterFactory
             \explode('?', $dsn)[0],
             PortableVisibilityConverter::fromArray(
                 $visibility,
-                $visibility['default_for_directories'] ?? Visibility::PRIVATE
-            )
+                $visibility['default_for_directories'] ?? Visibility::PRIVATE,
+            ),
         );
     }
 

@@ -29,7 +29,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'no-injection',
-            files: ['file' => self::uploadedFile()]
+            files: ['file' => self::uploadedFile()],
         );
 
         self::assertSame('0', $client->getResponse()->getContent());
@@ -52,7 +52,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'single-file',
-            files: ['file' => self::uploadedFile()]
+            files: ['file' => self::uploadedFile()],
         );
 
         self::assertSame("some content\n", $client->getResponse()->getContent());
@@ -60,7 +60,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'single-image',
-            files: ['image' => self::uploadedImage()]
+            files: ['image' => self::uploadedImage()],
         );
 
         self::assertSame('563', $client->getResponse()->getContent());
@@ -76,12 +76,12 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'single-stored-file',
-            files: ['file' => self::uploadedFile()]
+            files: ['file' => self::uploadedFile()],
         );
 
         self::assertSame(
             "public://eb9c2bf0eb63f3a7bc0ea37ef18aeba5/test.txt:some content\n",
-            $client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
         );
     }
 
@@ -95,7 +95,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'single-file-with-path',
-            files: ['data' => ['file' => self::uploadedFile()]]
+            files: ['data' => ['file' => self::uploadedFile()]],
         );
 
         self::assertSame("some content\n", $client->getResponse()->getContent());
@@ -110,7 +110,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
 
         $client->request(
             'GET',
-            'multiple-files'
+            'multiple-files',
         );
 
         self::assertSame('0', $client->getResponse()->getContent());
@@ -118,7 +118,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'multiple-files',
-            files: ['files' => self::uploadedFile()]
+            files: ['files' => self::uploadedFile()],
         );
 
         self::assertSame('1', $client->getResponse()->getContent());
@@ -126,7 +126,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'multiple-images',
-            files: ['images' => self::uploadedImage()]
+            files: ['images' => self::uploadedImage()],
         );
 
         self::assertSame('1', $client->getResponse()->getContent());
@@ -141,7 +141,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
 
         $client->request(
             'GET',
-            'multiple-files-with-path'
+            'multiple-files-with-path',
         );
 
         self::assertSame('0', $client->getResponse()->getContent());
@@ -149,7 +149,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'multiple-files-with-path',
-            files: ['data' => ['files' => self::uploadedFile()]]
+            files: ['data' => ['files' => self::uploadedFile()]],
         );
 
         self::assertSame('1', $client->getResponse()->getContent());
@@ -165,7 +165,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         $client->request(
             'GET',
             'single-image',
-            files: ['image' => self::uploadedFile()]
+            files: ['image' => self::uploadedFile()],
         );
         $response = $client->getResponse();
         self::assertSame(422, $response->getStatusCode());
@@ -174,7 +174,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
             $client->request(
                 'GET',
                 'validated-file',
-                files: ['file' => self::uploadedFile()]
+                files: ['file' => self::uploadedFile()],
             );
             $response = $client->getResponse();
 
@@ -187,7 +187,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         return new UploadedFile(
             fixture('textfile.txt'),
             'test.txt',
-            test: true
+            test: true,
         );
     }
 
@@ -196,7 +196,7 @@ class PendingDocumentValueResolverTest extends WebTestCase
         return new UploadedFile(
             fixture('symfony.png'),
             'symfony.png',
-            test: true
+            test: true,
         );
     }
 }

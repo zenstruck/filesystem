@@ -57,7 +57,7 @@ class RequestFilesExtractor
 
             return \array_map(
                 static fn(UploadedFile $file) => $returnImage ? new PendingImage($file) : new PendingFile($file),
-                $files
+                $files,
             );
         }
 
@@ -106,7 +106,7 @@ class RequestFilesExtractor
         $path = \preg_replace(
             '/\[]$/',
             '',
-            $path
+            $path,
         );
         // Correct arguments passed to preg_replace guarantee string return
         \assert(\is_string($path));
@@ -115,7 +115,7 @@ class RequestFilesExtractor
             $path = \preg_replace(
                 '/^([^[]+)/',
                 '[$1]',
-                $path
+                $path,
             );
             // Correct arguments passed to preg_replace guarantee string return
             \assert(\is_string($path));

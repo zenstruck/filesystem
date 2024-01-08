@@ -35,7 +35,7 @@ final class RouteTemporaryUrlGenerator implements TemporaryUrlGenerator
         return $this->router->temporary(
             $expiresAt,
             $this->route,
-            \array_merge($this->routeParameters, $config->get('parameters', []), ['path' => $path])
+            \array_merge($this->routeParameters, $config->get('parameters', []), ['path' => $path]),
         );
     }
 }
