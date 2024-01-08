@@ -379,21 +379,21 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 break;
         }
 
-        $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
+        $flysystemDef = $container->register($flysystemId = 'zenstruck_filesystem.flysystem.'.$name, Flysystem::class)
             ->setArguments([$config['dsn'], $config['config']])
         ;
 
-        $filesystemDef = $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
+        if ($config['lazy']) {
+            $flysystemDef
+                ->setLazy(true)
+                ->addTag('proxy', ['interface' => Flysystem::class])
+            ;
+        }
+
+        $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
             ->setArguments([new Reference($flysystemId), $name, new ServiceLocatorArgument($features)])
             ->addTag('zenstruck_filesystem', ['key' => $name])
         ;
-
-        if ($config['lazy']) {
-            $filesystemDef
-                ->setLazy(true)
-                ->addTag('proxy', ['interface' => Filesystem::class])
-            ;
-        }
 
         if ($config['log']['enabled']) {
             $container->register('.zenstruck_filesystem.filesystem.log_'.$name, LoggableFilesystem::class)
