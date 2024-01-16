@@ -47,13 +47,13 @@ class Mapping
     private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE];
     private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
 
-    /** @var Format */
+    /** @var Node\Format */
     public string|array $metadata;
 
     private ?Namer $namer;
 
     /**
-     * @param Format $metadata
+     * @param Node\Format $metadata
      */
     public function __construct(
         string|array $metadata,
@@ -121,7 +121,7 @@ class Mapping
      *
      * @param class-string<Node> $class
      *
-     * @return Format
+     * @return Node\Format
      */
     public function validate(string $class): array|string
     {
@@ -143,7 +143,7 @@ class Mapping
             }
 
             if (\in_array($value, self::FILE_METADATA, true)) {
-                if (!\is_a($class, File::class, true)) {
+                if (!\is_a($class, Node\File::class, true)) {
                     throw new \LogicException(\sprintf('Metadata "%s" can only be used with files.', $value));
                 }
 
@@ -175,7 +175,7 @@ class Mapping
     /**
      * @internal
      *
-     * @return Serialized
+     * @return Node\Serialized
      */
     public function serialize(Node $node): string|array
     {
@@ -283,7 +283,7 @@ class Mapping
      *
      * @return string|array<string,string>
      */
-    private static function serializeChecksum(File $file, string|array $value): string|array
+    private static function serializeChecksum(Node\File $file, string|array $value): string|array
     {
         if (self::CHECKSUM === $value) {
             return $file->checksum();

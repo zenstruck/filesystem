@@ -19,7 +19,7 @@ use Zenstruck\Filesystem\Node\PlaceholderNode;
  */
 class PlaceholderFile extends PlaceholderNode implements File
 {
-    use DecoratedFile;
+    use File\DecoratedFile;
 
     protected function inner(): File
     {

@@ -21,17 +21,17 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 trait DecoratedNode
 {
-    public function path(): Path
+    public function path(): Node\Path
     {
         return $this->inner()->path();
     }
 
-    public function dsn(): Dsn
+    public function dsn(): Node\Dsn
     {
         return $this->inner()->dsn();
     }
 
-    public function directory(): ?Directory
+    public function directory(): ?Node\Directory
     {
         return $this->inner()->directory();
     }
@@ -80,12 +80,12 @@ trait DecoratedNode
         return $this;
     }
 
-    public function ensureFile(): File
+    public function ensureFile(): Node\File
     {
         return $this->inner()->ensureFile();
     }
 
-    public function ensureDirectory(): Directory
+    public function ensureDirectory(): Node\Directory
     {
         return $this->inner()->ensureDirectory();
     }

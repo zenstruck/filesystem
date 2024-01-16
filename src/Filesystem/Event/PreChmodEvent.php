@@ -16,7 +16,7 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PreChmodEvent extends PreOperationEvent
+final class PreChmodEvent extends Filesystem\Event\PreOperationEvent
 {
     /**
      * @internal

@@ -37,54 +37,54 @@ final class EventDispatcherFilesystem implements Filesystem
 
     public function copy(string $source, string $destination, array $config = []): File
     {
-        $this->dispatch($event = new PreCopyEvent($this, $source, $destination, $config), Operation::COPY);
+        $this->dispatch($event = new Filesystem\Event\PreCopyEvent($this, $source, $destination, $config), Operation::COPY);
         $file = $this->inner->copy($event->source, $event->destination, $event->config);
-        $this->dispatch(new PostCopyEvent($event), Operation::COPY);
+        $this->dispatch(new Filesystem\Event\PostCopyEvent($event), Operation::COPY);
 
         return $file;
     }
 
     public function move(string $source, string $destination, array $config = []): File
     {
-        $this->dispatch($event = new PreMoveEvent($this, $source, $destination, $config), Operation::MOVE);
+        $this->dispatch($event = new Filesystem\Event\PreMoveEvent($this, $source, $destination, $config), Operation::MOVE);
         $file = $this->inner->move($event->source, $event->destination, $event->config);
-        $this->dispatch(new PostMoveEvent($event), Operation::MOVE);
+        $this->dispatch(new Filesystem\Event\PostMoveEvent($event), Operation::MOVE);
 
         return $file;
     }
 
     public function delete(string $path, array $config = []): self
     {
-        $this->dispatch($event = new PreDeleteEvent($this, $path, $config), Operation::DELETE);
+        $this->dispatch($event = new Filesystem\Event\PreDeleteEvent($this, $path, $config), Operation::DELETE);
         $this->inner->delete($event->path, $event->config);
-        $this->dispatch(new PostDeleteEvent($event), Operation::DELETE);
+        $this->dispatch(new Filesystem\Event\PostDeleteEvent($event), Operation::DELETE);
 
         return $this;
     }
 
     public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        $this->dispatch($event = new PreMkdirEvent($this, $path, $content, $config), Operation::MKDIR);
+        $this->dispatch($event = new Filesystem\Event\PreMkdirEvent($this, $path, $content, $config), Operation::MKDIR);
         $directory = $this->inner->mkdir($event->path, $content, $event->config);
-        $this->dispatch(new PostMkdirEvent($event), Operation::MKDIR);
+        $this->dispatch(new Filesystem\Event\PostMkdirEvent($event), Operation::MKDIR);
 
         return $directory;
     }
 
     public function chmod(string $path, string $visibility): File|Directory
     {
-        $this->dispatch($event = new PreChmodEvent($this, $path, $visibility), Operation::CHMOD);
+        $this->dispatch($event = new Filesystem\Event\PreChmodEvent($this, $path, $visibility), Operation::CHMOD);
         $node = $this->inner->chmod($event->path, $event->visibility);
-        $this->dispatch(new PostChmodEvent($event), Operation::CHMOD);
+        $this->dispatch(new Filesystem\Event\PostChmodEvent($event), Operation::CHMOD);
 
         return $node;
     }
 
     public function write(string $path, mixed $value, array $config = []): File
     {
-        $this->dispatch($event = new PreWriteEvent($this, $path, $value, $config), Operation::WRITE);
+        $this->dispatch($event = new Filesystem\Event\PreWriteEvent($this, $path, $value, $config), Operation::WRITE);
         $file = $this->inner->write($event->path, $event->value, $event->config);
-        $this->dispatch(new PostWriteEvent($event), Operation::WRITE);
+        $this->dispatch(new Filesystem\Event\PostWriteEvent($event), Operation::WRITE);
 
         return $file;
     }
@@ -94,7 +94,7 @@ final class EventDispatcherFilesystem implements Filesystem
         return $this->inner;
     }
 
-    private function dispatch(OperationEvent $event, string $operation): void
+    private function dispatch(Filesystem\Event\OperationEvent $event, string $operation): void
     {
         if ($this->config[$operation] ?? false) {
             $this->dispatcher->dispatch($event);

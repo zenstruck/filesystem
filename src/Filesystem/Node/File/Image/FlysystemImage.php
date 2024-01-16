@@ -23,9 +23,9 @@ use Zenstruck\ImageFileInfo;
  */
 final class FlysystemImage extends FlysystemFile implements Image
 {
-    public function transform(callable|object $filter, array $options = []): PendingImage
+    public function transform(callable|object $filter, array $options = []): Image\PendingImage
     {
-        return new PendingImage($this->tempFile()->transform($filter, $options));
+        return new Image\PendingImage($this->tempFile()->transform($filter, $options));
     }
 
     public function transformUrl(array|string $filter): string

@@ -103,7 +103,7 @@ class FlysystemFile extends FlysystemNode implements File
             return true;
         }
 
-        return \in_array($this->guessExtension(), Image::IMAGE_EXTENSIONS, true);
+        return \in_array($this->guessExtension(), File\Image::IMAGE_EXTENSIONS, true);
     }
 
     protected function createTempFile(): \SplFileInfo

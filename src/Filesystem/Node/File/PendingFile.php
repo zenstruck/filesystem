@@ -228,11 +228,11 @@ class PendingFile extends \SplFileInfo implements File
 
     public function isImage(): bool
     {
-        if ($this instanceof Image) {
+        if ($this instanceof File\Image) {
             return true;
         }
 
-        return \in_array($this->guessExtension(), Image::IMAGE_EXTENSIONS, true);
+        return \in_array($this->guessExtension(), File\Image::IMAGE_EXTENSIONS, true);
     }
 
     public function isDirectory(): bool

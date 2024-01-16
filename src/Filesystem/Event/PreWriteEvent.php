@@ -16,7 +16,7 @@ use Zenstruck\Filesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PreWriteEvent extends PreOperationEvent
+final class PreWriteEvent extends Filesystem\Event\PreOperationEvent
 {
     /**
      * @internal

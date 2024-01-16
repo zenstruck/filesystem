@@ -22,7 +22,7 @@ use Zenstruck\Filesystem\Node\Mapping;
  */
 class LazyFile extends LazyNode implements File
 {
-    use DecoratedFile;
+    use File\DecoratedFile;
 
     public function mimeType(): string
     {

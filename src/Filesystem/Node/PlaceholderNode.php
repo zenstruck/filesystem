@@ -18,18 +18,18 @@ use Zenstruck\Filesystem\Node;
  */
 abstract class PlaceholderNode implements Node
 {
-    use DecoratedNode;
+    use Node\DecoratedNode;
 
-    private Path $path;
+    private Node\Path $path;
 
     public function __construct(?string $path = null)
     {
         if ($path) {
-            $this->path = new Path($path);
+            $this->path = new Node\Path($path);
         }
     }
 
-    public function path(): Path
+    public function path(): Node\Path
     {
         return $this->path ?? $this->inner()->path();
     }

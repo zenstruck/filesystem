@@ -26,12 +26,12 @@ use Zenstruck\Filesystem\Node\Path\Namer;
  */
 class SerializableFile implements File, \JsonSerializable
 {
-    use DecoratedFile, DecoratedNode;
+    use DecoratedNode, File\DecoratedFile;
 
     private Mapping $mapping;
 
     /**
-     * @param Format $metadata
+     * @param File\Format $metadata
      */
     public function __construct(private File $file, string|array $metadata)
     {
@@ -39,7 +39,7 @@ class SerializableFile implements File, \JsonSerializable
     }
 
     /**
-     * @return Serialized
+     * @return File\Serialized
      */
     public function jsonSerialize(): string|array
     {
@@ -47,7 +47,7 @@ class SerializableFile implements File, \JsonSerializable
     }
 
     /**
-     * @return Serialized
+     * @return File\Serialized
      */
     public function serialize(): string|array
     {
