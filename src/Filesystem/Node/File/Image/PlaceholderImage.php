@@ -19,7 +19,7 @@ use Zenstruck\Filesystem\Node\File\PlaceholderFile;
  */
 final class PlaceholderImage extends PlaceholderFile implements Image
 {
-    use Image\DecoratedImage;
+    use DecoratedImage;
 
     protected function inner(): Image
     {

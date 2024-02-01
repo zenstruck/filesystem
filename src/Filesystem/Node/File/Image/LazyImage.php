@@ -23,7 +23,7 @@ use Zenstruck\Image\Dimensions;
  */
 final class LazyImage extends LazyFile implements Image
 {
-    use Image\DecoratedImage;
+    use DecoratedImage;
 
     public function transformUrl(array|string $filter): string
     {

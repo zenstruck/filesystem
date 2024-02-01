@@ -44,7 +44,7 @@ final class ZipFile extends \SplFileInfo implements Filesystem
 
     /**
      * @param File|Directory|\SplFileInfo|non-empty-array<array-key,File|\SplFileInfo> $what
-     * @param Filesystem\Archive\string|null                                           $filename The filename to save the zip as
+     * @param string|null                                                              $filename The filename to save the zip as
      * @param array{
      *     commit_progress?: callable(float):void
      * } $config

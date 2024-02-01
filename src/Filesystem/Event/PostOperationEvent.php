@@ -18,14 +18,14 @@ use Zenstruck\Filesystem;
  *
  * @template T of PreOperationEvent
  */
-abstract class PostOperationEvent extends Filesystem\Event\OperationEvent
+abstract class PostOperationEvent extends OperationEvent
 {
     /**
      * @internal
      *
-     * @param Filesystem\Event\T $event
+     * @param T $event
      */
-    public function __construct(protected Filesystem\Event\PreOperationEvent $event)
+    public function __construct(protected PreOperationEvent $event)
     {
     }
 

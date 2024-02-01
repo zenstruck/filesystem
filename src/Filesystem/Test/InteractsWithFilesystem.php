@@ -28,7 +28,7 @@ use Zenstruck\Filesystem\MultiFilesystem;
  */
 trait InteractsWithFilesystem
 {
-    private Filesystem\Test\TestFilesystem $_testFilesystem;
+    private TestFilesystem $_testFilesystem;
 
     /**
      * @before
@@ -43,13 +43,13 @@ trait InteractsWithFilesystem
         unset($this->_testFilesystem);
     }
 
-    protected function filesystem(): Filesystem\Test\TestFilesystem
+    protected function filesystem(): TestFilesystem
     {
         if (isset($this->_testFilesystem)) {
             return $this->_testFilesystem;
         }
 
-        if ($this instanceof Filesystem\Test\FilesystemProvider) {
+        if ($this instanceof FilesystemProvider) {
             $filesystem = $this->createFilesystem();
 
             if (!$filesystem instanceof Filesystem) {
@@ -74,7 +74,7 @@ trait InteractsWithFilesystem
             $filesystem = new FlysystemFilesystem(new InMemoryFilesystemAdapter());
         }
 
-        if ($this instanceof Filesystem\Test\FixtureFilesystemProvider) {
+        if ($this instanceof FixtureFilesystemProvider) {
             $fixtures = $this->createFixtureFilesystem();
 
             if (\is_string($fixtures)) {
@@ -92,6 +92,6 @@ trait InteractsWithFilesystem
             $filesystem = new MultiFilesystem(['_default_' => $filesystem, 'fixture' => $fixtures], '_default_');
         }
 
-        return $this->_testFilesystem = new Filesystem\Test\TestFilesystem($filesystem);
+        return $this->_testFilesystem = new TestFilesystem($filesystem);
     }
 }

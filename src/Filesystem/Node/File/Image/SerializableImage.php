@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Node\File\SerializableFile;
  */
 final class SerializableImage extends SerializableFile implements Image
 {
-    use Image\DecoratedImage;
+    use DecoratedImage;
 
     public function __construct(Image $image, string|array $metadata)
     {

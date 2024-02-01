@@ -24,14 +24,14 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class MultiFilesystem implements Filesystem
 {
-    private Filesystem\FilesystemRegistry $filesystems;
+    private FilesystemRegistry $filesystems;
 
     /**
      * @param array<string,Filesystem>|ContainerInterface|FilesystemRegistry $filesystems
      */
-    public function __construct(array|ContainerInterface|Filesystem\FilesystemRegistry $filesystems, private ?string $default = null)
+    public function __construct(array|ContainerInterface|FilesystemRegistry $filesystems, private ?string $default = null)
     {
-        $this->filesystems = $filesystems instanceof Filesystem\FilesystemRegistry ? $filesystems : new Filesystem\FilesystemRegistry($filesystems);
+        $this->filesystems = $filesystems instanceof FilesystemRegistry ? $filesystems : new FilesystemRegistry($filesystems);
     }
 
     public function name(?string $filesystem = null): string

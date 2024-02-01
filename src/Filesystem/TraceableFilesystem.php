@@ -22,7 +22,7 @@ use Zenstruck\Filesystem\Node\File\Image;
  */
 final class TraceableFilesystem implements Filesystem
 {
-    use Filesystem\DecoratedFilesystem;
+    use DecoratedFilesystem;
 
     /** @var array<Operation::*,list<array{0:string,1:string|null,2:float}>> */
     public array $operations = [];
@@ -62,13 +62,13 @@ final class TraceableFilesystem implements Filesystem
 
     public function totalReads(): int
     {
-        return \count($this->operations[Filesystem\Operation::READ] ?? []);
+        return \count($this->operations[Operation::READ] ?? []);
     }
 
     public function totalWrites(): int
     {
         return \array_sum(
-            \array_map(fn($type) => \count($this->operations[$type] ?? []), Filesystem\Operation::writes()),
+            \array_map(fn($type) => \count($this->operations[$type] ?? []), Operation::writes()),
         );
     }
 
@@ -79,61 +79,61 @@ final class TraceableFilesystem implements Filesystem
 
     public function node(string $path): File|Directory
     {
-        return $this->track(fn() => $this->inner()->node($path), Filesystem\Operation::READ, $path, 'node');
+        return $this->track(fn() => $this->inner()->node($path), Operation::READ, $path, 'node');
     }
 
     public function file(string $path): File
     {
-        return $this->track(fn() => $this->inner()->file($path), Filesystem\Operation::READ, $path, 'file');
+        return $this->track(fn() => $this->inner()->file($path), Operation::READ, $path, 'file');
     }
 
     public function directory(string $path = ''): Directory
     {
-        return $this->track(fn() => $this->inner()->directory($path), Filesystem\Operation::READ, $path, 'dir');
+        return $this->track(fn() => $this->inner()->directory($path), Operation::READ, $path, 'dir');
     }
 
     public function image(string $path): Image
     {
-        return $this->track(fn() => $this->inner()->image($path), Filesystem\Operation::READ, $path, 'image');
+        return $this->track(fn() => $this->inner()->image($path), Operation::READ, $path, 'image');
     }
 
     public function has(string $path): bool
     {
-        return $this->track(fn() => $this->inner()->has($path), Filesystem\Operation::READ, $path);
+        return $this->track(fn() => $this->inner()->has($path), Operation::READ, $path);
     }
 
     public function copy(string $source, string $destination, array $config = []): File
     {
-        return $this->track(fn() => $this->inner()->copy($source, $destination, $config), Filesystem\Operation::COPY, $source, $destination);
+        return $this->track(fn() => $this->inner()->copy($source, $destination, $config), Operation::COPY, $source, $destination);
     }
 
     public function move(string $source, string $destination, array $config = []): File
     {
-        return $this->track(fn() => $this->inner()->move($source, $destination, $config), Filesystem\Operation::MOVE, $source, $destination);
+        return $this->track(fn() => $this->inner()->move($source, $destination, $config), Operation::MOVE, $source, $destination);
     }
 
     public function delete(string $path, array $config = []): self
     {
-        $this->track(fn() => $this->inner()->delete($path, $config), Filesystem\Operation::DELETE, $path);
+        $this->track(fn() => $this->inner()->delete($path, $config), Operation::DELETE, $path);
 
         return $this;
     }
 
     public function mkdir(string $path, Directory|\SplFileInfo|null $content = null, array $config = []): Directory
     {
-        return $this->track(fn() => $this->inner()->mkdir($path, $content, $config), Filesystem\Operation::MKDIR, $path);
+        return $this->track(fn() => $this->inner()->mkdir($path, $content, $config), Operation::MKDIR, $path);
     }
 
     public function chmod(string $path, string $visibility): File|Directory
     {
-        return $this->track(fn() => $this->inner()->chmod($path, $visibility), Filesystem\Operation::CHMOD, $path, $visibility);
+        return $this->track(fn() => $this->inner()->chmod($path, $visibility), Operation::CHMOD, $path, $visibility);
     }
 
     public function write(string $path, mixed $value, array $config = []): File
     {
         return $this->track(
             fn() => $this->inner()->write($path, $value, $config),
-            Filesystem\Operation::WRITE, $path,
+            Operation::WRITE, $path,
             \get_debug_type($value),
         );
     }

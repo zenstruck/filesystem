@@ -26,11 +26,11 @@ use Zenstruck\Stream;
  */
 final class LoggableFilesystem implements Filesystem
 {
-    use Filesystem\DecoratedFilesystem;
+    use DecoratedFilesystem;
 
     public const DEFAULT_CONFIG = [
-        Filesystem\Operation::READ => LogLevel::DEBUG,
-        Filesystem\Operation::WRITE => LogLevel::INFO,
+        Operation::READ => LogLevel::DEBUG,
+        Operation::WRITE => LogLevel::INFO,
     ];
 
     /**
@@ -46,7 +46,7 @@ final class LoggableFilesystem implements Filesystem
     public function node(string $path): File|Directory
     {
         $this->log(
-            $this->config[Filesystem\Operation::READ] ?? self::DEFAULT_CONFIG[Filesystem\Operation::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Reading "{path}" (node) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -59,7 +59,7 @@ final class LoggableFilesystem implements Filesystem
     public function file(string $path): File
     {
         $this->log(
-            $this->config[Filesystem\Operation::READ] ?? self::DEFAULT_CONFIG[Filesystem\Operation::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Reading "{path}" (file) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -72,7 +72,7 @@ final class LoggableFilesystem implements Filesystem
     public function directory(string $path = ''): Directory
     {
         $this->log(
-            $this->config[Filesystem\Operation::READ] ?? self::DEFAULT_CONFIG[Filesystem\Operation::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Reading "{path}" (directory) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -85,7 +85,7 @@ final class LoggableFilesystem implements Filesystem
     public function image(string $path): Image
     {
         $this->log(
-            $this->config[Filesystem\Operation::READ] ?? self::DEFAULT_CONFIG[Filesystem\Operation::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Reading "{path}" (image) on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -98,7 +98,7 @@ final class LoggableFilesystem implements Filesystem
     public function has(string $path): bool
     {
         $this->log(
-            $this->config[Filesystem\Operation::READ] ?? self::DEFAULT_CONFIG[Filesystem\Operation::READ],
+            $this->config[Operation::READ] ?? self::DEFAULT_CONFIG[Operation::READ],
             'Checking existence of "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -111,7 +111,7 @@ final class LoggableFilesystem implements Filesystem
     public function copy(string $source, string $destination, array $config = []): File
     {
         $this->log(
-            $this->config[Filesystem\Operation::COPY] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+            $this->config[Operation::COPY] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Copying "{source}" to "{destination}" on filesystem "{filesystem}"',
             [
                 'source' => $source,
@@ -125,7 +125,7 @@ final class LoggableFilesystem implements Filesystem
     public function move(string $source, string $destination, array $config = []): File
     {
         $this->log(
-            $this->config[Filesystem\Operation::MOVE] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+            $this->config[Operation::MOVE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Moving "{source}" to "{destination}" on filesystem "{filesystem}"',
             [
                 'source' => $source,
@@ -139,7 +139,7 @@ final class LoggableFilesystem implements Filesystem
     public function delete(string $path, array $config = []): self
     {
         $this->log(
-            $this->config[Filesystem\Operation::DELETE] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+            $this->config[Operation::DELETE] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Deleting "{path}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -155,7 +155,7 @@ final class LoggableFilesystem implements Filesystem
     {
         if ($content) {
             $this->log(
-                $this->config[Filesystem\Operation::MKDIR] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+                $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
                 'Creating directory "{path}" containing "{what}" on filesystem "{filesystem}"',
                 [
                     'path' => $path,
@@ -164,7 +164,7 @@ final class LoggableFilesystem implements Filesystem
             );
         } else {
             $this->log(
-                $this->config[Filesystem\Operation::MKDIR] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+                $this->config[Operation::MKDIR] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
                 'Creating directory "{path}" on filesystem "{filesystem}"',
                 [
                     'path' => $path,
@@ -178,7 +178,7 @@ final class LoggableFilesystem implements Filesystem
     public function chmod(string $path, string $visibility): File|Directory
     {
         $this->log(
-            $this->config[Filesystem\Operation::CHMOD] ?? $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+            $this->config[Operation::CHMOD] ?? $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Setting visibility of "{path}" to "{visibility}" on filesystem "{filesystem}"',
             [
                 'path' => $path,
@@ -192,7 +192,7 @@ final class LoggableFilesystem implements Filesystem
     public function write(string $path, mixed $value, array $config = []): File
     {
         $this->log(
-            $this->config[Filesystem\Operation::WRITE] ?? self::DEFAULT_CONFIG[Filesystem\Operation::WRITE],
+            $this->config[Operation::WRITE] ?? self::DEFAULT_CONFIG[Operation::WRITE],
             'Writing "{what}" to "{path}" on filesystem "{filesystem}"',
             [
                 'what' => match (true) {

@@ -31,7 +31,7 @@ class SerializableFile implements File, \JsonSerializable
     private Mapping $mapping;
 
     /**
-     * @param File\Format $metadata
+     * @param Format $metadata
      */
     public function __construct(private File $file, string|array $metadata)
     {
@@ -39,7 +39,7 @@ class SerializableFile implements File, \JsonSerializable
     }
 
     /**
-     * @return File\Serialized
+     * @return Serialized
      */
     public function jsonSerialize(): string|array
     {
@@ -47,7 +47,7 @@ class SerializableFile implements File, \JsonSerializable
     }
 
     /**
-     * @return File\Serialized
+     * @return Serialized
      */
     public function serialize(): string|array
     {

@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Node;
  */
 abstract class LazyNode implements Node
 {
-    use Node\DecoratedNode;
+    use DecoratedNode;
 
     private const PLACEHOLDER = '2519856631465865896663102660600396863735707774042205734238233842';
 
@@ -42,7 +42,7 @@ abstract class LazyNode implements Node
     public function __construct(string|callable|array|null $attributes = null)
     {
         match (true) {
-            \is_string($attributes) && \str_contains($attributes, '://') => $this->attributes = [Node\Mapping::DSN => $attributes],
+            \is_string($attributes) && \str_contains($attributes, '://') => $this->attributes = [Mapping::DSN => $attributes],
             \is_string($attributes) || \is_callable($attributes) => $this->path = $attributes,
             \is_array($attributes) => $this->attributes = $attributes,
             default => null,
@@ -62,48 +62,48 @@ abstract class LazyNode implements Node
      */
     public function setPath(string|callable $path): void
     {
-        $this->path = \is_string($path) ? new Node\Path($path) : $path;
+        $this->path = \is_string($path) ? new Path($path) : $path;
     }
 
-    public function path(): Node\Path
+    public function path(): Path
     {
-        $this->path ??= $this->attributes[Node\Mapping::PATH] ?? null;
+        $this->path ??= $this->attributes[Mapping::PATH] ?? null;
 
-        if ($this->path instanceof Node\Path) {
+        if ($this->path instanceof Path) {
             return $this->path;
         }
 
         return $this->path = match (true) {
-            \is_callable($this->path) => new Node\Path($this->resolvePath($this->path)),
-            \is_string($this->path) => new Node\Path($this->path),
-            isset($this->attributes[Node\Mapping::DSN]) => $this->dsn()->path(),
+            \is_callable($this->path) => new Path($this->resolvePath($this->path)),
+            \is_string($this->path) => new Path($this->path),
+            isset($this->attributes[Mapping::DSN]) => $this->dsn()->path(),
             default => throw new \RuntimeException('Path not set.'),
         };
     }
 
-    public function dsn(): Node\Dsn
+    public function dsn(): Dsn
     {
-        if (!isset($this->attributes[Node\Mapping::DSN])) {
+        if (!isset($this->attributes[Mapping::DSN])) {
             return $this->inner()->dsn();
         }
 
-        if (!$this->attributes[Node\Mapping::DSN] instanceof Node\Dsn) {
-            $this->attributes[Node\Mapping::DSN] = Node\Dsn::wrap($this->attributes[Node\Mapping::DSN]);
+        if (!$this->attributes[Mapping::DSN] instanceof Dsn) {
+            $this->attributes[Mapping::DSN] = Dsn::wrap($this->attributes[Mapping::DSN]);
         }
 
-        return $this->attributes[Node\Mapping::DSN];
+        return $this->attributes[Mapping::DSN];
     }
 
     public function lastModified(): \DateTimeImmutable
     {
-        if (!isset($this->attributes[Node\Mapping::LAST_MODIFIED])) {
+        if (!isset($this->attributes[Mapping::LAST_MODIFIED])) {
             return $this->inner()->lastModified();
         }
 
-        $lastModified = $this->attributes[Node\Mapping::LAST_MODIFIED];
+        $lastModified = $this->attributes[Mapping::LAST_MODIFIED];
 
         if ($lastModified instanceof \DateTimeImmutable) {
-            return $this->attributes[Node\Mapping::LAST_MODIFIED];
+            return $this->attributes[Mapping::LAST_MODIFIED];
         }
 
         $lastModified = \is_numeric($lastModified) ? \DateTimeImmutable::createFromFormat('U', (string) $lastModified) : new \DateTimeImmutable($lastModified);
@@ -113,7 +113,7 @@ abstract class LazyNode implements Node
 
     public function visibility(): string
     {
-        return $this->attributes[Node\Mapping::VISIBILITY] ?? $this->inner()->visibility();
+        return $this->attributes[Mapping::VISIBILITY] ?? $this->inner()->visibility();
     }
 
     public function exists(): bool
@@ -145,17 +145,17 @@ abstract class LazyNode implements Node
 
     private function resolvePath(callable $generator): string
     {
-        if (isset($this->attributes[Node\Mapping::FILENAME])) {
-            $this->path = new Node\Path($this->attributes[Node\Mapping::FILENAME]);
+        if (isset($this->attributes[Mapping::FILENAME])) {
+            $this->path = new Path($this->attributes[Mapping::FILENAME]);
 
             return $generator();
         }
 
-        $this->path = new Node\Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Node\Mapping::EXTENSION]) ? '.' : '', $this->attributes[Node\Mapping::EXTENSION] ?? ''));
+        $this->path = new Path(\sprintf('%s%s%s', self::PLACEHOLDER, isset($this->attributes[Mapping::EXTENSION]) ? '.' : '', $this->attributes[Mapping::EXTENSION] ?? ''));
         $path = $generator();
 
         return match (true) {
-            \str_contains($path, self::PLACEHOLDER) && isset($this->attributes[Node\Mapping::EXTENSION]) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.'),
+            \str_contains($path, self::PLACEHOLDER) && isset($this->attributes[Mapping::EXTENSION]) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path except the extension.'),
             \str_contains($path, self::PLACEHOLDER) => throw new \LogicException('When lazy generating the path, your "path generator" may not use any parts of the path.'),
             default => $path,
         };

@@ -29,25 +29,25 @@ abstract class FlysystemNode implements Node
 {
     /** @var array<string,mixed> */
     protected array $cache = [];
-    private Node\Path $path;
-    private Node\Dsn $dsn;
+    private Path $path;
+    private Dsn $dsn;
 
-    public function __construct(string|Node\Path $path, protected Operator $operator)
+    public function __construct(string|Path $path, protected Operator $operator)
     {
-        $this->path = \is_string($path) ? new Node\Path($path) : $path;
+        $this->path = \is_string($path) ? new Path($path) : $path;
     }
 
-    public function path(): Node\Path
+    public function path(): Path
     {
         return $this->path;
     }
 
-    public function dsn(): Node\Dsn
+    public function dsn(): Dsn
     {
-        return $this->dsn ??= Node\Dsn::create($this->operator->name(), $this->path);
+        return $this->dsn ??= Dsn::create($this->operator->name(), $this->path);
     }
 
-    public function directory(): ?Node\Directory
+    public function directory(): ?Directory
     {
         $dirname = $this->path()->dirname();
 
@@ -85,7 +85,7 @@ abstract class FlysystemNode implements Node
 
     public function exists(): bool
     {
-        return $this->operator->{$this instanceof Node\File ? 'fileExists' : 'directoryExists'}($this->path());
+        return $this->operator->{$this instanceof File ? 'fileExists' : 'directoryExists'}($this->path());
     }
 
     public function ensureExists(): static
@@ -95,13 +95,13 @@ abstract class FlysystemNode implements Node
         }
 
         throw match (true) {
-            $this instanceof Node\File && $this->operator->directoryExists($this->path()) => NodeTypeMismatch::expectedFileAt($this->path()),
-            $this instanceof Node\Directory && $this->operator->fileExists($this->path()) => NodeTypeMismatch::expectedDirectoryAt($this->path()),
+            $this instanceof File && $this->operator->directoryExists($this->path()) => NodeTypeMismatch::expectedFileAt($this->path()),
+            $this instanceof Directory && $this->operator->fileExists($this->path()) => NodeTypeMismatch::expectedDirectoryAt($this->path()),
             default => new NodeNotFound($this->path(), $this->operator->name()),
         };
     }
 
-    public function ensureFile(): Node\File
+    public function ensureFile(): File
     {
         if ($this instanceof FlysystemFile) {
             return $this;
@@ -110,7 +110,7 @@ abstract class FlysystemNode implements Node
         throw NodeTypeMismatch::expectedFileAt($this->path());
     }
 
-    public function ensureDirectory(): Node\Directory
+    public function ensureDirectory(): Directory
     {
         if ($this instanceof FlysystemDirectory) {
             return $this;

@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Node\Directory;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PreMkdirEvent extends Filesystem\Event\PreOperationEvent
+final class PreMkdirEvent extends PreOperationEvent
 {
     /**
      * @internal

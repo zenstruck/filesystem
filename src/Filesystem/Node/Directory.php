@@ -57,12 +57,12 @@ interface Directory extends Node, \IteratorAggregate
     public function size(string|int|array $sizes): static;
 
     /**
-     * Common shortcut for {@see Node\size}.
+     * Common shortcut for {@see size}.
      */
     public function largerThan(string|int $size): static;
 
     /**
-     * Common shortcut for {@see Node\size}.
+     * Common shortcut for {@see size}.
      */
     public function smallerThan(string|int $size): static;
 
@@ -82,12 +82,12 @@ interface Directory extends Node, \IteratorAggregate
     public function date(string|array $dates): static;
 
     /**
-     * Common shortcut for {@see Node\date}.
+     * Common shortcut for {@see date}.
      */
     public function olderThan(string|int|\DateTimeInterface $timestamp): static;
 
     /**
-     * Common shortcut for {@see Node\date}.
+     * Common shortcut for {@see date}.
      */
     public function newerThan(string|int|\DateTimeInterface $timestamp): static;
 

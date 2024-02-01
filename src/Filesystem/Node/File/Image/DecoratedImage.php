@@ -27,7 +27,7 @@ trait DecoratedImage
         return $this->inner()->transformUrl($filter);
     }
 
-    public function transform(callable|object $filter, array $options = []): Image\PendingImage
+    public function transform(callable|object $filter, array $options = []): PendingImage
     {
         return $this->inner()->transform($filter, $options);
     }

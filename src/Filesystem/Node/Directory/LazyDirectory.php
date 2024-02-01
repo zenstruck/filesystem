@@ -21,7 +21,7 @@ use Zenstruck\Filesystem\Node\LazyNode;
  */
 final class LazyDirectory extends LazyNode implements Directory
 {
-    use Directory\DecoratedDirectory;
+    use DecoratedDirectory;
 
     public function ensureDirectory(): self
     {
