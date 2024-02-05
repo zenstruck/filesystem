@@ -1,8 +1,8 @@
 {
     "name": "zenstruck/filesystem",
-    "description": "Wrapper for league/flysystem with alternate API and added functionality.",
+    "description": "Symfony bundle for league/flysystem with alternate API and added functionality.",
     "homepage": "https://github.com/zenstruck/filesystem",
-    "type": "library",
+    "type": "symfony-bundle",
     "license": "MIT",
     "keywords": [],
     "authors": [
