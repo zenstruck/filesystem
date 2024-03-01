@@ -32,7 +32,7 @@ use Zenstruck\TempFile;
  */
 class PendingFile extends \SplFileInfo implements File
 {
-    private SymfonyFile|null $uploadedFile = null;
+    private ?SymfonyFile $uploadedFile = null;
     private Path $path;
     private \SplFileInfo $tempFile;
     private Flysystem $localFlysystem;
