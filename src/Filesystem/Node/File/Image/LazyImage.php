@@ -15,6 +15,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\Image\Hash\ThumbHash;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -47,6 +48,21 @@ final class LazyImage extends LazyFile implements Image
         }
 
         return $this->attributes[Mapping::DIMENSIONS] = new Dimensions($dimensions);
+    }
+
+    public function thumbHash(): ThumbHash
+    {
+        if (!isset($this->attributes[Mapping::THUMB_HASH])) {
+            return $this->inner()->thumbHash();
+        }
+
+        $thumbHash = $this->attributes[Mapping::THUMB_HASH];
+
+        if ($thumbHash instanceof ThumbHash) {
+            return $thumbHash;
+        }
+
+        return $this->attributes[Mapping::THUMB_HASH] = ThumbHash::from($thumbHash);
     }
 
     public function iptc(): array

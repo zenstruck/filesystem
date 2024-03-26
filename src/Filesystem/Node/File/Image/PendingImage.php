@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
 
 /**
@@ -48,6 +49,11 @@ final class PendingImage extends PendingFile implements Image
     public function dimensions(): Dimensions
     {
         return $this->localImage()->dimensions();
+    }
+
+    public function thumbHash(): ThumbHash
+    {
+        return $this->localImage()->thumbHash();
     }
 
     public function exif(): array

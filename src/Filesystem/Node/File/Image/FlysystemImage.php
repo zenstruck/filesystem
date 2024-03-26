@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\FlysystemFile;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
 
 /**
@@ -36,6 +37,11 @@ final class FlysystemImage extends FlysystemFile implements Image
     public function dimensions(): Dimensions
     {
         return $this->tempFile()->dimensions();
+    }
+
+    public function thumbHash(): ThumbHash
+    {
+        return $this->tempFile()->thumbHash();
     }
 
     public function exif(): array

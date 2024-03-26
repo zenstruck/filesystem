@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
 
 /**
@@ -35,6 +36,8 @@ interface Image extends File
     public function transform(callable|object $filter, array $options = []): PendingImage;
 
     public function dimensions(): Dimensions;
+
+    public function thumbHash(): ThumbHash;
 
     /**
      * @return array<string,string>
