@@ -186,10 +186,7 @@ final class TestKernel extends Kernel
         $routes->add('private_public', '/private/{path}')
             ->requirements(['path' => '.+'])
         ;
-        $routes->import(__DIR__.'/Controller/ArgumentResolverController.php', self::MAJOR_VERSION < 6 ? 'annotation' : 'attribute');
-
-        if (\PHP_VERSION_ID >= 80100) {
-            $routes->import(__DIR__.'/Controller/ValidatedArgumentResolverController.php', self::MAJOR_VERSION < 6 ? 'annotation' : 'attribute');
-        }
+        $routes->import(__DIR__.'/Controller/ArgumentResolverController.php', 'attribute');
+        $routes->import(__DIR__.'/Controller/ValidatedArgumentResolverController.php', 'attribute');
     }
 }
