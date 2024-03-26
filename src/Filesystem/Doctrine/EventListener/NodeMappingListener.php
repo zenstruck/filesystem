@@ -105,7 +105,8 @@ final class NodeMappingListener
 
             $mapping->validate($nodeClass); // @phpstan-ignore-line
 
-            if ($metadata->hasField($property->name) && isset($metadata->getFieldMapping($property->name)['declared'])) {
+            // cast to object since array in orm v2 and object in orm v3
+            if ($metadata->hasField($property->name) && isset(((object) $metadata->getFieldMapping($property->name))->declared)) {
                 // using inheritance mapping - field already mapped on parent
                 $collection->statefulMappings[$property->name] = $mapping;
 

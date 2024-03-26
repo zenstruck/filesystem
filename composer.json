@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.8",
-        "doctrine/orm": "^2.14",
+        "doctrine/orm": "^2.14|^3.0",
         "intervention/image": "^2.7",
         "league/flysystem-async-aws-s3": "^3.10",
         "league/flysystem-ftp": "^3.10",
