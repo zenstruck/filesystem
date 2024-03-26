@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Exception\InvalidType;
 use Doctrine\DBAL\Types\StringType as BaseStringType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
@@ -35,11 +36,16 @@ abstract class StringType extends BaseStringType
             throw new \LogicException('A pending file cannot be added directly to the database - use the event listener.');
         }
 
-        if (!$value instanceof File) {
-            throw ConversionException::conversionFailedInvalidType($value, File::class, [File::class, 'null']);
+        if ($value instanceof File) {
+            return $this->fileToData($value);
         }
 
-        return $this->fileToData($value);
+        if (\class_exists(InvalidType::class)) {
+            // dbal 4+
+            throw InvalidType::new($value, File::class, [File::class, 'null']);
+        }
+
+        throw ConversionException::conversionFailedInvalidType($value, File::class, [File::class, 'null']); // @phpstan-ignore-line
     }
 
     final public function convertToPHPValue($value, AbstractPlatform $platform): ?LazyFile

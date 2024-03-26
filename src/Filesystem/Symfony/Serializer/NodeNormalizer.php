@@ -102,7 +102,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return isset(self::TYPE_MAP[$type]);
     }
 
-    public function getSupportedTypes(?string $format): array
+    public function getSupportedTypes(?string $format): array // @phpstan-ignore-line
     {
         return \array_map(static fn() => true, self::TYPE_MAP);
     }

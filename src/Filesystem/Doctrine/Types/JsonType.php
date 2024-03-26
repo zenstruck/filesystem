@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Exception\InvalidType;
 use Doctrine\DBAL\Types\JsonType as BaseJsonType;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File\LazyFile;
@@ -44,11 +45,16 @@ abstract class JsonType extends BaseJsonType
             throw new \LogicException('A placeholder file cannot be added to the database.');
         }
 
-        if (!$value instanceof SerializableFile) {
-            throw ConversionException::conversionFailedInvalidType($value, SerializableFile::class, [SerializableFile::class, 'null']);
+        if ($value instanceof SerializableFile) {
+            return parent::convertToDatabaseValue($value->serialize(), $platform);
         }
 
-        return parent::convertToDatabaseValue($value->serialize(), $platform);
+        if (\class_exists(InvalidType::class)) {
+            // dbal 4+
+            throw InvalidType::new($value, SerializableFile::class, [SerializableFile::class, 'null']);
+        }
+
+        throw ConversionException::conversionFailedInvalidType($value, SerializableFile::class, [SerializableFile::class, 'null']); // @phpstan-ignore-line
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?LazyFile
@@ -57,11 +63,16 @@ abstract class JsonType extends BaseJsonType
             return null;
         }
 
-        if (!\is_array($value)) {
-            throw ConversionException::conversionFailedFormat($value, File::class, 'array|null');
+        if (\is_array($value)) {
+            return $this->dataToFile($value);
         }
 
-        return $this->dataToFile($value);
+        if (\class_exists(InvalidType::class)) {
+            // dbal 4+
+            throw InvalidType::new($value, File::class, ['array', 'null']);
+        }
+
+        throw ConversionException::conversionFailedFormat($value, File::class, 'array|null'); // @phpstan-ignore-line
     }
 
     final public function requiresSQLCommentHint(AbstractPlatform $platform): bool

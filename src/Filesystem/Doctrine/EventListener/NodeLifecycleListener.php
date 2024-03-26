@@ -105,8 +105,7 @@ final class NodeLifecycleListener
 
         // "virtual" column properties
         foreach ($collection->statelessMappings as $field => [$class, $mapping]) {
-            $property = self::property($metadata->getReflectionClass(), $field);
-            $property->setAccessible(true);
+            $property = self::property($metadata->getReflectionClass() ?? throw new \LogicException('Unable to parse property'), $field);
 
             $node = new $class();
             $node->setFilesystem(fn() => $this->filesystem($mapping));
