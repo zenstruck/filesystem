@@ -40,6 +40,7 @@ final class LazyImageTest extends LazyFileTest
             'iptc' => [
                 'baz' => 'foo',
             ],
+            'thumb_hash' => 'yPeFBAAoCbNHKNRhVD/Z9pONgOVYN5dzCA',
         ]);
 
         $this->assertSame('/filter1', $file->transformUrl('filter1'));
@@ -53,6 +54,7 @@ final class LazyImageTest extends LazyFileTest
         $this->assertSame(2.18, \round($file->dimensions()->aspectRatio(), 2));
         $this->assertSame(['foo' => 'bar'], $file->exif());
         $this->assertSame(['baz' => 'foo'], $file->iptc());
+        $this->assertSame('yPeFBAAoCbNHKNRhVD/Z9pONgOVYN5dzCA', $file->thumbHash()->key());
     }
 
     /**

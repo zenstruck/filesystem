@@ -183,6 +183,10 @@ $image->dimensions()->isLandscape(); // bool
 $image->exif(); // array - image exif data if available
 $image->iptc(); // array - image iptc data if available
 
+$thumbHash = $image->thumbHash(); // Zenstruck\Image\Hash\ThumbHash (requires srwiez/thumbhash)
+$thumbHash->dataUri(); // string - data uri for the thumb
+$thumbHash->key(); // string - hash for the thumb (to store in database/cache)
+
 $image->transformUrl('filter-name'); // string (needs to be configured)
 $image->transformUrl(['w' => 100, 'h' => 50]); // string (needs to be configured)
 
@@ -197,7 +201,7 @@ $image->transform(
 
 > [!NOTE]
 > See [`zenstruck/image`](https://github.com/zenstruck/image#zenstruckimage) for more
-> details about `Image::transform()`.
+> details about `Image::transform()` and `Image::thumbHash()`.
 
 ##### `PendingImage`
 

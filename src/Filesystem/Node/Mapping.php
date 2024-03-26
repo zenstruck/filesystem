@@ -41,11 +41,12 @@ class Mapping
     public const DIMENSIONS = 'dimensions';
     public const EXIF = 'exif';
     public const IPTC = 'iptc';
+    public const THUMB_HASH = 'thumb_hash';
 
     private const STRING_METADATA = [self::PATH, self::DSN];
     private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::FILENAME];
     private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE];
-    private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC];
+    private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC, self::THUMB_HASH];
 
     /** @var Format */
     public string|array $metadata;
@@ -217,6 +218,7 @@ class Mapping
                 self::DIMENSIONS => $node->ensureImage()->dimensions()->jsonSerialize(),
                 self::EXIF => $node->ensureImage()->exif(),
                 self::IPTC => $node->ensureImage()->iptc(),
+                self::THUMB_HASH => $node->ensureImage()->thumbHash()->key(),
                 default => throw new \InvalidArgumentException('Invalid metadata definition.'), // todo
             };
         }

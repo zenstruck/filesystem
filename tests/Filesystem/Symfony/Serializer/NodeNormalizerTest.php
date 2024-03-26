@@ -98,7 +98,7 @@ final class NodeNormalizerTest extends KernelTestCase
         ];
         yield [
             fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
-            ['metadata' => [Mapping::DSN, Mapping::SIZE, Mapping::DIMENSIONS]],
+            ['metadata' => [Mapping::DSN, Mapping::SIZE, Mapping::DIMENSIONS, Mapping::THUMB_HASH]],
             Image::class,
             [
                 'dsn' => 'public://some/image.png',
@@ -107,6 +107,7 @@ final class NodeNormalizerTest extends KernelTestCase
                     'width' => 563,
                     'height' => 678,
                 ],
+                'thumb_hash' => 'yPeFBAAoCbNHKNRhVD/Z9pONgOVYN5dzCA',
             ],
         ];
         yield [

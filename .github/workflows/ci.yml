@@ -37,6 +37,8 @@ jobs:
 
   sca:
     uses: zenstruck/.github/.github/workflows/php-stan.yml@main
+    with:
+      php: 8.2
 
   fixcs:
     name: Run php-cs-fixer

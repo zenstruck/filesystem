@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Node\File\Image;
 
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Image\Dimensions;
+use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
 
 /**
@@ -35,6 +36,11 @@ trait DecoratedImage
     public function dimensions(): Dimensions
     {
         return $this->inner()->dimensions();
+    }
+
+    public function thumbHash(): ThumbHash
+    {
+        return $this->inner()->thumbHash();
     }
 
     public function iptc(): array

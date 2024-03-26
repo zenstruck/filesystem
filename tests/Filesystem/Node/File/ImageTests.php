@@ -65,6 +65,16 @@ trait ImageTests
     /**
      * @test
      */
+    public function can_get_thumbhash(): void
+    {
+        $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
+
+        $this->assertSame('yPeFBAAoCbNHKNRhVD/Z9pONgOVYN5dzCA', $image->thumbHash()->key());
+    }
+
+    /**
+     * @test
+     */
     public function can_transform_image(): void
     {
         $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
