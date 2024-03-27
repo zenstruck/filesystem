@@ -16,6 +16,7 @@ use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Image\Dimensions;
 use Zenstruck\Image\Hash\ThumbHash;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,10 +27,10 @@ final class LazyImage extends LazyFile implements Image
 {
     use DecoratedImage;
 
-    public function transformUrl(array|string $filter): string
+    public function transformUrl(array|string $filter): Uri
     {
         if (\is_string($filter) && isset($this->attributes[Mapping::TRANSFORM_URL][$filter])) {
-            return $this->attributes[Mapping::TRANSFORM_URL][$filter];
+            return $this->attributes[Mapping::TRANSFORM_URL][$filter] = Uri\ParsedUri::new($this->attributes[Mapping::TRANSFORM_URL][$filter]);
         }
 
         return $this->inner()->transformUrl($filter);

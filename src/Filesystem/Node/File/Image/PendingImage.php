@@ -16,6 +16,7 @@ use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Image\Dimensions;
 use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -66,7 +67,7 @@ final class PendingImage extends PendingFile implements Image
         return $this->localImage()->iptc();
     }
 
-    public function transformUrl(array|string $filter): string
+    public function transformUrl(array|string $filter): Uri
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }

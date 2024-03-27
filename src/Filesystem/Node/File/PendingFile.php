@@ -26,6 +26,7 @@ use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\Path;
 use Zenstruck\Stream;
 use Zenstruck\TempFile;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -164,7 +165,7 @@ class PendingFile extends \SplFileInfo implements File
     /**
      * @internal
      */
-    public function publicUrl(array $config = []): string
+    public function publicUrl(array $config = []): Uri
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }
@@ -172,7 +173,7 @@ class PendingFile extends \SplFileInfo implements File
     /**
      * @internal
      */
-    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): Uri
     {
         throw new \BadMethodCallException(\sprintf('%s is not supported for %s.', __METHOD__, static::class));
     }

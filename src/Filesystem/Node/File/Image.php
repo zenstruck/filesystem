@@ -16,6 +16,7 @@ use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Image\Dimensions;
 use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -27,7 +28,7 @@ interface Image extends File
     /**
      * @param string[]|string $filter
      */
-    public function transformUrl(array|string $filter): string;
+    public function transformUrl(array|string $filter): Uri;
 
     /**
      * @param object|callable(object):object $filter

@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Stream;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -56,12 +57,12 @@ trait DecoratedFile
         return $this->inner()->checksum($algo);
     }
 
-    public function publicUrl(array $config = []): string
+    public function publicUrl(array $config = []): Uri
     {
         return $this->inner()->publicUrl($config);
     }
 
-    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): Uri
     {
         return $this->inner()->temporaryUrl($expires, $config);
     }

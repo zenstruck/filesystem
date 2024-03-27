@@ -14,6 +14,7 @@ namespace Zenstruck\Filesystem\Symfony\Routing;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
+use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -54,7 +55,7 @@ abstract class RouteUrlGenerator
         }
 
         if (!$this->container->has(SignedUrlGenerator::class)) {
-            throw new \LogicException('zenstruck/url is required to sign urls. Install with "composer require zenstruck/uri" and be sure the bundle is enabled.');
+            throw new \LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
         }
 
         $builder = $this->container->get(SignedUrlGenerator::class)->build($this->route, $routeParameters);

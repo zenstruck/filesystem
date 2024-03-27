@@ -20,6 +20,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Zenstruck\Filesystem\Node;
 use Zenstruck\Stream;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -93,7 +94,7 @@ interface File extends Node
      * @throws UnableToGeneratePublicUrl
      * @throws FilesystemException
      */
-    public function publicUrl(array $config = []): string;
+    public function publicUrl(array $config = []): Uri;
 
     /**
      * @see FilesystemReader::temporaryUrl()
@@ -103,7 +104,7 @@ interface File extends Node
      * @throws UnableToGenerateTemporaryUrl
      * @throws FilesystemException
      */
-    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string;
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): Uri;
 
     /**
      * Create a temporary, "real, local file". This file is deleted at the

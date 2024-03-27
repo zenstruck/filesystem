@@ -213,7 +213,7 @@ class Mapping
                 self::SIZE => $node->ensureFile()->size(),
                 self::EXTENSION => $node->path()->extension(),
                 self::CHECKSUM => self::serializeChecksum($node->ensureFile(), $value),
-                self::PUBLIC_URL => $node->ensureFile()->publicUrl(),
+                self::PUBLIC_URL => $node->ensureFile()->publicUrl()->toString(),
                 self::TRANSFORM_URL => self::serializeTransformUrl($node->ensureImage(), $value),
                 self::DIMENSIONS => $node->ensureImage()->dimensions()->jsonSerialize(),
                 self::EXIF => $node->ensureImage()->exif(),
@@ -274,7 +274,7 @@ class Mapping
         $ret = [];
 
         foreach ((array) $value as $filter) {
-            $ret[$filter] = $image->transformUrl($filter);
+            $ret[$filter] = $image->transformUrl($filter)->toString();
         }
 
         return $ret;

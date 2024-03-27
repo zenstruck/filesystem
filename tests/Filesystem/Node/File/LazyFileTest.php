@@ -168,7 +168,7 @@ class LazyFileTest extends TestCase
         $this->assertSame('image/png', $file->mimeType());
         $this->assertSame(72, $file->size());
         $this->assertSame('foo', $file->checksum());
-        $this->assertSame('http://example.com', $file->publicUrl());
+        $this->assertSame('http://example.com', $file->publicUrl()->toString());
 
         $this->assertSame('040f06fd774092478d450774f5ba30c5da78acc8', $file->checksum('sha1'));
 
@@ -180,7 +180,7 @@ class LazyFileTest extends TestCase
         $this->assertSame('image/png', $file->mimeType());
         $this->assertSame(7, $file->size());
         $this->assertSame('9a0364b9e99bb480dd25e1f0284c8555', $file->checksum());
-        $this->assertSame('/prefix/some/file.png', $file->publicUrl());
+        $this->assertSame('/prefix/some/file.png', $file->publicUrl()->toString());
     }
 
     /**
