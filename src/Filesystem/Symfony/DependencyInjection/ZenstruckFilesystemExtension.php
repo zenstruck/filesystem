@@ -340,7 +340,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
             case isset($config['temporary_url']['route']):
                 if (!$canSignUrls) {
-                    throw new LogicException(sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
+                    throw new LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
                 }
 
                 $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)

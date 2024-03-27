@@ -93,26 +93,26 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
     {
         $publicFile = $this->filesystem()->write('public://foo/file.png', 'content')->ensureImage();
 
-        $this->assertSame('/prefix/foo/file.png', $publicFile->publicUrl());
-        $this->assertStringContainsString('/temp/foo/file.png', $publicFile->temporaryUrl('tomorrow'));
-        $this->assertStringContainsString('_hash=', $publicFile->temporaryUrl('tomorrow'));
-        $this->assertStringContainsString('_expires=', $publicFile->temporaryUrl('tomorrow'));
-        $this->assertSame('http://localhost/transform/foo/file.png?filter=grayscale', $publicFile->transformUrl('grayscale'));
-        $this->assertSame('http://localhost/transform/foo/file.png?w=100&h=200', $publicFile->transformUrl(['w' => 100, 'h' => 200]));
+        $this->assertSame('/prefix/foo/file.png', $publicFile->publicUrl()->toString());
+        $this->assertStringContainsString('/temp/foo/file.png', $publicFile->temporaryUrl('tomorrow')->toString());
+        $this->assertStringContainsString('_hash=', $publicFile->temporaryUrl('tomorrow')->toString());
+        $this->assertStringContainsString('_expires=', $publicFile->temporaryUrl('tomorrow')->toString());
+        $this->assertSame('http://localhost/transform/foo/file.png?filter=grayscale', $publicFile->transformUrl('grayscale')->toString());
+        $this->assertSame('http://localhost/transform/foo/file.png?w=100&h=200', $publicFile->transformUrl(['w' => 100, 'h' => 200])->toString());
 
         $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
-        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl());
+        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl()->toString());
         $this->assertStringContainsString('_hash=', $privateFile->publicUrl());
         $this->assertStringNotContainsString('_expires=', $privateFile->publicUrl());
-        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl(['expires' => 'tomorrow']));
-        $this->assertStringContainsString('_hash=', $privateFile->publicUrl(['expires' => 'tomorrow']));
-        $this->assertStringContainsString('_expires=', $privateFile->publicUrl(['expires' => 'tomorrow']));
-        $this->assertSame('http://localhost/private/bar/file.png', $privateFile->publicUrl(['sign' => false]));
-        $this->assertStringContainsString('/private/bar/file.png', $privateFile->temporaryUrl('tomorrow'));
-        $this->assertStringContainsString('_hash=', $privateFile->temporaryUrl('tomorrow'));
-        $this->assertStringContainsString('_expires=', $privateFile->temporaryUrl('tomorrow'));
-        $this->assertSame('/glide/bar/file.png?w=100&h=200', $privateFile->transformUrl(['w' => 100, 'h' => 200]));
+        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl(['expires' => 'tomorrow'])->toString());
+        $this->assertStringContainsString('_hash=', $privateFile->publicUrl(['expires' => 'tomorrow'])->toString());
+        $this->assertStringContainsString('_expires=', $privateFile->publicUrl(['expires' => 'tomorrow'])->toString());
+        $this->assertSame('http://localhost/private/bar/file.png', $privateFile->publicUrl(['sign' => false])->toString());
+        $this->assertStringContainsString('/private/bar/file.png', $privateFile->temporaryUrl('tomorrow')->toString());
+        $this->assertStringContainsString('_hash=', $privateFile->temporaryUrl('tomorrow')->toString());
+        $this->assertStringContainsString('_expires=', $privateFile->temporaryUrl('tomorrow')->toString());
+        $this->assertSame('/glide/bar/file.png?w=100&h=200', $privateFile->transformUrl(['w' => 100, 'h' => 200])->toString());
     }
 
     /**

@@ -16,6 +16,8 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Image\Dimensions;
 use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
+use Zenstruck\Uri;
+use Zenstruck\Uri\ParsedUri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -29,9 +31,9 @@ final class FlysystemImage extends FlysystemFile implements Image
         return new PendingImage($this->tempFile()->transform($filter, $options));
     }
 
-    public function transformUrl(array|string $filter): string
+    public function transformUrl(array|string $filter): Uri
     {
-        return $this->cache['transform-url'][\serialize([$filter])] ??= $this->operator->transformUrl($this->path(), $filter);
+        return $this->cache['transform-url'][\serialize([$filter])] ??= ParsedUri::new($this->operator->transformUrl($this->path(), $filter));
     }
 
     public function dimensions(): Dimensions

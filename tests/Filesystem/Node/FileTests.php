@@ -123,9 +123,9 @@ trait FileTests
     {
         $file = $this->createFile(fixture('symfony.png'), 'some/file.png');
 
-        $this->assertSame('/prefix/some/file.png', $file->publicUrl());
-        $this->assertSame('/temp/some/file.png?expires=1640995200', $file->temporaryUrl(new \DateTime('2022-01-01')));
-        $this->assertStringContainsString('/temp/some/file.png?expires=', $file->temporaryUrl('+30 minutes'));
+        $this->assertSame('/prefix/some/file.png', $file->publicUrl()->toString());
+        $this->assertSame('/temp/some/file.png?expires=1640995200', $file->temporaryUrl(new \DateTime('2022-01-01'))->toString());
+        $this->assertStringContainsString('/temp/some/file.png?expires=', $file->temporaryUrl('+30 minutes')->toString());
     }
 
     /**

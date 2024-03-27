@@ -55,7 +55,7 @@ abstract class RouteUrlGenerator
         }
 
         if (!$this->container->has(SignedUrlGenerator::class)) {
-            throw new \LogicException(sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
+            throw new \LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
         }
 
         $builder = $this->container->get(SignedUrlGenerator::class)->build($this->route, $routeParameters);

@@ -17,6 +17,8 @@ use Zenstruck\Filesystem\Node\File\Image\FlysystemImage;
 use Zenstruck\Filesystem\Node\FlysystemNode;
 use Zenstruck\Stream;
 use Zenstruck\TempFile;
+use Zenstruck\Uri;
+use Zenstruck\Uri\ParsedUri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -61,18 +63,18 @@ class FlysystemFile extends FlysystemNode implements File
         return $this->cache['checksum'][$algo] ??= $this->operator->checksum($this->path(), $algo ? ['checksum_algo' => $algo] : []);
     }
 
-    public function publicUrl(array $config = []): string
+    public function publicUrl(array $config = []): Uri
     {
-        return $this->cache['public-url'][\serialize($config)] ??= $this->operator->publicUrl($this->path(), $config);
+        return $this->cache['public-url'][\serialize($config)] ??= ParsedUri::new($this->operator->publicUrl($this->path(), $config));
     }
 
-    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): string
+    public function temporaryUrl(\DateTimeInterface|string $expires, array $config = []): Uri
     {
         if (\is_string($expires)) {
             $expires = new \DateTimeImmutable($expires);
         }
 
-        return $this->operator->temporaryUrl($this->path(), $expires, $config);
+        return ParsedUri::new($this->operator->temporaryUrl($this->path(), $expires, $config));
     }
 
     public function tempFile(): \SplFileInfo

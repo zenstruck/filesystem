@@ -14,6 +14,8 @@ namespace Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Node\Mapping;
+use Zenstruck\Uri;
+use Zenstruck\Uri\ParsedUri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -47,10 +49,10 @@ class LazyFile extends LazyNode implements File
         return $this->inner()->checksum($algo);
     }
 
-    public function publicUrl(array $config = []): string
+    public function publicUrl(array $config = []): Uri
     {
         if (!$config && isset($this->attributes[Mapping::PUBLIC_URL])) {
-            return $this->attributes[Mapping::PUBLIC_URL];
+            return $this->attributes[Mapping::PUBLIC_URL] = ParsedUri::new($this->attributes[Mapping::PUBLIC_URL]);
         }
 
         return $this->inner()->publicUrl($config);

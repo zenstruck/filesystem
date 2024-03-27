@@ -40,7 +40,7 @@ composer require zenstruck/filesystem
 ### `Filesystem`
 
 ```php
-/** @var \Zenstruck\Filesystem $filesystem */
+/** @var Zenstruck\Filesystem $filesystem */
 
 // read operations
 $filesystem->has('some/path'); // bool
@@ -78,7 +78,7 @@ $filesystem->name(); // string - human-readable name for the filesystem
 Interface: `Zenstruck\Filesystem\Node`.
 
 ```php
-/** @var \Zenstruck\Filesystem\Node $node */
+/** @var Zenstruck\Filesystem\Node $node */
 
 $node->path(); // Zenstruck\Filesystem\Node\Path
 $node->path()->toString(); // string - the full path
@@ -118,11 +118,11 @@ $node->ensureImage(); // Zenstruck\Filesystem\Node\Image or throws NodeTypeMisma
 Interface: `Zenstruck\Filesystem\Node\File` (extends [`Node`](#node)).
 
 ```php
-/** @var \Zenstruck\Filesystem\Node\File $file */
+/** @var Zenstruck\Filesystem\Node\File $file */
 
 $file->contents(); // string - the file's contents
 
-$file->stream(); // \Zenstruck\Stream - wrapper for a resource
+$file->stream(); // Zenstruck\Stream - wrapper for a resource
 
 $file->read(); // "raw" resource
 
@@ -133,9 +133,14 @@ $file->guessExtension(); // string|null - returns extension if available or atte
 $file->checksum(); // string - using FilesystemAdapter's default algorithm
 $file->checksum('md5'); // string - specify the algorithm
 
-$file->publicUrl(); // string (needs to be configured)
-$file->temporaryUrl(new \DateTimeImmutable('+30 minutes')); // string - expiring url (needs to be configured)
-$file->temporaryUrl('+30 minutes'); // equivalent to above
+$publicUrl = $file->publicUrl(); // Zenstruck\Uri (needs to be configured)
+(string) $publicUrl;
+
+$temporaryUrl = $file->temporaryUrl(new \DateTimeImmutable('+30 minutes')); // Zenstruck\Uri - expiring url (needs to be configured)
+(string) $temporaryUrl;
+
+$temporaryUrl = $file->temporaryUrl('+30 minutes'); // equivalent to above
+(string) $temporaryUrl;
 
 $file->tempFile(); // \SplFileInfo - temporary local file that's deleted at the end of the script
 ```
@@ -147,6 +152,10 @@ $file->tempFile(); // \SplFileInfo - temporary local file that's deleted at the 
 > [!NOTE]
 > See [`zenstruck/stream`](https://github.com/zenstruck/stream#zenstruckstream) for more
 > details about `File::stream()`.
+
+> [!NOTE]
+> See [`zenstruck/uri`](https://github.com/zenstruck/uri) for more
+> details about `Uri` object returned from `File::publicUrl()` and `File::temporaryUrl()`.
 
 #### `PendingFile`
 
@@ -169,7 +178,7 @@ $file->path()->toString(); // $uploadedFile->getClientOriginalName()
 Interface: `Zenstruck\Filesystem\Node\File\Image` (extends [`File`](#file)).
 
 ```php
-/** @var \Zenstruck\Filesystem\Node\File\Image $image */
+/** @var Zenstruck\Filesystem\Node\File\Image $image */
 
 $image->dimensions(); // Zenstruck\Image\Dimensions
 $image->dimensions()->height(); // int
@@ -187,8 +196,11 @@ $thumbHash = $image->thumbHash(); // Zenstruck\Image\Hash\ThumbHash (requires sr
 $thumbHash->dataUri(); // string - data uri for the thumb
 $thumbHash->key(); // string - hash for the thumb (to store in database/cache)
 
-$image->transformUrl('filter-name'); // string (needs to be configured)
-$image->transformUrl(['w' => 100, 'h' => 50]); // string (needs to be configured)
+$url = $image->transformUrl('filter-name'); // Zenstruck\Uri (needs to be configured)
+(string) $url;
+
+$url = $image->transformUrl(['w' => 100, 'h' => 50]); // Zenstruck\Uri (needs to be configured)
+(string) $url;
 
 $image->transform(
     function(ManipulationObject $image) {
@@ -202,6 +214,10 @@ $image->transform(
 > [!NOTE]
 > See [`zenstruck/image`](https://github.com/zenstruck/image#zenstruckimage) for more
 > details about `Image::transform()` and `Image::thumbHash()`.
+
+> [!NOTE]
+> See [`zenstruck/uri`](https://github.com/zenstruck/uri) for more
+> details about the `Uri` object returned from `Image::transformUrl()`.
 
 ##### `PendingImage`
 
@@ -272,7 +288,7 @@ $directories = $directory
 ;
 
 // get first matching node
-$directories->first(); // null|\Zenstruck\Filesystem\Node
+$directories->first(); // null|Zenstruck\Filesystem\Node
 ```
 
 > [!NOTE]
@@ -319,7 +335,7 @@ $filesystem = new FlysystemFilesystem('flysystem+ftp://user:pass@host.com:21/roo
 ```php
 use Zenstruck\Filesystem\ScopedFilesystem;
 
-/** @var \Zenstruck\Filesystem $primaryFilesystem */
+/** @var Zenstruck\Filesystem $primaryFilesystem */
 
 $scopedFilesystem = new ScopedFilesystem($primaryFilesystem, 'some/prefix');
 
@@ -341,8 +357,8 @@ $scopedFilesystem
 ```php
 use Zenstruck\Filesystem\MultiFilesystem;
 
-/** @var \Zenstruck\Filesystem $filesystem1 */
-/** @var \Zenstruck\Filesystem $filesystem2 */
+/** @var Zenstruck\Filesystem $filesystem1 */
+/** @var Zenstruck\Filesystem $filesystem2 */
 
 $filesystem = new MultiFilesystem([
     'filesystem1' => $filesystem1,
@@ -379,8 +395,8 @@ use Zenstruck\Filesystem\LoggableFilesystem;
 use Zenstruck\Filesystem\Operation;
 use Psr\Log\LogLevel;
 
-/** @var \Zenstruck\Filesystem $inner */
-/** @var \Psr\Log\LoggerInterface $logger */
+/** @var Zenstruck\Filesystem $inner */
+/** @var Psr\Log\LoggerInterface $logger */
 
 $filesystem = new LoggableFilesystem($inner, $logger);
 
@@ -408,8 +424,8 @@ $filesystem = new LoggableFilesystem($inner, $logger, [
 use Zenstruck\Filesystem\Event\EventDispatcherFilesystem;
 use Zenstruck\Filesystem\Operation;
 
-/** @var \Zenstruck\Filesystem $inner */
-/** @var \Psr\EventDispatcher\EventDispatcherInterface $dispatcher */
+/** @var Zenstruck\Filesystem $inner */
+/** @var Psr\EventDispatcher\EventDispatcherInterface $dispatcher */
 
 $filesystem = new EventDispatcherFilesystem($inner, $dispatcher, [
     // set these to false or exclude to disable dispatching operation's event
@@ -495,12 +511,12 @@ $zipFile = ZipFile::compress(new \SplFileInfo('/some/local/file.txt')); // ZipFi
 // compress a local directory (all files (recursive) in "some/local/directory" are added to archive)
 $zipFile = ZipFile::compress(new \SplFileInfo('some/local/directory'));
 
-/** @var \Zenstruck\Filesystem\Node\File $file */
+/** @var Zenstruck\Filesystem\Node\File $file */
 
 // compress a filesystem file
 $zipFile = ZipFile::compress($file);
 
-/** @var \Zenstruck\Filesystem\Node\Directory $directory */
+/** @var Zenstruck\Filesystem\Node\Directory $directory */
 
 // compress a filesystem directory
 $zipFile = ZipFile::compress($directory);
@@ -531,7 +547,7 @@ $archive = new TarFile('/local/path/to/archive.tar');
 $archive = new TarFile('/local/path/to/archive.tar.gz');
 $archive = new TarFile('/local/path/to/archive.tar.bz2');
 
-$archive->file('some/file.txt'); // \Zenstruck\Filesystem\Node\File
+$archive->file('some/file.txt'); // Zenstruck\Filesystem\Node\File
 ```
 
 ## `TestFilesystem`
@@ -548,7 +564,7 @@ use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile
 use Zenstruck\Filesystem\Test\Node\TestImage;
 
-/** @var \Zenstruck\Filesystem $filesystem */
+/** @var Zenstruck\Filesystem $filesystem */
 
 $filesystem = new TestFilesystem($filesystem);
 
@@ -739,7 +755,7 @@ Take a filesystem [`File`](#file) and send as a response:
 ```php
 use Zenstruck\Filesystem\Symfony\HttpFoundation\FileResponse;
 
-/** @var \Zenstruck\Filesystem\File $file */
+/** @var Zenstruck\Filesystem\File $file */
 
 $response = new FileResponse($file); // auto-adds content-type/last-modified headers
 
@@ -760,7 +776,7 @@ Zip file(s) and send as a response. Can be created with a local file, local dire
 ```php
 use Zenstruck\Filesystem\Symfony\HttpFoundation\ArchiveResponse;
 
-/** @var \SplFileInfo|\Zenstruck\Filesystem\Node\File|\Zenstruck\Filesystem\Node\Directory $what */
+/** @var \SplFileInfo|Zenstruck\Filesystem\Node\File|Zenstruck\Filesystem\Node\Directory $what */
 
 $response = ArchiveResponse::zip($what);
 $response = ArchiveResponse::zip($what, 'data.zip'); // customize the content-disposition name (defaults to archive.zip)
@@ -776,9 +792,9 @@ the same API as Symfony's native [`File`](https://symfony.com/doc/current/refere
 use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;
 use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 
-/** @var \Symfony\Component\Validator\Validator\ValidatorInterface $validator */
-/** @var \Zenstruck\Filesystem\Node\File $file */
-/** @var \Zenstruck\Filesystem\Node\File\Image $image */
+/** @var Symfony\Component\Validator\Validator\ValidatorInterface $validator */
+/** @var Zenstruck\Filesystem\Node\File $file */
+/** @var Zenstruck\Filesystem\Node\File\Image $image */
 
 $validator->validate($file, new PendingFileConstraint(maxSize: '1M')));
 

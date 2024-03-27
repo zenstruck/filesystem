@@ -15,6 +15,7 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Image\Dimensions;
 use Zenstruck\Image\Hash\ThumbHash;
 use Zenstruck\ImageFileInfo;
+use Zenstruck\Uri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,7 +24,7 @@ use Zenstruck\ImageFileInfo;
  */
 trait DecoratedImage
 {
-    public function transformUrl(array|string $filter): string
+    public function transformUrl(array|string $filter): Uri
     {
         return $this->inner()->transformUrl($filter);
     }

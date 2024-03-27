@@ -43,8 +43,8 @@ final class LazyImageTest extends LazyFileTest
             'thumb_hash' => 'yPeFBAAoCbNHKNRhVD/Z9pONgOVYN5dzCA',
         ]);
 
-        $this->assertSame('/filter1', $file->transformUrl('filter1'));
-        $this->assertSame('/filter2', $file->transformUrl('filter2'));
+        $this->assertSame('/filter1', $file->transformUrl('filter1')->toString());
+        $this->assertSame('/filter2', $file->transformUrl('filter2')->toString());
         $this->assertSame(22, $file->dimensions()->height());
         $this->assertSame(48, $file->dimensions()->width());
         $this->assertFalse($file->dimensions()->isPortrait());
