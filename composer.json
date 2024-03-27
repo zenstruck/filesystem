@@ -16,7 +16,8 @@
         "league/flysystem": "^3.11",
         "zenstruck/image": "^1.0",
         "zenstruck/stream": "^1.2",
-        "zenstruck/temp-file": "^1.2.1"
+        "zenstruck/temp-file": "^1.2.1",
+        "zenstruck/uri": "^2.2"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.8",
@@ -46,8 +47,7 @@
         "twig/twig": "^3.6",
         "zenstruck/assert": "^1.2",
         "zenstruck/console-test": "^1.4",
-        "zenstruck/foundry": "^1.30.3",
-        "zenstruck/uri": "^2.2"
+        "zenstruck/foundry": "^1.30.3"
     },
     "config": {
         "preferred-install": "dist",
