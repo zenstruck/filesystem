@@ -369,6 +369,37 @@ $filesystem = new MultiFilesystem(
 $filesystem->file('another/file.txt'); // File from "filesystem2"
 ```
 
+### `CacheFilesystem`
+
+> [!NOTE]
+> A `psr/cache-implementation` is required.
+
+```php
+use Zenstruck\Filesystem\CacheFilesystem;
+use Zenstruck\Filesystem\Node\Mapping;
+
+/** @var \Zenstruck\Filesystem $inner */
+/** @var \Psr\Cache\CacheItemPoolInterface $cache */
+
+$filesystem = new CacheFilesystem(
+    inner: $inner,
+    cache: $cache,
+    metadata: [ // array of metadata to cache (see Zenstruck\Filesystem\Node\Mapping)
+        Mapping::LAST_MODIFIED,
+        Mapping::SIZE,
+    ],
+    ttl: 3600, // or null for no TTL
+);
+
+$filesystem->write('file.txt', 'content'); // caches metadata
+
+$file = $filesystem->file('file.txt');
+$file->lastModified(); // cached value
+$file->size(); // cached value
+$file->checksum(); // real value (as this wasn't configured to be cached)
+$file->contents(); // actually reads the file (contents cannot be cached)
+```
+
 ### `LoggableFilesystem`
 
 > [!NOTE]
@@ -645,7 +676,7 @@ class MyTest extends TestCase implements FilesystemProvider
         $filesystem->assertExists('file.txt');
     }
 
-    public function createFilesystem(): Filesystem|FilesystemAdapter|string;
+    public function createFilesystem(): Filesystem|FilesystemAdapter|string
     {
         return '/some/temp/dir';
     }
@@ -924,6 +955,24 @@ zenstruck_filesystem:
 
                     # Default expiry
                     expires:              null # Example: '+ 30 minutes'
+
+            # Cache file/image metadata
+            cache:
+                enabled:              false
+
+                # PSR-6 cache pool service id
+                pool:                 cache.app
+
+                # Cache TTL (null for no TTL)
+                ttl:                  null
+
+                # File/image metadata to cache (see Zenstruck\Filesystem\Node\Mapping)
+                metadata:             ~
+
+                    # Examples:
+                    # - last_modified
+                    # - size
+                    # - dimensions
 
             # Dispatch filesystem operation events
             events:

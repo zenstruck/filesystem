@@ -81,7 +81,7 @@ abstract class FilesystemTest extends TestCase
     public function can_get_image(): void
     {
         $fs = $this->createFilesystem();
-        $fs->write('some/file.png', 'content');
+        $fs->write('some/file.png', fixture('symfony.png'));
 
         $this->assertTrue($fs->image('some/file.png')->exists());
     }

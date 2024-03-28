@@ -33,6 +33,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Zenstruck\Filesystem;
+use Zenstruck\Filesystem\CacheFilesystem;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeLifecycleListener;
 use Zenstruck\Filesystem\Doctrine\EventListener\NodeMappingListener;
 use Zenstruck\Filesystem\Doctrine\MappingManager;
@@ -428,6 +429,18 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $container->register('.zenstruck_filesystem.filesystem.events_'.$name, EventDispatcherFilesystem::class)
                 ->setDecoratedService($filesystemId)
                 ->setArguments([new Reference('.inner'), new Reference('event_dispatcher'), $config['events']])
+            ;
+        }
+
+        if ($config['cache']['enabled']) {
+            $container->register('.zenstruck_filesystem.filesystem.cache_'.$name, CacheFilesystem::class)
+                ->setDecoratedService($filesystemId)
+                ->setArguments([
+                    new Reference('.inner'),
+                    new Reference($config['cache']['pool']),
+                    $config['cache']['metadata'],
+                    $config['cache']['ttl'],
+                ])
             ;
         }
 

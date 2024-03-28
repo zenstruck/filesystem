@@ -12,7 +12,9 @@
 namespace Zenstruck\Tests\Filesystem\Symfony;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
+use Zenstruck\Filesystem\Exception\NodeNotFound;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
@@ -163,11 +165,11 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $this->assertEmpty($subscriber->events);
 
         $fs = $this->filesystem();
-        $fs->write('foo', 'bar');
+        $fs->write('foo.txt', 'bar');
         $fs->mkdir('bar');
-        $fs->chmod('foo', 'public');
-        $fs->copy('foo', 'file.png');
-        $fs->delete('foo');
+        $fs->chmod('foo.txt', 'public');
+        $fs->copy('foo.txt', 'file.png');
+        $fs->delete('foo.txt');
         $fs->move('file.png', 'file2.png');
 
         $this->assertCount(12, $subscriber->events);
@@ -188,5 +190,30 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         self::ensureKernelShutdown();
 
         $this->filesystem()->assertExists('static://file.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function cached_filesystem(): void
+    {
+        /** @var Service $service */
+        $service = self::getContainer()->get(Service::class);
+
+        $this->filesystem()->write('cached://image.png', fixture('symfony.png'));
+
+        (new Filesystem())->remove(__DIR__.'/../../../var/cached/image.png');
+
+        $this->filesystem()->assertExists('cached://image.png');
+
+        $image = $this->filesystem()->image('cached://image.png')
+            ->assertSize(10862)
+            ->assertHeight(678)
+            ->assertWidth(563)
+        ;
+
+        $this->expectException(NodeNotFound::class);
+
+        $image->mimeType();
     }
 }
