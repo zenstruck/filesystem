@@ -93,6 +93,7 @@ class Entity1
             Mapping::SIZE,
             Mapping::CHECKSUM,
             Mapping::PUBLIC_URL,
+            Mapping::DIMENSIONS,
         ],
         filesystem: 'public',
         namer: 'expression:files/{this.title|slug}-{checksum:7}{ext}',

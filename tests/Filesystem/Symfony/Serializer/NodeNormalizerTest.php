@@ -78,7 +78,7 @@ final class NodeNormalizerTest extends KernelTestCase
         ];
         yield [
             fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
-            ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE]],
+            ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE, Mapping::DIMENSIONS]],
             File::class,
             [
                 'path' => 'some/file.txt',
@@ -94,6 +94,20 @@ final class NodeNormalizerTest extends KernelTestCase
                 'path' => 'some/file.txt',
                 'checksum' => '9a0364b9e99bb480dd25e1f0284c8555',
                 'size' => 7,
+            ],
+        ];
+        yield [
+            fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
+            ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE, Mapping::DIMENSIONS]],
+            File::class,
+            [
+                'path' => 'some/image.png',
+                'checksum' => 'ac6884fc84724d792649552e7211843a',
+                'size' => 10862,
+                'dimensions' => [
+                    'width' => 563,
+                    'height' => 678,
+                ],
             ],
         ];
         yield [

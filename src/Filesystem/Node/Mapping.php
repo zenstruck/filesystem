@@ -45,8 +45,7 @@ class Mapping
 
     private const STRING_METADATA = [self::PATH, self::DSN];
     private const NODE_METADATA = [self::PATH, self::DSN, self::LAST_MODIFIED, self::VISIBILITY, self::FILENAME];
-    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE];
-    private const IMAGE_METADATA = [self::DIMENSIONS, self::EXIF, self::IPTC, self::THUMB_HASH];
+    private const FILE_METADATA = [self::SIZE, self::CHECKSUM, self::PUBLIC_URL, self::EXTENSION, self::MIME_TYPE, self::DIMENSIONS, self::EXIF, self::IPTC, self::THUMB_HASH];
 
     /** @var Format */
     public string|array $metadata;
@@ -151,14 +150,6 @@ class Mapping
                 continue;
             }
 
-            if (\in_array($value, self::IMAGE_METADATA, true)) {
-                if (!\is_a($class, Image::class, true)) {
-                    throw new \LogicException(\sprintf('Metadata "%s" can only be used with images.', $value));
-                }
-
-                continue;
-            }
-
             if (self::CHECKSUM === $key) {
                 continue;
             }
@@ -214,16 +205,16 @@ class Mapping
                 self::EXTENSION => $node->path()->extension(),
                 self::CHECKSUM => self::serializeChecksum($node->ensureFile(), $value),
                 self::PUBLIC_URL => $node->ensureFile()->publicUrl(),
-                self::TRANSFORM_URL => self::serializeTransformUrl($node->ensureImage(), $value),
-                self::DIMENSIONS => $node->ensureImage()->dimensions()->jsonSerialize(),
-                self::EXIF => $node->ensureImage()->exif(),
-                self::IPTC => $node->ensureImage()->iptc(),
-                self::THUMB_HASH => $node->ensureImage()->thumbHash()->key(),
+                self::TRANSFORM_URL => $node->isImage() ? self::serializeTransformUrl($node->ensureImage(), $value) : null,
+                self::DIMENSIONS => $node->isImage() ? $node->ensureImage()->dimensions()->jsonSerialize() : null,
+                self::EXIF => $node->isImage() ? $node->ensureImage()->exif() : null,
+                self::IPTC => $node->isImage() ? $node->ensureImage()->iptc() : null,
+                self::THUMB_HASH => $node->isImage() ? $node->ensureImage()->thumbHash()->key() : null,
                 default => throw new \InvalidArgumentException('Invalid metadata definition.'), // todo
             };
         }
 
-        return $ret; // @phpstan-ignore-line
+        return \array_filter($ret, fn($v) => null !== $v); // @phpstan-ignore-line
     }
 
     private function requiresFilesystem(): bool
