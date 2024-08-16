@@ -57,13 +57,13 @@ function in_memory_filesystem(string $name = 'default'): Filesystem
         name: $name,
         features: [
             PublicUrlGenerator::class => new VersionUrlGenerator(new PrefixPublicUrlGenerator('/prefix'), Mapping::SIZE),
-            TemporaryUrlGenerator::class => new class() implements TemporaryUrlGenerator {
+            TemporaryUrlGenerator::class => new class implements TemporaryUrlGenerator {
                 public function temporaryUrl(string $path, DateTimeInterface $expiresAt, Config $config): string
                 {
                     return "/temp/{$path}?expires={$expiresAt->getTimestamp()}";
                 }
             },
-            TransformUrlGenerator::class => new class() implements TransformUrlGenerator {
+            TransformUrlGenerator::class => new class implements TransformUrlGenerator {
                 public function transformUrl(string $path, array|string $filter, Config $config): string
                 {
                     return "/generate/{$path}?filter={$filter}";
