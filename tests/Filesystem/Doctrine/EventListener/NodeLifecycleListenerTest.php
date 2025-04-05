@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Tests\Filesystem\Doctrine\DoctrineTestCase;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -56,7 +56,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         $this->em()->remove($fromDb);
         $this->em()->flush();
@@ -87,7 +87,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         $fromDb->{'setFile'.$num}($this->filesystem()->write('some/new-file.txt', 'content3'));
         $object->{'setImage'.$num}($this->filesystem()->write('some/new-image.png', fixture('metadata.jpg'))->ensureImage());
@@ -118,7 +118,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->filesystem()->assertExists('some/file.txt');
         $this->filesystem()->assertExists('some/image.png');
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         $fromDb->{'setFile'.$num}(null);
         $object->{'setImage'.$num}(null);
@@ -149,7 +149,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         $this->assertSame('new content', $this->loadMappingFor($fromDb)->{'getFile'.$num}()->contents());
     }
@@ -272,7 +272,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
 
         $this->filesystem()->delete('some/image.png');
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         /** @var Image $image */
         $image = $fromDb->getImage4();
@@ -325,7 +325,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->em()->flush();
         $this->em()->clear();
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
         $this->loadMappingFor($fromDb);
 
         $file = $fromDb->getFile1();
@@ -339,7 +339,7 @@ abstract class NodeLifecycleListenerTest extends DoctrineTestCase
         $this->em()->flush();
         $this->em()->clear();
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
         $this->loadMappingFor($fromDb);
 
         $file = $fromDb->getFile1();

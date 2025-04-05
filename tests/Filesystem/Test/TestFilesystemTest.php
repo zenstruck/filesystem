@@ -89,7 +89,7 @@ final class TestFilesystemTest extends FilesystemTest
         $file = $fs->realFile('file1.txt');
 
         $this->assertFileExists($file);
-        $this->assertSame('/tmp/file1.txt', (string) $file);
+        $this->assertSame('file1.txt', $file->getFilename());
         $this->assertSame('contents', \file_get_contents($file));
     }
 

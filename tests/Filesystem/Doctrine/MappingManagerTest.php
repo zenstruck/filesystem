@@ -18,7 +18,7 @@ use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Fixtures\Entity\Entity2;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -49,7 +49,7 @@ final class MappingManagerTest extends DoctrineTestCase
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
-        $fromDb = repository(Entity2::class)->first()->object();
+        $fromDb = repository(Entity2::class)->first();
         $fromDb = $this->mappingContext()->load($fromDb);
         $fromDb = $this->mappingContext()->load($fromDb); // ensure multiple calls work
         $this->mappingContext()->load([$fromDb]);

@@ -55,7 +55,6 @@ use Zenstruck\Filesystem\Symfony\Routing\RoutePublicUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTemporaryUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
-use Zenstruck\Filesystem\Test\Node\Foundry\LazyMock;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
 use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
@@ -118,12 +117,6 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         if ($mergedConfig['doctrine']['enabled']) {
             $this->registerDoctrine($container, $mergedConfig['doctrine']);
         }
-
-        if (isset($container->getParameter('kernel.bundles')['ZenstruckFoundryBundle'])) {
-            $container->register('.zenstruck_filesystem.test.foundry.faker_provider', LazyMock::class)
-                ->addTag('foundry.faker_provider')
-            ;
-        }
     }
 
     private function registerDoctrine(ContainerBuilder $container, array $config): void // @phpstan-ignore-line
@@ -177,7 +170,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             )
         ;
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.doctrine.twig_extension', MappingManagerExtension::class)
                 ->addTag('twig.extension')
             ;
@@ -205,7 +198,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $expression->addArgument(new Reference('slugger'));
         }
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.path_generator.twig', TwigPathGenerator::class)
                 ->addArgument(new Reference('twig'))
                 ->addTag('zenstruck_filesystem.path_generator', ['key' => 'twig'])
