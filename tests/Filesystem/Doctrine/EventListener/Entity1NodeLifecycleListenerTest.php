@@ -16,7 +16,7 @@ use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Tests\Fixtures\Entity\Entity1;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,7 +42,7 @@ final class Entity1NodeLifecycleListenerTest extends NodeLifecycleListenerTest
         $this->flushAndAssertNoChangesFor($object);
         $this->em()->clear();
 
-        $fromDb = repository($class)->first()->object();
+        $fromDb = repository($class)->first();
 
         $this->assertInstanceOf(LazyFile::class, $fromDb->getFile1());
         $this->assertSame('content1', $fromDb->getFile1()->contents());
