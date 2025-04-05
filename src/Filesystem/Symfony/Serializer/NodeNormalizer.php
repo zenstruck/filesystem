@@ -85,13 +85,11 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         if ($mapping->requiresPathGenerator()) {
-            $node->setPath(function() use ($mapping, $node, $context) {
-                return $this->container->get(PathGenerator::class)->generate(
-                    $mapping->namer(),
-                    $node,
-                    $context,
-                );
-            });
+            $node->setPath(fn() => $this->container->get(PathGenerator::class)->generate(
+                $mapping->namer(),
+                $node,
+                $context,
+            ));
         }
 
         return $node;
