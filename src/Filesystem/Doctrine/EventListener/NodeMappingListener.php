@@ -103,7 +103,7 @@ final class NodeMappingListener
                 throw new \LogicException(\sprintf('Property "%s::$%s" must have a "%s" or "%s" typehint.', $property->class, $property->name, File::class, Image::class));
             }
 
-            $mapping->validate($nodeClass); // @phpstan-ignore-line
+            $mapping->validate($nodeClass);
 
             // cast to object since array in orm v2 and object in orm v3
             if ($metadata->hasField($property->name) && isset(((object) $metadata->getFieldMapping($property->name))->declared)) {
@@ -126,7 +126,7 @@ final class NodeMappingListener
 
             $metadata->mapField(\array_merge($fieldMapping, [
                 'fieldName' => $property->name,
-                'type' => self::doctrineTypeFor($mapping, $nodeClass), // @phpstan-ignore-line
+                'type' => self::doctrineTypeFor($mapping, $nodeClass),
                 'nullable' => $fieldMapping['nullable'] ?? $type->allowsNull(),
             ]));
 

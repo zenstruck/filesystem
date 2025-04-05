@@ -119,7 +119,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $this->registerDoctrine($container, $mergedConfig['doctrine']);
         }
 
-        if (isset($container->getParameter('kernel.bundles')['ZenstruckFoundryBundle'])) {
+        if (isset($container->getParameter('kernel.bundles')['ZenstruckFoundryBundle'])) { // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.test.foundry.faker_provider', LazyMock::class)
                 ->addTag('foundry.faker_provider')
             ;
@@ -177,7 +177,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             )
         ;
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.doctrine.twig_extension', MappingManagerExtension::class)
                 ->addTag('twig.extension')
             ;
@@ -205,7 +205,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $expression->addArgument(new Reference('slugger'));
         }
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.path_generator.twig', TwigPathGenerator::class)
                 ->addArgument(new Reference('twig'))
                 ->addTag('zenstruck_filesystem.path_generator', ['key' => 'twig'])
