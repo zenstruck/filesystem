@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -57,8 +59,7 @@ use Zenstruck\Filesystem\Symfony\Routing\RouteTransformUrlGenerator;
 use Zenstruck\Filesystem\Symfony\Serializer\NodeNormalizer;
 use Zenstruck\Filesystem\TraceableFilesystem;
 use Zenstruck\Filesystem\Twig\TwigPathGenerator;
-use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
-use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
+use Zenstruck\Uri\ParsedUri;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -278,14 +279,14 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
 
         $features = [];
-        $canSignUrls = \in_array(ZenstruckUriBundle::class, (array) $container->getParameter('kernel.bundles'), true);
-        $routers = [UrlGeneratorInterface::class => new Reference('router')];
 
-        if ($canSignUrls) {
-            $routers[SignedUrlGenerator::class] = new Reference(SignedUrlGenerator::class);
-        }
-
-        $routers = new ServiceLocatorArgument($routers);
+        $container->register('.zenstruck_filesystem.route_url_generator.locator', ServiceLocator::class)
+            ->setArgument(0, [
+                UrlGeneratorInterface::class => new Reference('router'),
+                UriSigner::class => new Reference('uri_signer'),
+            ])
+            ->addTag('container.service_locator')
+        ;
 
         // public url config
         switch (true) {
@@ -310,7 +311,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             case isset($config['public_url']['route']):
                 $container->register($id = '.zenstruck_filesystem.filesystem_public_url.'.$name, RoutePublicUrlGenerator::class)
                     ->setArguments([
-                        $routers,
+                        new Reference('.zenstruck_filesystem.route_url_generator.locator'),
                         $config['public_url']['route']['name'],
                         $config['public_url']['route']['parameters'],
                         $config['public_url']['route']['sign'],
@@ -320,22 +321,24 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
                 $features[PublicUrlGenerator::class] = new Reference($id);
 
-                if ($canSignUrls) {
-                    $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
-                        ->setArguments([
-                            new Reference(SignedUrlGenerator::class),
-                            $config['public_url']['route']['name'],
-                            $config['public_url']['route']['parameters'],
-                        ])
-                    ;
+                $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
+                    ->setArguments([
+                        new Reference('.zenstruck_filesystem.route_url_generator.locator'),
+                        $config['public_url']['route']['name'],
+                        $config['public_url']['route']['parameters'],
+                    ])
+                ;
 
-                    $features[TemporaryUrlGenerator::class] = new Reference($id);
-                }
+                $features[TemporaryUrlGenerator::class] = new Reference($id);
 
                 break;
         }
 
         if (isset($config['public_url']) && $config['public_url']['version']['enabled'] && isset($features[PublicUrlGenerator::class])) {
+            if (!\class_exists(ParsedUri::class)) {
+                throw new LogicException('zenstruck\filesystem requires zenstruck/uri to use versioned public URLs. Install with "composer require zenstruck/uri".');
+            }
+
             $container->register($id = '.zenstruck_filesystem.filesystem_version_public_url.'.$name, VersionUrlGenerator::class)
                 ->setDecoratedService((string) $features[PublicUrlGenerator::class])
                 ->setArguments([
@@ -356,13 +359,9 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 break;
 
             case isset($config['temporary_url']['route']):
-                if (!$canSignUrls) {
-                    throw new LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
-                }
-
                 $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
                     ->setArguments([
-                        new Reference(SignedUrlGenerator::class),
+                        new Reference('.zenstruck_filesystem.route_url_generator.locator'),
                         $config['temporary_url']['route']['name'],
                         $config['temporary_url']['route']['parameters'],
                     ])
@@ -383,7 +382,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             case isset($config['image_url']['route']):
                 $container->register($id = '.zenstruck_filesystem.filesystem_image_url.'.$name, RouteTransformUrlGenerator::class)
                     ->setArguments([
-                        $routers,
+                        new Reference('.zenstruck_filesystem.route_url_generator.locator'),
                         $config['image_url']['route']['name'],
                         $config['image_url']['route']['parameters'],
                         $config['image_url']['route']['sign'],

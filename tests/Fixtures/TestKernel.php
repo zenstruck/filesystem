@@ -30,7 +30,6 @@ use Zenstruck\Filesystem\Symfony\Form\PendingFileType;
 use Zenstruck\Filesystem\Symfony\Form\PendingImageType;
 use Zenstruck\Filesystem\Symfony\ZenstruckFilesystemBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
-use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -77,7 +76,6 @@ final class TestKernel extends Kernel
         yield new FrameworkBundle();
         yield new DoctrineBundle();
         yield new TwigBundle();
-        yield new ZenstruckUriBundle();
         yield new ZenstruckFoundryBundle();
         yield new ZenstruckFilesystemBundle();
     }

@@ -30,6 +30,9 @@ final class VersionUrlGenerator implements PublicUrlGenerator
         private string $metadata = Mapping::LAST_MODIFIED,
         private string $queryParameter = 'v',
     ) {
+        if (!\class_exists(ParsedUri::class)) {
+            throw new \LogicException('zenstruck\filesystem requires zenstruck/uri to use versioned public URLs. Install with "composer require zenstruck/uri".');
+        }
     }
 
     public function publicUrl(string $path, Config $config): string

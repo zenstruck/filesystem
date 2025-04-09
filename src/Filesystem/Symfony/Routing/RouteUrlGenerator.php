@@ -12,9 +12,8 @@
 namespace Zenstruck\Filesystem\Symfony\Routing;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
-use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -48,18 +47,18 @@ abstract class RouteUrlGenerator
             $sign = true;
         }
 
+        $url = $this->container->get(UrlGeneratorInterface::class)
+            ->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL)
+        ;
+
         if (!$sign) {
-            return $this->container->get(UrlGeneratorInterface::class)
-                ->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL)
-            ;
+            return $url;
         }
 
-        if (!$this->container->has(SignedUrlGenerator::class)) {
-            throw new \LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
+        if (\is_string($expires)) {
+            $expires = new \DateTimeImmutable($expires);
         }
 
-        $builder = $this->container->get(SignedUrlGenerator::class)->build($this->route, $routeParameters);
-
-        return $expires ? $builder->expires($expires) : $builder;
+        return $this->container->get(UriSigner::class)->sign($url, $expires);
     }
 }
