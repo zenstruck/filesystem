@@ -12,9 +12,9 @@
 namespace Zenstruck\Filesystem\Symfony\Routing;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
-use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,6 +23,8 @@ use Zenstruck\Uri\Bridge\Symfony\ZenstruckUriBundle;
  */
 abstract class RouteUrlGenerator
 {
+    private bool $signByDefault;
+
     /**
      * @param array<string,mixed> $routeParameters
      */
@@ -30,36 +32,42 @@ abstract class RouteUrlGenerator
         private ContainerInterface $container,
         private string $route,
         private array $routeParameters = [],
-        private bool $signByDefault = false,
+        bool $signByDefault = false,
         private ?string $defaultExpires = null,
     ) {
+        $this->signByDefault = $this->defaultExpires ? true : $signByDefault;
     }
 
     /**
      * @param array<string,mixed> $routeParameters
      */
-    final protected function generate(string $path, array $routeParameters, ?bool $sign, string|\DateTimeInterface|null $expires): string
+    final protected function generate(string $path, array $routeParameters, string|\DateTimeInterface|null $expires): string
     {
-        $routeParameters = \array_merge($this->routeParameters, $routeParameters, ['path' => $path]);
-        $sign ??= $this->signByDefault;
         $expires ??= $this->defaultExpires;
+        $url = $this->container->get(UrlGeneratorInterface::class)
+            ->generate(
+                $this->route,
+                \array_merge($this->routeParameters, $routeParameters, ['path' => $path]),
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            )
+        ;
 
-        if (null !== $expires) {
-            $sign = true;
+        if ($expires && !$this->signByDefault) {
+            throw new \LogicException('Cannot set expiry when signing is disabled.');
         }
 
-        if (!$sign) {
-            return $this->container->get(UrlGeneratorInterface::class)
-                ->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL)
-            ;
+        if (!$this->signByDefault) {
+            return $url;
         }
 
-        if (!$this->container->has(SignedUrlGenerator::class)) {
-            throw new \LogicException(\sprintf('%s needs to be enabled to sign urls.', ZenstruckUriBundle::class));
+        if (\is_string($expires)) {
+            $expires = new \DateTimeImmutable($expires);
         }
 
-        $builder = $this->container->get(SignedUrlGenerator::class)->build($this->route, $routeParameters);
+        if ($expires && Kernel::VERSION_ID < 70100) { // @phpstan-ignore smaller.alwaysFalse, booleanAnd.alwaysFalse
+            throw new \LogicException('Expiring URLs requires Symfony 7.1 or higher.');
+        }
 
-        return $expires ? $builder->expires($expires) : $builder;
+        return $this->container->get(UriSigner::class)->sign($url, $expires);
     }
 }

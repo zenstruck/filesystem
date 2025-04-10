@@ -13,29 +13,27 @@ namespace Zenstruck\Filesystem\Symfony\Routing;
 
 use League\Flysystem\Config;
 use League\Flysystem\UrlGeneration\TemporaryUrlGenerator;
-use Zenstruck\Uri\Bridge\Symfony\Routing\SignedUrlGenerator;
+use Psr\Container\ContainerInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RouteTemporaryUrlGenerator implements TemporaryUrlGenerator
+final class RouteTemporaryUrlGenerator extends RouteUrlGenerator implements TemporaryUrlGenerator
 {
-    /**
-     * @param array<string,mixed> $routeParameters
-     */
     public function __construct(
-        private SignedUrlGenerator $router,
-        private string $route,
-        private array $routeParameters = [],
+        ContainerInterface $container,
+        string $route,
+        array $routeParameters = [],
     ) {
+        parent::__construct($container, $route, $routeParameters, true);
     }
 
     public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, Config $config): string
     {
-        return $this->router->temporary(
-            $expiresAt,
-            $this->route,
-            \array_merge($this->routeParameters, $config->get('parameters', []), ['path' => $path]),
+        return $this->generate(
+            path: $path,
+            routeParameters: $config->get('parameters', []),
+            expires: $expiresAt,
         );
     }
 }
