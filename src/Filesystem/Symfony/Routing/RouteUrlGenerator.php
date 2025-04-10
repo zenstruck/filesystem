@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class RouteUrlGenerator
 {
+    private bool $signByDefault;
+
     /**
      * @param array<string,mixed> $routeParameters
      */
@@ -29,29 +31,31 @@ abstract class RouteUrlGenerator
         private ContainerInterface $container,
         private string $route,
         private array $routeParameters = [],
-        private bool $signByDefault = false,
+        bool $signByDefault = false,
         private ?string $defaultExpires = null,
     ) {
+        $this->signByDefault = $this->defaultExpires ? true : $signByDefault;
     }
 
     /**
      * @param array<string,mixed> $routeParameters
      */
-    final protected function generate(string $path, array $routeParameters, ?bool $sign, string|\DateTimeInterface|null $expires): string
+    final protected function generate(string $path, array $routeParameters, string|\DateTimeInterface|null $expires): string
     {
-        $routeParameters = \array_merge($this->routeParameters, $routeParameters, ['path' => $path]);
-        $sign ??= $this->signByDefault;
         $expires ??= $this->defaultExpires;
-
-        if (null !== $expires) {
-            $sign = true;
-        }
-
         $url = $this->container->get(UrlGeneratorInterface::class)
-            ->generate($this->route, $routeParameters, UrlGeneratorInterface::ABSOLUTE_URL)
+            ->generate(
+                $this->route,
+                \array_merge($this->routeParameters, $routeParameters, ['path' => $path]),
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            )
         ;
 
-        if (!$sign) {
+        if ($expires && !$this->signByDefault) {
+            throw new \LogicException('Cannot set expiry when signing is disabled.');
+        }
+
+        if (!$this->signByDefault) {
             return $url;
         }
 

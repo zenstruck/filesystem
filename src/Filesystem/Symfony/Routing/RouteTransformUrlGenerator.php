@@ -28,7 +28,6 @@ final class RouteTransformUrlGenerator extends RouteUrlGenerator implements Tran
         return $this->generate(
             path: $path,
             routeParameters: \array_merge($config->get('parameters', []), $filter),
-            sign: $config->get('sign'),
             expires: $config->get('expires'),
         );
     }
