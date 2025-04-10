@@ -12,6 +12,7 @@
 namespace Zenstruck\Tests\Filesystem\Symfony;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpKernel\Kernel;
 use Zenstruck\Filesystem\Node\Path\Expression;
 use Zenstruck\Filesystem\Test\InteractsWithFilesystem;
 use Zenstruck\Filesystem\Test\ResetFilesystem;
@@ -101,15 +102,29 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
         $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
         $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl());
-        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl(['expires' => 'tomorrow']));
         $this->assertSame('/glide/bar/file.png?w=100&h=200', $privateFile->transformUrl(['w' => 100, 'h' => 200]));
     }
 
     /**
      * @test
      */
-    public function can_generate_signed_and_temporary_urls(): void
+    public function can_generate_signed_urls(): void
     {
+        $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
+
+        $this->assertStringContainsString('_hash=', $privateFile->publicUrl());
+        $this->assertStringNotContainsString('_expiration=', $privateFile->publicUrl());
+    }
+
+    /**
+     * @test
+     */
+    public function can_generate_temporary_urls(): void
+    {
+        if (Kernel::VERSION_ID < 70100) {
+            $this->markTestSkipped('Temporary URLs are not supported in Symfony < 7.1.');
+        }
+
         $publicFile = $this->filesystem()->write('public://foo/file.png', 'content')->ensureImage();
 
         $this->assertStringContainsString('/temp/foo/file.png', $publicFile->temporaryUrl('tomorrow'));
@@ -118,13 +133,24 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
 
         $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
-        $this->assertStringContainsString('_hash=', $privateFile->publicUrl());
-        $this->assertStringNotContainsString('_expiration=', $privateFile->publicUrl());
-        $this->assertStringContainsString('_hash=', $privateFile->publicUrl(['expires' => 'tomorrow']));
-        $this->assertStringContainsString('_expiration=', $privateFile->publicUrl(['expires' => 'tomorrow']));
         $this->assertStringContainsString('/private/bar/file.png', $privateFile->temporaryUrl('tomorrow'));
         $this->assertStringContainsString('_hash=', $privateFile->temporaryUrl('tomorrow'));
         $this->assertStringContainsString('_expiration=', $privateFile->temporaryUrl('tomorrow'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_generate_expiring_public_urls(): void
+    {
+        if (Kernel::VERSION_ID < 70100) {
+            $this->markTestSkipped('Expiring URLs are not supported in Symfony < 7.1.');
+        }
+
+        $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
+
+        $this->assertStringContainsString('_hash=', $privateFile->publicUrl(['expires' => 'tomorrow']));
+        $this->assertStringContainsString('_expiration=', $privateFile->publicUrl(['expires' => 'tomorrow']));
     }
 
     /**

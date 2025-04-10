@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -359,6 +360,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
                 break;
 
             case isset($config['temporary_url']['route']):
+                if (Kernel::VERSION_ID < 70100) { // @phpstan-ignore smaller.alwaysFalse
+                    throw new LogicException('"temporary_url" requires Symfony 7.1 or higher.');
+                }
+
                 $container->register($id = '.zenstruck_filesystem.filesystem_temporary_url.'.$name, RouteTemporaryUrlGenerator::class)
                     ->setArguments([
                         new Reference('.zenstruck_filesystem.route_url_generator.locator'),

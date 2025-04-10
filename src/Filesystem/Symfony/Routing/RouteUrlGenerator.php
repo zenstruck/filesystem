@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Symfony\Routing;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -61,6 +62,10 @@ abstract class RouteUrlGenerator
 
         if (\is_string($expires)) {
             $expires = new \DateTimeImmutable($expires);
+        }
+
+        if ($expires && Kernel::VERSION_ID < 70100) { // @phpstan-ignore smaller.alwaysFalse, booleanAnd.alwaysFalse
+            throw new \LogicException('Expiring URLs requires Symfony 7.1 or higher.');
         }
 
         return $this->container->get(UriSigner::class)->sign($url, $expires);
