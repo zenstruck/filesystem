@@ -26,7 +26,7 @@ use Zenstruck\Filesystem\MultiFilesystem;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait InteractsWithFilesystem
+trait InteractsWithFilesystem // @phpstan-ignore trait.unused
 {
     private TestFilesystem $_testFilesystem;
 

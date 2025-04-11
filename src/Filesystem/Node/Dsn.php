@@ -51,7 +51,7 @@ final class Dsn implements \Stringable
     public static function normalize(string $value): array
     {
         if (2 === \count($parts = \explode('://', $value, 2))) {
-            return $parts; // @phpstan-ignore return.type
+            return $parts;
         }
 
         return [null, $value];

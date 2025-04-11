@@ -25,7 +25,6 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
 
@@ -72,7 +71,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             $data = [Mapping::FILENAME => $data];
         }
 
-        /** @var LazyNode $node */
+        /** @var LazyDirectory|LazyFile $node */
         $node = new (self::TYPE_MAP[$type])($data);
         $filesystem = $mapping->filesystem();
 
