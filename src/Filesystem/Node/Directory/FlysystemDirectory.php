@@ -135,7 +135,7 @@ final class FlysystemDirectory extends FlysystemNode implements Directory
         $clone = clone $this;
 
         foreach ((array) $sizes as $size) {
-            $clone->sizes[] = new NumberComparator($size); // @phpstan-ignore-line
+            $clone->sizes[] = new NumberComparator($size); // @phpstan-ignore argument.type
         }
 
         return $clone;

@@ -45,7 +45,7 @@ abstract class StringType extends BaseStringType
             throw InvalidType::new($value, File::class, [File::class, 'null']);
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, File::class, [File::class, 'null']); // @phpstan-ignore-line
+        throw ConversionException::conversionFailedInvalidType($value, File::class, [File::class, 'null']); // @phpstan-ignore staticMethod.notFound
     }
 
     final public function convertToPHPValue($value, AbstractPlatform $platform): ?LazyFile

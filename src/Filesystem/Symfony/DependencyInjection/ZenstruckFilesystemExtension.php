@@ -69,7 +69,7 @@ use Zenstruck\Uri\ParsedUri;
  */
 final class ZenstruckFilesystemExtension extends ConfigurableExtension
 {
-    protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore-line
+    protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore missingType.iterableValue
     {
         $registry = $container->register(FilesystemRegistry::class)
             ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('zenstruck_filesystem', 'key')))
@@ -121,7 +121,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerDoctrine(ContainerBuilder $container, array $config): void // @phpstan-ignore-line
+    private function registerDoctrine(ContainerBuilder $container, array $config): void // @phpstan-ignore missingType.iterableValue
     {
         $container->register('.zenstruck_filesystem.doctrine.mapping_listener', NodeMappingListener::class)
             ->addArgument(new Reference(FilesystemRegistry::class))
@@ -172,7 +172,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             )
         ;
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.doctrine.twig_extension', MappingManagerExtension::class)
                 ->addTag('twig.extension')
             ;
@@ -200,7 +200,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
             $expression->addArgument(new Reference('slugger'));
         }
 
-        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
+        if (isset($container->getParameter('kernel.bundles')['TwigBundle'])) {  // @phpstan-ignore offsetAccess.nonOffsetAccessible
             $container->register('.zenstruck_filesystem.path_generator.twig', TwigPathGenerator::class)
                 ->addArgument(new Reference('twig'))
                 ->addTag('zenstruck_filesystem.path_generator', ['key' => 'twig'])
@@ -208,7 +208,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerFilesystems(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore-line
+    private function registerFilesystems(array $mergedConfig, ContainerBuilder $container): void // @phpstan-ignore missingType.iterableValue
     {
         if (!$mergedConfig['filesystems']) {
             return; // no filesystems defined
@@ -227,7 +227,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         }
     }
 
-    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void // @phpstan-ignore-line
+    private function registerFilesystem(string $name, array $config, ContainerBuilder $container, ?string $defaultName, array $filesystemNames): void // @phpstan-ignore missingType.iterableValue, missingType.iterableValue
     {
         if ('static-in-memory' === $config['dsn']) {
             $config['dsn'] = "in-memory:{$name}";
@@ -240,7 +240,7 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
             $container->setParameter(
                 'zenstruck_filesystem.reset_before_tests_filesystems',
-                \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]), // @phpstan-ignore-line
+                \array_merge($container->getParameter('zenstruck_filesystem.reset_before_tests_filesystems'), [$name]), // @phpstan-ignore argument.type
             );
         }
 

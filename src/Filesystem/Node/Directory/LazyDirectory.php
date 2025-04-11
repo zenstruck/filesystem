@@ -30,6 +30,6 @@ final class LazyDirectory extends LazyNode implements Directory
 
     protected function inner(): Directory
     {
-        return $this->inner ??= $this->filesystem()->directory($this->path()); // @phpstan-ignore-line
+        return $this->inner ??= $this->filesystem()->directory($this->path()); // @phpstan-ignore return.type
     }
 }

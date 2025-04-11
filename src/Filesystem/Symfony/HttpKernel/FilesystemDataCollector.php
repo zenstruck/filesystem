@@ -56,9 +56,9 @@ final class FilesystemDataCollector extends DataCollector
         }
     }
 
-    public function getData(): array // @phpstan-ignore-line
+    public function getData(): array // @phpstan-ignore missingType.iterableValue
     {
-        return $this->data; // @phpstan-ignore-line
+        return $this->data; // @phpstan-ignore return.type
     }
 
     public function getName(): string

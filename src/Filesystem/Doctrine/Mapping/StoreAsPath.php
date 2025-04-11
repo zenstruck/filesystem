@@ -31,6 +31,6 @@ final class StoreAsPath extends Stateful
 
     public function filesystem(): string
     {
-        return parent::filesystem(); // @phpstan-ignore-line
+        return parent::filesystem(); // @phpstan-ignore return.type
     }
 }

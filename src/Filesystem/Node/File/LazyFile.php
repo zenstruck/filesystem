@@ -68,6 +68,6 @@ class LazyFile extends LazyNode implements File
 
     protected function inner(): File
     {
-        return $this->inner ??= $this->filesystem()->file($this->path()); // @phpstan-ignore-line
+        return $this->inner ??= $this->filesystem()->file($this->path()); // @phpstan-ignore return.type
     }
 }

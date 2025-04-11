@@ -67,7 +67,7 @@ final class AdapterFactory
         };
     }
 
-    private static function createLocalAdapter(string $dsn, array $parsed): LocalFilesystemAdapter // @phpstan-ignore-line
+    private static function createLocalAdapter(string $dsn, array $parsed): LocalFilesystemAdapter // @phpstan-ignore missingType.iterableValue
     {
         $parsed = self::normalizeQuery($parsed);
         $visibility = $parsed['query']['visibility'] ?? [];
@@ -81,7 +81,7 @@ final class AdapterFactory
         );
     }
 
-    private static function parse(string $dsn): array // @phpstan-ignore-line
+    private static function parse(string $dsn): array // @phpstan-ignore missingType.iterableValue
     {
         $parsed = \parse_url($dsn);
 
@@ -105,7 +105,7 @@ final class AdapterFactory
         return $parsed;
     }
 
-    private static function normalizeQuery(array $parts): array // @phpstan-ignore-line
+    private static function normalizeQuery(array $parts): array // @phpstan-ignore missingType.iterableValue, missingType.iterableValue
     {
         $query = [];
 
@@ -116,7 +116,7 @@ final class AdapterFactory
         return $parts;
     }
 
-    private static function createInMemoryAdapter(array $parsed): InMemoryFilesystemAdapter // @phpstan-ignore-line
+    private static function createInMemoryAdapter(array $parsed): InMemoryFilesystemAdapter // @phpstan-ignore missingType.iterableValue
     {
         if ($name = $parsed['path'] ?? null) {
             return StaticInMemoryAdapterRegistry::get($name);
@@ -125,7 +125,7 @@ final class AdapterFactory
         return new InMemoryFilesystemAdapter();
     }
 
-    private static function createSftpAdapter(array $parsed): FilesystemAdapter // @phpstan-ignore-line
+    private static function createSftpAdapter(array $parsed): FilesystemAdapter // @phpstan-ignore missingType.iterableValue
     {
         if (!\class_exists(SftpAdapter::class)) {
             throw new \LogicException('league/flysystem-sftp-v3 is required to use the SFTP adapter. Install with "composer require league/flysystem-sftp-v3".');
@@ -146,7 +146,7 @@ final class AdapterFactory
         );
     }
 
-    private static function createFtpAdapter(array $parsed): FilesystemAdapter // @phpstan-ignore-line
+    private static function createFtpAdapter(array $parsed): FilesystemAdapter // @phpstan-ignore missingType.iterableValue
     {
         if (!\class_exists(FtpAdapter::class)) {
             throw new \LogicException('league/flysystem-ftp is required to use the FTP adapter. Install with "composer require league/flysystem-ftp".');
@@ -164,7 +164,7 @@ final class AdapterFactory
         ])));
     }
 
-    private static function createS3Adapter(array $parsed): FilesystemAdapter // @phpstan-ignore-line
+    private static function createS3Adapter(array $parsed): FilesystemAdapter // @phpstan-ignore missingType.iterableValue
     {
         $parsed = self::normalizeQuery($parsed);
 
@@ -181,8 +181,8 @@ final class AdapterFactory
         }
 
         if (\class_exists(AwsS3V3Adapter::class)) {
-            return new AwsS3V3Adapter( // @phpstan-ignore-line
-                new S3Client([ // @phpstan-ignore-line
+            return new AwsS3V3Adapter( // @phpstan-ignore return.type
+                new S3Client([ // @phpstan-ignore class.notFound
                     'region' => $parsed['query']['region'] ?? $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set in the query (ie ?region=us-east-1) or as the fragment (ie #us-east-1).'),
                     'credentials' => [
                         'key' => $parsed['user'] ?? null,

@@ -54,7 +54,7 @@ abstract class JsonType extends BaseJsonType
             throw InvalidType::new($value, SerializableFile::class, [SerializableFile::class, 'null']);
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, SerializableFile::class, [SerializableFile::class, 'null']); // @phpstan-ignore-line
+        throw ConversionException::conversionFailedInvalidType($value, SerializableFile::class, [SerializableFile::class, 'null']); // @phpstan-ignore staticMethod.notFound
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?LazyFile
@@ -72,7 +72,7 @@ abstract class JsonType extends BaseJsonType
             throw InvalidType::new($value, File::class, ['array', 'null']);
         }
 
-        throw ConversionException::conversionFailedFormat($value, File::class, 'array|null'); // @phpstan-ignore-line
+        throw ConversionException::conversionFailedFormat($value, File::class, 'array|null'); // @phpstan-ignore staticMethod.notFound
     }
 
     final public function requiresSQLCommentHint(AbstractPlatform $platform): bool

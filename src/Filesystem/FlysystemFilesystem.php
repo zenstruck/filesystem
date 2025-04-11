@@ -142,7 +142,7 @@ final class FlysystemFilesystem implements Filesystem
             $progress = $config['progress'] ?? static fn() => null;
 
             foreach ($content->files() as $file) {
-                $file = $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config); // @phpstan-ignore-line
+                $file = $this->write($prefixer->prefixPath(\mb_substr($file->path(), $prefixLength)), $file, $config); // @phpstan-ignore argument.type
                 $progress($file);
             }
 

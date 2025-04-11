@@ -56,7 +56,7 @@ final class FlysystemImage extends FlysystemFile implements Image
 
     public function tempFile(): ImageFileInfo
     {
-        return parent::tempFile(); // @phpstan-ignore-line
+        return parent::tempFile(); // @phpstan-ignore return.type
     }
 
     protected function createTempFile(): \SplFileInfo
