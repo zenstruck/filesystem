@@ -42,7 +42,7 @@ final class PathGenerator
             $namer = new Namer($namer);
         }
 
-        if (!$namer instanceof Namer && \is_callable($namer)) {
+        if (!$namer instanceof Namer) {
             return (new CallbackPathGenerator($namer))->generatePath($node, $context);
         }
 

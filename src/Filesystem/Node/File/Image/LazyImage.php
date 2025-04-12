@@ -82,6 +82,6 @@ final class LazyImage extends LazyFile implements Image
 
     protected function inner(): Image
     {
-        return $this->inner ??= $this->filesystem()->image($this->path()); // @phpstan-ignore-line
+        return $this->inner ??= $this->filesystem()->image($this->path()); // @phpstan-ignore return.type
     }
 }

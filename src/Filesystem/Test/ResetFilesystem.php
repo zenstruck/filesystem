@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\FilesystemRegistry;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait ResetFilesystem
+trait ResetFilesystem // @phpstan-ignore trait.unused
 {
     /**
      * @before

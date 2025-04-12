@@ -27,11 +27,11 @@ final class Stateless extends Mapping
 
     public function filesystem(): string
     {
-        return parent::filesystem(); // @phpstan-ignore-line
+        return parent::filesystem(); // @phpstan-ignore return.type
     }
 
     public function namer(): Namer
     {
-        return parent::namer(); // @phpstan-ignore-line
+        return parent::namer(); // @phpstan-ignore return.type
     }
 }

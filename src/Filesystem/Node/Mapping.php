@@ -75,7 +75,7 @@ class Mapping
     /**
      * @internal
      */
-    public static function fromArray(array $array): self // @phpstan-ignore-line
+    public static function fromArray(array $array): self // @phpstan-ignore missingType.iterableValue
     {
         $filesystem = $array['filesystem'] ?? null;
 
@@ -214,7 +214,7 @@ class Mapping
             };
         }
 
-        return \array_filter($ret, fn($v) => null !== $v); // @phpstan-ignore-line
+        return \array_filter($ret, fn($v) => null !== $v); // @phpstan-ignore return.type
     }
 
     private function requiresFilesystem(): bool

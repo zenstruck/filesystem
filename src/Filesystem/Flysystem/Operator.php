@@ -51,7 +51,7 @@ final class Operator implements FilesystemOperator
         return $this->name;
     }
 
-    public function publicUrl(string $path, array $config = []): string // @phpstan-ignore-line
+    public function publicUrl(string $path, array $config = []): string // @phpstan-ignore missingType.iterableValue
     {
         try {
             return $this->feature(PublicUrlGenerator::class)->publicUrl($path, new Config($config));
@@ -60,7 +60,7 @@ final class Operator implements FilesystemOperator
         }
     }
 
-    public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, array $config = []): string // @phpstan-ignore-line
+    public function temporaryUrl(string $path, \DateTimeInterface $expiresAt, array $config = []): string // @phpstan-ignore missingType.iterableValue
     {
         try {
             return $this->feature(TemporaryUrlGenerator::class)->temporaryUrl($path, $expiresAt, new Config($config));
@@ -69,7 +69,7 @@ final class Operator implements FilesystemOperator
         }
     }
 
-    public function checksum(string $path, array $config = []): string // @phpstan-ignore-line
+    public function checksum(string $path, array $config = []): string // @phpstan-ignore missingType.iterableValue
     {
         return $this->inner->checksum($path, $config);
     }
@@ -124,12 +124,12 @@ final class Operator implements FilesystemOperator
         return $this->inner->visibility($path);
     }
 
-    public function write(string $location, string $contents, array $config = []): void // @phpstan-ignore-line
+    public function write(string $location, string $contents, array $config = []): void // @phpstan-ignore missingType.iterableValue
     {
         $this->inner->write($location, $contents, $config);
     }
 
-    public function writeStream(string $location, $contents, array $config = []): void // @phpstan-ignore-line
+    public function writeStream(string $location, $contents, array $config = []): void // @phpstan-ignore missingType.iterableValue
     {
         $this->inner->writeStream($location, $contents, $config);
     }
@@ -149,17 +149,17 @@ final class Operator implements FilesystemOperator
         $this->inner->deleteDirectory($location);
     }
 
-    public function createDirectory(string $location, array $config = []): void // @phpstan-ignore-line
+    public function createDirectory(string $location, array $config = []): void // @phpstan-ignore missingType.iterableValue
     {
         $this->inner->createDirectory($location, $config);
     }
 
-    public function move(string $source, string $destination, array $config = []): void // @phpstan-ignore-line
+    public function move(string $source, string $destination, array $config = []): void // @phpstan-ignore missingType.iterableValue
     {
         $this->inner->move($source, $destination, $config);
     }
 
-    public function copy(string $source, string $destination, array $config = []): void // @phpstan-ignore-line
+    public function copy(string $source, string $destination, array $config = []): void // @phpstan-ignore missingType.iterableValue
     {
         $this->inner->copy($source, $destination, $config);
     }
@@ -183,7 +183,7 @@ final class Operator implements FilesystemOperator
         }
 
         if (\is_array($this->features) && isset($this->features[$feature])) {
-            return $this->features[$feature]; // @phpstan-ignore-line
+            return $this->features[$feature]; // @phpstan-ignore return.type
         }
 
         throw new UnsupportedFeature($feature, $this->name(), $e ?? null);

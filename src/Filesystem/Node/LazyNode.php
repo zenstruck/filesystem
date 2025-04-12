@@ -108,7 +108,7 @@ abstract class LazyNode implements Node
 
         $lastModified = \is_numeric($lastModified) ? \DateTimeImmutable::createFromFormat('U', (string) $lastModified) : new \DateTimeImmutable($lastModified);
 
-        return $lastModified->setTimezone(new \DateTimeZone(\date_default_timezone_get())); // @phpstan-ignore-line
+        return $lastModified->setTimezone(new \DateTimeZone(\date_default_timezone_get())); // @phpstan-ignore method.nonObject
     }
 
     public function visibility(): string

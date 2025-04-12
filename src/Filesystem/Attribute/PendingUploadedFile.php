@@ -20,9 +20,6 @@ use Zenstruck\Filesystem\Symfony\Validator\PendingImageConstraint;
 
 /**
  * @author Jakub Caban <kuba.iluvatar@gmail.com>
- *
- * @phpstan-consistent-constructor
- * @readonly
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class PendingUploadedFile
@@ -48,7 +45,7 @@ class PendingUploadedFile
             $attribute = $attributes[0];
             \assert($attribute instanceof self);
         } else {
-            $attribute = new static();
+            $attribute = new self();
         }
 
         $attribute->path ??= $argument->getName();

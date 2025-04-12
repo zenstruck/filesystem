@@ -19,28 +19,35 @@ use Zenstruck\Filesystem\Node;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends \IteratorAggregate<Node|File|Directory>
+ * @extends \IteratorAggregate<File|Directory> (required for intellisense)
+ *
+ * @phpstan-template T of Node = Node
+ * @phpstan-extends \IteratorAggregate<T>
  */
 interface Directory extends Node, \IteratorAggregate
 {
     public function recursive(): static;
 
+    /**
+     * @return File|Directory
+     * @phpstan-return T|null
+     */
     public function first(): ?Node;
 
     /**
      * Filter nodes (return true = include, return false = exclude).
      *
-     * @param callable(Node):bool|callable(File):bool|callable(Directory):bool $predicate
+     * @param callable(T):bool $predicate
      */
     public function filter(callable $predicate): static;
 
     /**
-     * @return $this<File>|File[]
+     * @return static<File>
      */
     public function files(): static;
 
     /**
-     * @return $this<Directory>|Directory[]
+     * @return static<self>
      */
     public function directories(): static;
 
@@ -151,8 +158,6 @@ interface Directory extends Node, \IteratorAggregate
 
     /**
      * @see FilesystemReader::listContents()
-     *
-     * @return Node[]|File[]|Directory[]|\Traversable<Node|File|Directory>
      *
      * @throws UnableToListContents
      * @throws FilesystemException

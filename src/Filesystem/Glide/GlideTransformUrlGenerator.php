@@ -28,8 +28,8 @@ final class GlideTransformUrlGenerator implements TransformUrlGenerator
     {
         $filter = match (true) {
             \is_string($filter) => ['p' => $filter], // is glide "preset"
-            \is_array($filter) && !\array_is_list($filter) => $filter, // is standard glide parameters
-            \is_array($filter) => ['p' => \implode(',', $filter)], // is array of "presets"
+            !\array_is_list($filter) => $filter, // is standard glide parameters
+            default => ['p' => \implode(',', $filter)], // is array of "presets"
         };
 
         return $this->urlBuilder->getUrl($path, $filter);

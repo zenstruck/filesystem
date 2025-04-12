@@ -25,7 +25,6 @@ use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\File\Image\LazyImage;
 use Zenstruck\Filesystem\Node\File\LazyFile;
 use Zenstruck\Filesystem\Node\File\PendingFile;
-use Zenstruck\Filesystem\Node\LazyNode;
 use Zenstruck\Filesystem\Node\Mapping;
 use Zenstruck\Filesystem\Node\PathGenerator;
 
@@ -47,12 +46,12 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param Node $object
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string // @phpstan-ignore-line
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string // @phpstan-ignore missingType.iterableValue, missingType.iterableValue
     {
         return Mapping::fromArray($context)->serialize($object);
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool // @phpstan-ignore-line
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool // @phpstan-ignore missingType.iterableValue
     {
         return $data instanceof Node && !$data instanceof PendingFile;
     }
@@ -60,7 +59,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param string $data
      */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node // @phpstan-ignore-line
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node // @phpstan-ignore missingType.iterableValue
     {
         if (!\is_string($data) && !\is_array($data)) {
             throw new UnexpectedValueException('Data must be a string or array.');
@@ -72,7 +71,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
             $data = [Mapping::FILENAME => $data];
         }
 
-        /** @var LazyNode $node */
+        /** @var LazyDirectory|LazyFile $node */
         $node = new (self::TYPE_MAP[$type])($data);
         $filesystem = $mapping->filesystem();
 
@@ -95,7 +94,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $node;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool // @phpstan-ignore-line
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool // @phpstan-ignore missingType.iterableValue
     {
         return isset(self::TYPE_MAP[$type]);
     }
