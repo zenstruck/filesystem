@@ -86,6 +86,17 @@ abstract class TestNode implements Node
         return $this;
     }
 
+    abstract public function dump(): static;
+
+    /**
+     * @return no-return
+     */
+    public function dd(): void
+    {
+        $this->dump();
+        exit(1);
+    }
+
     protected function inner(): Node
     {
         return $this->inner;
