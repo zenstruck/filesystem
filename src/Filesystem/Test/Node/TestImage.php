@@ -22,7 +22,7 @@ use Zenstruck\ImageFileInfo;
  */
 final class TestImage extends TestNode implements Image
 {
-    use DecoratedFile, DecoratedImage;
+    use DecoratedFile, DecoratedImage, FileAssertions;
 
     public function __construct(private Image $inner)
     {

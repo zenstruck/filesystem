@@ -33,22 +33,13 @@ final class TestDirectory extends TestNode implements Directory
         return $this;
     }
 
-    public function dump(): self
+    public function dump(): static
     {
         $files = \array_map(static fn($d) => (string) $d->path(), \iterator_to_array($this));
 
         \function_exists('dump') ? dump($files) : \var_dump($files);
 
         return $this;
-    }
-
-    /**
-     * @return no-return
-     */
-    public function dd(): void
-    {
-        $this->dump();
-        exit(1);
     }
 
     protected function inner(): Directory

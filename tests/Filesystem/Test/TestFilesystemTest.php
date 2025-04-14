@@ -62,6 +62,7 @@ final class TestFilesystemTest extends FilesystemTest
                     ->assertContentContains('1')
                     ->assertContentDoesNotContain('foo')
                     ->assertMimeTypeIs('text/plain')
+                    ->assertSize(9)
                     ->assertMimeTypeIsNot('foo')
                     ->assertLastModified(function(\DateTimeInterface $actual) {
                         $this->assertTrue($actual->getTimestamp() > 0);
@@ -71,6 +72,8 @@ final class TestFilesystemTest extends FilesystemTest
             })
             ->assertImageExists('symfony.png', function(TestImage $image) {
                 $image
+                    ->assertMimeTypeIs('image/png')
+                    ->assertSize(10862)
                     ->assertHeight(678)
                     ->assertWidth(563)
                 ;
