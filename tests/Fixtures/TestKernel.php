@@ -152,7 +152,7 @@ final class TestKernel extends Kernel
                     'cache' => [
                         'metadata' => [Mapping::LAST_MODIFIED, Mapping::SIZE, Mapping::DIMENSIONS],
                     ],
-                ]
+                ],
             ],
             'default_filesystem' => 'public',
         ]);
