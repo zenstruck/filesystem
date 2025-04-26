@@ -31,4 +31,22 @@ final class PathTest extends TestCase
         $this->assertSame('bar', $path->basename());
         $this->assertSame('foo', $path->dirname());
     }
+
+    /**
+     * @test
+     * @dataProvider dirnameProvider
+     */
+    public function dirname(string $path, ?string $expected): void
+    {
+        $this->assertSame($expected, (new Path($path))->dirname());
+    }
+
+    public static function dirnameProvider(): iterable
+    {
+        yield 'empty' => ['', null];
+        yield 'one level' => ['foo', ''];
+        yield 'one level trailing slash' => ['foo/', ''];
+        yield 'two levels' => ['foo/bar', 'foo'];
+        yield 'two levels trailing slash' => ['foo/bar/', 'foo'];
+    }
 }
