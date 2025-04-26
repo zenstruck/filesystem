@@ -86,7 +86,7 @@ $node->path()->toString(); // string - the full path
 $node->path()->name(); // string - filename with extension
 $node->path()->basename(); // string - filename without extension
 $node->path()->extension(); // string|null - file extension
-$node->path()->dirname(); // string - the parent directory
+$node->path()->dirname(); // string|null - the parent directory (or null if there is none)
 
 $node->dsn(); // Zenstruck\Filesystem\Node\Dsn
 $node->dsn()->toString(); // string - <filesystem-name>://<full-path>
@@ -94,7 +94,7 @@ $node->dsn()->toString(); // string - <filesystem-name>://<full-path>
 $node->dsn()->path(); // Zenstruck\Filesystem\Node\Path
 $node->dsn()->filesystem(); // string - name of the filesystem this node belongs to
 
-$node->directory(); // Zenstruck\Filesystem\Node\Directory|null - parent directory object
+$node->directory(); // Zenstruck\Filesystem\Node\Directory|null - parent directory object (or null if there is none)
 
 $node->visibility(); // string - ie "public" or "private"
 $node->lastModified(); // \DateTimeImmutable (in currently configured timezone)

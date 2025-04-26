@@ -62,9 +62,15 @@ final class Path implements \Stringable
         return $this->nameParts()[0];
     }
 
-    public function dirname(): string
+    public function dirname(): ?string
     {
-        return \dirname($this->value);
+        if (!$this->value) {
+            return null;
+        }
+
+        $dirname = \dirname($this->value);
+
+        return '.' === $dirname ? '' : $dirname;
     }
 
     /**

@@ -39,7 +39,8 @@ trait DirectoryTests
 
         $dir = $this->createDirectory(fixture('sub1'), 'foo');
 
-        $this->assertNull($dir->directory());
+        $this->assertSame('', $dir->directory()->path()->toString());
+        $this->assertNull($dir->directory()->directory());
     }
 
     /**

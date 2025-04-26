@@ -265,6 +265,18 @@ abstract class FilesystemTest extends TestCase
 
     /**
      * @test
+     */
+    public function root_parent_dir(): void
+    {
+        $fs = $this->createFilesystem();
+
+        $fs->write('foo/bar.txt', 'content');
+
+        $this->assertNull($fs->directory()->directory());
+    }
+
+    /**
+     * @test
      * @dataProvider writeValueProvider
      */
     public function can_write_file(mixed $value): void

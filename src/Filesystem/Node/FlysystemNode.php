@@ -51,7 +51,7 @@ abstract class FlysystemNode implements Node
     {
         $dirname = $this->path()->dirname();
 
-        return '.' === $dirname ? null : new FlysystemDirectory($dirname, $this->operator);
+        return null === $dirname ? null : new FlysystemDirectory($dirname, $this->operator);
     }
 
     public function lastModified(): \DateTimeImmutable
