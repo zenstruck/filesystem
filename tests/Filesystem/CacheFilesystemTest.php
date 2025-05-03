@@ -17,12 +17,12 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\CacheFilesystem;
 use Zenstruck\Filesystem\Node\File\Image;
 use Zenstruck\Filesystem\Node\Mapping;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CacheFilesystemTest extends FilesystemTest
+final class CacheFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

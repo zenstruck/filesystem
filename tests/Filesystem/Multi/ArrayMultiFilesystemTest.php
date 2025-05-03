@@ -12,12 +12,12 @@
 namespace Zenstruck\Tests\Filesystem\Multi;
 
 use Zenstruck\Filesystem\MultiFilesystem;
-use Zenstruck\Tests\Filesystem\MultiFilesystemTest;
+use Zenstruck\Tests\Filesystem\MultiFilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ArrayMultiFilesystemTest extends MultiFilesystemTest
+final class ArrayMultiFilesystemTest extends MultiFilesystemTestCase
 {
     protected function createMultiFilesystem(array $filesystems, ?string $default = null): MultiFilesystem
     {

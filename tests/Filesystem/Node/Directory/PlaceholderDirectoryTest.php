@@ -13,12 +13,12 @@ namespace Zenstruck\Tests\Filesystem\Node\Directory;
 
 use Zenstruck\Filesystem\Node\Directory\PlaceholderDirectory;
 use Zenstruck\Filesystem\Node\PlaceholderNode;
-use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTest;
+use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PlaceholderDirectoryTest extends PlaceholderNodeTest
+final class PlaceholderDirectoryTest extends PlaceholderNodeTestCase
 {
     /**
      * @test

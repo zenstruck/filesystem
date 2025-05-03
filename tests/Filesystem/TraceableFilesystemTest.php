@@ -14,12 +14,12 @@ namespace Zenstruck\Tests\Filesystem;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Zenstruck\Filesystem\Operation;
 use Zenstruck\Filesystem\TraceableFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TraceableFilesystemTest extends FilesystemTest
+final class TraceableFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

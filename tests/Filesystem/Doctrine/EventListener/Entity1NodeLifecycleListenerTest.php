@@ -21,7 +21,7 @@ use function Zenstruck\Foundry\Persistence\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Entity1NodeLifecycleListenerTest extends NodeLifecycleListenerTest
+final class Entity1NodeLifecycleListenerTest extends NodeLifecycleListenerTestCase
 {
     /**
      * @test

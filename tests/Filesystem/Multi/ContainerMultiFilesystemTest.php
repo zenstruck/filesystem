@@ -16,12 +16,12 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
-use Zenstruck\Tests\Filesystem\MultiFilesystemTest;
+use Zenstruck\Tests\Filesystem\MultiFilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ContainerMultiFilesystemTest extends MultiFilesystemTest
+final class ContainerMultiFilesystemTest extends MultiFilesystemTestCase
 {
     public function can_nest_multi_filesystems(): void
     {

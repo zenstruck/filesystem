@@ -16,7 +16,7 @@ use Zenstruck\Tests\Fixtures\Entity\Entity2;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Entity2NodeLifecycleListenerTest extends NodeLifecycleListenerTest
+final class Entity2NodeLifecycleListenerTest extends NodeLifecycleListenerTestCase
 {
     protected function entityClass(): string
     {

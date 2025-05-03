@@ -14,13 +14,13 @@ namespace Zenstruck\Tests\Filesystem\Archive;
 use League\Flysystem\ZipArchive\UnableToOpenZipArchive;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Archive\ZipFile;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 use Zenstruck\Tests\InteractsWithTempDirectory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ZipFileTest extends FilesystemTest
+final class ZipFileTest extends FilesystemTestCase
 {
     use InteractsWithTempDirectory;
 

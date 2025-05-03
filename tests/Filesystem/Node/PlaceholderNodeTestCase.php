@@ -17,7 +17,7 @@ use Zenstruck\Filesystem\Node\PlaceholderNode;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class PlaceholderNodeTest extends TestCase
+abstract class PlaceholderNodeTestCase extends TestCase
 {
     /**
      * @test

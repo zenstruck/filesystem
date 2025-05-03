@@ -12,12 +12,12 @@
 namespace Zenstruck\Tests\Filesystem\Node\File;
 
 use Zenstruck\Filesystem\Node\File\PlaceholderFile;
-use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTest;
+use Zenstruck\Tests\Filesystem\Node\PlaceholderNodeTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class PlaceholderFileTest extends PlaceholderNodeTest
+class PlaceholderFileTest extends PlaceholderNodeTestCase
 {
     protected function createNode(?string $path = null): PlaceholderFile
     {

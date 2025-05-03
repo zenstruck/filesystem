@@ -22,7 +22,7 @@ use function Zenstruck\Foundry\Persistence\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class NodeLifecycleListenerTest extends DoctrineTestCase
+abstract class NodeLifecycleListenerTestCase extends DoctrineTestCase
 {
     public static function fileMethodProvider(): iterable
     {

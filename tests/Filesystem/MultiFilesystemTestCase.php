@@ -15,12 +15,12 @@ use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\Exception\UnregisteredFilesystem;
 use Zenstruck\Filesystem\LazyFilesystem;
 use Zenstruck\Filesystem\MultiFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class MultiFilesystemTest extends FilesystemTest
+abstract class MultiFilesystemTestCase extends FilesystemTestCase
 {
     /**
      * @test

@@ -15,12 +15,12 @@ use Zenstruck\Filesystem\Test\Node\TestDirectory;
 use Zenstruck\Filesystem\Test\Node\TestFile;
 use Zenstruck\Filesystem\Test\Node\TestImage;
 use Zenstruck\Filesystem\Test\TestFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TestFilesystemTest extends FilesystemTest
+final class TestFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

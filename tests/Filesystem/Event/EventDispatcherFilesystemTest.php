@@ -27,13 +27,13 @@ use Zenstruck\Filesystem\Event\PreMkdirEvent;
 use Zenstruck\Filesystem\Event\PreMoveEvent;
 use Zenstruck\Filesystem\Event\PreWriteEvent;
 use Zenstruck\Filesystem\Operation;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 use Zenstruck\Tests\Fixtures\FilesystemEventSubscriber;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class EventDispatcherFilesystemTest extends FilesystemTest
+final class EventDispatcherFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

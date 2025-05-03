@@ -22,7 +22,7 @@ use Zenstruck\TempFile;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class FilesystemTest extends TestCase
+abstract class FilesystemTestCase extends TestCase
 {
     /**
      * @test

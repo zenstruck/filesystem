@@ -20,12 +20,12 @@ use Zenstruck\Filesystem\Node\File\Image\PendingImage;
 use Zenstruck\Filesystem\Node\File\PendingFile;
 use Zenstruck\Filesystem\Operation;
 use Zenstruck\Stream;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LoggableFilesystemTest extends FilesystemTest
+final class LoggableFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

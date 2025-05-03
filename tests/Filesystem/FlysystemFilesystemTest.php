@@ -14,12 +14,12 @@ namespace Zenstruck\Tests\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\FlysystemFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FlysystemFilesystemTest extends FilesystemTest
+final class FlysystemFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test

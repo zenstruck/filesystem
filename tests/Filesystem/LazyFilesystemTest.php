@@ -13,12 +13,12 @@ namespace Zenstruck\Tests\Filesystem;
 
 use Zenstruck\Filesystem;
 use Zenstruck\Filesystem\LazyFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LazyFilesystemTest extends FilesystemTest
+final class LazyFilesystemTest extends FilesystemTestCase
 {
     protected function createFilesystem(): Filesystem
     {

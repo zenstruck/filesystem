@@ -12,12 +12,12 @@
 namespace Zenstruck\Tests\Filesystem;
 
 use Zenstruck\Filesystem\ScopedFilesystem;
-use Zenstruck\Tests\FilesystemTest;
+use Zenstruck\Tests\FilesystemTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ScopedFilesystemTest extends FilesystemTest
+final class ScopedFilesystemTest extends FilesystemTestCase
 {
     /**
      * @test
