@@ -33,7 +33,7 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('zenstruck_filesystem');
 
-        $treeBuilder->getRootNode() // @phpstan-ignore method.notFound
+        $treeBuilder->getRootNode()
             ->validate()
                 ->ifTrue(function(array $v) {
                     if (null === $v['default_filesystem']) {

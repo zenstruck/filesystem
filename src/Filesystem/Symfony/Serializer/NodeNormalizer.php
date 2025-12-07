@@ -46,12 +46,12 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param Node $object
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string // @phpstan-ignore missingType.iterableValue, missingType.iterableValue
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string // @phpstan-ignore missingType.iterableValue
     {
         return Mapping::fromArray($context)->serialize($object);
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool // @phpstan-ignore missingType.iterableValue
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Node && !$data instanceof PendingFile;
     }
@@ -59,7 +59,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param string $data
      */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node // @phpstan-ignore missingType.iterableValue
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Node
     {
         if (!\is_string($data) && !\is_array($data)) {
             throw new UnexpectedValueException('Data must be a string or array.');
@@ -94,7 +94,7 @@ final class NodeNormalizer implements NormalizerInterface, DenormalizerInterface
         return $node;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool // @phpstan-ignore missingType.iterableValue
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return isset(self::TYPE_MAP[$type]);
     }

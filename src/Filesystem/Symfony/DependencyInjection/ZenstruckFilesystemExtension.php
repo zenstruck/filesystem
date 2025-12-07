@@ -406,10 +406,10 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
         ;
 
         if ($config['lazy']) {
-            $flysystemDef
-                ->setLazy(true)
-                ->addTag('proxy', ['interface' => Flysystem::class])
-            ;
+//            $flysystemDef
+//                ->setLazy(true)
+//                ->addTag('proxy', ['interface' => Flysystem::class])
+//            ;
         }
 
         $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
