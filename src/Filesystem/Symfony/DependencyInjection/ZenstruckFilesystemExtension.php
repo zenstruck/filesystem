@@ -13,7 +13,6 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
-use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UrlGeneration\PrefixPublicUrlGenerator;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\ShardedPrefixPublicUrlGenerator;
