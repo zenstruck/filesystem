@@ -197,7 +197,7 @@ final class TestFilesystem implements Filesystem
     }
 
     /**
-     * @return no-return
+     * @return never
      */
     public function dd(): void
     {

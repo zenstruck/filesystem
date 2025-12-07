@@ -89,7 +89,7 @@ abstract class TestNode implements Node
     abstract public function dump(): static;
 
     /**
-     * @return no-return
+     * @return never
      */
     public function dd(): void
     {

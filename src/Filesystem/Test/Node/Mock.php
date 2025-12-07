@@ -37,7 +37,7 @@ final class Mock
     /**
      * @param int<1, max> $width
      * @param int<1, max> $height
-     * @param ?string $filename Optional filename to use (must not include directory separators)
+     * @param ?string     $filename Optional filename to use (must not include directory separators)
      */
     public static function pendingImage(int $width = 10, int $height = 10, string $type = 'png', ?string $filename = null): PendingImage
     {
