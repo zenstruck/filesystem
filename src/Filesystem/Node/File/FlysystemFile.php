@@ -58,7 +58,7 @@ class FlysystemFile extends FlysystemNode implements File
 
     public function checksum(?string $algo = null): string
     {
-        return $this->cache['checksum'][$algo] ??= $this->operator->checksum($this->path(), $algo ? ['checksum_algo' => $algo] : []);
+        return $this->cache['checksum'][$algo ?? '_auto'] ??= $this->operator->checksum($this->path(), $algo ? ['checksum_algo' => $algo] : []);
     }
 
     public function publicUrl(array $config = []): string

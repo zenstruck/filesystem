@@ -12,7 +12,7 @@
 namespace Zenstruck\Tests\Fixtures\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Zenstruck\Filesystem\Attribute\PendingUploadedFile;
 use Zenstruck\Filesystem\Node\File;
 use Zenstruck\Filesystem\Symfony\Validator\PendingFileConstraint;

@@ -47,7 +47,7 @@ final class MappingManager
                 }
             }
 
-            return $object;
+            return $object; // @phpstan-ignore return.type
         }
 
         if (isset($this->loaded[$object])) {
