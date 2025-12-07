@@ -13,6 +13,7 @@ namespace Zenstruck\Filesystem\Symfony\DependencyInjection;
 
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UrlGeneration\PrefixPublicUrlGenerator;
 use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\UrlGeneration\ShardedPrefixPublicUrlGenerator;
@@ -407,10 +408,6 @@ final class ZenstruckFilesystemExtension extends ConfigurableExtension
 
         if ($config['lazy']) {
             $flysystemDef->setLazy(true);
-
-            if (\PHP_VERSION_ID <= 80400) {
-                $flysystemDef->addTag('proxy', ['interface' => Flysystem::class]);
-            }
         }
 
         $container->register($filesystemId = 'zenstruck_filesystem.filesystem.'.$name, FlysystemFilesystem::class)
