@@ -57,7 +57,7 @@ trait InteractsWithFilesystem // @phpstan-ignore trait.unused
             }
         } elseif ($this instanceof KernelTestCase) {
             $filesystem = new LazyFilesystem(
-                function() {
+                static function() {
                     try {
                         return self::getContainer()->get(MultiFilesystem::class);
                     } catch (NotFoundExceptionInterface $e) {

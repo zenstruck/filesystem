@@ -32,7 +32,7 @@ final class PathGeneratorTest extends TestCase
     {
         $file = in_memory_filesystem()->write('some/file.txt', 'content');
 
-        $this->assertSame('from/callback', $generator->generate(fn(File $f, array $context) => 'from/callback', $file));
+        $this->assertSame('from/callback', $generator->generate(static fn(File $f, array $context) => 'from/callback', $file));
         $this->assertSame('from/custom.txt', $generator->generate('custom', $file));
         $this->assertSame('from/custom.txtfoo:bar', $generator->generate('custom', $file, ['foo' => 'bar']));
         $this->assertSame('from/custom.txtbaz:foofoo:bar', $generator->generate(new Namer('custom', ['baz' => 'foo']), $file, ['foo' => 'bar']));
@@ -55,6 +55,6 @@ final class PathGeneratorTest extends TestCase
     public static function generators(): iterable
     {
         yield [new PathGenerator(['custom' => new CustomPathGenerator()])];
-        yield [new PathGenerator(new ServiceLocator(['custom' => fn() => new CustomPathGenerator()]))];
+        yield [new PathGenerator(new ServiceLocator(['custom' => static fn() => new CustomPathGenerator()]))];
     }
 }

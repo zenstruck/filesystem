@@ -118,7 +118,7 @@ final class ZipFileTest extends FilesystemTestCase
         $first = null;
         $last = null;
 
-        $filesystem->commit(function($current) use (&$first, &$last, &$count) {
+        $filesystem->commit(static function($current) use (&$first, &$last, &$count) {
             if (null === $first) {
                 $first = $current;
             }

@@ -83,7 +83,7 @@ final class MappingManagerTest extends DoctrineTestCase
         $this->assertTrue($files[0]->exists());
         $this->assertTrue($files[1]->exists());
 
-        $files = \array_map(fn(File $file) => $file->path()->toString(), $files);
+        $files = \array_map(static fn(File $file) => $file->path()->toString(), $files);
 
         $this->assertContains('some/dir/foo/file1.txt', $files);
         $this->assertContains('some/dir/foo/file2.txt', $files);

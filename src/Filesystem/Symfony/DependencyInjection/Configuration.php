@@ -35,7 +35,7 @@ final class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->validate()
-                ->ifTrue(function(array $v) {
+                ->ifTrue(static function(array $v) {
                     if (null === $v['default_filesystem']) {
                         return false;
                     }
@@ -51,7 +51,7 @@ final class Configuration implements ConfigurationInterface
                     ->arrayPrototype()
                         ->beforeNormalization()
                             ->ifString()
-                            ->then(fn($v) => ['dsn' => $v])
+                            ->then(static fn($v) => ['dsn' => $v])
                         ->end()
                         ->children()
                             ->scalarNode('dsn')
@@ -79,7 +79,7 @@ final class Configuration implements ConfigurationInterface
                                 ->info('Public URL generator for this filesystem')
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function(string $v) {
+                                    ->then(static function(string $v) {
                                         return match (true) {
                                             \str_starts_with($v, 'route:') => ['route' => ['name' => \mb_substr($v, 6)]],
                                             \str_starts_with($v, '@') => ['service' => \mb_substr($v, 1)],
@@ -88,11 +88,11 @@ final class Configuration implements ConfigurationInterface
                                     })
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn($v) => \count(\array_filter($v)) > 2)
+                                    ->ifTrue(static fn($v) => \count(\array_filter($v)) > 2)
                                     ->thenInvalid('Can only set one of "prefix", "service", "route"')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn($v) => 1 === \count(\array_filter($v)) && $v['version']['enabled'])
+                                    ->ifTrue(static fn($v) => 1 === \count(\array_filter($v)) && $v['version']['enabled'])
                                     ->thenInvalid('Must set a url generation strategy to use versioning')
                                 ->end()
                                 ->children()
@@ -108,7 +108,7 @@ final class Configuration implements ConfigurationInterface
                                     ->arrayNode('route')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(fn($v) => ['name' => $v])
+                                            ->then(static fn($v) => ['name' => $v])
                                         ->end()
                                         ->info('Generate with a route')
                                         ->children()
@@ -136,7 +136,7 @@ final class Configuration implements ConfigurationInterface
                                         ->info('Enables cache busting for public urls')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(fn(string $v) => ['metadata' => $v])
+                                            ->then(static fn(string $v) => ['metadata' => $v])
                                         ->end()
                                         ->canBeEnabled()
                                         ->children()
@@ -157,7 +157,7 @@ final class Configuration implements ConfigurationInterface
                                 ->info('Temporary URL generator for this filesystem')
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function(string $v) {
+                                    ->then(static function(string $v) {
                                         return match (true) {
                                             \str_starts_with($v, 'route:') => ['route' => ['name' => \mb_substr($v, 6)]],
                                             \str_starts_with($v, '@') => ['service' => \mb_substr($v, 1)],
@@ -166,7 +166,7 @@ final class Configuration implements ConfigurationInterface
                                     })
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn($v) => \count(\array_filter($v)) > 1)
+                                    ->ifTrue(static fn($v) => \count(\array_filter($v)) > 1)
                                     ->thenInvalid('Can only set one of "service", "route"')
                                 ->end()
                                 ->children()
@@ -177,7 +177,7 @@ final class Configuration implements ConfigurationInterface
                                     ->arrayNode('route')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(fn($v) => ['name' => $v])
+                                            ->then(static fn($v) => ['name' => $v])
                                         ->end()
                                         ->info('Generate with a route')
                                         ->children()
@@ -198,7 +198,7 @@ final class Configuration implements ConfigurationInterface
                                 ->info('Image Transform URL generator for this filesystem')
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function(string $v) {
+                                    ->then(static function(string $v) {
                                         return match (true) {
                                             \str_starts_with($v, 'route:') => ['route' => ['name' => \mb_substr($v, 6)]],
                                             \str_starts_with($v, '@') => ['service' => \mb_substr($v, 1)],
@@ -207,7 +207,7 @@ final class Configuration implements ConfigurationInterface
                                     })
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn($v) => \count(\array_filter($v)) > 1)
+                                    ->ifTrue(static fn($v) => \count(\array_filter($v)) > 1)
                                     ->thenInvalid('Can only set one of "service", "route"')
                                 ->end()
                                 ->children()
@@ -218,7 +218,7 @@ final class Configuration implements ConfigurationInterface
                                     ->arrayNode('route')
                                         ->beforeNormalization()
                                             ->ifString()
-                                            ->then(fn($v) => ['name' => $v])
+                                            ->then(static fn($v) => ['name' => $v])
                                         ->end()
                                         ->info('Generate with a route')
                                         ->children()

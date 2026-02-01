@@ -53,31 +53,31 @@ final class NodeNormalizerTest extends KernelTestCase
     public static function normalizeProvider(): iterable
     {
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             [],
             File::class,
             'public://some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir'),
+            static fn(Filesystem $f) => $f->mkdir('some/dir'),
             [],
             Directory::class,
             'public://some/dir',
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => 'public'],
             File::class,
             'some/file.txt',
         ];
         yield [
-            fn(Filesystem $f) => $f->mkdir('some/dir'),
+            static fn(Filesystem $f) => $f->mkdir('some/dir'),
             ['filesystem' => 'public'],
             Directory::class,
             'some/dir',
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE, Mapping::DIMENSIONS]],
             File::class,
             [
@@ -87,7 +87,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/file.txt', 'content'),
             ['filesystem' => new Mapping([Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE], 'public')],
             File::class,
             [
@@ -97,7 +97,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
+            static fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
             ['filesystem' => 'public', 'metadata' => [Mapping::PATH, Mapping::CHECKSUM, Mapping::SIZE, Mapping::DIMENSIONS]],
             File::class,
             [
@@ -111,7 +111,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
+            static fn(Filesystem $f) => $f->write('some/image.png', fixture('symfony.png'))->ensureImage(),
             ['metadata' => [Mapping::DSN, Mapping::SIZE, Mapping::DIMENSIONS, Mapping::THUMB_HASH]],
             Image::class,
             [
@@ -125,7 +125,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('9a0364b9e99bb480dd25e1f0284c8555.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('9a0364b9e99bb480dd25e1f0284c8555.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => [Mapping::CHECKSUM, Mapping::SIZE, Mapping::EXTENSION],
@@ -139,7 +139,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => [Mapping::CHECKSUM, Mapping::SIZE, Mapping::FILENAME],
@@ -153,7 +153,7 @@ final class NodeNormalizerTest extends KernelTestCase
             ],
         ];
         yield [
-            fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
+            static fn(Filesystem $f) => $f->write('some/prefix/some-file.txt', 'content'),
             [
                 'filesystem' => 'public',
                 'metadata' => Mapping::FILENAME,

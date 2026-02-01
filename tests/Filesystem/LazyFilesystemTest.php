@@ -22,6 +22,6 @@ final class LazyFilesystemTest extends FilesystemTestCase
 {
     protected function createFilesystem(): Filesystem
     {
-        return new LazyFilesystem(fn() => in_memory_filesystem());
+        return new LazyFilesystem(static fn() => in_memory_filesystem());
     }
 }

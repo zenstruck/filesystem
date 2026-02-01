@@ -41,7 +41,7 @@ final class TestFilesystemTest extends FilesystemTestCase
             ->assertImageExists('symfony.png')
             ->assertSame('file1.txt', 'nested/file2.txt')
             ->assertNotSame('file1.txt', 'symfony.png')
-            ->assertDirectoryExists('', function(TestDirectory $dir) {
+            ->assertDirectoryExists('', static function(TestDirectory $dir) {
                 $dir
                     ->assertCount(4)
                     ->files()->assertCount(2)
@@ -70,7 +70,7 @@ final class TestFilesystemTest extends FilesystemTestCase
                     ->assertSize(9)
                 ;
             })
-            ->assertImageExists('symfony.png', function(TestImage $image) {
+            ->assertImageExists('symfony.png', static function(TestImage $image) {
                 $image
                     ->assertMimeTypeIs('image/png')
                     ->assertSize(10862)

@@ -62,7 +62,7 @@ class PendingFileType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'data_class' => fn(Options $options) => $options['multiple'] ? null : static::pendingFileType(),
+                'data_class' => static fn(Options $options) => $options['multiple'] ? null : static::pendingFileType(),
             ])
         ;
     }

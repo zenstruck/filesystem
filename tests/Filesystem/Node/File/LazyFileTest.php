@@ -76,7 +76,7 @@ class LazyFileTest extends TestCase
         $file = $this->createLazyFile();
 
         $file->setFilesystem($filesystem);
-        $file->setPath(fn() => 'some/image.png');
+        $file->setPath(static fn() => 'some/image.png');
 
         $this->assertSame('content', $file->contents());
     }
@@ -87,7 +87,7 @@ class LazyFileTest extends TestCase
     public function can_use_callable_for_path(): void
     {
         $count = 0;
-        $file = $this->createLazyFile(function() use (&$count) {
+        $file = $this->createLazyFile(static function() use (&$count) {
             ++$count;
 
             return 'some/image.png';
@@ -107,7 +107,7 @@ class LazyFileTest extends TestCase
         $filesystem->write('some/image.png', 'content');
         $count = 0;
         $file = $this->createLazyFile('some/image.png');
-        $file->setFilesystem(function() use (&$count, $filesystem) {
+        $file->setFilesystem(static function() use (&$count, $filesystem) {
             ++$count;
 
             return $filesystem;
@@ -140,7 +140,7 @@ class LazyFileTest extends TestCase
     public function can_create_with_path_as_attribute(): void
     {
         $this->assertSame('foo', $this->createLazyFile(['path' => 'foo'])->path()->toString());
-        $this->assertSame('foo', $this->createLazyFile(['path' => fn() => 'foo'])->path()->toString());
+        $this->assertSame('foo', $this->createLazyFile(['path' => static fn() => 'foo'])->path()->toString());
     }
 
     /**
@@ -233,7 +233,7 @@ class LazyFileTest extends TestCase
             Mapping::EXTENSION => 'jpg',
         ]);
 
-        $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{checksum}{ext}'), $file));
+        $file->setPath(static fn() => (new PathGenerator())->generate(new Expression('files/{checksum}{ext}'), $file));
 
         $this->assertSame('files/foobar.jpg', $file->path()->toString());
     }
@@ -248,7 +248,7 @@ class LazyFileTest extends TestCase
             Mapping::EXTENSION => 'jpg',
         ]);
 
-        $file->setPath(fn() => (new PathGenerator())->generate(new Expression('files/{name}{ext}'), $file));
+        $file->setPath(static fn() => (new PathGenerator())->generate(new Expression('files/{name}{ext}'), $file));
 
         $this->expectException(\LogicException::class);
 

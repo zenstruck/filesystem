@@ -39,7 +39,7 @@ class PendingImageTest extends PendingFileTest
 
         $this->assertSame(563, $image->dimensions()->width());
 
-        $transformed = $image->transformInPlace(fn(InterventionImage $image) => $image->widen(100));
+        $transformed = $image->transformInPlace(static fn(InterventionImage $image) => $image->widen(100));
 
         $this->assertSame($transformed, $image);
         $this->assertSame(100, $image->dimensions()->width());

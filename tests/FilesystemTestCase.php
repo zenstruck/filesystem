@@ -322,7 +322,7 @@ abstract class FilesystemTestCase extends TestCase
         $fs = $this->createFilesystem();
         $nodes = [];
 
-        $fs->mkdir('foo', $value, ['progress' => function(File $file) use (&$nodes) {
+        $fs->mkdir('foo', $value, ['progress' => static function(File $file) use (&$nodes) {
             $nodes[] = $file->path()->toString();
         }]);
 

@@ -79,7 +79,7 @@ trait ImageTests
     {
         $image = $this->createFile(fixture('symfony.png'), 'symfony.png');
 
-        $transformed = $image->transform(fn(InterventionImage $image) => $image->widen(100));
+        $transformed = $image->transform(static fn(InterventionImage $image) => $image->widen(100));
 
         $this->assertSame(100, $transformed->dimensions()->width());
         $this->assertSame(563, $image->refresh()->dimensions()->width());

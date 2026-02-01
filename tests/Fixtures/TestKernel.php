@@ -62,7 +62,7 @@ final class TestKernel extends Kernel
                 }
             }
 
-            return new JsonResponse(\array_map(fn($f) => \get_debug_type($f), $file));
+            return new JsonResponse(\array_map(static fn($f) => \get_debug_type($f), $file));
         }
 
         if (!\file_exists($file)) {

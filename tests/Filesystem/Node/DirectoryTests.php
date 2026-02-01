@@ -153,7 +153,7 @@ trait DirectoryTests
     {
         $this->fixtureDir()
             ->files()
-            ->filter(fn(File $file) => $file->contents() === \file_get_contents(fixture('symfony.jpg')))
+            ->filter(static fn(File $file) => $file->contents() === \file_get_contents(fixture('symfony.jpg')))
             ->assertCount(1)
             ->recursive()
             ->assertCount(2)

@@ -22,7 +22,7 @@ final class ServiceProviderMultiFilesystemTest extends MultiFilesystemTestCase
 {
     protected function createMultiFilesystem(array $filesystems, ?string $default = null): MultiFilesystem
     {
-        $filesystems = \array_map(fn($f) => fn() => $f, $filesystems);
+        $filesystems = \array_map(static fn($f) => static fn() => $f, $filesystems);
 
         return new MultiFilesystem(new ServiceLocator($filesystems), $default);
     }

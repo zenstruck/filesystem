@@ -214,7 +214,7 @@ class Mapping
             };
         }
 
-        return \array_filter($ret, fn($v) => null !== $v); // @phpstan-ignore return.type
+        return \array_filter($ret, static fn($v) => null !== $v); // @phpstan-ignore return.type
     }
 
     private function requiresFilesystem(): bool
