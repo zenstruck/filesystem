@@ -176,7 +176,7 @@ final class AdapterFactory
                     'accessKeySecret' => $parsed['pass'] ?? null,
                 ]),
                 $parsed['host'] ?? throw new \InvalidArgumentException('A bucket must be set as the host.'), // bucket
-                $parsed['path'] ?? '', // prefix
+                isset($parsed['query']['prefix-without-leading-slash']) ? preg_replace('/^\//', '', $parsed['path'] ?? '') : ($parsed['path'] ?? ''), // prefix
             );
         }
 
@@ -191,7 +191,7 @@ final class AdapterFactory
                     'version' => $parsed['query']['version'] ?? 'latest',
                 ]),
                 $parsed['host'] ?? throw new \InvalidArgumentException('A bucket must be set as the host.'), // bucket
-                $parsed['path'] ?? '', // prefix
+                isset($parsed['query']['prefix-without-leading-slash']) ? preg_replace('/^\//', '', $parsed['path'] ?? '') : ($parsed['path'] ?? ''), // prefix
             );
         }
 
