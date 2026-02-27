@@ -172,8 +172,8 @@ final class AdapterFactory
             return new AsyncAwsS3Adapter(
                 new AsyncS3Client([
                     'region' => $parsed['query']['region'] ?? $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set in the query (ie ?region=us-east-1) or as the fragment (ie #us-east-1).'),
-                    'accessKeyId' => $parsed['user'] ?? null,
-                    'accessKeySecret' => $parsed['pass'] ?? null,
+                    ...($parsed['user'] ?? null) !== null ? ['accessKeyId' => $parsed['user']] : [],
+                    ...($parsed['pass'] ?? null) !== null ? ['accessKeySecret' => $parsed['pass']] : [],
                 ]),
                 $parsed['host'] ?? throw new \InvalidArgumentException('A bucket must be set as the host.'), // bucket
                 $parsed['path'] ?? '', // prefix
@@ -184,10 +184,10 @@ final class AdapterFactory
             return new AwsS3V3Adapter( // @phpstan-ignore return.type
                 new S3Client([ // @phpstan-ignore class.notFound
                     'region' => $parsed['query']['region'] ?? $parsed['fragment'] ?? throw new \InvalidArgumentException('A region must be set in the query (ie ?region=us-east-1) or as the fragment (ie #us-east-1).'),
-                    'credentials' => [
+                    ...($parsed['user'] ?? null) !== null ? ['credentials' => [
                         'key' => $parsed['user'] ?? null,
                         'secret' => $parsed['pass'] ?? null,
-                    ],
+                    ]] : [],
                     'version' => $parsed['query']['version'] ?? 'latest',
                 ]),
                 $parsed['host'] ?? throw new \InvalidArgumentException('A bucket must be set as the host.'), // bucket
