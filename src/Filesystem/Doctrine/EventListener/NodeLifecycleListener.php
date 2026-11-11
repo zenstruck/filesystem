@@ -353,7 +353,7 @@ final class NodeLifecycleListener
     }
 
     /**
-     * @param \ReflectionClass<object> $class
+     * @param \ReflectionClass<covariant object> $class
      */
     private static function property(\ReflectionClass $class, string $property): \ReflectionProperty
     {
