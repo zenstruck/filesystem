@@ -154,7 +154,7 @@ final class NodeMappingListener
     }
 
     /**
-     * @param \ReflectionClass<object> $class
+     * @param \ReflectionClass<covariant object> $class
      *
      * @return iterable<array{0:\ReflectionProperty,1:Mapping}>
      */

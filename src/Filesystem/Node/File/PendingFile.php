@@ -74,9 +74,9 @@ class PendingFile extends \SplFileInfo implements File
 
     public function lastModified(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U', (string) $this->getMTime()) // @phpstan-ignore method.nonObject
-            ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
-        ;
+        $date = new \DateTimeImmutable('@'.$this->getMTime());
+
+        return $date->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
     }
 
     public function exists(): bool

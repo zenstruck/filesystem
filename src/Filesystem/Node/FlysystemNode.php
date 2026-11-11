@@ -56,9 +56,15 @@ abstract class FlysystemNode implements Node
 
     public function lastModified(): \DateTimeImmutable
     {
-        return $this->cache['last-modified'] ??= \DateTimeImmutable::createFromFormat('U', $this->operator->lastModified($this->path())) // @phpstan-ignore method.nonObject, argument.type
-            ->setTimezone(new \DateTimeZone(\date_default_timezone_get()))
-        ;
+        if (isset($this->cache['last-modified'])) {
+            return $this->cache['last-modified'];
+        }
+
+        $path = $this->path();
+        $timestamp = $this->operator->lastModified($path);
+        $date = new \DateTimeImmutable('@'.$timestamp);
+
+        return $this->cache['last-modified'] = $date->setTimezone(new \DateTimeZone(\date_default_timezone_get()));
     }
 
     public function visibility(): string

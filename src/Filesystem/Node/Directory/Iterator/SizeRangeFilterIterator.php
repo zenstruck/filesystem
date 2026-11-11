@@ -21,14 +21,15 @@ use Zenstruck\Filesystem\Node\File;
  *
  * @internal
  *
- * @extends \FilterIterator<int,Node,\Iterator<Node>>
+ * @template TKey
+ * @extends \FilterIterator<TKey,Node,\Iterator<TKey,Node>>
  * @method Node current()
  */
 final class SizeRangeFilterIterator extends \FilterIterator
 {
     /**
-     * @param \Iterator<Node>    $iterator
-     * @param NumberComparator[] $comparators
+     * @param \Iterator<TKey,Node> $iterator
+     * @param NumberComparator[]   $comparators
      */
     public function __construct(\Iterator $iterator, private array $comparators)
     {
