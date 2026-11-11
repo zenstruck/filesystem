@@ -1,2 +1,0 @@
-# Permanent signed URLs remain part of the public API.
-~^Since symfony/http-foundation 8\.2: Not passing an expiration to "Symfony\\Component\\HttpFoundation\\UriSigner::sign\(\)" is deprecated~

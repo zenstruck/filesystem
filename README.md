@@ -838,6 +838,8 @@ $validator->validate($image, new PendingImageConstraint(maxWidth: 200, maxHeight
 
 ##### Public Url Route
 
+Generating a signed URL without an expiration is deprecated. On Symfony 7.1 or higher, omitted expiry defaults to `+1 year`; older Symfony versions retain their existing signing behavior. Set `public_url.route.expires` to a value such as `'+30 minutes'`, or pass `['expires' => 'tomorrow']` to `publicUrl()`. For signed image URLs, use `image_url.route.expires` or the `expires` option passed to `transformUrl()`. Explicit expirations require Symfony 7.1 or higher.
+
 ##### Temporary Url Route
 
 ##### Transform Url Route
@@ -907,7 +909,7 @@ zenstruck_filesystem:
                     # Sign by default?
                     sign:                 false
 
-                    # Default expiry
+                    # Default expiry; omitting expiry for signed URLs is deprecated
                     expires:              null # Example: '+ 30 minutes'
 
                 # Enables cache busting for public urls
@@ -953,7 +955,7 @@ zenstruck_filesystem:
                     # Sign by default?
                     sign:                 false
 
-                    # Default expiry
+                    # Default expiry; omitting expiry for signed URLs is deprecated
                     expires:              null # Example: '+ 30 minutes'
 
             # Cache file/image metadata

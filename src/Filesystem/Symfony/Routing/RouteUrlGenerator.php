@@ -60,6 +60,12 @@ abstract class RouteUrlGenerator
             return $url;
         }
 
+        if (null === $expires) {
+            @\trigger_error('Generating a signed URL without an expiration is deprecated. Configure a default expiry or pass the "expires" option.', \E_USER_DEPRECATED);
+            $constructor = new \ReflectionMethod(UriSigner::class, '__construct');
+            $expires = $constructor->getNumberOfParameters() >= 3 ? new \DateTimeImmutable('+1 year') : null;
+        }
+
         if (\is_string($expires)) {
             $expires = new \DateTimeImmutable($expires);
         }

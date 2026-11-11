@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Tests\Filesystem\Symfony;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
@@ -26,7 +27,7 @@ use Zenstruck\Tests\Fixtures\Service;
  */
 final class ZenstruckFilesystemBundleTest extends KernelTestCase
 {
-    use InteractsWithFilesystem, ResetFilesystem;
+    use ExpectDeprecationTrait, InteractsWithFilesystem, ResetFilesystem;
 
     /**
      * @test
@@ -103,19 +104,33 @@ final class ZenstruckFilesystemBundleTest extends KernelTestCase
 
         $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
-        $this->assertStringContainsString('http://localhost/private/bar/file.png', $privateFile->publicUrl());
         $this->assertSame('/glide/bar/file.png?w=100&h=200', $privateFile->transformUrl(['w' => 100, 'h' => 200]));
+
+        if (Kernel::VERSION_ID < 70100) {
+            $this->expectException(\LogicException::class);
+            $this->expectExceptionMessage('Expiring URLs requires Symfony 7.1 or higher.');
+        }
+
+        $url = $privateFile->publicUrl(['expires' => 'tomorrow']);
+
+        $this->assertStringContainsString('http://localhost/private/bar/file.png', $url);
+        $this->assertStringContainsString('_expiration=', $url);
     }
 
     /**
      * @test
+     *
+     * @group legacy
      */
-    public function can_generate_signed_urls(): void
+    public function can_generate_signed_urls_without_expiration_with_deprecation(): void
     {
         $privateFile = $this->filesystem()->write('private://bar/file.png', 'content')->ensureImage();
 
-        $this->assertStringContainsString('_hash=', $privateFile->publicUrl());
-        $this->assertStringNotContainsString('_expiration=', $privateFile->publicUrl());
+        $this->expectDeprecation('Generating a signed URL without an expiration is deprecated. Configure a default expiry or pass the "expires" option.');
+
+        $url = $privateFile->publicUrl();
+
+        $this->assertStringContainsString('_hash=', $url);
     }
 
     /**
