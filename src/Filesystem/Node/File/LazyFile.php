@@ -24,6 +24,27 @@ class LazyFile extends LazyNode implements File
 {
     use DecoratedFile;
 
+    /** @var array<array-key,mixed>|null */
+    private readonly ?array $serializedMetadata;
+
+    /**
+     * @param null|string|array<string,mixed>|callable():string $attributes
+     */
+    public function __construct(string|callable|array|null $attributes = null)
+    {
+        parent::__construct($attributes);
+
+        $this->serializedMetadata = \is_array($attributes) && !\is_callable($attributes) ? $attributes : null;
+    }
+
+    /**
+     * @return array<array-key,mixed>|null
+     */
+    public function serialize(): ?array
+    {
+        return $this->serializedMetadata;
+    }
+
     public function mimeType(): string
     {
         return $this->attributes[Mapping::MIME_TYPE] ?? $this->inner()->mimeType();

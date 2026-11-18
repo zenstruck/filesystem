@@ -49,6 +49,10 @@ abstract class JsonType extends BaseJsonType
             return parent::convertToDatabaseValue($value->serialize(), $platform);
         }
 
+        if ($value instanceof LazyFile && null !== $metadata = $value->serialize()) {
+            return parent::convertToDatabaseValue($metadata, $platform);
+        }
+
         if (\class_exists(InvalidType::class)) {
             // dbal 4+
             throw InvalidType::new($value, SerializableFile::class, [SerializableFile::class, 'null']);

@@ -12,6 +12,7 @@
 namespace Zenstruck\Filesystem\Doctrine\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs as ORMPreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -154,28 +155,27 @@ final class NodeLifecycleListener
      */
     public function prePersist(LifecycleEventArgs $event): void
     {
-        [$object, $metadata, $collection] = self::extract($event->getObject(), $event->getObjectManager());
+        $object = $event->getObject();
+        $manager = $event->getObjectManager();
 
-        if (!$collection) {
+        $this->prepareFiles($object, $manager);
+    }
+
+    /**
+     * ORM 3.8 converts file values during change detection, before preUpdate.
+     */
+    public function preFlush(object $object, PreFlushEventArgs $event): void
+    {
+        $manager = $event->getObjectManager();
+        $unitOfWork = $manager->getUnitOfWork();
+
+        if ($unitOfWork->isScheduledForInsert($object)) {
             return;
         }
 
-        foreach ($collection->statefulMappings as $field => $mapping) {
-            $original = $metadata->getFieldValue($object, $field);
-            $new = null;
+        $originalData = $unitOfWork->getOriginalEntityData($object);
 
-            if (self::needsToBeSaved($original, $mapping)) {
-                $new = $this->saveFile($mapping, $original, $object, $field);
-            }
-
-            if ($original && $mapping instanceof StoreWithMetadata && !$original instanceof SerializableFile) {
-                $new = self::createSerialized($mapping, $new ?? $original);
-            }
-
-            if ($new) {
-                $metadata->setFieldValue($object, $field, $new);
-            }
-        }
+        $this->prepareFiles($object, $manager, $originalData);
     }
 
     /**
@@ -196,25 +196,6 @@ final class NodeLifecycleListener
 
             $old = $event->getOldValue($field);
             $new = $event->getNewValue($field);
-
-            if (self::needsToBeSaved($new, $mapping)) {
-                $new = $this->saveFile($mapping, $new, $object, $field);
-
-                // just setting the new value does not update the property so refresh the object on flush
-                $this->postFlushOperations[] = static fn() => $event->getObjectManager()->refresh($object);
-
-                // because the above refresh clears the values, reload them
-                // todo is there a better method to do this?
-                $this->postFlushOperations[] = fn(EntityManagerInterface $em) => $this->load($object, $em, force: true);
-            }
-
-            if ($new && $mapping instanceof StoreWithMetadata && !$new instanceof SerializableFile) {
-                $new = self::createSerialized($mapping, $new);
-            }
-
-            if ($new) {
-                $event->setNewValue($field, $new);
-            }
 
             if (self::shouldOldFileBeRemoved($mapping, $old, $new)) {
                 $this->postFlushOperations[] = fn() => $this->filesystemFor($mapping, $old)->delete($old->path());
@@ -241,6 +222,40 @@ final class NodeLifecycleListener
         }
 
         $this->postFlushOperations = $this->onFailureOperations = [];
+    }
+
+    /**
+     * @param array<string,mixed> $originalData
+     */
+    private function prepareFiles(object $object, ObjectManager $manager, array $originalData = []): void
+    {
+        [$object, $metadata, $collection] = self::extract($object, $manager);
+
+        if (!$collection) {
+            return;
+        }
+
+        foreach ($collection->statefulMappings as $field => $mapping) {
+            $original = $metadata->getFieldValue($object, $field);
+
+            if ($original === ($originalData[$field] ?? null)) {
+                continue;
+            }
+
+            $new = null;
+
+            if (self::needsToBeSaved($original, $mapping)) {
+                $new = $this->saveFile($mapping, $original, $object, $field);
+            }
+
+            if ($original && $mapping instanceof StoreWithMetadata && !$original instanceof SerializableFile) {
+                $new = self::createSerialized($mapping, $new ?? $original);
+            }
+
+            if ($new) {
+                $metadata->setFieldValue($object, $field, $new);
+            }
+        }
     }
 
     private static function needsToBeSaved(?File $file, Mapping $mapping): bool
