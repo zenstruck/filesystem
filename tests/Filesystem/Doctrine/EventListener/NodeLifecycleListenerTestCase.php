@@ -199,6 +199,34 @@ abstract class NodeLifecycleListenerTestCase extends DoctrineTestCase
 
     /**
      * @test
+     * @dataProvider fileMetadataMethodProvider
+     */
+    public function can_update_pending_files_after_loading(int $num): void
+    {
+        $class = $this->entityClass();
+        $object = new $class('Foo');
+        $object->{'setFile'.$num}(new PendingFile(fixture('sub1/file1.txt')));
+        $this->em()->persist($object);
+        $this->em()->flush();
+        $this->em()->clear();
+
+        $object = repository($class)->first();
+        $this->loadMappingFor($object);
+        $this->flushAndAssertNoChangesFor($object);
+
+        $object->{'setFile'.$num}(new PendingFile(fixture('archive.zip')));
+        $this->flushAndAssertNoChangesFor($object);
+        $this->em()->clear();
+
+        $object = repository($class)->first();
+        $this->loadMappingFor($object);
+        $this->assertSame('files/foo-0a4a9b1.zip', $object->{'getFile'.$num}()->path()->toString());
+        $this->assertSame('0a4a9b1c162b2b4ccfa9db645f8b7eaa', $object->{'getFile'.$num}()->checksum());
+        $this->filesystem()->assertNotExists('files/foo-d41d8cd.txt');
+    }
+
+    /**
+     * @test
      * @dataProvider fileMethodProvider
      */
     public function persisting_failure_does_not_write_pending_file(int $num): void

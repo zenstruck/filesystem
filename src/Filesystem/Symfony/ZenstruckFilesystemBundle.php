@@ -11,8 +11,10 @@
 
 namespace Zenstruck\Filesystem\Symfony;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Zenstruck\Filesystem\Symfony\DependencyInjection\Compiler\RegisterDoctrineListenerPass;
 use Zenstruck\Filesystem\Symfony\DependencyInjection\Compiler\RegisterDoctrineTypePass;
 
 /**
@@ -25,5 +27,7 @@ final class ZenstruckFilesystemBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RegisterDoctrineTypePass());
+        // Register entity listeners before Doctrine resolves their service tags.
+        $container->addCompilerPass(new RegisterDoctrineListenerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
     }
 }

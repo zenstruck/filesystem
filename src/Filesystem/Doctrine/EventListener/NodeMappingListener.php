@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Filesystem\Doctrine\EventListener;
 
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
@@ -138,6 +139,10 @@ final class NodeMappingListener
         }
 
         $metadata->table['options'][self::OPTION_KEY] = $collection;
+
+        if ($collection->statefulMappings && !\in_array(['class' => NodeLifecycleListener::class, 'method' => 'preFlush'], $metadata->entityListeners[Events::preFlush] ?? [], true)) {
+            $metadata->addEntityListener(Events::preFlush, NodeLifecycleListener::class, 'preFlush');
+        }
     }
 
     /**
